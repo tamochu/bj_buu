@@ -196,8 +196,10 @@ sub m_attack {
 	}
 	
 	my $guard_pre_hp = $y{hp};
+	
+	my $use_mp = 
 	# •KŽE‹Z ³í‚ÈºÏÝÄÞ‚© # ‘®«‚ª‘•”õ‚µ‚Ä‚¢‚é‚à‚Ì‚Æ“¯‚¶‚© # MP‚ª‚ ‚é‚© # ƒƒ^ƒ‹‘ŠŽè‚¶‚á‚È‚¢‚©
-	if ($cmd > 0 && defined($m_s) && $weas[$m{wea}][2] eq $m_s->[2] && $m{mp} >= $m_s->[3] && !$metal) {
+	if ($cmd > 0 && defined($m_s) && $weas[$m{wea}][2] eq $m_s->[2] && ($m{mp} >= $m_s->[3] || ($guas[$m{gua}][0] eq '6' && $m{mp} >= int($m_s->[3] / 2))) && !$metal) {
 		if($guas[$m{gua}][0] eq '6'){
 			$m{mp} -= int($m_s->[3] / 2);
 		}else{
@@ -311,7 +313,7 @@ sub y_attack {
 	
 	my $guard_pre_hp = $m{hp};
 	# •KŽE‹Z ³í‚ÈºÏÝÄÞ‚© # ‘®«‚ª‘•”õ‚µ‚Ä‚¢‚é‚à‚Ì‚Æ“¯‚¶‚© # MP‚ª‚ ‚é‚©
-	if (defined($y_s) && $weas[$y{wea}][2] eq $y_s->[2] && $y{mp} >= $y_s->[3] ) {
+	if (defined($y_s) && $weas[$y{wea}][2] eq $y_s->[2] && ($y{mp} >= $y_s->[3] || ($guas[$y{gua}][0] eq '6' && $y{mp} >= int($y_s->[3] / 2)))) {
 		$y{mp} -= $y_s->[3];
 		$y_mes = $y_s->[5] ? "$y_s->[5]" : "$y_s->[1]!" unless $y_mes;
 		$mes .= "$y{name}‚Ì$y_s->[1]!!<br>";
@@ -401,7 +403,7 @@ sub m_flag {
 	my $m_s = $skills[ $m_skills[$cmd-1] ];
 	
 	# •KŽE‹Z ³í‚ÈºÏÝÄÞ‚© # ‘®«‚ª‘•”õ‚µ‚Ä‚¢‚é‚à‚Ì‚Æ“¯‚¶‚© # MP‚ª‚ ‚é‚©
-	if ($cmd > 0 && defined($m_s) && $weas[$m{wea}][2] eq $m_s->[2] && ($m{mp} >= $m_s->[3] || $is_guard_s) ) {
+	if ($cmd > 0 && defined($m_s) && $weas[$m{wea}][2] eq $m_s->[2] && (($m{mp} >= $m_s->[3] || ($guas[$m{gua}][0] eq '6' && $m{mp} >= int($m_s->[3] / 2))) || $is_guard_s) ) {
 		&{ $m_s->[6] };
 	}
 	# –h‹ï‚Ì“ÁŽêƒtƒ‰ƒO
@@ -423,7 +425,7 @@ sub y_flag {
 	}
 	
 	# •KŽE‹Z ³í‚ÈºÏÝÄÞ‚© # ‘®«‚ª‘•”õ‚µ‚Ä‚¢‚é‚à‚Ì‚Æ“¯‚¶‚© # MP‚ª‚ ‚é‚©
-	if (defined($y_s) && $weas[$y{wea}][2] eq $y_s->[2] && ($y{mp} >= $y_s->[3] || $is_guard_s) ) {
+	if (defined($y_s) && $weas[$y{wea}][2] eq $y_s->[2] && (($y{mp} >= $y_s->[3] || ($guas[$y{gua}][0] eq '6' && $y{mp} >= int($y_s->[3] / 2))) || $is_guard_s) ) {
 		&{ $y_s->[6] };
 	}
 	# –h‹ï‚Ì“ÁŽêƒtƒ‰ƒO
