@@ -123,7 +123,7 @@ form { margin: 0; padding: 7px; }
 			<input type="submit" value="相場" class="button1">
 			<br><span class="text_small">アイテム価格の推移</span>
 		</form>
-		<a href="bj_buu_20150809.zip">source（大事なことは無し、入ってたら連絡ください）</a>
+		<a href="https://github.com/tamochu/bj_buu">source github（大事なことは無し、入ってたら連絡ください）</a>
 <br>
 		<hr style="border: 1px dashed #CCC;">
 		<form action="$home">
