@@ -1,0 +1,299 @@
+/*--------------------------------------
+ ëSëÃ
+--------------------------------------*/
+html {
+	scrollbar-base-color: #000;
+	scrollbar-arrow-color: #FFF;
+}
+
+body {
+	color: #CCC;
+	font-size: 90%;
+	background-color: #000000;
+}
+
+h1 {
+	padding: 0 1em;
+	color: #F00;
+	font-size: 28px;
+	font-style: Italic;
+	font-family: "Times New Roman", Times;
+	border-top : 8px solid #06C;
+	border-bottom : 3px solid #06C;
+	background-color: #336;
+	background: url(back1.gif);
+}
+
+a:hover   { background-color: #FCC; }
+a:link    { color:#69F; }
+a:visited { color:#F0F; }
+a:active  { color:#F00; }
+ul,li     { text-align: left; }
+li        { margin: 0.3em; }
+hr        { border: 1px solid #666; }
+a img     { border: 0; }
+.text_small { font-size: 12px; }
+
+/*--------------------------------------
+ IndexÕﬂ∞ºﬁ
+--------------------------------------*/
+.login_list {
+	height: 270px;
+	width: 540px;
+	margin: 1em 0;
+	padding: 5px;
+	text-align: left;
+	border: 3px solid #CCC;
+	background-color: #333;
+	overflow: auto;
+	overflow-y: auto;
+}
+
+.login_box {
+	margin: 1em;
+	padding: 1em;
+	border: 3px double #039;
+	background: url(back1.gif);
+}
+
+.button_login {
+	width: 140px;
+	height: 30px;
+	color: #003;
+	font-size: 14px;
+	font-weight: bold;
+	border: 3px ridge #9CF;
+	background-color: #69C;
+	cursor: hand;
+}
+
+.link1 {
+	padding: 0.3em 0.5em;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;
+	background-color: #333;
+	border: 2px solid #CCC;
+	text-decoration: none;
+	cursor: hand;
+}
+
+.footer {
+	margin: 0.5em 0;
+	padding: 0.5em;
+	text-align: center;
+	border: 1px solid #CCC;
+	background: url(back1.gif);
+}
+
+.table2 {
+	width: 540px;
+	border: 2px solid #999;
+	border-collapse: collapse;
+	border-spacing: 0;
+	empty-cells: show;
+}
+.table2 td, .table2 th {
+	color: #CCC;
+	font-size: 80%;
+	border: 1px solid #999;
+	background: #333;
+}
+
+
+
+
+/*--------------------------------------
+ √∞ÃﬁŸ
+--------------------------------------*/
+.table1 {
+	border: 2px solid #999;
+	border-collapse: collapse;
+	border-spacing: 0;
+	empty-cells: show;
+}
+.table1 th {
+	border: 2px solid #999;
+	background: #336;
+	white-space: nowrap;
+}
+.table1 td {
+	border: 1px solid #999;
+	background: #333;
+	white-space: nowrap;
+}
+td,th {
+	color: #CCC;
+	font-size: 80%;
+}
+tr.stripe1 td { background-color: #222; }
+tr.stripe2 td { background-color: #C00; }
+
+.table1s {
+	border: 2px solid #999;
+	border-collapse: collapse;
+	border-spacing: 0;
+	empty-cells: show;
+	width: 320;
+}
+.table1s th {
+	border: 2px solid #999;
+	background: #336;
+	white-space: nowrap;
+}
+.table1s td {
+	border: 1px solid #999;
+	background: #333;
+	white-space: nowrap;
+}
+td,th {
+	color: #CCC;
+	font-size: 80%;
+}
+tr.stripe1 td { background-color: #222; }
+tr.stripe2 td { background-color: #C00; }
+/*--------------------------------------
+ Œﬁ¿›
+--------------------------------------*/
+.button1 {
+	width: 120px;
+	height: 24px;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;
+	border: 2px solid #CCC;
+	background-color: #336;
+	cursor: hand;
+}
+.button_s {
+	color: #FFF;
+	font-size: 14px;
+	border: 2px ridge #CCC;
+	background-color: #336;
+	cursor: hand;
+}
+.menu1 {
+	width: 120px;
+	color: #CCC;
+	font-size: 14px;
+	background-color: #003;
+}
+.select1 {
+	color: #FFF;
+	background-color: #003;
+}
+.button1s {
+	color: #FFF;
+	font-size: 8px;
+	font-weight: bold;
+	width: 65px;
+	height: 65px;
+	background: #333366;
+	-webkit-border-radius: 10px;
+	-webkit-appearance: none;
+	word-break: break-all;
+}
+
+/*--------------------------------------
+ √∑ΩƒŒﬁØ∏Ω,√∑Ωƒ¥ÿ±,
+--------------------------------------*/
+.text_box1,
+.text_box_s,
+.text_box_b {
+	width: 120px;
+	height: 20px;
+	color: #FFC;
+	border: 1px solid #FFF;
+	background-color: #003;
+}
+.text_box_s {
+	width: 80px;
+}
+.text_box_b {
+	width: 400px;
+}
+
+.textarea1 {
+	color: #FFF;
+	font-size: 90%;
+	border: 1px solid #FFF;
+	background-color: #003;
+}
+
+
+/*--------------------------------------
+ “Øæ∞ºﬁ
+--------------------------------------*/
+.mes {
+	width: 600px;
+	padding: 0.5em;
+	color: #CCC;
+	border: 3px solid #CCC;
+}
+
+/*--------------------------------------
+ Exp îÊòJìxÇ»Ç«ÇÃ ﬁ∞
+--------------------------------------*/
+.bar1,.bar2,.bar3,.bar4,.bar5 {
+	width: 180px;
+	height: 12px;
+	border: 1px inset #CCC;
+}
+.bar1 img,.bar2 img,.bar3 img,.bar4 img,.bar5 img {
+	height: 3px;
+}
+
+.bar1 { /* ê‘ */
+	background-color: #633;
+}
+.bar1 img {
+	background-color: #C00;
+	border-top: 3px solid #F00;
+	border-bottom: 4px solid #900;
+}
+
+.bar2 { /* éá */
+	background-color: #636;
+}
+.bar2 img {
+	background-color: #C0C;
+	border-top: 3px solid #F0F;
+	border-bottom: 4px solid #909;
+}
+
+.bar3 { /* â© */
+	background-color: #663;
+}
+.bar3 img {
+	background-color: #CC0;
+	border-top: 3px solid #FF0;
+	border-bottom: 4px solid #990;
+}
+
+.bar4 { /* êÖ */
+	background-color: #366;
+}
+.bar4 img {
+	background-color: #09C;
+	border-top: 3px solid #0CF;
+	border-bottom: 4px solid #069;
+}
+
+.bar5 { /* óŒ */
+	background-color: #363;
+}
+.bar5 img {
+	background-color: #0C0;
+	border-top: 3px solid #0F0;
+	border-bottom: 4px solid #090;
+}
+
+/*--------------------------------------
+ ∂ºﬁ…
+--------------------------------------*/
+#enchant-stage {
+	position: relative;
+	top: 0px;
+	width: 550px;
+	height: 550px;
+}
