@@ -15,6 +15,25 @@ my @war_forms = ('攻撃陣形','防御陣形','突撃陣形');
 # 新規のボーナスタイム(戦争勝利数)リミット
 my $new_entry_war_c = 100;
 
+# ランダムセレクト用コマンド退避
+my $m_cmd = $cmd;
+if ($m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
+	while (1) {
+		$m_cmd = int(rand(3));
+		if ($m{rest_a} + $m{rest_b} + $m{rest_c} <= 0) {
+			last;
+		}
+		if ($m_cmd eq '0' && $m{rest_a} > 0) {
+			last;
+		}
+		if ($m_cmd eq '1' && $m{rest_b} > 0) {
+			last;
+		}
+		if ($m_cmd eq '2' && $m{rest_c} > 0) {
+			last;
+		}
+	}
+}
 
 #================================================
 # 利用条件
@@ -126,9 +145,9 @@ sub tp_100 {
 	$m{rest_a} = 0;
 	$m{rest_b} = 0;
 	$m{rest_c} = 0;
-	$y{rest_a} = 0;
-	$y{rest_b} = 0;
-	$y{rest_c} = 0;
+	$y{rest_a} = 2;
+	$y{rest_b} = 2;
+	$y{rest_c} = 2;
 	
 	my $idx = 0;
 	for my $cnt (1..$m{turn}) {
@@ -189,7 +208,8 @@ sub tp_110 {
 	$mes .= "今回の作戦の限界ﾀｰﾝは $m{turn} ﾀｰﾝです<br>";
 	$mes .= "$m{name}軍 $m{sol}人 VS $y{name}軍 $y{sol}人<br>";
 	$mes .= '攻め込む陣形を選んでください<br>';
-	$mes .= "$war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
+	$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
+	$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
 	&menu(@war_forms,'退却');
 	
 	$m{tp} += 10;
@@ -226,21 +246,22 @@ sub loop_menu {
 	$mes .= "残り$m{turn} ﾀｰﾝ<br>";
 	$mes .= "$m{name}軍 $m{sol}人 VS $y{name}軍 $y{sol}人<br>";
 	$mes .= '攻め込む陣形を選んでください<br>';
-	$mes .= "$war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
+	$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
+	$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
 	&menu(@war_forms);
 }
 
 sub _rest_check {
 	if ($m{rest_a} + $m{rest_b} + $m{rest_c} > 0) {
-		if ($cmd eq '0' && $m{rest_a} <= 0) {
+		if ($m_cmd eq '0' && $m{rest_a} <= 0) {
 			$mes .= '残り回数がありません<br>';
 			return 0;
 		}
-		if ($cmd eq '1' && $m{rest_b} <= 0) {
+		if ($m_cmd eq '1' && $m{rest_b} <= 0) {
 			$mes .= '残り回数がありません<br>';
 			return 0;
 		}
-		if ($cmd eq '2' && $m{rest_c} <= 0) {
+		if ($m_cmd eq '2' && $m{rest_c} <= 0) {
 			$mes .= '残り回数がありません<br>';
 			return 0;
 		}
@@ -249,15 +270,15 @@ sub _rest_check {
 }
 
 sub tp_190 {
-	if ($cmd >= 0 && $cmd <= 2 && &_rest_check) {
+	if ($m_cmd >= 0 && $m_cmd <= 2 && &_rest_check) {
 		--$m{turn};
-		if ($cmd eq '0') {
+		if ($m_cmd eq '0') {
 			$m{rest_a}--;
 		}
-		if ($cmd eq '1') {
+		if ($m_cmd eq '1') {
 			$m{rest_b}--;
 		}
-		if ($cmd eq '2') {
+		if ($m_cmd eq '2') {
 			$m{rest_c}--;
 		}
 		$mes .= "残り$m{turn}ﾀｰﾝ<br>";
@@ -296,7 +317,8 @@ sub tp_190 {
 		}
 		else {
 			$mes .= '攻め込む陣形を選んでください<br>';
-			$mes .= "$war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
+			$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
+			$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
 			
 			# 一騎打ち出現確立
 			if ($y{wea} eq 'no_single') {
@@ -316,7 +338,7 @@ sub tp_190 {
 			}
 		}
 	}
-	elsif ($cmd eq '3' && $m{tp} eq '120') {
+	elsif ($m_cmd eq '3' && $m{tp} eq '120') {
 		$m_mes = '全軍退却!!';
 		
 		if ($m{turn} < 5) {
@@ -340,7 +362,7 @@ sub tp_190 {
 			&loop_menu;
 		}
 	}
-	elsif ($cmd eq '3' && $m{tp} eq '130') {
+	elsif ($m_cmd eq '3' && $m{tp} eq '130') {
 		$m_mes = "$y{name}と一騎打ち願いたい!";
 
 		my $v = int(rand(@answers));
@@ -428,23 +450,23 @@ sub _crash {
 		$y{rest_c}--;
 	}
 	
-	$m_mes = $war_forms[$cmd];
+	$m_mes = $war_forms[$m_cmd];
 	$y_mes = $war_forms[$y_cmd];
 	
 	my $result = 'lose';
-	if ($cmd eq '0') {
+	if ($m_cmd eq '0') {
 		$result = $y_cmd eq '1' ? 'win'
 				: $y_cmd eq '2' ? 'lose'
 				:				  'draw'
 				;
 	}
-	elsif ($cmd eq '1') {
+	elsif ($m_cmd eq '1') {
 		$result = $y_cmd eq '2' ? 'win'
 				: $y_cmd eq '0' ? 'lose'
 				:				  'draw'
 				;
 	}
-	elsif ($cmd eq '2') {
+	elsif ($m_cmd eq '2') {
 		$result = $y_cmd eq '0' ? 'win'
 				: $y_cmd eq '1' ? 'lose'
 				:				  'draw'

@@ -130,7 +130,7 @@ sub write_user {
 		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
 		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c fes_c war_c_t dom_c_t mil_c_t pro_c_t boch_c storm_c
 		shogo_t icon_t breed breed_c depot_bonus akindo_guild silent_kind silent_tail guild_number disp_casino chat_java disp_top disp_news disp_chat disp_ad disp_daihyo salary_switch no_boss incubation_switch disp_gacha_time delete_shield
-		valid_blacklist
+		valid_blacklist war_select_switch
 		c_turn c_stock c_value c_type tp_r cataso_ratio
 		no1_c money_overflow random_migrate ceo_c tam_c ban_c wt_c wt_c_latest
 		
