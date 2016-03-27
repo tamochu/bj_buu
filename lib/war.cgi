@@ -122,6 +122,61 @@ sub tp_100 {
 		$mes .= "‚È‚ñ‚ÆA$cs{name}[$union]‚©‚ç$v•º‚Ì‰‡ŒR‚ª‹ì‚¯‚Â‚¯‚½!<br>";
 	}
 	
+	# ”z”v
+	$m{rest_a} = 0;
+	$m{rest_b} = 0;
+	$m{rest_c} = 0;
+	$y{rest_a} = 0;
+	$y{rest_b} = 0;
+	$y{rest_c} = 0;
+	
+	my $idx = 0;
+	for my $cnt (1..$m{turn}) {
+		unless ($units[$m{unit}][7][$idx]) {
+			$idx = 0;
+		}
+		
+		if ($units[$m{unit}][7][$idx] eq '1') {
+			$m{rest_a}++;
+		} elsif ($units[$m{unit}][7][$idx] eq '2') {
+			$m{rest_b}++;
+		} elsif ($units[$m{unit}][7][$idx] eq '3') {
+			$m{rest_c}++;
+		} else {
+			if (rand(3) < 1) {
+				$m{rest_a}++;
+			} elsif (rand(2) < 1) {
+				$m{rest_b}++;
+			} else {
+				$m{rest_c}++;
+			}
+		}
+		$idx++;
+	}
+	$idx = 0;
+	for my $cnt (1..$m{turn}) {
+		unless ($units[$y{unit}][7][$idx]) {
+			$idx = 0;
+		}
+		
+		if ($units[$y{unit}][7][$idx] eq '1') {
+			$y{rest_a}++;
+		} elsif ($units[$y{unit}][7][$idx] eq '2') {
+			$y{rest_b}++;
+		} elsif ($units[$y{unit}][7][$idx] eq '3') {
+			$y{rest_c}++;
+		} else {
+			if (rand(3) < 1) {
+				$y{rest_a}++;
+			} elsif (rand(2) < 1) {
+				$y{rest_b}++;
+			} else {
+				$y{rest_c}++;
+			}
+		}
+		$idx++;
+	}
+	
 	$m{tp} += 10;
 	&n_menu;
 }
@@ -134,6 +189,7 @@ sub tp_110 {
 	$mes .= "¡‰ñ‚Ììí‚ÌŒÀŠEÀ°İ‚Í $m{turn} À°İ‚Å‚·<br>";
 	$mes .= "$m{name}ŒR $m{sol}l VS $y{name}ŒR $y{sol}l<br>";
 	$mes .= 'U‚ß‚ŞwŒ`‚ğ‘I‚ñ‚Å‚­‚¾‚³‚¢<br>';
+	$mes .= "$war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
 	&menu(@war_forms,'‘Ş‹p');
 	
 	$m{tp} += 10;
@@ -170,12 +226,40 @@ sub loop_menu {
 	$mes .= "c‚è$m{turn} À°İ<br>";
 	$mes .= "$m{name}ŒR $m{sol}l VS $y{name}ŒR $y{sol}l<br>";
 	$mes .= 'U‚ß‚ŞwŒ`‚ğ‘I‚ñ‚Å‚­‚¾‚³‚¢<br>';
+	$mes .= "$war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
 	&menu(@war_forms);
 }
 
+sub _rest_check {
+	if ($m{rest_a} + $m{rest_b} + $m{rest_c} > 0) {
+		if ($cmd eq '0' && $m{rest_a} <= 0) {
+			$mes .= 'c‚è‰ñ”‚ª‚ ‚è‚Ü‚¹‚ñ<br>';
+			return 0;
+		}
+		if ($cmd eq '1' && $m{rest_b} <= 0) {
+			$mes .= 'c‚è‰ñ”‚ª‚ ‚è‚Ü‚¹‚ñ<br>';
+			return 0;
+		}
+		if ($cmd eq '2' && $m{rest_c} <= 0) {
+			$mes .= 'c‚è‰ñ”‚ª‚ ‚è‚Ü‚¹‚ñ<br>';
+			return 0;
+		}
+	}
+	return 1;
+}
+
 sub tp_190 {
-	if ($cmd >= 0 && $cmd <= 2) {
+	if ($cmd >= 0 && $cmd <= 2 && &_rest_check) {
 		--$m{turn};
+		if ($cmd eq '0') {
+			$m{rest_a}--;
+		}
+		if ($cmd eq '1') {
+			$m{rest_b}--;
+		}
+		if ($cmd eq '2') {
+			$m{rest_c}--;
+		}
 		$mes .= "c‚è$m{turn}À°İ<br>";
 		&_crash;
 		
@@ -212,6 +296,7 @@ sub tp_190 {
 		}
 		else {
 			$mes .= 'U‚ß‚ŞwŒ`‚ğ‘I‚ñ‚Å‚­‚¾‚³‚¢<br>';
+			$mes .= "$war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
 			
 			# ˆê‹R‘Å‚¿oŒ»Šm—§
 			if ($y{wea} eq 'no_single') {
@@ -283,8 +368,65 @@ sub tp_190 {
 #================================================
 # wŒ`íŒ‹‰Ê
 #================================================
+sub _ai {
+	my @y_cmds = (0, 1, 2);
+	my $y_cmd;
+
+	if ($m{rest_a} + $m{rest_b} <= 0){
+		if ($y{rest_b} > 0) {
+			@y_cmds = (1);
+		} elsif ($y{rest_c} > 0) {
+			@y_cmds = (2);
+		}
+	} elsif ($m{rest_b} + $m{rest_c} <= 0) {
+		if ($y{rest_c} > 0) {
+			@y_cmds = (2);
+		} elsif ($y{rest_a} > 0) {
+			@y_cmds = (0);
+		}
+	} elsif ($m{rest_c} + $m{rest_a} <= 0) {
+		if ($y{rest_a} > 0) {
+			@y_cmds = (0);
+		} elsif ($y{rest_b} > 0) {
+			@y_cmds = (1);
+		}
+	} elsif ($m{rest_a} <= 0 && $y{rest_a} + $y{rest_b} > 0) {
+		@y_cmds = (0, 1);
+	} elsif ($m{rest_b} <= 0 && $y{rest_b} + $y{rest_c} > 0) {
+		@y_cmds = (1, 2);
+	} elsif ($m{rest_c} <= 0 && $y{rest_c} + $y{rest_a} > 0) {
+		@y_cmds = (0, 2);
+	}
+
+	while (1) {
+		$y_cmd = $y_cmds[int(rand(@y_cmds))];
+		if ($y{rest_a} + $y{rest_b} + $y{rest_c} <= 0) {
+			last;
+		}
+		if ($y_cmd eq '0' && $y{rest_a} > 0) {
+			last;
+		}
+		if ($y_cmd eq '1' && $y{rest_b} > 0) {
+			last;
+		}
+		if ($y_cmd eq '2' && $y{rest_c} > 0) {
+			last;
+		}
+	}
+	return $y_cmd;
+}
+
 sub _crash {
-	my $y_cmd = int(rand(3));
+	my $y_cmd = &_ai;
+	if ($y_cmd eq '0') {
+		$y{rest_a}--;
+	}
+	if ($y_cmd eq '1') {
+		$y{rest_b}--;
+	}
+	if ($y_cmd eq '2') {
+		$y{rest_c}--;
+	}
 	
 	$m_mes = $war_forms[$cmd];
 	$y_mes = $war_forms[$y_cmd];

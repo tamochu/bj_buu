@@ -15,6 +15,9 @@ $VERSION = '2.71';
 # ﾒﾝﾃﾅﾝｽ表示(分) 通常稼動時は「0」
 $mente_min = 0;
 
+# テスト用
+$config_test = 0;
+
 # 管理ﾊﾟｽﾜｰﾄﾞ(適当な半角英数字に必ず変更してください)
 require './admin_password.cgi';
 

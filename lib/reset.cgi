@@ -5,7 +5,7 @@ use File::Path;
 #================================================
 
 # “ˆê“ïˆÕ“xF[“ï‚µ‚¢ 60 ` 40 ŠÈ’P]
-my $game_lv = int( rand(11) + 40 );
+my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
 
 # “ˆêŠúŒÀ(“ú)
 my $limit_touitu_day = int( rand(6)+5 );
@@ -81,7 +81,7 @@ sub time_limit  {
 	close $fh;
 	
 	if ($w{world} eq '0') { # •½˜a
-		$w{reset_time} += 3600 * 12;
+		$w{reset_time} += $config_test ? 0 : 3600 * 12;
 	}
 	elsif ($w{world} eq '6') { # Œ‹‘©
 		my @win_cs = ();
@@ -339,11 +339,11 @@ sub reset {
 	
 	# set world
 	$w{year}++;
-	$w{reset_time} = $time + 3600 * 12;
+	$w{reset_time} = $config_test ? $time : $time + 3600 * 12;
 	$w{limit_time} = $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
-		$w{reset_time} = $time + 3600 * 12;
+		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
 		$w{limit_time} = $time + 3600 * 36;
 		$w{game_lv} = 99;
 	}
