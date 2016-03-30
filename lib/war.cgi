@@ -17,7 +17,7 @@ my $new_entry_war_c = 100;
 
 # ランダムセレクト用コマンド退避
 my $m_cmd = $cmd;
-if ($m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
+if (!$m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
 	while (1) {
 		$m_cmd = int(rand(3));
 		if ($m{rest_a} + $m{rest_b} + $m{rest_c} <= 0) {
@@ -145,9 +145,9 @@ sub tp_100 {
 	$m{rest_a} = 0;
 	$m{rest_b} = 0;
 	$m{rest_c} = 0;
-	$y{rest_a} = 2;
-	$y{rest_b} = 2;
-	$y{rest_c} = 2;
+	$y{rest_a} = 1;
+	$y{rest_b} = 1;
+	$y{rest_c} = 1;
 	
 	my $idx = 0;
 	for my $cnt (1..$m{turn}) {

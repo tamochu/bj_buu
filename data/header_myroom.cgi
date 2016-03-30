@@ -9,6 +9,7 @@ my @files = (
 	['“ú‹L',	'blog'],
 	['‚¨ŠG•`‚«','oekaki'],
 	['–{ì¬',	'book'],
+	['‚¨ŠG•`‚«(¼°Êß¯Êß)','oekaki_spp'],
 );
 
 
@@ -24,7 +25,8 @@ sub header_myroom {
 	print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
 
 	for my $i (0 .. $#files) {
-		next if $is_mobile && $files[$i][1] eq 'oekaki';
+		next if ($is_mobile || $is_smart) && $files[$i][1] eq 'oekaki';
+		next if $is_mobile && $files[$i][1] eq 'oekaki_spp';
 		print $in{no} eq $i ? qq| $files[$i][0] /| : qq| <a href="$files[$i][1].cgi?id=$id&pass=$pass&no=$i">$files[$i][0]</a> /|;
 	}
 	print qq|<h1>$files[$in{no}][0]</h1>|;
