@@ -52,11 +52,11 @@ sub begin {
 	close $fh;
 	if ($m{bank} eq $guild_bank_name){
 		$is_find = 1;
-		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$guild_bank_name" checked>$shop_name<br>|
-			 : qq|<tr><td><input type="radio" name="cmd" value="$guild_bank_name" checked>$guild_bank_shop_name</td><td>$guild_bank_name</td><td><br></td></tr>|;
+		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$guild_bank_name" checked>$guild_bank_shop_name<br>|
+			 : qq|<tr><td><input type="radio" name="cmd" value="$guild_bank_name" checked>$guild_bank_shop_name</td><td>システム</td><td>メッセージ募集中<br></td></tr>|;
 	}else {
-		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$guild_bank_name">$shop_name<br>|
-			 : qq|<tr><td><input type="radio" name="cmd" value="$guild_bank_name">$guild_bank_shop_name</td><td>$guild_bank_name</td><td><br></td></tr>|;
+		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$guild_bank_name">$guild_bank_shop_name<br>|
+			 : qq|<tr><td><input type="radio" name="cmd" value="$guild_bank_name">$guild_bank_shop_name</td><td>システム</td><td>メッセージ募集中<br></td></tr>|;
 	}
 	$m{bank} = '' unless $is_find;
 	

@@ -29,11 +29,11 @@ sub begin {
 		$mes .= '装備中のペットと預り所にあるﾍﾟｯﾄを合成できるよ！よ！<br>';
 	}
 	
-	&menu('やめる','ﾍﾟｯﾄを合成する','まとめて合成', '生け贄の羊を祭壇に');
+	&menu('やめる','ﾍﾟｯﾄを合成する','まとめて合成', '生け贄の羊を祭壇に', '合成可能ペットを確認');
 }
 
 sub tp_1 {
-	return if &is_ng_cmd(1..3);
+	return if &is_ng_cmd(1..4);
 	
 	$layout = 2;
 	if($cmd eq '1'){
@@ -53,6 +53,22 @@ sub tp_1 {
 		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		$mes .= $is_mobile ? qq|<p><input type="submit" value="合成する" class="button1" accesskey="#"></p></form>|:
 			qq|<p><input type="submit" value="合成する" class="button1"></p></form>|;
+	} elsif ($cmd eq '4') {
+		$mes .= "今合成可能\なのは<br>";
+		my $line_i = 0;
+		for my $pi (1..$#pets) {
+			if ($pets[$pi][5]) {
+				$mes .= $pets[$pi][1] . ", ";
+				$line_i++;
+				if ($line_i > 5) {
+					$mes .= "<br>";
+					$line_i = 0;
+				}
+			}
+		}
+		$mes .= "<br>だよ。";
+		&begin;
+		return;
 	}else{
 		$mes .= "どれと合成しますか?<br>";
 		$mes .= qq|<form method="$method" action="$script">|;

@@ -259,7 +259,7 @@ sub m_attack {
 			}
 			else {
 				$mes .= "<br>$v ‚ÌÀÞÒ°¼Þ‚ð‚ ‚½‚¦‚Ü‚µ‚½<br>";
-				if ($m{wea_c} > 0) {
+				if ($m{wea_c} > 0 && $scc eq '1') {
 					--$m{wea_c};
 					my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 					$mes .= "$wname‚Í‰ó‚ê‚Ä‚µ‚Ü‚Á‚½<br>" if $m{wea_c} == 0;

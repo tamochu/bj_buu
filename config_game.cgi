@@ -436,7 +436,7 @@ require './lib/system_game.cgi';
  	[13,	'ｽｶｰﾚｯﾄ',	'war_win',		sub{ ++$m{medal}; if (rand(20) < $m{pet_c}) { ++$m{medal}; $mes .= "$pets[$m{pet}][1]★$m{pet_c}の効果でさらに勲章が追加されました。"; } }, '', 1],
  
  # 給与補助
- 	[14,	'ﾏﾈｷﾈｺ',	'salary',	sub{ return $_[0] + 15000, 1 }],
+ 	[14,	'ﾏﾈｷﾈｺ',	'salary',	sub{ return $_[0] + 15000 + (100 * $m{pet_c} * $m{pet_c}), 1 }, '', 1],
  	[15,	'ﾏﾊﾗｼﾞｬ',	'salary',	sub{ return $_[0] * 1.5, 1 }],
  	[16,	'ﾋﾞｯｷｰ',	'salary',	sub{ $m{egg_c} += int(rand(100)+50) if $m{egg} }],
  
@@ -482,13 +482,13 @@ require './lib/system_game.cgi';
  
  # Lvup+系
  	[49,	'ﾁﾋﾞﾌｧｲﾀｰ',		'lv_up',	sub{ ++$m{max_hp};	$mes .= qq|<br><font color="#CC00FF">$e2j{max_hp}+1</font>|; }],
- 	[50,	'ﾎﾜｲﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ ++$m{max_mp};	$mes .= qq|<br><font color="#CC00FF">$e2j{max_mp}+1</font>|; }],
- 	[51,	'ﾌﾞﾗｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ ++$m{at};		$mes .= qq|<br><font color="#CC00FF">$e2j{at}+1</font>|; }],
- 	[52,	'ｼｰﾙﾄﾞﾅｲﾄ',		'lv_up',	sub{ ++$m{df};		$mes .= qq|<br><font color="#CC00FF">$e2j{df}+1</font>|; }],
- 	[53,	'ﾏｼﾞｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ ++$m{mat};		$mes .= qq|<br><font color="#CC00FF">$e2j{mat}+1</font>|; }],
- 	[54,	'ﾐｽﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ ++$m{mdf};		$mes .= qq|<br><font color="#CC00FF">$e2j{mdf}+1</font>|; }],
+ 	[50,	'ﾎﾜｲﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('max_mp'); }, '', 1],
+ 	[51,	'ﾌﾞﾗｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('at'); }, '', 1],
+ 	[52,	'ｼｰﾙﾄﾞﾅｲﾄ',		'lv_up',	sub{ ++$m{df};		$mes .= qq|<br><font color="#CC00FF">$e2j{df}+1</font>|; }, '', 1],
+ 	[53,	'ﾏｼﾞｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('mat'); }, '', 1],
+ 	[54,	'ﾐｽﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('mdf'); }, '', 1],
  	[55,	'ｼｰﾌﾅｲﾄ',		'lv_up',	sub{ ++$m{ag};		$mes .= qq|<br><font color="#CC00FF">$e2j{ag}+1</font>|; }],
- 	[56,	'ｷﾝｸﾞﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ ++$m{lea};		$mes .= qq|<br><font color="#CC00FF">$e2j{lea}+1</font>|; }],
+ 	[56,	'ｷﾝｸﾞﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('lea'); }, '', 1],
  	[57,	'ｳﾞｨｰﾅｽ',		'lv_up',	sub{ ++$m{cha}; ++$m{cha_org};		$mes .= qq|<br><font color="#CC00FF">$e2j{cha}+1</font>|; }],
  	[58,	'ｷﾝｸﾞ',			'lv_up',	sub{ ++$m{$_} for (qw/df lea cha cha_org/);		$mes .= qq|<br><font color="#CC00FF">$e2j{df}+1 $e2j{lea}+1 $e2j{cha}+1</font>|; },'荒ぶる…荒ぶるぞ！俺の魂が！！'],
  	[59,	'ﾃﾞｭﾗﾊﾝ',		'lv_up',	sub{ ++$m{$_} for (qw/at df ag/);		$mes .= qq|<br><font color="#CC00FF">$e2j{at}+1 $e2j{df}+1 $e2j{ag}+1</font>|; },'あなたが考えているほど、世界は悪くないから。'],
@@ -583,7 +583,7 @@ require './lib/system_game.cgi';
  	[133,	'ｼﾞｬｯｸﾎﾟｯﾄ','myself',	sub{ my $v = int(1000*(int(rand(5))+1)); $m{coin} += $v; $mes.="$pets[$m{pet}][1]★$m{pet_c}を使いｶｼﾞﾉｺｲﾝを $v枚 手に入れました<br>"; }],
  	[134,	'ﾕﾀﾞ',		'myself',	sub{ if ($w{world} eq $#world_states) { require './lib/vs_npc.cgi'; return unless &is_move_npc_country; require './lib/move_player.cgi'; &move_player($m{name}, $m{country}, $w{country}); $m{country}=$w{country}; } else { return unless $m{country}; $m{rank_exp}=0; $m{rank}-=5; $m{rank}=1 if $m{rank} < 1; $mes.="$pets[$m{pet}][1]★$m{pet_c}の力により$m{name}の階級が下がりました<br>"; $y{country} = $m{country}; &add_prisoner; };	},'ｳﾛﾎﾞﾛｽ1個10万で買います'],
  	[135,	'ﾌｪﾝﾘﾙ',	'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; for my $i (1..$w{country}) { next if $cs{strong}[$i] < 500; next if $i eq $m{country}; $cs{strong}[$i] -= int(rand(300))+100; }; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い各国の$e2j{strong}が下がりました</b>");	}],
- 	[136,	'ﾒﾃｵ',		'myself',	sub{ return unless $m{country}; return if ($w{world} eq '6') || ($w{world} eq '8'); for my $i (1..$w{country}) { for my $j ($i+1..$w{country}) { $w{"f_${i}_${j}"}=int(rand(20)); $w{"p_${i}_${j}"}=2; } }; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い世界中が開戦となりました</b>");	}],
+ 	[136,	'ﾒﾃｵ',		'myself',	sub{ return unless $m{country}; return if ($w{world} eq '6') || ($w{world} eq '8'); my $rankup = (rand(10) < $m{pet_c}); for my $i (1..$w{country}) { for my $j ($i+1..$w{country}) { if (!($rankup && ($i eq $m{country} || $j eq $m{country}) && $w{"p_${i}_${j}"} eq '1')) {$w{"f_${i}_${j}"}=int(rand(20)); $w{"p_${i}_${j}"}=2;} } }; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い世界中が開戦となりました</b>");	}, '', 1],
  	[137,	'ﾍﾟｽﾄ',		'myself',	sub{ for my $i (1..$w{country}) { $cs{state}[$i] = 5; }; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い各国の$e2j{state}が $country_states[5] になりました</b>");	}],
  	[138,	'ﾍﾞﾙﾌｪｺﾞｰﾙ','myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; return if ($w{world} eq '17' || $w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3); $w{reset_time} = $time + 3600 * 4; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使ったことによりしばらく休戦となります</b>");	},'使うﾀｲﾐﾝｸﾞ考えろよ？'],
  	[139,	'ﾘｳﾞｧｲｱｻﾝ',	'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; &_pet_steal_country( 'strong',  int(rand(10)+10) * 100  ); &_pet_status_up('rank_exp', 50);	}],
@@ -648,7 +648,7 @@ require './lib/system_game.cgi';
  	[190,	'ｱﾘﾖｼ',	'myself',	sub{},'おしゃべりクソ野郎'],# trick.cgiに埋め込み処理
  	[191,	'ﾃﾝﾁﾄﾋﾄﾂ',	'myself',	sub{}],# 処理が似ているのでtrick.cgiに埋め込み処理
 	[192,	'ﾊﾟﾗﾃﾞｨﾝ',			'lv_up',	sub{ ++$m{$_} for (qw/max_hp max_mp/);		$mes .= qq|<br><font color="#CC00FF">$e2j{hp}+1 $e2j{mp}+1 </font>|; }],
-	[193,	'ﾀﾞｰｸﾗﾋﾞｯﾄ',	'war_result',sub{ return if (rand(7) < 6); $mes.="$pets[$m{pet}][1]★$m{pet_c}の力が開放された!力を使い果たした$pets[$m{pet}][1]★$m{pet_c}は消えてしまった!<br>"; $m{pet}=0; $m{renzoku_c}=99 if $_[0] eq '0';}],
+	[193,	'ﾀﾞｰｸﾗﾋﾞｯﾄ',	'war_result',sub{ return if (rand(1000) < 600 + $m{pet_c} * $m{pet_c}); $mes.="$pets[$m{pet}][1]★$m{pet_c}の力が開放された!力を使い果たした$pets[$m{pet}][1]★$m{pet_c}は消えてしまった!<br>"; $m{pet}=0; $m{renzoku_c}=99 if $_[0] eq '0';}, 'あぁ^～心がぴょんぴょんするんじゃぁ^～', 1],
  	[194,	'ﾈｸﾛﾏﾝｻｰ',	'salary',	sub{ &_pet_summon(int(rand(16807)));},'夜、一人では遊ばないでください。'],
  	[195,	'ﾈｸﾛﾏｿｻｰ',	'salary',	sub{ &_pet_summon(99999);},'自分まだ見習いなので･･･さーせんｗｗｗ'],
  	[196,	'ｸﾏﾖｹ',	'no_boss',	sub{}, '', 1],# hunting.cgiに埋め込み処理
@@ -805,43 +805,52 @@ require './lib/system_game.cgi';
 	}
 }
  
- sub _pet_summon {
- 	my $rank_p = shift;
- 	my @pet_ss = (62, 63, 139, 64, 135, 188);
- 	my @pet_s = (61, 65..71, 77, 80, 83, 86, 89, 92, 95, 98, 101, 104, 107, 110, 131, 136..138, 140..145, 151, 152, 181, 187);
- 	my @pet_a = (76, 79, 82, 85, 88, 91, 94, 97, 100, 103, 106, 109, 132, 128..130, 180, 184);
- 	my @pet_b = (78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 153);
- 	my @pet_c = (133, 134, 148, 149, 171, 175, 176, 185, 189, 190);
- 	my @pet_x = (120, 121, 124, 165);
- 	my $v;
- 	if($rank_p > 2400){
- 		$v = $pet_x[int(rand(@pet_x))];
- 	}elsif($rank_p > 342){
- 		$v = $pet_c[int(rand(@pet_c))];
- 	}elsif($rank_p > 48){
- 		$v = $pet_b[int(rand(@pet_b))];
- 	}elsif($rank_p > 6){
- 		$v = $pet_a[int(rand(@pet_a))];
- 	}elsif($rank_p > 0){
- 		$v = $pet_s[int(rand(@pet_s))];
- 	}else{
- 		$v = $pet_ss[int(rand(@pet_ss))];
- 	}
+sub _pet_summon {
+	my $rank_p = shift;
+	my @pet_ss = (62, 63, 139, 64, 135, 188);
+	my @pet_s = (61, 65..71, 77, 80, 83, 86, 89, 92, 95, 98, 101, 104, 107, 110, 131, 136..138, 140..145, 151, 152, 181, 187);
+	my @pet_a = (76, 79, 82, 85, 88, 91, 94, 97, 100, 103, 106, 109, 132, 128..130, 180, 184);
+	my @pet_b = (78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 153);
+	my @pet_c = (133, 134, 148, 149, 171, 175, 176, 185, 189, 190);
+	my @pet_x = (120, 121, 124, 165);
+	my $v;
+	if($rank_p > 2400){
+		$v = $pet_x[int(rand(@pet_x))];
+	}elsif($rank_p > 342){
+		$v = $pet_c[int(rand(@pet_c))];
+	}elsif($rank_p > 48){
+		$v = $pet_b[int(rand(@pet_b))];
+	}elsif($rank_p > 6){
+		$v = $pet_a[int(rand(@pet_a))];
+	}elsif($rank_p > 0){
+		$v = $pet_s[int(rand(@pet_s))];
+	}else{
+		$v = $pet_ss[int(rand(@pet_ss))];
+	}
 
- 	$mes.="なんと、$pets[$m{pet}][1]★$m{pet_c}が$pets[$v][1]を召喚しました!<br>$pets[$v][1]は預かり所へ送られました<br>";
- 	&send_item($m{name}, 3, $v, 0, 0, 1);
+	$mes.="なんと、$pets[$m{pet}][1]★$m{pet_c}が$pets[$v][1]を召喚しました!<br>$pets[$v][1]は預かり所へ送られました<br>";
+	&send_item($m{name}, 3, $v, 0, 0, 1);
 	if (rand(10) < 1){
 		$m{pet} = 0;
 		$mes .= "ﾈｸﾛﾏﾝｻｰ＜疲れたから帰る";
 	}
- }
+}
  
- sub _pet_c_bonus {
- 	if (rand(500) < $m{pet_c} * $m{pet_c}) {
- 		$mes .= "なんと追加で支援金 3000 G をもらいました";
- 		$m{money} += 3000;
- 	}
- }
+sub _pet_c_bonus {
+	if (rand(500) < $m{pet_c} * $m{pet_c}) {
+		$mes .= "なんと追加で支援金 3000 G をもらいました";
+		$m{money} += 3000;
+	}
+}
  
+sub _pet_status_up {
+	my $sta = shift;
+	my $v = 1;
+	$v++ if ($m{pet_c} > rand(10));
+	$v++ if ($m{pet_c} - 10 > rand(10));
+	$m{$sta} += $v;
+	$mes .= qq|<br><font color="#CC00FF">$e2j{$sta}+$v</font>|;
+}
+
  1; # 削除不可
  

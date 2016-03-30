@@ -197,11 +197,11 @@ sub spp_header {
 	print qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 	print qq|<link rel="shortcut icon" href="$htmldir/favicon.ico">|;
 	print qq|<link rel="stylesheet" type="text/css" href="$htmldir/bj.css?$jstime">|;
-	print qq|<script type="text/javascript" src="$htmldir/nokori_time.js"></script>\n|;
-	print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js"></script>\n|;
-	print qq|<script type="text/javascript" src="$htmldir/js/SPPainter.js"></script>|;
-	print qq|<script type="text/javascript" src="$htmldir/js/CanvasFillAlgorithm.js"></script>|;
-	print qq|<script type="text/javascript" src="$htmldir/js/b64utils.js"></script>|;
-	print qq|<link rel="stylesheet" type="text/css" href="$htmldir/css/SPPainter.css">|;
+	print qq|<script type="text/javascript" src="$htmldir/nokori_time.js?$jstime"></script>\n|;
+	print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
+	print qq|<script type="text/javascript" src="$htmldir/js/SPPainter.js?$jstime"></script>|;
+	print qq|<script type="text/javascript" src="$htmldir/js/CanvasFillAlgorithm.js?$jstime"></script>|;
+	print qq|<script type="text/javascript" src="$htmldir/js/b64utils.js?$jstime"></script>|;
+	print qq|<link rel="stylesheet" type="text/css" href="$htmldir/css/SPPainter.css?$jstime">|;
 	print qq|</head><body $body><a name="top"></a>|;
 }

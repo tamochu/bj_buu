@@ -580,6 +580,7 @@ sub _penalty {
 sub down_friendship {
 	my $c_c = &union($m{country}, $y{country});
 	$w{'f_'.$c_c} -= 1;
+	$w{'f_'.$c_c} -= ($m{pet_c} - 10) if ($m{pet} eq '193' && $m{pet_c} > 10);
 	if ($w{'p_'.$c_c} ne '2' && $w{'f_'.$c_c} < 10 && $y{country} ne $union) {
 		$w{'p_'.$c_c} = 2;
 		&write_world_news("<b>$c_m‚Ì$m{name}‚ÌiŒR‚É‚æ‚è$c_y‚ÆŒğíó‘Ô‚É‚È‚è‚Ü‚µ‚½</b>");
