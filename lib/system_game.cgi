@@ -1382,6 +1382,7 @@ sub create_sale_data_chart {
 		$html .= qq|<meta http-equiv="Cache-Control" content="no-cache">|;
 		$html .= qq|<meta http-equiv="Expires" content="0">|;
 		$html .= qq|<title>$title</title>|;
+		$html .= qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 		$html .= qq|</head><body $body>|;
 		$html .= qq|<p>更新日時 $date</p>|;
 		$html .= qq|<hr size="1"><h1>$cs{name}[$country]</h1>|;
