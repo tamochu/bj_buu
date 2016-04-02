@@ -970,22 +970,53 @@ sub bug_prize {
 # ó’éûèàóù(Ç®ÇªÇÁÇ≠àÍìxÇæÇØÇÃèàóùÇÃèÍçáÇªÇÃìsìxÇ±Ç±Ç≈èàóù)
 #=================================================
 sub admin_expendable {
-	opendir my $dh, "$userdir" or &error("’∞ªﬁ∞√ﬁ®⁄∏ƒÿÇ™äJÇØÇ‹ÇπÇÒ");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		my %you_datas = &get_you_datas($pid, 1);
-		
-		if ($you_datas{name} eq $m{name}){
-			$m{wt_c_latest} = $m{wt_c};
-			$m{wt_c} = 0;
-			&write_user;
-		} else {
-			&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-			&regist_you_data($you_datas{name}, "wt_c", 0);
+	for my $file_name (qw/bbs bbs_log bbs_member depot depot_log depot_b depot_b_log leader member patrol prison prison_member prisoner violator/) {
+		my $output_file = "$logdir/0/$file_name.cgi";
+		open my $fh, "> $output_file" or &error("$output_file Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ");
+		close $fh;
+		chmod $chmod, $output_file;
+	}
+	for my $i (1 .. $w{country}) {
+		for my $file_name (qw/bbs bbs_log bbs_member depot depot_log depot_b depot_b_log leader member patrol prison prison_member prisoner violator/) {
+			my $output_file = "$logdir/$i/$file_name.cgi";
+			open my $fh, "> $output_file" or &error("$output_file Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ");
+			close $fh;
+			chmod $chmod, $output_file;
+		}
+		for my $j ($i+1 .. $in{country}) {
+			my $file_name = "$logdir/union/${i}_${j}";
+			open my $fh, "> $file_name.cgi" or &error("$file_name.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+			close $fh;
+			chmod $chmod, "$file_name.cgi";
+			
+			open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+			close $fh2;
+			chmod $chmod, "${file_name}_log.cgi";
+			
+			open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+			close $fh3;
+			chmod $chmod, "${file_name}_member.cgi";
 		}
 	}
-	closedir $dh;
+	for my $i (0..5) {
+		my $file_name = "$logdir/colosseum/champ_${i}";
+		open my $fh, "> $file_name.cgi" or &error("$file_name.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+		close $fh;
+		chmod $chmod, "$file_name.cgi";
+	}
+	
+	require "$datadir/casino.cgi";
+	for my $i (0..$#files) {
+		my $f = $files[$i][2];
+		my $file_name = "$logdir/chat_casino${f}";
+		open my $fh, "> $file_name.cgi" or &error("$file_name.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+		close $fh;
+		chmod $chmod, "$file_name.cgi";
+		
+		open my $fh, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+		close $fh;
+		chmod $chmod, "${file_name}_member.cgi";
+	}
 }
 
 #=================================================

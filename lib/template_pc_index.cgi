@@ -48,12 +48,6 @@ form { margin: 0; padding: 7px; }
 <div align="center">
 <table width="840" border="0" cellpading="0" cellspacing="0" class="top_box">
 <tr>
-	<td colspan="2">
-<script type="text/javascript" src="http://rot2.a8.net/jsa/8d0e4293b197c3fb13ff616441888a8e/c6f057b86584942e415435ffb1fa93d4.js">
-</script>
-	</td>
-</tr>
-<tr>
 	<td valign="top">
 		<div class="login_list">
 			$login_list
@@ -150,18 +144,6 @@ form { margin: 0; padding: 7px; }
 		</div>
 	</td>
 </tr>
-<tr>
-	<td colspan="2">
-		<div class="footer">
-
-<iframe src="http://rcm-jp.amazon.co.jp/e/cm?t=a8-affi-53438-22&o=9&p=13&l=ur1&category=books&f=ifr" width=468 height=60 scrolling="no" border="0" marginwidth="0" style="border:none;" frameborder="0"></iframe> <img border="0" width="1" height="1" src="http://www12.a8.net/0.gif?a8mat=1U3K24+96FLIQ+249K+BWGDT" alt="">
-<br>
-<a href="http://px.a8.net/svt/ejp?a8mat=1U3K24+98TBXU+5WS+CEO8X" target="_blank">
-<img border="0" width="468" height="60" alt="" src="http://www26.a8.net/svt/bgt?aid=111020620559&wid=001&eno=01&mid=s00000000766002084000&mc=1"></a>
-</div>
-	</td>
-</tr>
-
 </table>
 
 </div>

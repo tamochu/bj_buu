@@ -120,7 +120,7 @@ sub tp_200 {
 	$m{tp} += 10;
 }
 sub tp_210 {
-	if ($in{loop} && $in{loop} !~ /[^0-9]/) {
+	if ($in{loop} && $in{loop} !~ /[^0-9]/ && $in{loop} < 300) {
 		for my $loop (1..$in{loop}) {
 			if ($cmd) {
 				for my $i (1 .. $#prizes) {

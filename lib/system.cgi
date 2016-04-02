@@ -318,7 +318,7 @@ sub access_check {
 		}
 		close $fh;
 	}
-	unless($is_find){
+	if(!$is_find && $id){
 		open my $fh2, ">> $userdir/$id/access_log.cgi" or &error("‚»‚Ì‚æ‚¤‚È–¼‘O$in{login_name}‚ÌÌßÚ²Ô°‚ª‘¶İ‚µ‚Ü‚¹‚ñ");
 		print $fh2 "$addr<>$host<>$agent<>\n";
 		close $fh2;

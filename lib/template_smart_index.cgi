@@ -17,15 +17,6 @@ sub index {
 	$cs_c{0}   ||= 0;
 
 	print <<"EOM";
-<!-- i-mobile for SmartPhone client script -->
-<script type="text/javascript">
-	imobile_tag_ver = "0.2"; 
-	imobile_pid = "7436"; 
-	imobile_asid = "106863"; 
-	imobile_type = "inline";
-</script>
-<script type="text/javascript" src="http://spad.i-mobile.co.jp/script/adssp.js?20110215"></script>
-
 <h1>$title</h1>
 <form method="$method" action="login.cgi">
 <div>ÌßÚ²Ô°–¼:<input type="text" name="login_name" value="$cook_name"></div>

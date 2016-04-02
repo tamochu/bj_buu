@@ -196,6 +196,10 @@ sub tp_100 {
 		$idx++;
 	}
 	
+	if ($config_test) {
+		$y{sol} /= 10;
+	}
+	
 	$m{tp} += 10;
 	&n_menu;
 }
