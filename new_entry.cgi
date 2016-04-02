@@ -4,8 +4,6 @@ require 'config_game.cgi';
 #================================================
 # V‹K“o˜^ Created by Merino
 #================================================
-my $admin_name = '•“Ø';
-
 &decode;
 &header;
 &access_check;

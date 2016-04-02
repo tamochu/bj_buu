@@ -16,7 +16,7 @@ $save_dir    = "$logdir/kaizou2";
 $this_script = 'chat_horyu_w.cgi';
 $this_return = 'chat_horyu_w';
 
-@deletable_member = ('•“Ø', '‚¨‚¢‚¢‚¤‚¢‚¢');
+@deletable_member = ($admin_name, $admin_sub_name);
 
 # Å‘åºÒİÄ”(”¼Šp)
 $max_comment = 2000;

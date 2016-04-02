@@ -4,9 +4,6 @@ require "$datadir/header_myroom.cgi";
 #================================================
 # è† Created by Merino
 #================================================
-my $admin_name = '•“Ø';
-
-
 &get_data;
 &header_myroom;
 &delete_kiji if $in{mode} eq 'delete_kiji';

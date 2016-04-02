@@ -120,7 +120,7 @@ sub get_data {
 # ©•ª‚ªIŠÇ‚©‚Ç‚¤‚©
 #================================================
 sub is_sabakan {
-	for my $k (qw/•“Ø ‚¨‚¢‚¢‚¤‚¢‚¢ GF‹³ö/) {
+	for my $k ($admin_name, $admin_sub_name, $admin_support_name) {
 		return 1 if $m{name} eq $k;
 	}
 	return 0;

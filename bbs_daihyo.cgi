@@ -24,8 +24,6 @@ my $non_new_commer_date = 30;
 # íœŒ ŒÀ‚ ‚è‚Ìê‡B•K—v•[
 my @need_vote_violator = (2, 4, 6);
 
-my $admin_name = '•“Ø';
-
 #=================================================
 &vote;
 &run;

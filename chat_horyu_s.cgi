@@ -11,7 +11,7 @@ $this_list   = "$logdir/chat_horyu_list_s";
 $this_dir    = "$logdir/kaizou2";
 $this_script = 'chat_horyu_s.cgi';
 
-@del_member = ('çïìÿ', 'Ç®Ç¢Ç¢Ç§Ç¢Ç¢');
+@del_member = ($admin_name, $admin_sub_name);
 #=================================================
 &run;
 &footer;

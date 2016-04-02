@@ -25,10 +25,10 @@ $max_comment = 2000;
 $remind_time = 3 * 24 * 3600;
 
 # Ã‘£–³‚µ
-@no_remind = ('•“Ø', '‚¨‚¢‚¢‚¤‚¢‚¢');
+@no_remind = ($admin_name, $admin_sub_name);
 
 # ŒNåˆÈŠO‚Ì’÷‚ßØ‚èŒ ŒÀÒ
-@deletable_member = ('•“Ø', '‚¨‚¢‚¢‚¤‚¢‚¢');
+@deletable_member = ($admin_name, $admin_sub_name);
 
 #=================================================
 &run;

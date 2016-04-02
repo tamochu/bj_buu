@@ -22,7 +22,9 @@ $config_test = 0;
 require './admin_password.cgi';
 
 # ŠÇ—lÌßÚ²Ô°–¼
-$admin_name = '•“Ø';
+$admin_name = 'nanamie';
+$admin_sub_name = '‚¨‚¢‚¢‚¤‚¢‚¢';
+$admin_support_name = '';
 
 # gzipˆ³k“]‘—(‚í‚©‚ç‚È‚¢Eg‚í‚È‚¢ê‡‚Í‹ó—“ '' )
 $gzip = '';
