@@ -59,7 +59,7 @@ form { margin: 0; padding: 7px; }
 			$login_box_html
 		</div>
 		<div align="left" style="padding: 0.2em 2em;">
-			<p><a href="http://buu.pandora.nu/cgi-bin/bj/user/8d9593d8/book/526561646d65208dec3a8d9593d8.html" class="link1">[> Readme　</a></p>
+			<p><a href="readme.html" class="link1">[> Readme　</a></p>
 			<p><a href="http://www13.atwiki.jp/blindjustice/" class="link1">[> 説明書　</a></p>
 			<p><a href="http://www43.atwiki.jp/bjkurobutasaba/" class="link1">[> wiki　</a></p>
 			<p class="text_small">質問する前に必ず読むこと!</p>

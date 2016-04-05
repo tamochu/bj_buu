@@ -9,8 +9,6 @@ my $mobile_max = 50;
 
 sub begin {
 	$layout = 2;
-#	&confiscate_shop(1);
-#	&confiscate_shop(2);
 	
 	$m{tp_r} = 1 if $m{tp_r} > 1;
 	$mes .= "‚Ç‚Ì‚¨“X‚Å”ƒ•¨‚µ‚Ü‚·‚©?<br>";
@@ -19,15 +17,6 @@ sub begin {
 	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="total_list" checked>¤•iˆê——<br>|;
 	$mes .= qq|<table class="table1"><tr><th>“X–¼</th><th>“X’·</th><th>Ğ‰î•¶<br></th></tr>| unless $is_mobile;
 
-	open my $fha, "< $logdir/bbs_akindo_1_allmember.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $headline = <$fha>;
-	my($gname1, $gcolor1) = split /<>/, $headline;
-	close $fha;
-	open my $fha2, "< $logdir/bbs_akindo_2_allmember.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $headline2 = <$fha2>;
-	my($gname2, $gcolor2) = split /<>/, $headline2;
-	close $fha2;
-	
 	open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ');
 	while (my $line = <$fh>) {
 		my($shop_name, $name, $message, $sale_c, $sale_money, $display, $guild_number) = split /<>/, $line;
@@ -36,17 +25,12 @@ sub begin {
 		my $shop_id = unpack 'H*', $name;
 		next unless -s "$userdir/$shop_id/shop.cgi";
 
-		my $gc = $guild_number eq '1' ? $gcolor1:
-				$guild_number eq '2' ? $gcolor2: "#ffffff";
+		my $gc = "#ffffff";
 		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font><br>|
 			 : qq|<tr><td><input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font></td><td>$name</td><td>$message<br></td></tr>|;
 		$count++;
 	}
 	close $fh;
-	$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="guild_shop1"><font color="$gcolor1">$gname1’¼‰c“X</font><br>|
-			 : qq|<tr><td><input type="radio" name="cmd" value="guild_shop1"><font color="$gcolor1">$gname1’¼‰c“X</font></td><td>$gname1</td><td>$gname1‚Ì’¼‰c“X‚Å‚·<br></td></tr>|;
-	$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="guild_shop2"><font color="$gcolor2">$gname2’¼‰c“X</font><br>|
-			 : qq|<tr><td><input type="radio" name="cmd" value="guild_shop2"><font color="$gcolor2">$gname2’¼‰c“X</font></td><td>$gname2</td><td>$gname2‚Ì’¼‰c“X‚Å‚·<br></td></tr>|;
 
 	$m{stock} = $count;
 	
@@ -120,61 +104,8 @@ sub tp_1 {
 	}
 	close $fh;
 	
-	open my $fha, "< $logdir/bbs_akindo_1_allmember.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $headline = <$fha>;
-	my($gname1, $gcolor1) = split /<>/, $headline;
-	close $fha;
-	open my $fha2, "< $logdir/bbs_akindo_2_allmember.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $headline2 = <$fha2>;
-	my($gname2, $gcolor2) = split /<>/, $headline2;
-	close $fha2;
-		
 	# ‚¨“X‚ª‘¶İ‚µ‚È‚¢
-	if ($y{name} eq 'guild_shop1') {
-		$mes .= qq|y$gname1’¼‰c“Xz$gname1u$gname1‚Ì’¼‰c“X‚Å‚·v<br>|;
-		$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
-		$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>’l’i<br></th></tr>|;
-		
-		open my $fh, "< $logdir/guild_shop1.cgi" or &error("$gname1’¼‰c“X‚É“ü‚ê‚Ü‚¹‚ñ");
-		while (my $line = <$fh>) {
-			my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
-			$mes .= qq|<tr><td><input type="radio" name="cmd" value="$no">|;
-			$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-				  : $kind eq '3' ? "$pets[$item_no][1]š$item_c"
-				  : 			   "$guas[$item_no][1]"
-				  ;
-			$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
-		}
-		close $fh;
-		
-		$mes .= qq|</table><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= qq|<p><input type="submit" value="”ƒ‚¤" class="button1"></p></form>|;
-		$m{tp_r} = 100;
-	}
-	elsif ($y{name} eq 'guild_shop2') {
-		$mes .= qq|y$gname2’¼‰c“Xz$gname2u$gname2‚Ì’¼‰c“X‚Å‚·v<br>|;
-		$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
-		$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>’l’i<br></th></tr>|;
-		
-		open my $fh, "< $logdir/guild_shop2.cgi" or &error("$gname2’¼‰c“X‚É“ü‚ê‚Ü‚¹‚ñ");
-		while (my $line = <$fh>) {
-			my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
-			$mes .= qq|<tr><td><input type="radio" name="cmd" value="$no">|;
-			$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-				  : $kind eq '3' ? "$pets[$item_no][1]š$item_c"
-				  : 			   "$guas[$item_no][1]"
-				  ;
-			$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
-		}
-		close $fh;
-		
-		$mes .= qq|</table><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= qq|<p><input type="submit" value="”ƒ‚¤" class="button1"></p></form>|;
-		$m{tp_r} = 100;
-	}
-	elsif (!$is_find || !-f "$userdir/$shop_id/shop.cgi") {
+	if (!$is_find || !-f "$userdir/$shop_id/shop.cgi") {
 		$mes .= "$m{stock}‚Æ‚¢‚¤‚¨“X‚Í•Â“X‚µ‚Ä‚µ‚Ü‚Á‚½‚æ‚¤‚Å‚·<br>";
 		&begin;
 	}
@@ -296,66 +227,6 @@ sub tp_100 {
 		$cmd = $y{name}; # –¼‘O‚ğcmd‚É“ü‚ê‚Ä&tp_1
 		&tp_1;
 	}
-	elsif ($cmd && ($y{name} eq 'guild_shop1' || $y{name} eq 'guild_shop2')) {
-		my $is_find    = 0;
-		my $is_rewrite = 0;
-		my @lines = ();
-		open my $fh, "+< $logdir/$y{name}.cgi" or &error("¤•iØ½Ä‚ªŠJ‚¯‚Ü‚¹‚ñ");
-		eval { flock $fh, 2; };
-		while (my $line = <$fh>) {
-			my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
-			
-			if ($cmd eq $no) {
-				$is_find = 1;
-
-				if ($m{money} >= $price && &is_buyable($kind, $item_no)) {
-					$m{money} -= $price;
-					
-					my $item_name = $kind eq '1' ? $weas[$item_no][1]
-								  : $kind eq '2' ? $eggs[$item_no][1]
-								  : $kind eq '3' ? $pets[$item_no][1]
-								  :				   $guas[$item_no][1]
-								  ;
-					$mes .= "$item_name‚ğ”ƒ‚¢‚Ü‚µ‚½<br>$item_name‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
-					
-					&send_item($m{name}, $kind, $item_no, $item_c, $item_lv, int(rand(1000)+1));
-					&send_money($y{name}, "y$m{stock}($item_name)z$m{name}", $price, 1);
-					$is_rewrite = 1;
-					
-					# ”„ã‹à‰ÁZ
-					open my $fh2, "+< $logdir/$y{name}_sale.cgi" or &error("”„ãÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-					eval { flock $fh2, 2; };
-					my $line2 = <$fh2>;
-					my($sale_c, $sale_money, $update_t) = split /<>/, $line2;
-					$sale_c++;
-					$sale_money += $price;
-					seek  $fh2, 0, 0;
-					truncate $fh2, 0;
-					print $fh2 "$sale_c<>$sale_money<>$update_t<>";
-					close $fh2;
-				}
-				else {
-					$mes .= "$y{name}u‚¨‹à‚ª‘«‚è‚Ü‚¹‚ñv<br>";
-					last;
-				}
-			}
-			else {
-				push @lines, $line;
-			}
-		}
-		if ($is_rewrite) {
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh @lines;
-		}
-		close $fh;
-		
-		unless ($is_find) {
-			$mes .= "$y{name}u‚»‚Ì¤•i‚ÍA‚½‚Á‚½¡”„‚èØ‚ê‚Ä‚µ‚Ü‚¢‚Ü‚µ‚½v<br>" ;
-		}
-		$cmd = $y{name}; # –¼‘O‚ğcmd‚É“ü‚ê‚Ä&tp_1
-		&tp_1;
-	}
 	else {
 		$mes .= '‚â‚ß‚Ü‚µ‚½<br>';
 		&begin
@@ -398,39 +269,6 @@ sub tp_200 {
 	}
 	close $fh;
 	
-	open my $ifh, "< $logdir/guild_shop1.cgi" or &error("$gname1‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
-	while (my $iline = <$ifh>) {
-		my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
-		$item_no = 42 if ($kind == 2 && $item_no == 53);
-		$item_no = 76 if ($kind == 3 && $item_no == 180);
-		$item_no = 77 if ($kind == 3 && $item_no == 181);
-		$item_no = 194 if ($kind == 3 && $item_no == 195);
-		next if $cmd eq '1' && $price > $m{money};
-		push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>guild_shop1<>1<>1<>\n";
-	}
-	close $ifh;	
-	open my $ifh, "< $logdir/guild_shop2.cgi" or &error("$gname2‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
-	while (my $iline = <$ifh>) {
-		my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
-		$item_no = 42 if ($kind == 2 && $item_no == 53);
-		$item_no = 76 if ($kind == 3 && $item_no == 180);
-		$item_no = 77 if ($kind == 3 && $item_no == 181);
-		$item_no = 194 if ($kind == 3 && $item_no == 195);
-		next if $cmd eq '1' && $price > $m{money};
-		push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>guild_shop2<>1<>2<>\n";
-	}
-	close $ifh;
-	
-	open my $fha, "< $logdir/bbs_akindo_1_allmember.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $headline = <$fha>;
-	my($gname1, $gcolor1) = split /<>/, $headline;
-	close $fha;
-	open my $fha2, "< $logdir/bbs_akindo_2_allmember.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $headline2 = <$fha2>;
-	my($gname2, $gcolor2) = split /<>/, $headline2;
-	close $fha2;
-
-	
 	@item_list = map { $_->[0] }
 				sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
 					map { [$_, split /<>/ ] } @item_list;
@@ -445,8 +283,7 @@ sub tp_200 {
 		if($name eq $b_name && $kind == $b_kind && $item_no == $b_item_no){
 			next;
 		}
-		my $gc = $guild_number eq '1' ? $gcolor1:
-				$guild_number eq '2' ? $gcolor2: "#ffffff";
+		my $gc = "#ffffff";
 		$mes .= qq|<tr><td><input type="radio" name="cmd" value="$name">|;
 		$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
 			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
@@ -496,29 +333,6 @@ sub tp_300 {#mobile
 	}
 	close $fh;
 
-	open my $ifh, "< $logdir/guild_shop1.cgi" or &error("$gname1‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
-	while (my $iline = <$ifh>) {
-		my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
-		$item_no = 42 if ($kind == 2 && $item_no == 53);
-		$item_no = 76 if ($kind == 3 && $item_no == 180);
-		$item_no = 77 if ($kind == 3 && $item_no == 181);
-		$item_no = 194 if ($kind == 3 && $item_no == 195);
-		next if $cmd eq '1' && $price > $m{money};
-		push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>guild_shop1<>1<>1<>\n";
-	}
-	close $ifh;	
-	open my $ifh, "< $logdir/guild_shop2.cgi" or &error("$gname2‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
-	while (my $iline = <$ifh>) {
-		my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
-		$item_no = 42 if ($kind == 2 && $item_no == 53);
-		$item_no = 76 if ($kind == 3 && $item_no == 180);
-		$item_no = 77 if ($kind == 3 && $item_no == 181);
-		$item_no = 194 if ($kind == 3 && $item_no == 195);
-		next if $cmd eq '1' && $price > $m{money};
-		push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>guild_shop2<>1<>2<>\n";
-	}
-	close $ifh;
-	
 	@item_list = map { $_->[0] }
 				sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
 					map { [$_, split /<>/ ] } @item_list;

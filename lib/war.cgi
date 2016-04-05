@@ -145,9 +145,9 @@ sub tp_100 {
 	$m{rest_a} = 0;
 	$m{rest_b} = 0;
 	$m{rest_c} = 0;
-	$y{rest_a} = 1;
-	$y{rest_b} = 1;
-	$y{rest_c} = 1;
+	$y{rest_a} = 0;
+	$y{rest_b} = 0;
+	$y{rest_c} = 0;
 	
 	my $idx = 0;
 	for my $cnt (1..$m{turn}) {

@@ -50,6 +50,7 @@ elsif ($in{mode} eq 'admin_summer_end')   { &admin_summer_end; }
 elsif ($in{mode} eq 'admin_expendable')   { &admin_expendable; }
 elsif ($in{mode} eq 'admin_parupunte')   { &admin_parupunte; }
 elsif ($in{mode} eq 'admin_compare')   { &admin_compare; }
+elsif ($in{mode} eq 'migrate_reset')   { &migrate_reset; }
 
 &top;
 &footer;
@@ -311,6 +312,12 @@ sub top {
 	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_summer_end">|;
 	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
 	print qq|<p><input type="submit" value="終了" class="button_s"></p></form></div>|;
+		
+	print qq|<br><br><br>|;
+	print qq|<div class="mes">適当士官フラグリセット処理<ul>|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="migrate_reset">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="リセット" class="button_s"></p></form></div>|;
 	
 	print qq|<br><br><br>|;
 	print qq|<div class="mes">臨時処理（連打しないこと、また処理終了後コメントアウトのこと）<ul>|;
@@ -970,53 +977,24 @@ sub bug_prize {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
-	for my $file_name (qw/bbs bbs_log bbs_member depot depot_log depot_b depot_b_log leader member patrol prison prison_member prisoner violator/) {
-		my $output_file = "$logdir/0/$file_name.cgi";
-		open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-		close $fh;
-		chmod $chmod, $output_file;
-	}
-	for my $i (1 .. $w{country}) {
-		for my $file_name (qw/bbs bbs_log bbs_member depot depot_log depot_b depot_b_log leader member patrol prison prison_member prisoner violator/) {
-			my $output_file = "$logdir/$i/$file_name.cgi";
-			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-			close $fh;
-			chmod $chmod, $output_file;
-		}
-		for my $j ($i+1 .. $in{country}) {
-			my $file_name = "$logdir/union/${i}_${j}";
-			open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
-			close $fh;
-			chmod $chmod, "$file_name.cgi";
-			
-			open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
-			close $fh2;
-			chmod $chmod, "${file_name}_log.cgi";
-			
-			open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
-			close $fh3;
-			chmod $chmod, "${file_name}_member.cgi";
-		}
-	}
-	for my $i (0..5) {
-		my $file_name = "$logdir/colosseum/champ_${i}";
-		open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
-		close $fh;
-		chmod $chmod, "$file_name.cgi";
-	}
+	$w{year} = 1;
+	$w{world} = 0;
+	$w{playing} = 0;
 	
-	require "$datadir/casino.cgi";
-	for my $i (0..$#files) {
-		my $f = $files[$i][2];
-		my $file_name = "$logdir/chat_casino${f}";
-		open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
-		close $fh;
-		chmod $chmod, "$file_name.cgi";
-		
-		open my $fh, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
-		close $fh;
-		chmod $chmod, "${file_name}_member.cgi";
+	my $country = $w{country};
+	my $ave_c = int($w{player} / $country);
+	for my $i (1..$w{country}) {
+		$cs{win_c}[$i]    = 0;
+		$cs{tax}[$i]      = 30;
+		$cs{strong}[$i]   = int(rand(6)  + 7) * 1000;
+		$cs{food}[$i]     = int(rand(10) + 3) * 1000;
+		$cs{money}[$i]    = int(rand(10) + 3) * 1000;
+		$cs{soldier}[$i]  = int(rand(10) + 3) * 1000;
+		$cs{state}[$i]    = rand(2) > 1 ? 0 : int(rand(@country_states));
+		$cs{capacity}[$i] = $ave_c;
+		$cs{is_die}[$i]   = 0;
 	}
+	&write_cs;
 }
 
 #=================================================
@@ -1126,6 +1104,20 @@ sub admin_compare {
 	$mes .= qq|</table>|;
 }
 
+#=================================================
+# 適当士官フラグリセット
+#=================================================
+sub migrate_reset {
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $id = readdir $dh) {
+		next if $id =~ /\./;
+		next if $id =~ /backup/;
+		$name = pack 'H*', $id;
+		&regist_you_data($name, "random_migrate", '');
+	}
+	closedir $dh;
+
+}
 #=================================================
 # 改造ﾊﾟﾙﾌﾟﾝﾃ
 #=================================================

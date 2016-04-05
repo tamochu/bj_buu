@@ -24,8 +24,7 @@ sub begin {
 		my $shop_id = unpack 'H*', $name;
 		next unless -s "$userdir/$shop_id/shop.cgi";
 		
-		my $gc = $guild_number eq '1' ? $gcolor1:
-				$guild_number eq '2' ? $gcolor2: "#ffffff";
+		my $gc = "#ffffff";
 		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font><br>|
 			 : qq|<tr><td><input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font></td><td>$name</td><td>$message<br></td></tr>|;
 		$count++;
@@ -251,8 +250,7 @@ sub tp_200 {
 		if($name eq $b_name && $kind == $b_kind && $item_no == $b_item_no){
 			next;
 		}
-		my $gc = $guild_number eq '1' ? $gcolor1:
-				$guild_number eq '2' ? $gcolor2: "#ffffff";
+		my $gc = "#ffffff";
 		$mes .= qq|<tr><td><input type="radio" name="cmd" value="$name">|;
 		$mes .= $kind eq '1' ? "$weas[$item_no][1]Åö$item_lv($item_c/$weas[$item_no][4])"
 			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"

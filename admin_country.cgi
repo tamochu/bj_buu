@@ -62,6 +62,7 @@ if    ($in{mode} eq 'now_country')     { &now_country;     }
 elsif ($in{mode} eq 'add_country')     { &admin_add_country;     }
 elsif ($in{mode} eq 'delete_country')  { &admin_delete_country;  }
 elsif ($in{mode} eq 'restore_country') { &restore_country; }
+elsif ($in{mode} eq 'modify_country') { &modify_country; }
 elsif ($in{step}) { &{ 'step_' . $in{step} }; }
 else { &step_1; }
 &footer;
@@ -154,6 +155,15 @@ EOM
 		<input type="hidden" name="mode" value="delete_country">
 		<input type="hidden" name="pass" value="$in{pass}">
 		<p><input type="submit" value="íœ" class="button1"></p>
+	</form>
+	</div>
+	<br>
+	<div class="mes">
+	‘‚ğC³<br>
+	<form method="$method" action="$this_script">
+		<input type="hidden" name="mode" value="modify_country">
+		<input type="hidden" name="pass" value="$in{pass}">
+		<p><input type="submit" value="C³" class="button1"></p>
 	</form>
 	</div>
 	<br>
@@ -494,4 +504,72 @@ sub backup {
 	print qq|<p><input type="submit" value="•œŒ³" class="button1"></p></form></div>|;
 }
 
+#=================================================
+# C³
+#=================================================
+sub modify_country {
+	&read_cs;
+
+	if ($in{execute}) {
+		for my $i (1..$w{country}) {
+			$cs{color}[$i] = $in{"color_" . $i};
+			$cs{name}[$i] = $in{"name_" . $i};
+			for my $k (qw/strong food money soldier tax state/) {
+				$cs{$k}[$i] = $in{$k . "_" . $i};
+				if ($cs{$k}[$i] =~ /[^0-9]/ || $cs{$k}[$i] < 0) {
+					$cs{$k}[$i] = 0;
+				}
+			}
+		}
+		&write_cs;
+	}
+	
+	print <<"EOM";
+	<p>‘‚Ìî•ñ‚ğŒˆ‚ß‚Ä‚­‚¾‚³‚¢</p>
+	<form method="$method" action="$this_script">
+		<input type="hidden" name="mode" value="modify_country">
+		<input type="hidden" name="execute" value="1">
+		<input type="hidden" name="pass" value="$in{pass}">
+EOM
+	print qq|<table class="table1">|;
+
+	print qq|<tr><th>F</th>|;
+	for my $i (1 .. $w{country}) {
+		print qq|<td align="center" style="color: #333; background-color: $cs{color}[$i];"><input type="text" name="color_${i}" value="$cs{color}[$i]"/></td>|;
+	}
+	print qq|</tr>\n|;
+
+	print qq|<tr><th>$e2j{name}</th>|;
+	for my $i (1 .. $w{country}) {
+		print qq|<td align="center" style="color: #333; background-color: $cs{color}[$i];"><input type="text" name="name_${i}" value="$cs{name}[$i]"/></td>|;
+	}
+	print qq|</tr>\n|;
+
+	for my $k (qw/strong food money soldier tax/) {
+		print qq|<tr><th>$e2j{$k}</th>|;
+		for my $i (1 .. $w{country}) {
+			print qq|<td align="right"><input type="text" name="${k}_${i}" value="$cs{$k}[$i]"/></td>|;
+		}
+		print qq|</tr>\n|;
+	}
+
+	print qq|<tr><th>$e2j{state}</th>|;
+	for my $i (1 .. $w{country}) {
+		print qq|<td align="right">|;
+		print qq|<select name="state_${i}">|;
+		for my $j (0..$#country_states) {
+			my $selected = $cs{state}[$i] eq $j ? ' selected' : '';
+			print qq|<option value="$j"$selected>$country_states[$j]</option>|;
+		}
+		print qq|</select>|;
+		print qq|</td>|;
+	}
+	print qq|</tr>\n|;
+
+	print qq|</table>|;	
+	print <<"EOM";
+		<p><input type="submit" value="C³" class="button_s"></p>
+	</form>
+EOM
+}
 

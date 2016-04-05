@@ -38,7 +38,12 @@ var Painter = function(canvas) {
   }
 };
 
-var isTouch = ('ontouchstart' in window);
+function getPageX(event) {
+  return typeof event.originalEvent.changedTouches !== "undefined" ? event.originalEvent.changedTouches[0].pageX : event.pageX;
+}
+function getPageY(event) {
+  return typeof event.originalEvent.changedTouches !== "undefined" ? event.originalEvent.changedTouches[0].pageY : event.pageY;
+}
 
 $(function() {
   id = $("#id").val();
@@ -144,14 +149,28 @@ $(function() {
       $(this).val('');
       return;
     }
-    
-    var reader = new FileReader();
-    reader.onload = function() {
-      var img_src = $('<img>').attr('src', reader.result);
-      painter.foreContext.drawImage(img_src.get(0), 0, 0, painter.foreCanvas.width, painter.foreCanvas.height);
-      painter.mixtureImage(true, 0, 0, painter.foreCanvas.width, painter.foreCanvas.height);
-    };
-    reader.readAsDataURL(file);
+    if (navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 || navigator.userAgent.indexOf('iPod') > 0) {
+      var UrlObject = window.URL || window.webkitURL;
+      var blobUrl = UrlObject.createObjectURL(file);
+
+      var tmpImage = new Image();
+      tmpImage.src = blobUrl;
+      tmpImage.onload = function() {
+        painter.foreContext.drawImage(this, 0, 0, painter.foreCanvas.width, painter.foreCanvas.height);
+        painter.mixtureImage(true, 0, 0, painter.foreCanvas.width, painter.foreCanvas.height);
+      };
+      tmpImage.onerror = function(e) {
+        alert("imgError:" + e);
+      };
+    } else {
+      var reader = new FileReader();
+      reader.onload = function() {
+        var img_src = $('<img>').attr('src', reader.result);
+        painter.foreContext.drawImage(img_src.get(0), 0, 0, painter.foreCanvas.width, painter.foreCanvas.height);
+        painter.mixtureImage(true, 0, 0, painter.foreCanvas.width, painter.foreCanvas.height);
+      };
+      reader.readAsDataURL(file);
+    }
   });
 
   $("#send").on("click", function() {
@@ -342,10 +361,10 @@ Painter.prototype.drawStart = function(event) {
   this.saveundo();
   
   var rect = event.target.getBoundingClientRect();
-  this.startx = isTouch ? event.originalEvent.touches[0].pageX : event.pageX;
+  this.startx = getPageX(event)
   this.startx -= rect.left;
   this.startx -= $(window).scrollLeft();
-  this.starty = isTouch ? event.originalEvent.touches[0].pageY : event.pageY;
+  this.starty = getPageY(event);
   this.starty -= rect.top;
   this.starty -= $(window).scrollTop();
 
@@ -371,10 +390,10 @@ Painter.prototype.draw = function(event) {
   if (!this.drawFlag) { return false; }
 
   var rect = event.target.getBoundingClientRect();
-  this.endx = isTouch ? event.originalEvent.touches[0].pageX : event.pageX;
+  this.endx =  getPageX(event);
   this.endx -= rect.left;
   this.endx -= $(window).scrollLeft();
-  this.endy = isTouch ? event.originalEvent.touches[0].pageY : event.pageY;
+  this.endy = getPageY(event);
   this.endy -= rect.top;
   this.endy -= $(window).scrollTop();
 

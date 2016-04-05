@@ -1647,7 +1647,7 @@ sub tp_1110 {
 	$mes .= "ÃŞ¨°×°‚Ì¶°ÄŞy$m[$a]z<br>";
 	$mes .= "‹M•û‚Ì¶°ÄŞy$m[$cmd]z</p>";
 	
-	if ($cmd != $a) {
+	if ($cmd >= 0 && $cmd < @m && $cmd != $a) {
 		$m{stock} = 100 if $m{stock} == 0;
 		$m{stock} = int(1.5 * $m{stock});
 		$mes .= '‚¨‚ß‚Å‚Æ‚¤‚²‚´‚¢‚Ü‚·!<br>';

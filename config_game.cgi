@@ -482,13 +482,13 @@ require './lib/system_game.cgi';
  
  # Lvup+系
  	[49,	'ﾁﾋﾞﾌｧｲﾀｰ',		'lv_up',	sub{ ++$m{max_hp};	$mes .= qq|<br><font color="#CC00FF">$e2j{max_hp}+1</font>|; }],
- 	[50,	'ﾎﾜｲﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('max_mp'); }, '', 1],
- 	[51,	'ﾌﾞﾗｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('at'); }, '', 1],
+ 	[50,	'ﾎﾜｲﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_lv_up('max_mp'); }, '', 1],
+ 	[51,	'ﾌﾞﾗｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_lv_up('at'); }, '', 1],
  	[52,	'ｼｰﾙﾄﾞﾅｲﾄ',		'lv_up',	sub{ ++$m{df};		$mes .= qq|<br><font color="#CC00FF">$e2j{df}+1</font>|; }, '', 1],
- 	[53,	'ﾏｼﾞｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('mat'); }, '', 1],
- 	[54,	'ﾐｽﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('mdf'); }, '', 1],
+ 	[53,	'ﾏｼﾞｯｸﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_lv_up('mat'); }, '', 1],
+ 	[54,	'ﾐｽﾄﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_lv_up('mdf'); }, '', 1],
  	[55,	'ｼｰﾌﾅｲﾄ',		'lv_up',	sub{ ++$m{ag};		$mes .= qq|<br><font color="#CC00FF">$e2j{ag}+1</font>|; }],
- 	[56,	'ｷﾝｸﾞﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_status_up('lea'); }, '', 1],
+ 	[56,	'ｷﾝｸﾞﾄﾞﾗｺﾞﾝ',	'lv_up',	sub{ &_pet_lv_up('lea'); }, '', 1],
  	[57,	'ｳﾞｨｰﾅｽ',		'lv_up',	sub{ ++$m{cha}; ++$m{cha_org};		$mes .= qq|<br><font color="#CC00FF">$e2j{cha}+1</font>|; }],
  	[58,	'ｷﾝｸﾞ',			'lv_up',	sub{ ++$m{$_} for (qw/df lea cha cha_org/);		$mes .= qq|<br><font color="#CC00FF">$e2j{df}+1 $e2j{lea}+1 $e2j{cha}+1</font>|; },'荒ぶる…荒ぶるぞ！俺の魂が！！'],
  	[59,	'ﾃﾞｭﾗﾊﾝ',		'lv_up',	sub{ ++$m{$_} for (qw/at df ag/);		$mes .= qq|<br><font color="#CC00FF">$e2j{at}+1 $e2j{df}+1 $e2j{ag}+1</font>|; },'あなたが考えているほど、世界は悪くないから。'],
@@ -843,7 +843,7 @@ sub _pet_c_bonus {
 	}
 }
  
-sub _pet_status_up {
+sub _pet_lv_up {
 	my $sta = shift;
 	my $v = 1;
 	$v++ if ($m{pet_c} > rand(10));

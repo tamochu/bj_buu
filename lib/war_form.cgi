@@ -84,7 +84,7 @@ sub tp_1 {
 	}
 	--$cmd;
 
-	if (!$war_marchs[$cmd][3]) {
+	if (!&{$war_marchs[$cmd][3]}) {
 		$mes .= "$war_marchs[$cmd][0]‚ÅiŒR‚·‚éğŒ‚ğ–‚½‚µ‚Ä‚¢‚Ü‚¹‚ñ<br>";
 		&begin;
 	}

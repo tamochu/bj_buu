@@ -602,6 +602,11 @@ sub tp_450 {
 		close $fh;
 		
 		if($comment2){
+			unless (-f "$logdir/$m{country}/bbs_log_$y{country}.cgi") {
+				open my $fh2, "> $logdir/$m{country}/bbs_log_$y{country}.cgi" or &error("$logdir/$m{country}/bbs_log_$y{country}.cgi Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+				close $fh2;
+			}
+			
 			my @lines2 = ();
 			open my $fh2, "+< $logdir/$m{country}/bbs_log_$y{country}.cgi" or &error("$logdir/$m{country}/bbs_log_$y{country}.cgi Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 			eval { flock $fh2, 2; };

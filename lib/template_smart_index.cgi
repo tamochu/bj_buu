@@ -27,7 +27,7 @@ sub index {
 </form>
 <hr>
 <ol>
-<li><a href="http://buu.pandora.nu/cgi-bin/bj/user/8d9593d8/book/526561646d65208dec3a8d9593d8.html">Readme</a>
+<li><a href="readme.html">Readme</a>
 <li><a href="http://www13.atwiki.jp/blindjustice/">à–¾‘</a>
 <li><a href="http://www43.atwiki.jp/bjkurobutasaba/">Wiki</a>
 <li><a href="new_entry.cgi">V‹K“o˜^</a>

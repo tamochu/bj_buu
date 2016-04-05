@@ -41,7 +41,7 @@ $title = 'Blind Justice';
 $title_img = './html/title.jpg';
 
 # 戻り先URL
-$home = 'http://buu.pandora.nu/';
+$home = 'http://www.pandora.nu/nyaa/';
 
 # 大陸の名前
 $world_name = 'ﾕｸﾞﾄﾞﾗﾙ';
@@ -204,5 +204,5 @@ if ($is_smart
 #================================================
 # javascriptファイル更新変数
 #================================================
-$jstime = '201603302335';
+$jstime = '201604040110';
 1; # 削除不可
