@@ -142,58 +142,67 @@ sub tp_100 {
 	}
 	
 	# ”z”v
-	$m{rest_a} = 0;
-	$m{rest_b} = 0;
-	$m{rest_c} = 0;
-	$y{rest_a} = 0;
-	$y{rest_b} = 0;
-	$y{rest_c} = 0;
-	
-	my $idx = 0;
-	for my $cnt (1..$m{turn}) {
-		unless ($units[$m{unit}][7][$idx]) {
-			$idx = 0;
-		}
+	if ($m{war_select_switch}) {
+		$m{rest_a} = 0;
+		$m{rest_b} = 0;
+		$m{rest_c} = 0;
+		$y{rest_a} = 0;
+		$y{rest_b} = 0;
+		$y{rest_c} = 0;
 		
-		if ($units[$m{unit}][7][$idx] eq '1') {
-			$m{rest_a}++;
-		} elsif ($units[$m{unit}][7][$idx] eq '2') {
-			$m{rest_b}++;
-		} elsif ($units[$m{unit}][7][$idx] eq '3') {
-			$m{rest_c}++;
-		} else {
-			if (rand(3) < 1) {
+		my $idx = 0;
+		for my $cnt (1..$m{turn}) {
+			unless ($units[$m{unit}][7][$idx]) {
+				$idx = 0;
+			}
+			
+			if ($units[$m{unit}][7][$idx] eq '1') {
 				$m{rest_a}++;
-			} elsif (rand(2) < 1) {
+			} elsif ($units[$m{unit}][7][$idx] eq '2') {
 				$m{rest_b}++;
-			} else {
+			} elsif ($units[$m{unit}][7][$idx] eq '3') {
 				$m{rest_c}++;
-			}
-		}
-		$idx++;
-	}
-	$idx = 0;
-	for my $cnt (1..$m{turn}) {
-		unless ($units[$y{unit}][7][$idx]) {
-			$idx = 0;
-		}
-		
-		if ($units[$y{unit}][7][$idx] eq '1') {
-			$y{rest_a}++;
-		} elsif ($units[$y{unit}][7][$idx] eq '2') {
-			$y{rest_b}++;
-		} elsif ($units[$y{unit}][7][$idx] eq '3') {
-			$y{rest_c}++;
-		} else {
-			if (rand(3) < 1) {
-				$y{rest_a}++;
-			} elsif (rand(2) < 1) {
-				$y{rest_b}++;
 			} else {
-				$y{rest_c}++;
+				if (rand(3) < 1) {
+					$m{rest_a}++;
+				} elsif (rand(2) < 1) {
+					$m{rest_b}++;
+				} else {
+					$m{rest_c}++;
+				}
 			}
+			$idx++;
 		}
-		$idx++;
+		$idx = 0;
+		for my $cnt (1..$m{turn}) {
+			unless ($units[$y{unit}][7][$idx]) {
+				$idx = 0;
+			}
+			
+			if ($units[$y{unit}][7][$idx] eq '1') {
+				$y{rest_a}++;
+			} elsif ($units[$y{unit}][7][$idx] eq '2') {
+				$y{rest_b}++;
+			} elsif ($units[$y{unit}][7][$idx] eq '3') {
+				$y{rest_c}++;
+			} else {
+				if (rand(3) < 1) {
+					$y{rest_a}++;
+				} elsif (rand(2) < 1) {
+					$y{rest_b}++;
+				} else {
+					$y{rest_c}++;
+				}
+			}
+			$idx++;
+		}
+	} else {
+		$m{rest_a} = $m{turn};
+		$m{rest_b} = $m{turn};
+		$m{rest_c} = $m{turn};
+		$y{rest_a} = $m{turn};
+		$y{rest_b} = $m{turn};
+		$y{rest_c} = $m{turn};
 	}
 	
 	if ($config_test) {

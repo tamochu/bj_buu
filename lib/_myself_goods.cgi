@@ -113,7 +113,7 @@ sub tp_110 {
 				rename "$this_path_dir/$file_title", "$icondir/_add_$def_file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
 				$mes .= "デフォルトアイコンに追加しました<br>";
 			}elsif($in{is_send_library}){
-				rename "$this_path_dir/$file_title", "$logdir/library/$file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
+				rename "$this_path_dir/$file_title", "$logdir/library/book/$file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
 				$mes .= "図書館に寄贈しました<br>";
 			}
 		}

@@ -126,6 +126,9 @@ form { margin: 0; padding: 7px; }
 		<form method="$method" action="reset_player.cgi">
 			<input type="submit" name="name" value="Ø¾¯Äˆ—" class="button_s">
 		</form>
+		<form method="$method" action="search_player.cgi">
+			<input type="text" name="search_name" value=""><input type="submit" value="..." class="button_s">
+		</form>
 	</td>
 </tr>
 <tr>
