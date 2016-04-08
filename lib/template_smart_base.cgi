@@ -143,6 +143,14 @@ sub top_menu_html {
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	print qq|</form>|;
 	print qq|</td>|;
+	if (&is_sabakan){
+		print qq|<td>|;
+		print qq|<form method="$method" action="chat_admin.cgi">|;
+		print qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		print qq|</form>|;
+		print qq|</td>|;
+	}
 	print qq|</tr>|;
 	print qq|$country_menu|;
 	print qq|</table>|;

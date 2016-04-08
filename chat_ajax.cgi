@@ -28,6 +28,7 @@ while (my $line = <$fh>) {
 		last;
 	}
 	my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
+	$bname = &name_link($bname);
 	unless ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
 		$bname .= "[$bshogo]" if $bshogo;
 	}

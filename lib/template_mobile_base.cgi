@@ -52,6 +52,7 @@ sub top_menu_html {
 		print qq|<a href="./chat_casino.cgi?id=$id&pass=$pass">‘Îl¶¼ŞÉ</a>/|;
 	}
 	print qq|<a href="./bbs_daihyo.cgi?id=$id&pass=$pass">‘ã•\\•]‹c‰ï</a>/| unless $m{disp_daihyo} eq '0';
+	print qq|<a href="./chat_admin.cgi?id=$id&pass=$pass">‰^‰c“¢˜_ê</a>/| if (&is_sabakan);
 }
 
 #================================================

@@ -297,3 +297,18 @@ tr.stripe2 td { background-color: #C00; }
 	width: 550px;
 	height: 550px;
 }
+
+/*--------------------------------------
+ ‰ß‹‰h‚Å‚Ìƒ†[ƒU[–¼
+--------------------------------------*/
+a.clickable_name {
+	cursor: text !important;
+	color: inherit;
+	text-decoration: none;
+}
+a.clickable_name:hover {
+	background-color: transparent !important;
+}
+a.clickable_name:focus {
+	outline: none;
+}

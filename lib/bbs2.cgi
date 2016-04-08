@@ -97,6 +97,7 @@ sub run {
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 			print qq|<input type="submit" value="ƒŒƒX" class="button_s"></form><br>|;
 		}
+		$bname = &name_link($bname);
 		$bname .= "[$bshogo]" if $bshogo;
 		if ($is_mobile) {
 			print qq|<div>$bicon<font color="$cs{color}[$bcountry]">$bname<br>$bcomment <font size="1">($cs{name}[$bcountry] $bdate)</font></font>$reses</div><hr size="1">\n|;

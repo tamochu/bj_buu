@@ -57,7 +57,7 @@ sub tp_1 {
 		$mes .= "¡‡¬‰Â”\\‚È‚Ì‚Í<br>";
 		my $line_i = 0;
 		for my $pi (1..$#pets) {
-			if ($pets[$pi][5]) {
+			if ($pets[$pi][5] && $pi ne'180' && $pi ne'181') {
 				$mes .= $pets[$pi][1] . ", ";
 				$line_i++;
 				if ($line_i > 5) {

@@ -592,18 +592,8 @@ sub down_friendship {
 # C³ŒãŠ‘®l”
 #=================================================
 sub modified_member {
-	my $count_country = shift;
-	my $count = 0;
-	my @members = &get_country_members($count_country);
-	for my $member (@members) {
-		$member =~ tr/\x0D\x0A//d; # = chomp —]•ª‚È‰üsíœ
-		my $member_id = unpack 'H*', $member;
-		my %datas = &get_you_datas($member_id, 1);
-		unless ($datas{sedai} == 1) {
-			$count++;
-		}
-	}
-	return $count;
+	my $i = shift;
+	return $cs{member}[$i] - $cs{new_commer}[$i];
 }
 
 

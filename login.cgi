@@ -42,6 +42,8 @@ if (-M "./html/all.html" >= $update_cycle_day) {
 	&write_all_players_html;
 	&backup_players;
 }
+&make_player_name_list;
+&refresh_new_commer;
 exit;
 
 

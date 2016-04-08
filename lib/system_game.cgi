@@ -17,11 +17,13 @@ sub write_cs {
 		win_c old_ceo ceo war dom mil pro war_c dom_c mil_c pro_c ceo_continue
 		modify_war modify_dom modify_mil modify_pro
 		extra extra_limit
+		new_commer
 	/);
 	# 国名　総国力　税率　総兵糧　国家予算　総兵士数　状態　滅亡ﾌﾗｸﾞ　所属人数　定員　国色
 	# 統一数　旧代表者　代表者　参謀　内政官　策士　外交官　参謀ﾎﾟｲﾝﾄ　内政官ﾎﾟｲﾝﾄ　策士ﾎﾟｲﾝﾄ　外交官ﾎﾟｲﾝﾄ　代表年期
 	# 各国設定戦争　内政　軍事　外交
 	# 追加効果　追加効果期限
+	# 新規数
 	
 	# -------------------
 	# 物資の最大値
@@ -483,7 +485,10 @@ sub send_money {
 # 表示しつつﾆｭｰｽにも書き込む
 #================================================
 sub mes_and_world_news {
-	my $w_name = ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) ? '名無し':$m{name};
+	my $w_name = &name_link($m{name});
+	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+		$wname = '名無し';
+	}
 	my $message = shift;
 	$mes .= "$message<br>";
 	  $message =~ /^<b>/  ? &write_world_news("<b>$c_mの$w_nameが</b>$message", @_)
@@ -493,7 +498,10 @@ sub mes_and_world_news {
 	;
 }
 sub mes_and_send_news {
-	my $w_name = ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) ? '名無し':$m{name};
+	my $w_name = &name_link($m{name});
+	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+		$wname = '名無し';
+	}
 	my $message = shift;
 	$mes .= "$message<br>";
 	  $message =~ /^<b>/  ? &write_send_news("<b>$c_mの$w_nameが</b>$message", @_)
@@ -995,6 +1003,28 @@ sub get_modify {
 													(1.1 + 0.02 * $cs{'modify_' . $var}[$m{country}]);
 	return $modify;
 }
+
+#================================================
+# 新規数カウント
+#================================================
+sub refresh_new_commer {
+	for my $i (1..$w{country}) {
+		$cs{new_commer}[$i] = 0;
+	}
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $uid = readdir $dh) {
+		next if $uid =~ /\./;
+		next if $uid =~ /backup/;
+		my %datas = &get_you_datas($uid, 1);
+		if ($datas{sedai} == 1) {
+			$cs{new_commer}[$datas{country}]++;
+		}
+	}
+	closedir $dh;
+	
+	&write_cs;
+}
+
 #================================================
 # 国追加
 #================================================

@@ -113,6 +113,12 @@ sub framework {
 		print qq|<input type="submit" value="‚l‚™ ‚q‚‚‚" class="button1">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		print qq|</form>|;
+		if (&is_sabakan){
+			print qq|<form method="$method" action="chat_admin.cgi">|;
+			print qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1">|;
+			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			print qq|</form>|;
+		}
 	}
 	print qq|<p>$menu_cmd</p>| if $layout eq '2' && $menu_cmd;
 	print qq|</td></tr><tr>|;

@@ -473,6 +473,81 @@ sub log_errors {
 	close $fh;
 }
 
+#================================================
+# ﾌﾟﾚｲﾔｰ名リンク
+#================================================
+sub name_link {
+	my $name = shift;
+	
+	my $id = unpack("H*", $name);
+	return "<a href=\"profile.cgi?id=$id\" class=\"clickable_name\">$name</a>";
+}
+
+#================================================
+# ﾌﾟﾚｲﾔｰ名置換
+#================================================
+sub name_replace {
+	$text = shift;
+	
+	my @names = ();
+	open my $fh, "< $logdir/player_name_list.cgi";
+	while (my $name = <$fh>) {
+		chomp($name);
+		if ($name) {
+			push @names, $name;
+		}
+	}
+	close $fh;
+	
+	for my $name (@names) {
+		my @pre_links = ();
+		while ($text =~ /^(.*?)(<a\s.*?>.*?<\/a>)(.*)$/) {
+			$text = $1 . '__a_dummy__' . $3;
+			push @pre_links, $2;
+		}
+		my @pre_tags = ();
+		while ($text =~ /^(.*?)(<.*?>)(.*)$/) {
+			$text = $1 . "__tag__" . $3;
+			push @pre_tags, $2;
+		}
+		my $text_new = '';
+		my $q_name = quotemeta $name;
+		while ($text =~ /^(.*?)$q_name(.*)$/) {
+			$text_new .= $1 . &name_link($name);
+			$text = $2;
+		}
+		$text = $text_new . $text;
+		while ($text =~ /^(.*?)__tag__(.*)$/) {
+			my $tag = shift @pre_tags;
+			$text = $1 . $tag . $2;
+		}
+		while ($text =~ /^(.*?)__a_dummy__(.*)$/) {
+			my $a_tag = shift @pre_links;
+			$text = $1 . $a_tag . $2;
+		}
+	}
+	return $text;
+}
+
+#================================================
+# ﾌﾟﾚｲﾔｰリスト作成
+#================================================
+sub make_player_name_list {
+	my @lines = ();
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $id = readdir $dh) {
+		next if $id =~ /\./;
+		next if $id =~ /backup/;
+		$name = pack 'H*', $id;
+		push @lines, "$name\n";
+	}
+	closedir $dh;
+	
+	open my $fh, "> $logdir/player_name_list.cgi";
+	print $fh @lines;
+	close $fh;
+}
+
 
 
 

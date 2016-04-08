@@ -72,6 +72,7 @@ sub run {
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $line = <$fh>) {
 		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
+		$bname = &name_link($bname);
 		unless ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
 			$bname .= "[$bshogo]" if $bshogo;
 		}

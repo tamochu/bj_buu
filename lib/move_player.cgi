@@ -68,7 +68,7 @@ sub move_player {
 		close $fh9;
 		++$cs{member}[$to_country];
 	}
-	
+	&refresh_new_commer;
 	&write_cs;
 }
 
