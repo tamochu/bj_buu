@@ -174,7 +174,7 @@ sub war_win {
 		$v = int($v * 1.1) ;
 	}
 	# ŒNå‚Í’D‘—Í1.05”{A–\ŒN‚È‚ç‚Î1.2”{
-	elseif ($cs{ceo}[$m{country}] eq $m{name}) {
+	elsif ($cs{ceo}[$m{country}] eq $m{name}) {
 		my $ceo_value = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05;
 		$v = int($v * $ceo_value);
 	}
