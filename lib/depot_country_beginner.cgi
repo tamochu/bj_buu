@@ -213,7 +213,7 @@ sub tp_210 {
 	eval { flock $fh, 2; };
 	push @lines, $_ while <$fh>;
 	
-	if (@lines >= $max_depot+1) {
+	if (@lines >= $max_depot) {
 		close $fh;
 		$mes .= '‚±‚êˆÈã—a‚¯‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ<br>';
 	}
