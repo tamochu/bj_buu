@@ -169,19 +169,10 @@ sub war_win {
 	# 各国設定
 	$v *= &get_modify('war');
 	
-	# 参謀は奪国力1.1倍
-	if ($cs{war}[$m{country}] eq $m{name}) {
-		$v = int($v * 1.1) ;
-	}
-	# 君主は奪国力1.05倍、暴君時ならば1.2倍
-	elseif ($cs{ceo}[$m{country}] eq $m{name}) {
-		my $ceo_value = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05;
-		$v = int($v * $ceo_value);
-	}
-#	#代表ボーナス
-#	$v = int($v * 1.1) if $cs{war}[$m{country}] eq $m{name};    
-#	$v = int($v * 1.05) if $cs{ceo}[$m{country}] eq $m{name};
-
+	#代表ボーナス
+	$v = int($v * 1.1) if $cs{war}[$m{country}] eq $m{name};	
+	$v = int($v * 1.05) if $cs{ceo}[$m{country}] eq $m{name};
+	
 	
 	$v = $v * $m{value} * (rand(0.4)+0.8);
 	$v = $m{value} * 100 if $m{pet} eq '193';

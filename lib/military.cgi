@@ -516,14 +516,8 @@ sub exe3 {
 	my $k = shift;
 	
 	
-	# ôm‚Í’DŒR–—Í1.1”{
 	$m{stock} = int($m{stock} * 1.1) if  $cs{mil}[$m{country}] eq $m{name};
-	# ŒNå‚Í’DŒR–—Í1.05”{A–\ŒN‚È‚ç‚Î1.2”{
-	if ($cs{ceo}[$m{country}] eq $m{name}) {
-		my $ceo_value = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05;
-		$m{stock} = int($m{stock} * $ceo_value);
-	}
-#	$m{stock} = int($m{stock} * 1.05) if  $cs{ceo}[$m{country}] eq $m{name};
+	$m{stock} = int($m{stock} * 1.05) if  $cs{ceo}[$m{country}] eq $m{name};
 	$m{stock} = int($m{stock} * 1.1) if  $m{unit} eq '17';
 	$m{stock} = int($m{stock} * 0.3) if  $m{unit} eq '18';
 	
