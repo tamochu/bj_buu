@@ -306,9 +306,8 @@ sub salary {
 	# ŒNå‚È‚ç‹‹—¿2.0”{A‘‚Ì‘ã•\Ò‚È‚ç‹‹—¿1.5”{
 	if ($cs{ceo}[$m{country}] eq $m{name}) {
 		$v *= 2.0;
-	}
-	else {
-		$v *= 1.5 if &is_daihyo;
+	} elsif (&is_daihyo) {
+		$v *= 1.5;
 	}
 	
 	# “ˆê‘‚È‚çÎŞ°Å½
