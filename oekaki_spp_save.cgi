@@ -29,8 +29,8 @@ sub save_img {
 	my %datas = &get_you_datas($fid, 1);
 	&error_oekaki("wrong password") unless $datas{pass} eq $fpass;
 	
-	# ãƒ•ã‚¡ã‚¤ãƒ«ä½œæˆâ†’ãƒã‚¤ãƒŠãƒªãƒ‡ãƒ¼ã‚¿èª­ã¿æ›¸ãâ†’ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºãŒ0ãƒã‚¤ãƒˆãªã‚‰å‰Šé™¤
-	# ã‚¹ãƒžãƒ¼ãƒˆã˜ã‚ƒãªã„ã®ã§ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºå–å¾—â†’1ãƒã‚¤ãƒˆä»¥ä¸Šãªã‚‰ãƒ•ã‚¡ã‚¤ãƒ«ä½œæˆã¨æ›¸ãè¾¼ã¿ã«ã—ãŸã„
+	# ƒtƒ@ƒCƒ‹ì¬¨ƒoƒCƒiƒŠƒf[ƒ^“Ç‚Ý‘‚«¨ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ª0ƒoƒCƒg‚È‚çíœ
+	# ƒXƒ}[ƒg‚¶‚á‚È‚¢‚Ì‚Åƒtƒ@ƒCƒ‹ƒTƒCƒYŽæ“¾¨1ƒoƒCƒgˆÈã‚È‚çƒtƒ@ƒCƒ‹ì¬‚Æ‘‚«ž‚Ý‚É‚µ‚½‚¢
 	open my $fh, "> $userdir/$fid/picture/_$time.$image_type" or &error_oekaki("save failed");
 	binmode $fh;
 	my $file_size = 0;
