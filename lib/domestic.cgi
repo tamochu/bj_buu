@@ -108,8 +108,19 @@ sub tp_400 {
 		&begin;
 	}
 }
-
-
+#=================================================
+# 内政官&君主ボーナス
+#=================================================
+sub dom_ceo_bonus {
+	my $v = shift;
+	# 内政官は内政力1.1倍
+	return $v * 1.1 if $cs{dom}[$m{country}] eq $m{name};
+	# 君主は内政力1.05倍、暴君時ならば1.2倍
+	if ($cs{ceo}[$m{country}] eq $m{name}) {
+		return $v * ( ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05 );
+	}
+	return $v;
+}
 #=================================================
 # 農業結果
 #=================================================
@@ -124,11 +135,12 @@ sub tp_110 {
 		$v *= 0.5; # 暴風
 	}
 	
-	if ($cs{dom}[$m{country}] eq $m{name}) {
-		$v *= 1.1; # 代表ボーナス
-	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-		$v *= 1.05;
-	}
+	$v = dom_ceo_bonus($v);
+#	if ($cs{dom}[$m{country}] eq $m{name}) {
+#		$v *= 1.1; # 代表ボーナス
+#	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
+#		$v *= 1.05;
+#	}
 	
 	# 各国設定
 	$v *= &get_modify('dom');
@@ -159,11 +171,12 @@ sub tp_210 {
 		$v *= 0.5; # 不況
 	}
 	
-	if ($cs{dom}[$m{country}] eq $m{name}) {
-		$v *= 1.1; # 代表ボーナス
-	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-		$v *= 1.05;
-	}
+	$v = dom_ceo_bonus($v);
+#	if ($cs{dom}[$m{country}] eq $m{name}) {
+#		$v *= 1.1; # 代表ボーナス
+#	} elsif ($cs{ceo}[$m{country}] eq $m{name}) {
+#		$v *= 1.05;
+#	}
 	
 	# 各国設定
 	$v *= &get_modify('dom');
@@ -191,11 +204,12 @@ sub tp_310 {
 		$v *= 0.5; # 飢饉
 	}
 	
-	if ($cs{dom}[$m{country}] eq $m{name}) {
-		$v *= 1.1; # 代表ボーナス
-	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-		$v *= 1.05;
-	}
+	$v = dom_ceo_bonus($v);
+#	if ($cs{dom}[$m{country}] eq $m{name}) {
+#		$v *= 1.1; # 代表ボーナス
+#	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
+#		$v *= 1.05;
+#	}
 	
 	# 各国設定
 	$v *= &get_modify('dom');

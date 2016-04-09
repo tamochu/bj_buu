@@ -129,7 +129,10 @@ sub tp_110 {
 		$v += 1 if $m{gai_c} > 1000;
 		$v += 1 if $m{gai_c} > 1400;
 		$v += rand(3)+1 if $cs{pro}[$m{country}] eq $m{name};
-		$v += 1 if $cs{ceo}[$m{country}] eq $m{name};
+		if ($cs{ceo}[$m{country}] eq $m{name}) {
+			$v = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? int(rand(4)+2) : 1;
+		}
+#		$v += 1 if $cs{ceo}[$m{country}] eq $m{name};
 		$v *= $modify;
 		
 		$w{"f_$u"} += int($v);
