@@ -4,5 +4,3 @@ blind justice黒豚鯖ソースコード
 
 @see http://buu.pandora.nu/cgi-bin/bj/index.cgi
 @see http://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi?
-
-文字化けテスト
