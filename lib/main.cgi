@@ -303,8 +303,13 @@ sub salary {
 	
 	my $v = int( $salary_base * &tax ) + 1000;
 	
-	# 国の代表者ならﾎﾞｰﾅｽ
-	$v *= 1.5 if &is_daihyo;
+	# 君主なら給料2.0倍、国の代表者なら給料1.5倍
+	if $cs{ceo}[$m{country}] eq $m{name} {
+		$v *= 2.0;
+	}
+	else {
+		$v *= 1.5 if &is_daihyo;
+	}
 	
 	# 統一国ならﾎﾞｰﾅｽ
 	my($c1, $c2) = split /,/, $w{win_countries};
