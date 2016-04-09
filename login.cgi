@@ -331,6 +331,7 @@ my $html =<<"EOM";
 <html>
 <head>
 <meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
 <link rel="stylesheet" type="text/css" href="bj.css">
 <title>$title / $cs{name}[$country]</title>
 <link rel="stylesheet" type="text/css" href="themes/green/style.css">
@@ -372,6 +373,7 @@ my $html =<<"EOM";
 <html>
 <head>
 <meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
 <link rel="stylesheet" type="text/css" href="bj.css">
 <title>$title / 全プレイヤー</title>
 <link rel="stylesheet" type="text/css" href="themes/green/style.css">
@@ -444,6 +446,7 @@ sub header_chart_html {
 	my $html = '';
 	$html .= qq|<html><head>|;
 	$html .= qq|<meta http-equiv="Cache-Control" content="no-cache">|;
+	$html .= qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 	$html .= qq|<title>$title / $cs{name}[$country]</title>|;
 	$html .= qq|</head><body $body>|;
 	$html .= qq|<form method="$method" action="../$script_index"><input type="submit" value="ＴＯＰ"></form>|;
