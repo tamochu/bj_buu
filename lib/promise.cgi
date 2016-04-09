@@ -131,7 +131,7 @@ sub tp_110 {
 		$v += rand(3)+1 if $cs{pro}[$m{country}] eq $m{name};
 		# ŒNå‚Í—FDğ–ñ+1A–\ŒN‚È‚ç‚Î+2`5
 		if ($cs{ceo}[$m{country}] eq $m{name}) {
-			$v = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? int(rand(4)+2) : 1;
+			$v += ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? int(rand(4)+2) : 1;
 		}
 #		$v += 1 if $cs{ceo}[$m{country}] eq $m{name};
 		$v *= $modify;
