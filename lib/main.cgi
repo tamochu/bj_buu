@@ -304,7 +304,7 @@ sub salary {
 	my $v = int( $salary_base * &tax ) + 1000;
 	
 	# ŒNå‚È‚ç‹‹—¿2.0”{A‘‚Ì‘ã•\Ò‚È‚ç‹‹—¿1.5”{
-	if $cs{ceo}[$m{country}] eq $m{name} {
+	if ($cs{ceo}[$m{country}] eq $m{name}) {
 		$v *= 2.0;
 	}
 	else {
