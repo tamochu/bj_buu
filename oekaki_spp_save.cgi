@@ -29,13 +29,23 @@ sub save_img {
 	my %datas = &get_you_datas($fid, 1);
 	&error_oekaki("wrong password") unless $datas{pass} eq $fpass;
 	
+	# ファイル作成→バイナリデータ読み書き→ファイルサイズが0バイトなら削除
+	# スマートじゃないのでファイルサイズ取得→1バイト以上ならファイル作成と書き込みにしたい
 	open my $fh, "> $userdir/$fid/picture/_$time.$image_type" or &error_oekaki("save failed");
 	binmode $fh;
-	while (read($file, $buffer, 1024)) {
+	my $file_size = 0;
+	my $read_size = read($file, $buffer, 1024);
+	while ($read_size) {
+		$file_size += $read_size;
 		print $fh $buffer;
+		$read_size = read($file, $buffer, 1024);
 	}
 	close $fh;
 	close $file;
+	if ($file_size == 0) {
+		unlink "$userdir/$fid/picture/_$time.$image_type";
+		&error_oekaki("save failed\nyour web browser is not supported");
+	}
 	
 	print "Content-type: text/plain\n\n";
 }
