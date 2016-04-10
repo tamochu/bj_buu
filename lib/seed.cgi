@@ -23,7 +23,7 @@ $unmarried_human_percent = 50;
 %seeds = &get_seeds;
 
 # 基本種族
-$default_seed = 'human'
+$default_seed = 'human';
 
 #================================================
 # 種族ボーナス
@@ -32,7 +32,7 @@ sub get_seeds {
 	require "$datadir/seeds.cgi";
 	my %all_seeds = ();
 	for my $i (0..$#default_seeds) {
-		%all_seeds{$default_seeds[$i][1]} = $default_seeds[$i][2];
+		%all_seeds{$default_seeds[$i][1]} = @{$default_seeds[$i][2]};
 	}
 	# ここ
 	return %all_seeds;
@@ -42,7 +42,8 @@ sub get_seeds {
 # 種族ボーナス
 #================================================
 sub seed_bonus {
-	my($lib, $v) = @_;
+	my $lib = shift;
+	my $v = shift;
 	if ($m{seed} eq '' || !defined($seeds{$m{seed}})) {
 		$m{seed} = $default_seed;
 	}
@@ -56,11 +57,11 @@ sub seed_bonus {
 # 種族ボーナス
 #================================================
 sub seed_change {
-	my $v = shift;
-	if ($v eq 'keep') {
+	my $sta = shift;
+	if ($sta eq 'keep') {
 		return;
 	}
-	if ($v eq 'change' && rand(100) < $change_percent) {
+	if ($sta eq 'change' && rand(100) < $change_percent) {
 		if (rand(100) < $change_new_seed_percent) {
 			&create_new_seed;
 		} else {
@@ -95,7 +96,7 @@ sub create_new_seed {
 	10
 );
 EOM
-	open my $fh "< $add_seeds_dir/$new_seed";
+	open my $fh "< $add_seeds_dir/$new_seed.cgi";
 	print $fh $blank_line;
 	close $fh;
 	$m{seed} = $new_seed;
