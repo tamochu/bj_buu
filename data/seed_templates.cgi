@@ -98,7 +98,7 @@ EOM
 	[7, '’Z–½',
 		{
 			'sedai_lv' => <<'EOM'
-		'sedai_lv' => sub {
+		,'sedai_lv' => sub {
 			$v = shift;
 			$v -= 10;
 			return $v;
@@ -110,7 +110,7 @@ EOM
 	[8, '’·–½',
 		{
 			'sedai_lv' => <<'EOM'
-		'sedai_lv' => sub {
+		,'sedai_lv' => sub {
 			$v = shift;
 			$v += 10;
 			return $v;
@@ -122,7 +122,7 @@ EOM
 	[9, '”sŽÒ‚ðP‚¤',
 		{
 			'war_win' => <<'EOM'
-		'war_win' => sub {
+		,'war_win' => sub {
 			$v = shift;
 			if (&you_exists($y{name})) {
 				%datas = &get_you_datas($y{name});

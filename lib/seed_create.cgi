@@ -1,4 +1,4 @@
-
+require "$datadir/seed_templates.cgi";
 #================================================
 # 新種族テンプレート選択
 #================================================
@@ -17,7 +17,7 @@ sub tp_100  {
 	$mes .= "テンプレートを選んでください。";
 	$layout = 2;
 	&show_templates;
-	$m{tp} = 100;
+	$m{tp} = 200;
 	&n_menu;
 }
 
@@ -54,7 +54,6 @@ sub tp_200 {
 }
 
 sub show_templates {
-	require "$datadir/seed_templates.cgi";
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<table class="table1"><tr><th>選択</th><th>能力名</th><th>ステータス値<br></th></tr>| unless $is_mobile;
 	
