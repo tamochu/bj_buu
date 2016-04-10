@@ -101,8 +101,8 @@ sub create_new_seed {
 	'–¼Ì–¢Œˆ’è',
 	{
 		'default' => sub {
-			$v = shift;
-			return $v;
+			\$v = shift;
+			return \$v;
 		}
 	},
 	10
