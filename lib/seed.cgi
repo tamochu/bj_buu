@@ -39,7 +39,7 @@ sub get_seeds {
 	}
 	opendir my $dh, "$add_seeds_dir" or &error("’Ç‰ÁŽí‘°ÃÞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $fname = readdir $dh) {
-		next if $fname =~ /\./;
+		next if $fname !~ /\.cgi/;
 		$fname =~ s/\.cgi//g;
 		require "$add_seeds_dir/$fname.cgi";
 		$all_seeds{$fname} = \@$fname;
