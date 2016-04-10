@@ -5,10 +5,15 @@
 
 #================================================
 sub begin {
-	$m{tp} = 1;
+	$m{tp} = 100;
 	&n_menu;
 }
 sub tp_1  {
+	$m{tp} = 100;
+	&n_menu;
+}
+
+sub tp_100  {
 	$mes .= "テンプレートを選んでください。";
 	$layout = 2;
 	&show_templates;
@@ -16,7 +21,7 @@ sub tp_1  {
 	&n_menu;
 }
 
-sub tp_100 {
+sub tp_200 {
 	if (&is_ng_cmd(1)) {
 		&begin;
 		return;

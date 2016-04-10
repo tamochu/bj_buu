@@ -100,7 +100,7 @@ sub seed_change {
 #================================================
 sub create_new_seed {
 	$m{lib} = 'seed_create';
-	$m{tp} = 1;
+	$m{tp} = 100;
 	$m{stock} = 1;
 	$mes .= "V‚½‚ÈŒŒ–¬‚ª’a¶‚·‚éB<br>";
 }
