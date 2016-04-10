@@ -32,7 +32,7 @@ sub get_seeds {
 	require "$datadir/seeds.cgi";
 	my %all_seeds = ();
 	for my $i (0..$#default_seeds) {
-		%all_seeds{$default_seeds[$i][1]} = @{$default_seeds[$i][2]};
+		$all_seeds{$default_seeds[$i][1]} = @{$default_seeds[$i][2]};
 	}
 	# ‚±‚±
 	return %all_seeds;
@@ -96,7 +96,7 @@ sub create_new_seed {
 	10
 );
 EOM
-	open my $fh "< $add_seeds_dir/$new_seed.cgi";
+	open my $fh, "> $add_seeds_dir/$new_seed.cgi";
 	print $fh $blank_line;
 	close $fh;
 	$m{seed} = $new_seed;
