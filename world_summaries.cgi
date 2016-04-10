@@ -15,7 +15,7 @@ exit;
 #================================================
 sub run {
 	$in{world} ||= 0;
-	$in{world} = 0 if $in{world} >= @world_states;
+	$in{world} = 0 if $in{world} > @world_states;
 
 	if ($in{id} && $in{pass}) {
 		print qq|<form method="$method" action="$script">|;
