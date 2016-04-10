@@ -111,7 +111,7 @@ sub top {
 		my($id, $name, $pass, $country, $addr, $host, $agent, $ldate) = split /<>/, $line;
 		
 		# もしホスト名が同じなら赤表示
-		if ( ($addr eq $b_addr && $host eq $b_host && $agent eq $b_agent)
+		if ( ($host ne 'admin_login' && $addr eq $b_addr && $host eq $b_host && $agent eq $b_agent)
 			|| ($agent eq $b_agent && ($agent =~ /DoCoMo/ || $agent =~ /KDDI|UP\.Browser/ || $agent =~ /J-PHONE|Vodafone|SoftBank/)) ) {
 				unless ($is_duplicated) {
 					my($pid, $pname, $ppass, $pcountry, $paddr, $phost, $pagent, $pldate) = split /<>/, $pre_line;
