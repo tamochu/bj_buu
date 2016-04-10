@@ -43,8 +43,10 @@ sub tp_1 { # C—
 		
 		if ($m{money} >= $need_money) {
 			$need_money = &use_pet('smith', $need_money);
+			$need_money = &seed_bonus('smith', $need_money);
 			$m{money} -= $need_money;
 			++$m{wea_lv} if $m{wea_lv} < 30;
+
 
 			if ($m{wea} eq '31' && $m{wea_lv} >= 30) {
 				$mes .= "$weas[$m{wea}][1]‚Í•²X‚ÉÓ‚¯U‚è$weas[32][1]‚É‚È‚è‚Ü‚µ‚½<br>";

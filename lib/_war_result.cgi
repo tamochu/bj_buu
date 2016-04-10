@@ -184,6 +184,7 @@ sub war_win {
 
 	
 	$v = $v * $m{value} * (rand(0.4)+0.8);
+	$v = &seed_bonus('war_win', $v);
 	$v = $m{value} * 100 if $m{pet} eq '193';
 	if($m{unit} eq '18'){
 		$v = $v * 1.5;

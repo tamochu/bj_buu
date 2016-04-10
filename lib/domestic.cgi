@@ -185,6 +185,9 @@ sub tp_210 {
 	$v *= &get_modify('dom');
 	
 	$v = &use_pet('sho', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '29');
+	
+	$v = &seed_bonus('sho', $v);
+	
 	$v = int($v);
 
 	$cs{money}[$m{country}] += $v;
@@ -220,6 +223,9 @@ sub tp_310 {
 	if ($v < $m{money}){
 		$v = &use_pet('hei', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '30');
 	}
+	
+	$v = &seed_bonus('hei', $v);
+
 	$v = int($v);
 
 	$v = $m{money} if $v > $m{money};
