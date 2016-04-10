@@ -22,7 +22,7 @@ sub tp_100  {
 }
 
 sub tp_200 {
-	if (&is_ng_cmd(1)) {
+	if ($cmd ne '1') {
 		&begin;
 		return;
 	}
@@ -49,6 +49,7 @@ sub tp_200 {
 	}
 	
 	&create_seed;
+	&refresh;
 }
 
 sub show_templates {
