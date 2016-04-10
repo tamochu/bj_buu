@@ -977,24 +977,14 @@ sub bug_prize {
 # —ÕŽžˆ—(‚¨‚»‚ç‚­ˆê“x‚¾‚¯‚Ìˆ—‚Ìê‡‚»‚Ì“s“x‚±‚±‚Åˆ—)
 #=================================================
 sub admin_expendable {
-	$w{year} = 1;
-	$w{world} = 0;
-	$w{playing} = 0;
-	
-	my $country = $w{country};
-	my $ave_c = int($w{player} / $country);
-	for my $i (1..$w{country}) {
-		$cs{win_c}[$i]    = 0;
-		$cs{tax}[$i]      = 30;
-		$cs{strong}[$i]   = int(rand(6)  + 7) * 1000;
-		$cs{food}[$i]     = int(rand(10) + 3) * 1000;
-		$cs{money}[$i]    = int(rand(10) + 3) * 1000;
-		$cs{soldier}[$i]  = int(rand(10) + 3) * 1000;
-		$cs{state}[$i]    = rand(2) > 1 ? 0 : int(rand(@country_states));
-		$cs{capacity}[$i] = $ave_c;
-		$cs{is_die}[$i]   = 0;
+	opendir my $dh, "$userdir" or &error("Õ°»Þ°ÃÞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	while (my $pid = readdir $dh) {
+		next if $pid =~ /\./;
+		next if $pid =~ /backup/;
+		
+		my %pm = &get_you_datas($pid, 1);
+		&regist_you_data($pm{name}, "seed", 'human');
 	}
-	&write_cs;
 }
 
 #=================================================

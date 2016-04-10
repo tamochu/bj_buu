@@ -168,6 +168,8 @@ sub create_user {
 	for my $k (@zeros) {
 		$m{$k} = 0;
 	}
+	
+	$m{seed} = 'human';
 
 	&write_user;
 	
