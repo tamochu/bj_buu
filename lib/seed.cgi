@@ -99,32 +99,10 @@ sub seed_change {
 # 新種族
 #================================================
 sub create_new_seed {
-	$new_seed = "new_seed_" . $time . $id;
-	$blank_line = <<"EOM";
-\@$new_seed = (
-	'名称未決定',
-	{
-		'default' => sub {
-			\$v = shift;
-			return \$v;
-		}
-	},
-	10
-);
-
-1;
-EOM
-	open my $fh, "> $add_seeds_dir/$new_seed.cgi";
-	print $fh $blank_line;
-	close $fh;
-	$m{seed} = $new_seed;
-	
-	$in{comment} = qq|$m{name} さんが新種族になりました。至急対応をお願いします。|;
-	my $mname = $m{name};
-	$m{name} = "システム";
-	&send_letter($admin_name, 0);
-	&send_letter($admin_sub_name, 0);
-	$m{name} = $mname;
+	$m{lib} = 'seed_create';
+	$m{tp} = 1;
+	$m{stock} = 1;
+	$mes .= "新たな血脈が誕生する。<br>";
 }
 
 #================================================
