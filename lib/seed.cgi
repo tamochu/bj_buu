@@ -98,12 +98,12 @@ sub create_new_seed {
 	$blank_line = <<"EOM";
 \@$new_seed = (
 	'–¼Ì–¢Œˆ’è',
-	(
+	{
 		'default' => sub {
 			$v = shift;
 			return $v;
 		}
-	),
+	},
 	10
 );
 
