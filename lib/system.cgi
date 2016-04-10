@@ -340,6 +340,7 @@ sub access_check {
 			
 		}
 	} else {
+		$agent = 'admin_agent';
 		$addr = '0.0.0.0';
 		$host = 'admin_login';
 	}
