@@ -55,7 +55,7 @@ sub seed_bonus {
 	print $seeds{$m{seed}}[2];
 	print "ddd";
 	if (defined($seeds{$m{seed}}[1]{$lib})) {
-		$v = &{$seeds{$m{seed}}[1]{$lib}}($v);
+		$v = &{${$seeds{$m{seed}}[1]}{$lib}}($v);
 	}
 	return $v;
 }
