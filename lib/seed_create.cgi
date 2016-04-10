@@ -50,6 +50,7 @@ sub tp_200 {
 	
 	&create_seed;
 	&refresh;
+	&n_menu;
 }
 
 sub show_templates {
