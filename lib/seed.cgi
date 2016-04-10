@@ -119,7 +119,7 @@ EOM
 	close $fh;
 	$m{seed} = $new_seed;
 	
-	$in{comment} = print qq|$m{name} さんが新種族になりました。至急対応をお願いします。|;
+	$in{comment} = qq|$m{name} さんが新種族になりました。至急対応をお願いします。|;
 	my $mname = $m{name};
 	$m{name} = "システム";
 	&send_letter($admin_name, 0);
@@ -132,7 +132,7 @@ EOM
 #================================================
 sub seed_overflow {
 	my $seeds_num = keys(%seeds);
-	if ($seed_num > $seeds_max) {
+	if ($seeds_num > $seeds_max) {
 		my %seed_players = ();
 
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
