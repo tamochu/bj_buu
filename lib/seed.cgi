@@ -76,7 +76,8 @@ sub seed_change {
 		if (rand(100) < $change_new_seed_percent) {
 			&create_new_seed;
 		} else {
-			$m{seed} = int(rand(@seeds));
+			my @seed_keys = keys(%seeds);
+			$m{seed} = $seed_keys[int(rand(@seed_keys))];
 		}
 	} else {
 		if ($m{marriage} && &you_exists($m{marriage})) {
