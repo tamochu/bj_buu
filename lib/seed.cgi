@@ -106,6 +106,8 @@ sub create_new_seed {
 	),
 	10
 );
+
+1;
 EOM
 	open my $fh, "> $add_seeds_dir/$new_seed.cgi";
 	print $fh $blank_line;
