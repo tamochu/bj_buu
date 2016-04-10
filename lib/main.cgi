@@ -496,6 +496,20 @@ sub lv_up {
 			}
 			close $fh;
 		}
+		if ($pets[$m{pet}][2] eq 'keep_seed') {
+			$mes .= "$pets[$m{pet}][1]★$m{pet_c}の力により種族がそのまま引き継がれました<br>";
+			$mes .= "役目を終えた$pets[$m{pet}][1]★$m{pet_c}は、光の中へと消えていった…<br>";
+			$m{pet} = 0;
+			&seed_change('keep');
+		} elsif ($pets[$m{pet}][2] eq 'change_seed') {
+			$mes .= "$pets[$m{pet}][1]★$m{pet_c}の力により種族が変わるかもしれません<br>";
+			$mes .= "役目を終えた$pets[$m{pet}][1]★$m{pet_c}は、光の中へと消えていった…<br>";
+			$m{pet} = 0;
+			&seed_change('change');
+		} else {
+			&seed_change('');
+		}
+		&refresh_new_commer;
 	}
 	# レベルアップ
 	else {

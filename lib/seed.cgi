@@ -25,6 +25,9 @@ $unmarried_human_percent = 50;
 # 基本種族
 $default_seed = 'human';
 
+# 種族数閾値
+$seeds_max = 10;
+
 #================================================
 # 種族情報
 #================================================
@@ -34,7 +37,15 @@ sub get_seeds {
 	for my $i (0..$#default_seeds) {
 		$all_seeds{$default_seeds[$i][1]} = $default_seeds[$i][2];
 	}
-	# ここ
+	opendir my $dh, "$add_seeds_dir" or &error("追加種族ﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $fname = readdir $dh) {
+		next if $fname =~ /\./;
+		$fname =~ s/\.cgi//g;
+		require "$add_seeds_dir/$fname.cgi";
+		$all_seeds{$fname} = \@$fname;
+	}
+	closedir $dh;
+
 	return %all_seeds;
 }
 
@@ -100,6 +111,21 @@ EOM
 	print $fh $blank_line;
 	close $fh;
 	$m{seed} = $new_seed;
+	
+	$in{comment} = print qq|$m{name} さんが新種族になりました。至急対応をお願いします。|;
+	my $mname = $m{name};
+	$m{name} = "システム";
+	&send_letter($admin_name, 0);
+	&send_letter($admin_sub_name, 0);
+	$m{name} = $mname;
+	
+	&seed_overflow;
 }
 
+#================================================
+# 絶滅
+#================================================
+sub seed_overflow {
+
+}
 1; # 削除不可
