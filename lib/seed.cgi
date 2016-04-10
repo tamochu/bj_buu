@@ -76,7 +76,10 @@ sub seed_change {
 		if (rand(100) < $change_new_seed_percent) {
 			&create_new_seed;
 		} else {
-			my @seed_keys = keys(%seeds);
+			my @seed_keys = ();
+			foreach $key (keys(%seeds)) {
+				push @seed_keys, $key for 1..$seeds{$key}[2];
+			}
 			$m{seed} = $seed_keys[int(rand(@seed_keys))];
 		}
 	} else {
@@ -89,6 +92,7 @@ sub seed_change {
 			$m{seed} = 0;
 		}
 	}
+	&seed_overflow;
 }
 
 #================================================
@@ -121,14 +125,31 @@ EOM
 	&send_letter($admin_name, 0);
 	&send_letter($admin_sub_name, 0);
 	$m{name} = $mname;
-	
-	&seed_overflow;
 }
 
 #================================================
 # â–Å
 #================================================
 sub seed_overflow {
+	my $seeds_num = keys(%seeds);
+	if ($seed_num > $seeds_max) {
+		my %seed_players = ();
 
+		opendir my $dh, "$userdir" or &error("Õ°»Ş°ÃŞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		while (my $uid = readdir $dh) {
+			next if $uid =~ /\./;
+			next if $uid =~ /backup/;
+			my %datas = &get_you_datas($uid, 1);
+			$seed_players{$datas{seed}}++;
+		}
+		closedir $dh;
+		for my $key (keys(%seeds)) {
+			if (!$seed_players{$key}) {
+				if (-f "$add_seeds_dir/$key.cgi") {
+					unlink "$add_seeds_dir/$key.cgi";
+				}
+			}
+		}
+	}
 }
 1; # íœ•s‰Â
