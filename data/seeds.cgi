@@ -4,7 +4,7 @@
 		(
 			'nou' => sub {
 				$v = shift;
-				print $v;
+				$m{shogo} = "hhh";
 				return $v;
 			}
 		),

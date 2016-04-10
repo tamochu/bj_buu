@@ -47,6 +47,9 @@ sub seed_bonus {
 	if ($m{seed} eq '' || !defined($seeds{$m{seed}})) {
 		$m{seed} = $default_seed;
 	}
+	print %seeds;
+	print $m{seed};
+	print $seeds{$m{seed}};
 	if (defined($seeds{$m{seed}}[1]{$lib})) {
 		$v = &{$seeds{$m{seed}}[1]{$lib}}($v);
 	}
