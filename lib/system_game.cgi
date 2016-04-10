@@ -3,6 +3,7 @@
 #================================================
 require './lib/jcode.pl';
 require './lib/summer_system_game.cgi';
+require './lib/seed.cgi';
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
 #================================================
@@ -119,7 +120,7 @@ sub write_user {
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可(login_time以外))
 	my @keys = (qw/
 		login_time ldate start_time name pass lib tp wt act sex shogo sedai vote
-		country job lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
+		country job seed lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
 		max_hp hp max_mp mp at df mat mdf ag cha lea wea wea_c wea_lv wea_name gua egg egg_c pet pet_c shuffle master master_c boch_pet
 		marriage lot is_full next_salary icon mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
 		rest_a rest_b rest_c
@@ -139,7 +140,7 @@ sub write_user {
 		sox_kind sox_no
 	/);
 	# ﾛｸﾞｲﾝ時間　更新日時　作成日時　名前　ﾊﾟｽﾜｰﾄﾞ　ﾗｲﾌﾞﾗﾘ　ﾀｰﾆﾝｸﾞﾎﾟｲﾝﾄ　待ち時間　疲労度　性別　称号　世代　投票　
-	# 所属国　職業　ﾚﾍﾞﾙ　経験値　ﾗﾝｸ　ﾗﾝｸ経験値　兵種　兵士数　士気　勲章　お金　ｺｲﾝ　技(複数)　連続攻めた国　連続ｶｳﾝﾄ　
+	# 所属国　職業　種族　ﾚﾍﾞﾙ　経験値　ﾗﾝｸ　ﾗﾝｸ経験値　兵種　兵士数　士気　勲章　お金　ｺｲﾝ　技(複数)　連続攻めた国　連続ｶｳﾝﾄ　
 	# 最大HP　HP　最大MP　MP　力　守り　魔力　魔防　素早　魅力　統率　武器　武器耐久　武器ﾚﾍﾞﾙ　防具　特殊武器名　ﾀﾏｺﾞ　ﾀﾏｺﾞ成長　ﾍﾟｯﾄ　シャッフルフラグ　
 	# 結婚相手　宝ｸｼﾞ　預かり所満杯ﾌﾗｸﾞ　次の給与　ｱｲｺﾝ　ﾒｯｾｰｼﾞ　勝ちｾﾘﾌ　負けｾﾘﾌ　統一ｾﾘﾌ　更新時間　ｶﾞﾁｬ時間 ｶﾞﾁｬ時間2 賽銭時間　いたずら解除時間　発言禁止時間
 	# ﾀｰﾝ　ｽﾄｯｸ　ﾊﾞﾘｭｰ　ﾌﾟﾚｲ中ﾌﾗｸﾞ　相手ﾃﾞｰﾀ …
@@ -650,6 +651,19 @@ sub disaster {
 	&write_world_news("<b>世界中に $disasters[$v][0] が起こりました</b>");
 }
 #================================================
+# 相手ﾃﾞｰﾀがあるかチェック
+#================================================
+sub you_exists {
+	my($name, $is_unpack) = @_;
+
+	my $y_id = $is_unpack ? $name : unpack 'H*', $name;
+	
+	if (-f "$userdir/$y_id/user.cgi") {
+		return 1;
+	}
+	return 0;
+}
+#================================================
 # 相手ﾃﾞｰﾀをGet 戻り値はハッシュ
 #================================================
 # 使い方: &get_you_datas('相手の名前');
@@ -657,6 +671,7 @@ sub get_you_datas {
 	my($name, $is_unpack) = @_;
 	
 	my $y_id = $is_unpack ? $name : unpack 'H*', $name;
+	
 	open my $fh, "< $userdir/$y_id/user.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません$y_id");
 	my $line_data = <$fh>;
 	my $line_info = <$fh>;
@@ -1433,4 +1448,5 @@ sub create_sale_data_chart {
 		close $out;
 	}
 }
+
 1; # 削除不可
