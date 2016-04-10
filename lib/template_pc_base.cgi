@@ -419,7 +419,7 @@ sub world_info {
 
 	print $w{playing} >= $max_playing ? qq|<font color="#FF0000">œ</font>| : qq|<font color="#00FF00">œ</font>|;
 	print qq|ÌßÚ²’†y$w{playing}/$max_playinglz/ |;
-	print qq|¢ŠEî¨y<a href="world_summaries.cgi?id=$id&$pass=$pass&world=$w{world}" class="clickable_name">$world_states[$w{world}]</a>z/ |;
+	print qq|¢ŠEî¨y<a href="world_summaries.cgi?id=$id&pass=$pass&world=$w{world}" class="clickable_name">$world_states[$w{world}]</a>z/ |;
 	print qq|$world_name—ïy$w{year}”Nz/ |;
 	print qq|“ˆêŠúŒÀyc‚è$limit_dayz<br>|;
 	
