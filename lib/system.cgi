@@ -301,30 +301,48 @@ sub access_check {
 			&error($deny_message) if $host =~ /^$deny$/i;
 		}
 	}
-	my $is_find = 0;
-	if(-f "$userdir/$id/access_log.cgi"){
-		open my $fh, "< $userdir/$id/access_log.cgi" or &error("そのような名前$in{login_name}のﾌﾟﾚｲﾔｰが存在しません");
-		while (my $line = <$fh>){
-			my($access_addr, $access_host, $access_agent) = split /<>/, $line;
-			if($is_mobile){
-				if($access_agent eq $agent){
-					$is_find = 1;
-				}
-			}else{
-				if($access_addr eq $addr && $access_host eq $host && $access_agent eq $agent){
-					$is_find = 1;
+	my $logging = 1;
+	for my $nolog (@nolog_lists) {
+		$nolog =~ s/\./\\\./g;
+		$nolog =~ s/\*/\.\*/g;
+		
+		if ($is_mobile) {
+			$logging = 0 if $agent =~ /$nolog/;
+		}
+		else {
+			$logging = 0 if $addr =~ /^$nolog$/i;
+			$logging = 0 if $host =~ /^$nolog$/i;
+		}
+	}
+	
+	if ($logging) {
+		my $is_find = 0;
+		if(-f "$userdir/$id/access_log.cgi"){
+			open my $fh, "< $userdir/$id/access_log.cgi" or &error("そのような名前$in{login_name}のﾌﾟﾚｲﾔｰが存在しません");
+			while (my $line = <$fh>){
+				my($access_addr, $access_host, $access_agent) = split /<>/, $line;
+				if($is_mobile){
+					if($access_agent eq $agent){
+						$is_find = 1;
+					}
+				}else{
+					if($access_addr eq $addr && $access_host eq $host && $access_agent eq $agent){
+						$is_find = 1;
+					}
 				}
 			}
+			close $fh;
 		}
-		close $fh;
+		if(!$is_find && $id){
+			open my $fh2, ">> $userdir/$id/access_log.cgi" or &error("そのような名前$in{login_name}のﾌﾟﾚｲﾔｰが存在しません");
+			print $fh2 "$addr<>$host<>$agent<>\n";
+			close $fh2;
+			
+		}
+	} else {
+		$addr = '0.0.0.0';
+		$host = 'admin_login';
 	}
-	if(!$is_find && $id){
-		open my $fh2, ">> $userdir/$id/access_log.cgi" or &error("そのような名前$in{login_name}のﾌﾟﾚｲﾔｰが存在しません");
-		print $fh2 "$addr<>$host<>$agent<>\n";
-		close $fh2;
-		
-	}
-
 }
 
 #================================================
