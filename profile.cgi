@@ -176,7 +176,7 @@ sub status_pc {
 			<font color="#99CC99">¿œ∫ﬁÅF$eggs[$m{egg}][1]</font>
 		</tt></td><td valign="top" align="left"><tt>
 			<b>$m{sedai}</b>ê¢ë„ñ⁄ $sexes[ $m{sex} ]<br>
-			Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]]<br>
+			Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>
 			<hr size="1">
 			éëã‡ <b>$m{money}</b>G<br>
 			<hr size="1">
