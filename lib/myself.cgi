@@ -250,7 +250,7 @@ sub my_status_mobile {
 	my $m_st = &m_st;
 	$mes .=<<"EOM";
 		<b>$m{sedai}</b>¢‘ã–Ú<br>
-		$sexes[ $m{sex} ] [$jobs[$m{job}][1]]<br>
+		$sexes[ $m{sex} ] [$jobs[$m{job}][1]][$seeds{$m{seed}}[1]]<br>
 		ŒMÍ <b>$m{medal}</b>ŒÂ<br>
 		¶¼ŞÉº²İ <b>$m{coin}</b>–‡<br>
 		•ó¸¼Şy$m{lot}z<br>

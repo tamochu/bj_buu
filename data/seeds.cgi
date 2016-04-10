@@ -30,7 +30,7 @@
 			{
 				'nou' => sub {
 					$v = shift;
-					$v = int($v * 1000.05);
+					$v = int($v * 1.05);
 					return $v;
 				},
 				'hei' => sub {

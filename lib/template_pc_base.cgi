@@ -267,7 +267,7 @@ sub status_html {
 	</tt></td><td valign="top" align="left"><tt>
 		
 		<b>$m{sedai}</b>ê¢ë„ñ⁄ $sexes[ $m{sex} ]<br>
-		Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]]<br>
+		Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>
 		<font color="#CC9999">$e2j{hp} [ <b>$m{hp}</b>/<b>$m{max_hp}</b> ]</font><br>
 		<font color="#CC99CC">$e2j{mp} [ <b>$m{mp}</b>/<b>$m{max_mp}</b> ]</font><br>
 		<hr size="1">
