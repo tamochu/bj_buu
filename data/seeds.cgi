@@ -2,8 +2,9 @@
 	[0, 'human',
 		['Ë­°Ïİ',
 		(
-			'default' => sub {
+			'nou' => sub {
 				$v = shift;
+				print $v;
 				return $v;
 			}
 		),

@@ -144,8 +144,11 @@ sub tp_110 {
 	
 	# äeçëê›íË
 	$v *= &get_modify('dom');
-		
+	
 	$v = &use_pet('nou', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '28');
+	
+	$v = &seed_bonus('nou', $v);
+	
 	$v = int($v);
 	
 	$cs{food}[$m{country}] += $v;
