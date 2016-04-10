@@ -86,7 +86,7 @@
 								&regist_you_data($datas{name}, 'marriage', $m{name});
 
 								&write_world_news(qq|<font color="#740A00">ƒ™:ß*'ö‚©‚è¥'*ß:™„$m{name}‚Æ$datas{name}‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
-s
+
 								my @lines = ();
 								open my $fh3, "+< $marriage_file_woman" or &error("$marriage_file_womanÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 								eval { flock $fh3, 2; };
