@@ -146,7 +146,7 @@ sub top_menu_html {
 	if (&is_sabakan){
 		print qq|<td>|;
 		print qq|<form method="$method" action="chat_admin.cgi">|;
-		print qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1">|;
+		print qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1s">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		print qq|</form>|;
 		print qq|</td>|;
