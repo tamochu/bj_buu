@@ -248,6 +248,7 @@ sub countries_info {
 		:       ''
 		;
 	print qq|¢ŠEî¨ <a href="world_summaries.cgi?id=$id&pass=$pass&world=$w{world}" style="text-decoratin:none;">$world_states[$w{world}]</a><br>|;
+	print qq|¢ŠEî¨ <a href="world_summaries.cgi?id=$id&pass=$pass&world=$w{world}" style="border-bottom:1px solid #000;">$world_states[$w{world}]</a><br>|;
 	print qq|$world_name—ï$w{year}”N<br>|;
 }
 
