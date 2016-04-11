@@ -247,7 +247,7 @@ sub countries_info {
 		: $c1 ? qq|“ˆê‘ <font color="$cs{color}[$c1]">$cs{name}[$c1]</font><br>|
 		:       ''
 		;
-	print qq|¢ŠEî¨ <a href="world_summaries.cgi?id=$id&pass=$pass&world=$w{world}" class="clickable_name">$world_states[$w{world}]</a><br>|;
+	print qq|¢ŠEî¨ <a href="world_summaries.cgi?id=$id&pass=$pass&world=$w{world}" style="color:inherit;text-decoration:none;">$world_states[$w{world}]</a><br>|;
 	print qq|$world_name—ï$w{year}”N<br>|;
 }
 

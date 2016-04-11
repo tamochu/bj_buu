@@ -91,5 +91,5 @@ sub run {
 	}
 
 	print "<h1>$world_states[$in{world}]</h1>";
-	print "$world_states[$in{world}]‚Å‚ÍA$world_summaries[$in{world}]";
+	print "$world_states[$in{world}]‚ÍA$world_summaries[$in{world}]";
 }
