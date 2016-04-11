@@ -286,6 +286,17 @@ sub main_system {
 		require './lib/fx_func.cgi';
 		$mes .= &check_losscut;
 	}
+	
+	if ($config_test) {
+		if ($in{seed_change}) {
+			&seed_change('change');
+		} else {
+			$mes .= qq|<form method="$method" action="$script">|;
+			$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			$mes .= qq|<input type="hidden" name="seed_change" value="1">|;
+			$mes .= qq|<input type="submit" value="‹­§Ží‘°•ÏX" class="button1"></form>|;
+		}
+	}
 }
 
 
