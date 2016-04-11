@@ -54,9 +54,9 @@ sub tp_200 {
 }
 
 sub show_templates {
-	$mes .= qq|振り分け可能pt$m{stock}<br>|;
+	$mes .= qq|振り分け可能\pt$m{stock}<br>|;
 	$mes .= qq|<form method="$method" action="$script">|;
-	$mes .= qq|<table class="table1"><tr><th>選択</th><th>能力名</th><th>ステータス値<br></th></tr>| unless $is_mobile;
+	$mes .= qq|<table class="table1"><tr><th>選択</th><th>能\力名</th><th>ステータス値<br></th></tr>| unless $is_mobile;
 	
 	for my $i (0..$#seed_templates) {
 		$mes .= $is_mobile ? qq|<input type="checkbox" name="check_$seed_templates[$i][0]" value="1"/> / $seed_templates[$i][1] / $seed_templates[$i][3]<br>|
