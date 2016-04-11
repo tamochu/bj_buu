@@ -9,7 +9,7 @@ use File::Path;
 $add_seeds_dir = "$datadir/add_seeds";
 
 # 転生成功確率(%)
-$change_percent = 50;
+$change_percent = 100;
 
 # 新種族確率(%)
 $change_new_seed_percent = 10;
@@ -72,6 +72,8 @@ sub seed_change {
 	if ($sta eq 'keep') {
 		return;
 	}
+	$before = $m{seed};
+	
 	if ($sta eq 'change' && rand(100) < $change_percent) {
 		if (rand(100) < $change_new_seed_percent) {
 			&create_new_seed;
@@ -89,9 +91,14 @@ sub seed_change {
 				$m{seed} = $datas{seed};
 			}
 		} elsif (rand(100) < $unmarried_human_percent)  {
-			$m{seed} = 0;
+			$m{seed} = $default_seed;
 		}
 	}
+	
+	if ($before ne $m{seed}) {
+		$mes .= "$seeds{$m{seed}}[0]に転生しました。";
+	}
+	
 	&seed_overflow;
 }
 
