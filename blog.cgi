@@ -145,7 +145,7 @@ sub view_blog {
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ºÒİÄ‚ğ‘‚­</a><br>@bcomments</td></tr>| if $is_comment;
 			print qq|</table><br>|;
-#		}
+		}
 	}
 	close $fh;
 }
