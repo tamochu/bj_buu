@@ -108,7 +108,7 @@ sub seed_change {
 sub create_new_seed {
 	$m{lib} = 'seed_create';
 	$m{tp} = 100;
-	$m{stock} = 1;
+	$m{stock} = int(rand(3));
 	$mes .= "V‚½‚ÈŒŒ–¬‚ª’a¶‚·‚éB<br>";
 }
 
