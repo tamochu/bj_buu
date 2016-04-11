@@ -34,7 +34,7 @@ sub tp_200 {
 			my @seed_keys = keys($seed_templates[$i][2]);
 			for my $key (@seed_keys) {
 				if ($sames{$key}++) {
-					$mes .= "同系統のステータスは同時に選べません。";
+					$mes .= "同系統のステータス($key)は同時に選べません。";
 					&begin;
 					return;
 				}
@@ -54,6 +54,7 @@ sub tp_200 {
 }
 
 sub show_templates {
+	$mes .= qq|振り分け可能pt$m{stock}<br>|;
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<table class="table1"><tr><th>選択</th><th>能力名</th><th>ステータス値<br></th></tr>| unless $is_mobile;
 	
@@ -77,6 +78,7 @@ sub create_seed {
 			return \$v;
 		}
 EOM
+	my $pt = 0;
 	for my $i (0..$#seed_templates) {
 		if ($in{'check_' . $seed_templates[$i][0]}) {
 			for my $key (keys($seed_templates[$i][2])) {
@@ -86,6 +88,7 @@ EOM
 					$bonus_line .= $seed_templates[$i][2]->{$key};
 				}
 			}
+			$pt += $seed_templates[$i][3];
 		}
 	}
 	$blank_line = <<"EOM";
@@ -104,7 +107,12 @@ EOM
 	close $fh;
 	$m{seed} = $new_seed;
 	
-	$in{comment} = qq|$m{name} さんが新種族になりました。至急対応をお願いします。|;
+	$in{comment} = qq|$m{name} さんが新種族になりました。至急対応をお願いします。<br>|;
+	$in{comment} .= qq|振り分けpt $pt / $m{stock}<br>|;
+	if ($in{free}) {
+		$in{comment} .= qq|自由入力<br>|;
+		$in{comment} .= $in{free};
+	}
 	my $mname = $m{name};
 	$m{name} = "システム";
 	&send_letter($admin_name, 0);
