@@ -122,25 +122,36 @@ sub myself_blog {
 #================================================
 sub view_blog {
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが読み込めません");
-	while (my $line = <$fh>) {
-		$line =~ tr/\x0D\x0A//d;
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
-		next if $bicon;
-		$bname .= "[$bshogo]" if $bshogo;
-		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
-		if ($is_mobile) {
-			print qq|<br>$bdate|;
-			print qq|<hr>$baddr|;
-			print qq|<hr>$bcomment<br>|;
-			print qq|<hr><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments| if $is_comment;
-			print qq|<hr><br>|;
+	if ($is_mobile) {
+		while (my $line = <$fh>) {
+			$line =~ tr/\x0D\x0A//d;
+			my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
+			next if $bicon;
+			$bname .= "[$bshogo]" if $bshogo;
+			print qq|$bdate <a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">$baddr</a>|;
 		}
-		else {
-			print qq|<table class="table1" cellpadding="5" width="440">|;
-			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
-			print qq|<tr><td>$bcomment<br></td></tr>|;
-			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments</td></tr>| if $is_comment;
-			print qq|</table><br>|;
+	}
+	else {
+		while (my $line = <$fh>) {
+			$line =~ tr/\x0D\x0A//d;
+			my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
+			next if $bicon;
+			$bname .= "[$bshogo]" if $bshogo;
+			$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
+			if ($is_mobile) {
+				print qq|<br>$bdate|;
+				print qq|<hr>$baddr|;
+				print qq|<hr>$bcomment<br>|;
+				print qq|<hr><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments| if $is_comment;
+				print qq|<hr><br>|;
+			}
+			else {
+				print qq|<table class="table1" cellpadding="5" width="440">|;
+				print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
+				print qq|<tr><td>$bcomment<br></td></tr>|;
+				print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments</td></tr>| if $is_comment;
+				print qq|</table><br>|;
+			}
 		}
 	}
 	close $fh;
