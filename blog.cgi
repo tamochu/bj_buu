@@ -128,7 +128,7 @@ sub view_blog {
 			my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
 			next if $bicon;
 			$bname .= "[$bshogo]" if $bshogo;
-			print qq|$bdate <a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">$baddr</a>|;
+			print qq|$bdate <a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">$baddr</a><hr>|;
 		}
 	}
 	else {
