@@ -461,6 +461,7 @@ sub tp_930 { # ô”]¬Œ÷
 sub tp_140 { # ‹­’D
 	&c_up('gou_c') for 1 .. $m{turn};
 	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
+	$m{stock} = &seed_bonus('gou', $m{stock});
 	my $v = &exe3('food');
 	&write_yran('gou', $v) if $v > 0;
 	&write_yran('gou_t', $v, 1) if $v > 0;
@@ -470,6 +471,7 @@ sub tp_140 { # ‹­’D
 sub tp_240 { # ’³•ñ
 	&c_up('cho_c') for 1 .. $m{turn};
 	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
+	$m{stock} = &seed_bonus('cho', $m{stock});
 	my $v = &exe3('money');
 	&write_yran('cho', $v) if $v > 0;
 	&write_yran('cho_t', $v, 1) if $v > 0;
@@ -479,6 +481,7 @@ sub tp_240 { # ’³•ñ
 sub tp_340 { # ô”]
 	&c_up('sen_c') for 1 .. $m{turn};
 	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
+	$m{stock} = &seed_bonus('sen', $m{stock});
 	my $v = &exe3('soldier');
 	&write_yran('sen', $v) if $v > 0;
 	&write_yran('sen_t', $v, 1) if $v > 0;
@@ -488,6 +491,7 @@ sub tp_340 { # ô”]
 sub tp_740 { # ‹­’D
 	&c_up('gou_c') for 1 .. $m{turn};
 	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
+	$m{stock} = &seed_bonus('gou', $m{stock});
 	my $v = &exe3('food');
 	&write_yran('gou', $v) if $v > 0;
 	&write_yran('gou_t', $v, 1) if $v > 0;
@@ -497,6 +501,7 @@ sub tp_740 { # ‹­’D
 sub tp_840 { # ’³•ñ
 	&c_up('cho_c') for 1 .. $m{turn};
 	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
+	$m{stock} = &seed_bonus('cho', $m{stock});
 	my $v = &exe3('money');
 	&write_yran('cho', $v) if $v > 0;
 	&write_yran('cho_t', $v, 1) if $v > 0;
@@ -506,6 +511,7 @@ sub tp_840 { # ’³•ñ
 sub tp_940 { # ô”]
 	&c_up('sen_c') for 1 .. $m{turn};
 	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
+	$m{stock} = &seed_bonus('sen', $m{stock});
 	my $v = &exe3('soldier');
 	&write_yran('sen', $v) if $v > 0;
 	&write_yran('sen_t', $v, 1) if $v > 0;
@@ -645,6 +651,7 @@ sub tp_540 { # ‹UŒv
 	      	$m{gik_c} > 2000 ? int($m{turn} * 1.4):
 		int($m{turn} * (2000 + $m{gik_c}) / 2900);
 	$v = 10 if $v > 10;
+	$v = &seed_bonus('gik', $v);
 	&write_yran('gik', $v, 1) if $v > 0;
 	for my $i (1 .. $w{country}) {
 		next if $y{country} eq $i;

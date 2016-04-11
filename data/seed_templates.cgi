@@ -191,6 +191,78 @@ EOM
 		},
 		2
 	],
+	[12, '‹­—~',
+		{
+			'gou' => <<'EOM'
+		,'gou' => sub {
+			$v = shift;
+			$v = int($v * 1.05);
+			return $v;
+		}
+EOM
+		},
+		2
+	],
+	[13, 'æ‚è‚±‚Ú‚µ',
+		{
+			'gou' => <<'EOM'
+		,'gou' => sub {
+			$v = shift;
+			$v = int($v * 0.95);
+			return $v;
+		}
+EOM
+		},
+		-2
+	],
+	[14, '007',
+		{
+			'cho' => <<'EOM'
+		,'cho' => sub {
+			$v = shift;
+			$v = int($v * 1.05);
+			return $v;
+		}
+EOM
+		},
+		2
+	],
+	[15, 'ˆ«–Ú—§‚¿',
+		{
+			'cho' => <<'EOM'
+		,'cho' => sub {
+			$v = shift;
+			$v = int($v * 0.95);
+			return $v;
+		}
+EOM
+		},
+		-2
+	],
+	[16, 'ƒiƒ“ƒp',
+		{
+			'sen' => <<'EOM'
+		,'sen' => sub {
+			$v = shift;
+			$v = int($v * 1.05);
+			return $v;
+		}
+EOM
+		},
+		2
+	],
+	[17, 'Œû‰ºè',
+		{
+			'sen' => <<'EOM'
+		,'sen' => sub {
+			$v = shift;
+			$v = int($v * 0.95);
+			return $v;
+		}
+EOM
+		},
+		-2
+	],
 );
 
 1;

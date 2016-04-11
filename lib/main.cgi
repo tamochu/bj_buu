@@ -355,6 +355,7 @@ sub lv_up {
 	++$m{lv};
 	
 	# ¢‘ãŒğ‘ã
+	my $sedai_max = &seed_bonus('sedai_lv', 100);
 	if ($m{lv} >= 100) {
 		$m{lv} = 1;
 		&c_up('sedai');
