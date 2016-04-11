@@ -339,7 +339,7 @@ sub reset {
 	
 	# set world
 	$w{year}++;
-	$w{reset_time} = $config_test ? $time : $time + 3600 * 12;
+	$w{reset_time} = $config_test ? $time : $time + 3600 * 8; #12
 	$w{limit_time} = $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
