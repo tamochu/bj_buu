@@ -379,8 +379,9 @@ sub header {
 		print qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 		print qq|<link rel="shortcut icon" href="$htmldir/favicon.ico">|;
 		print qq|<link rel="stylesheet" type="text/css" href="$htmldir/bj.css?$jstime">|;
-		print qq|<script type="text/javascript" src="$htmldir/nokori_time.js"></script>\n|;
-		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js"></script>\n|;
+		print qq|<script type="text/javascript" src="$htmldir/nokori_time.js?$jstime"></script>\n|;
+		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
+		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
 	}
 	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	print qq|<title>$title</title>|;
@@ -499,7 +500,7 @@ sub name_link {
 	my $name = shift;
 	
 	my $id = unpack("H*", $name);
-	return "<a href=\"profile.cgi?id=$id\" class=\"clickable_name\">$name</a>";
+	return "<span data-id=\"$id\" class=\"namelink\">$name</span>";
 }
 
 #================================================
