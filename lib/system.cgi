@@ -500,7 +500,8 @@ sub name_link {
 	my $name = shift;
 	
 	my $id = unpack("H*", $name);
-	return "<span data-id=\"$id\" class=\"namelink\">$name</span>";
+	my $tabindex = $is_mobile ? qq| tabindex="20"| : qq||;
+	return "<span data-id=\"$id\" class=\"namelink\"$tabindex>$name</span>";
 }
 
 #================================================
