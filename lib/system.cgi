@@ -500,8 +500,7 @@ sub name_link {
 	my $name = shift;
 	
 	my $id = unpack("H*", $name);
-	my $tabindex = $is_mobile ? qq| tabindex="20" onclick="location.href='profile.cgi?id=$id'"| : qq||;
-	return "<span data-id=\"$id\" class=\"namelink\"$tabindex>$name</span>";
+	return qq|<a href="profile.cgi?id=$id" style="color:inherit;text-decoration:none;" class="clickable_name">$name</a>|;
 }
 
 #================================================
