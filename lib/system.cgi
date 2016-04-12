@@ -382,6 +382,8 @@ sub header {
 		print qq|<script type="text/javascript" src="$htmldir/nokori_time.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
+	} else {
+		print qq|<link rel="stylesheet" type="text/css" href="$htmldir/bj_mobile.css?$jstime">|;
 	}
 	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	print qq|<title>$title</title>|;
@@ -500,7 +502,7 @@ sub name_link {
 	my $name = shift;
 	
 	my $id = unpack("H*", $name);
-	return qq|<a href="profile.cgi?id=$id" style="color:inherit;text-decoration:none;" class="clickable_name">$name</a>|;
+	return qq|<a href="profile.cgi?id=$id" class="clickable_name">$name</a>|;
 }
 
 #================================================
