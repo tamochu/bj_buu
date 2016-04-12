@@ -108,6 +108,7 @@ EOM
 	$m{seed} = $new_seed;
 	
 	$in{comment} = qq|$m{name} さんが新種族になりました。至急対応をお願いします。<br>|;
+	$in{comment} .= qq|キー : $m{seed}<br>|;
 	$in{comment} .= qq|振り分けpt $pt / $m{stock}<br>|;
 	if ($in{free}) {
 		$in{comment} .= qq|自由入力<br>|;
