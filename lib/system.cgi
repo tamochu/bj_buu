@@ -161,7 +161,7 @@ sub union {
 sub send_letter {
 	my($name, $is_save_log) = @_;
 	
-	if ($name =~ "^<(.*)>$" && &is_sabakan) {
+	if ($name =~ /^&lt;(.*)&gt;$/ && &is_sabakan) {
 		&send_group($1);
 		return;
 	}
