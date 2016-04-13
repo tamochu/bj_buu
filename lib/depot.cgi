@@ -360,6 +360,7 @@ sub tp_410 {
 	my $send_id = unpack 'H*', $in{send_name};
 	my %datas = &get_you_datas($send_id, 1);
 	
+	# ‚±‚±‚Ìˆ—‚ğ•Ï‚¦‚é‚Æ‚±‚ë‚©‚ç
 	if ($datas{is_full} && $cmd ne '5' && !&is_sabakan) {
 		$mes .= "$in{send_name}‚Ì—a‚©‚èŠ‚ª–”t‚Å‘—‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ<br>";
 		&begin;
