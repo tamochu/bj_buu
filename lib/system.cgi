@@ -211,7 +211,28 @@ sub send_letter_save_log {
 
 sub send_group {
 	$group = shift;
-	print qq|$group|;
+	if ($group eq 'all') {
+		my @names = &get_player_name_list;
+		for my $name (@names) {
+			&send_letter($name, 0);
+		}
+	} elsif ($group eq 'ceo') {
+		for my $i (1..$w{country}) {
+			if ($cs{ceo}[$i]) {
+				&send_letter($cs{ceo}[$i], 0);
+			}
+		}
+	} elsif ($group eq 'daihyo') {
+		for my $i (1..$w{country}) {
+			for my $k (qw/war dom pro mil ceo/) {
+				if ($cs{$k}[$i]) {
+					&send_letter($cs{$k}[$i], 0);
+				}
+			}
+		}
+	} else {
+		&error("$groupというグループは存在しません");
+	}
 }
 
 #==========================================================
@@ -520,15 +541,7 @@ sub name_link {
 sub name_replace {
 	$text = shift;
 	
-	my @names = ();
-	open my $fh, "< $logdir/player_name_list.cgi";
-	while (my $name = <$fh>) {
-		chomp($name);
-		if ($name) {
-			push @names, $name;
-		}
-	}
-	close $fh;
+	my @names = &get_player_name_list;
 	
 	for my $name (@names) {
 		my @pre_links = ();
@@ -577,6 +590,23 @@ sub make_player_name_list {
 	open my $fh, "> $logdir/player_name_list.cgi";
 	print $fh @lines;
 	close $fh;
+}
+
+#================================================
+# ﾌﾟﾚｲﾔｰリスト取得
+#================================================
+sub get_player_name_list {
+	my @names = ();
+	open my $fh, "< $logdir/player_name_list.cgi";
+	while (my $name = <$fh>) {
+		chomp($name);
+		if ($name) {
+			push @names, $name;
+		}
+	}
+	close $fh;
+	
+	return @names;
 }
 
 
