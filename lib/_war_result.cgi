@@ -74,7 +74,8 @@ sub war_lose {
 	&refresh;
 	my $renzoku = $m{unit} eq '18' ? $m{renzoku_c} * 2: $m{renzoku_c};
 	if ( ( ($w{world} eq '7' || ($w{world} eq '19' && $w{world_sub} eq '7')) && $cs{strong}[$y{country}] <= 3000 ) || ( ($w{world} eq '11' || ($w{world} eq '19' && $w{world_sub} eq '11')) && $renzoku > rand(4) ) || $renzoku > rand(7) + 2  || ($cs{is_die}[$m{country}] && $renzoku == 1 && rand(9) < 1) || ($cs{is_die}[$m{country}] && $renzoku == 2 && rand(8) < 1)) {
-		&write_world_news("$c_m‚Ì$m{name}‚ª$c_y‚Ì˜S–‚É—H•Â‚³‚ê‚Ü‚µ‚½");
+		my $mname = &name_link($m{name});
+		&write_world_news("$c_m‚Ì$mname‚ª$c_y‚Ì˜S–‚É—H•Â‚³‚ê‚Ü‚µ‚½");
 		&add_prisoner;
 	}
 
@@ -253,16 +254,17 @@ sub war_win {
 		$mes .= "$c_y‚©‚ç$v‚Ì$e2j{strong}‚ğ’D‚¢‚Ü‚µ‚½<br>";
 	}
 	
+	my $mname = &name_link($m{name});
 	if ($w{world} eq $#world_states - 5) {
-		&write_world_news(qq|$c_m‚Ì$m{name}‚ª<font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ“¾‚é–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
+		&write_world_news(qq|$c_m‚Ì$mname‚ª<font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ“¾‚é–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
 	} else {
 		if ($is_single) {
-			&write_world_news(qq|$c_m‚Ì$m{name}‚ª$c_y‚ÉNUA$y{name}‚Æˆê‹R“¢‚¿‚Ì––‚±‚ê‚ğ‰º‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
+			&write_world_news(qq|$c_m‚Ì$mname‚ª$c_y‚ÉNUA$y{name}‚Æˆê‹R“¢‚¿‚Ì––‚±‚ê‚ğ‰º‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
 		}
 		else {
 			$m{value} < 1
 				? &write_world_news(qq|‰½Ò‚©‚ª$c_y‚ÉNUA$y{name}‚Ì•”‘à‚ğŒ‚”j‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤‚±‚Æ‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|)
-				: &write_world_news(qq|$c_m‚Ì$m{name}‚ª$c_y‚ÉNUA$y{name}‚Ì•”‘à‚ğŒ‚”j‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤‚±‚Æ‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|)
+				: &write_world_news(qq|$c_m‚Ì$mname‚ª$c_y‚ÉNUA$y{name}‚Ì•”‘à‚ğŒ‚”j‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤‚±‚Æ‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|)
 				;
 		}
 	}
@@ -500,36 +502,37 @@ sub _touitu {
 	}
 	++$cs{win_c}[$m{country}];
 	
+	my $mname = &name_link($m{name});
 	if ($w{world} eq $#world_states) {
 		if ($m{country} eq $w{country} || $union eq $w{country}) { # NPC‘‘¤‚ÌŸ—˜
 			&mes_and_world_news("<em>ˆ«–‚’B‚Ì—¦æÒ‚Æ‚µ‚Ä$world_name‘å—¤‚ğx”z‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½</em>",1);
-			&write_legend('touitu', "[‚«ˆÅ‚æ‚è–ÚŠo‚ß‚½$cs{name}[$w{country}]‚Ì–ÒÒ’B‚ª$m{name}‚ğ•M“ª‚Æ‚µ$world_name‘å—¤‚ğx”z‚·‚é");
+			&write_legend('touitu', "[‚«ˆÅ‚æ‚è–ÚŠo‚ß‚½$cs{name}[$w{country}]‚Ì–ÒÒ’B‚ª$mname‚ğ•M“ª‚Æ‚µ$world_name‘å—¤‚ğx”z‚·‚é");
 			$is_npc_win = 1;
 		}
 		else {
 			&mes_and_world_news("<em>–‚ŠE‚ğÄ‚Ñ••ˆó‚µA$world_name‘å—¤‚É‚Ğ‚Æ‚Æ‚«‚ÌˆÀ‚ç‚¬‚ª‚¨‚Æ‚¸‚ê‚Ü‚µ‚½</em>",1);
-			&write_legend('touitu', "$c_m‚Ì$m{name}‚Æ‚»‚Ì’‡ŠÔ’B‚ª–‚ŠE‚ğÄ‚Ñ••ˆó‚µA$world_name‘å—¤‚É‚Ğ‚Æ‚Æ‚«‚ÌˆÀ‚ç‚¬‚ª‚¨‚Æ‚¸‚ê‚é");
+			&write_legend('touitu', "$c_m‚Ì$mname‚Æ‚»‚Ì’‡ŠÔ’B‚ª–‚ŠE‚ğÄ‚Ñ••ˆó‚µA$world_name‘å—¤‚É‚Ğ‚Æ‚Æ‚«‚ÌˆÀ‚ç‚¬‚ª‚¨‚Æ‚¸‚ê‚é");
 		}
 	}
 	elsif ($w{world} eq $#world_states-2) {
-		&mes_and_world_news("<em>$world_name‘å—¤‚ğ“ñ•ª‚·‚éí‚¢‚Í$c_m‚Ì$m{name}‚Æ‚»‚Ì’‡ŠÔ’B‚ÌŸ—˜‚ÉI‚í‚Á‚½</em>",1);
-		&write_legend('touitu', "$c_m‚Ì$m{name}‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
+		&mes_and_world_news("<em>$world_name‘å—¤‚ğ“ñ•ª‚·‚éí‚¢‚Í$c_m‚Ì$mname‚Æ‚»‚Ì’‡ŠÔ’B‚ÌŸ—˜‚ÉI‚í‚Á‚½</em>",1);
+		&write_legend('touitu', "$c_m‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
 		$w{win_countries} = $m{country};
 	}
 	elsif ($w{world} eq $#world_states-3) {
-		&mes_and_world_news("<em>$world_name‘å—¤‚ğO•ª‚·‚éí‚¢‚Í$c_m‚Ì$m{name}‚Æ‚»‚Ì’‡ŠÔ’B‚ÌŸ—˜‚ÉI‚í‚Á‚½</em>",1);
-		&write_legend('touitu', "$c_m‚Ì$m{name}‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
+		&mes_and_world_news("<em>$world_name‘å—¤‚ğO•ª‚·‚éí‚¢‚Í$c_m‚Ì$mname‚Æ‚»‚Ì’‡ŠÔ’B‚ÌŸ—˜‚ÉI‚í‚Á‚½</em>",1);
+		&write_legend('touitu', "$c_m‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
 		$w{win_countries} = $m{country};
 	}
 	else {
 		if ($union) {
 			$mes .= "<em>$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>";
-			&write_world_news("<em>$c_m$cs{name}[$union]“¯–¿‚Ì$m{name}‚ª$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>",1);
-			&write_legend('touitu', "$c_m$cs{name}[$union]“¯–¿‚Ì$m{name}‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é")
+			&write_world_news("<em>$c_m$cs{name}[$union]“¯–¿‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>",1);
+			&write_legend('touitu', "$c_m$cs{name}[$union]“¯–¿‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é")
 		}
 		else {
 			&mes_and_world_news("<em>$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>",1);
-			&write_legend('touitu', "$c_m‚Ì$m{name}‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
+			&write_legend('touitu', "$c_m‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
 		}
 	}
 
@@ -593,7 +596,8 @@ sub down_friendship {
 	$w{'f_'.$c_c} -= ($m{pet_c} - 10) if ($m{pet} eq '193' && $m{pet_c} > 10);
 	if ($w{'p_'.$c_c} ne '2' && $w{'f_'.$c_c} < 10 && $y{country} ne $union) {
 		$w{'p_'.$c_c} = 2;
-		&write_world_news("<b>$c_m‚Ì$m{name}‚ÌiŒR‚É‚æ‚è$c_y‚ÆŒğíó‘Ô‚É‚È‚è‚Ü‚µ‚½</b>");
+		my $mname = &name_link($m{name});
+		&write_world_news("<b>$c_m‚Ì$mname‚ÌiŒR‚É‚æ‚è$c_y‚ÆŒğíó‘Ô‚É‚È‚è‚Ü‚µ‚½</b>");
 	}
 	$w{'f_'.$c_c} = int(rand(20)) if $w{'f_'.$c_c} < 1;
 }

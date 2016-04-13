@@ -161,6 +161,11 @@ sub union {
 sub send_letter {
 	my($name, $is_save_log) = @_;
 	
+	if ($name =~ "^&lt;(.*)&gt;$" && &is_sabakan) {
+		&send_group($1);
+		return;
+	}
+	
 	&error('‘—‚èæ‚Ì–¼‘O‚ª‚ ‚è‚Ü‚¹‚ñ') if $name eq '';
 	my $send_id = unpack 'H*', $name;
 	
@@ -204,6 +209,10 @@ sub send_letter_save_log {
 	close $fh;
 }
 
+sub send_group {
+	$group = shift;
+	print qq|$group|;
+}
 
 #==========================================================
 # ‘‚Ì•ûjæ“¾(‘‚Ìˆø”‚ğ—^‚¦‚é‚Æ‚»‚Ì‘‚Ì•ûj‚¾‚¯)
