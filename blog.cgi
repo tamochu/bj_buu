@@ -219,6 +219,9 @@ sub comment_exe {
 	my $send_name = pack 'H*', $in{id};
 	$in{id} = unpack 'H*', $in{name};
 	&read_user;
+	# ↑自分が存在するかのチェック後に読んでたブログIDを戻さないと、
+	# コメント投稿直後に表示されるブログの「ｺﾒﾝﾄを書く」先が自分の日記になってしまう
+	$in{id} = $blog_uid;
 
 	if (-f "$userdir/$blog_uid/blacklist.cgi") {
 		open my $fh, "< $userdir/$blog_uid/blacklist.cgi" or &error("$userdir/$blog_uid/blacklist.cgiﾌｧｲﾙが開けません");
