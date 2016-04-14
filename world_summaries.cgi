@@ -27,7 +27,9 @@ require 'config_game.cgi';
 	# 不仲
 	'不仲',
 	# 絶望
-	'絶望',
+	'戦争勝利時に復興フラグが立ちません。<br>'.
+	'終焉と違い同盟可、統一国力を超えたら通常通り統一できます。<br>'.
+	'以下省略',
 	# 深遠
 	'深淵',
 	# 監禁
@@ -91,5 +93,6 @@ sub run {
 	}
 
 	print "<h1>$world_states[$in{world}]</h1>";
+	print "<p>誰か書きたい人おらんかね～</p>";
 	print "$world_states[$in{world}]は、$world_summaries[$in{world}]";
 }

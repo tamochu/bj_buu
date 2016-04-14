@@ -413,6 +413,9 @@ sub header {
 		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
 	} else {
+		# ガラケーで外部CSSの読み込みはNG
+		# HTMLファイルを読み込んだ後にCSSファイルを読み込むため、
+		# 素のHTMLが表示された後にCSSが適用され画面がチラつくなどの問題がある
 		print qq|<style type="text/css"><!-- a.clickable_name {color: inherit; text-decoration: none;} --></style>|;
 	}
 	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
