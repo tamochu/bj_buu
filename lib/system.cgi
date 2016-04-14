@@ -413,7 +413,7 @@ sub header {
 		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
 	} else {
-		print qq|<link rel="stylesheet" type="text/css" href="$htmldir/bj_mobile.css?$jstime">|;
+		print qq|<style type="text/css"><!-- a.clickable_name {color: inherit; text-decoration: none;} --></style>|;
 	}
 	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	print qq|<title>$title</title>|;
