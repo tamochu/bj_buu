@@ -41,6 +41,7 @@ sub run {
 	for my $i (0 .. $#files) {
 		print $i eq $in{no} ? qq|$files[$i][0] / | : qq|<a href="?id=$in{id}&pass=$in{pass}&no=$i">$files[$i][0]</a> / |;
 	}
+	print qq|<a href="./amida.cgi?id=$in{id}&pass=$in{pass}">±ĞÀŞ¸¼Ş</a> / |;
 
 	print qq|<hr><h1>$files[$in{no}][0]</h1><hr>|;
 	print qq|<font size="1">¦‰æ‘œ‚ª•\\¦‚³‚ê‚Ä‚¢‚È‚¢‚à‚Ì‚ÍA‚»‚Ìl‚ÌÏ²Ëß¸Á¬‚©‚ç‚È‚­‚È‚Á‚½‚à‚Ì‚Å‚·</font><br>| if $files[$in{no}][1] eq 'picture_news';
