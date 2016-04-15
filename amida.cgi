@@ -153,7 +153,7 @@ sub run {
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			$line =~ tr/\x0D\x0A//d;
-			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount $bsusers, $bsitems) = split /<>/, $line;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 
 			print qq|<li>|;
 			if ($bcmp) { print "[ŒöŠJÏ]"; } else { print "[•åW’†]"; } 
@@ -272,7 +272,7 @@ sub run {
 				for (my $i = 0; $i < $bcount; $i++) {
 					print "<tr><td>".($i+1).".";
 					print qq|$user_list[$i]|	if $user_list[$i];
-					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|;	unless $user_list[$i] || $cmp_flg;
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|	unless $user_list[$i] || $cmp_flg;
 					print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
 					print "<td>$suser_list[$i]</td>"	if $cmp_flg;
 					print "<td>$item_list[$i]</td>"	if $cmp_flg;
@@ -378,7 +378,7 @@ sub view_amida {
 	if ($amida) {
 		while (my $line = <$fh>) {
 			$line =~ tr/\x0D\x0A//d;
-			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount $bsusers, $bsitems) = split /<>/, $line;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 
 			next	if $btime != $amida;
 
@@ -404,7 +404,7 @@ sub view_amida {
 				for (my $i = 0; $i < $bcount; $i++) {
 					print "<tr><td>".($i+1).".";
 					print qq|$user_list[$i]| if $user_list[$i];
-					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|;	unless $user_list[$i] || $bcmp;
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|	unless $user_list[$i] || $bcmp;
 					print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
 					print "<td>$suser_list[$i]</td>"	if $bcmp;
 					print "<td>$sitem_list[$i]</td>"	if $bcmp;
@@ -437,7 +437,7 @@ sub view_amida {
 		print "<ul>";
 		while (my $line = <$fh>) {
 			$line =~ tr/\x0D\x0A//d;
-			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount $bsusers, $bsitems) = split /<>/, $line;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 
 #			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $susers, $sitems) = split /<>/, $line;
 #			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp) = split /<>/, $line;
