@@ -200,34 +200,34 @@ sub run {
 				elsif (&is_entry($in{login_name}, @user_list)) {
 					print qq|<p>‚·‚Å‚É´İÄØ°Ï‚İ‚Å‚·Bd•¡‚µ‚Ä´İÄØ°‚·‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ</p>|;#	unless $items;
 				}
-				elsif (@user_list[$no]) {
-					print qq|<p>‚»‚Ì‚­‚¶‚Í‚·‚Å‚É@user_list[$no]‚³‚ñ‚ª´İÄØ°‚µ‚Ä‚¢‚Ü‚·</p>|;#	unless $items;
+				elsif ($user_list[$no]) {
+					print qq|<p>‚»‚Ì‚­‚¶‚Í‚·‚Å‚É$user_list[$no]‚³‚ñ‚ª´İÄØ°‚µ‚Ä‚¢‚Ü‚·</p>|;#	unless $items;
 				}
 				else {
 					print "<p>".($no+1)."”Ô–Ú‚Ì‚­‚¶‚É´İÄØ°‚µ‚Ü‚µ‚½</p>";#	unless $items;
-					@user_list[$no] = $in{login_name};
+					$user_list[$no] = $in{login_name};
 					$bscount++;
 					$busers = join(',', @user_list);
 
 #					for (my $i = 0; $i < $bcount; $i++) {
-#						if (@user_list[$i]) {
+#						if ($user_list[$i]) {
 #							$user_count++;
-#							@user_list[$i] = "";
+#							$user_list[$i] = "";
 #						}
 #					}
 				}
 
 
 #				for (my $i = 0; $i < $bcount; $i++) {
-#					unless (@user_list[$i]) {
+#					unless ($user_list[$i]) {
 #						$user_count--;
-#						@user_list[$i] = "";
+#						$user_list[$i] = "";
 #					}
 #				}
 
 #				my $_cmp = 1;
 #				for (my $i = 0; $i < $bcount; $i++) {
-#					$_cmp = (@user_list[$i]) && $_cmp;
+#					$_cmp = ($user_list[$i]) && $_cmp;
 #				}
 
 				print qq|<p>‚·‚×‚Ä‚Ì‚­‚¶‚ª–„‚Ü‚Á‚½‚½‚ßŒ‹‰Ê‚ğŒöŠJ‚µ‚Ü‚·</p>|	if ($bcount <= $bscount) && !$cmp;
@@ -241,8 +241,8 @@ sub run {
 					my @item_list = $bcount;
 					@item_list = split /,/, $bitems;
 #					for (my $i = 0; $i < $bcount; $i++) {
-#						unless (@item_list[$i]) {
-#							@item_list[$i] = "";
+#						unless ($item_list[$i]) {
+#							$item_list[$i] = "";
 #						}
 #					}
 					my @suser_list = List::Util::shuffle(@user_list);
@@ -251,18 +251,18 @@ sub run {
 					$bsitems = join(',', @item_list);
 #					for (my $i = 0; $i < $bcount; $i++) {
 #						print "<tr><td>".($i+1).".";
-#						print qq|@user_list[$i]|	if @user_list[$i];
+#						print qq|$user_list[$i]|	if $user_list[$i];
 #						print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
-#						print "<td>@suser_list[$i]</td>";
-#						print "<td>@item_list[$i]</td>";
+#						print "<td>$suser_list[$i]</td>";
+#						print "<td>$item_list[$i]</td>";
 #						print "</tr>";
 #					}
 				}
 #				else {
 #					for (my $i = 0; $i < $bcount; $i++) {
 #						print "<tr><td>".($i+1).".";
-#						print qq|@user_list[$i]|	if @user_list[$i];
-#						print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|	unless @user_list[$i];
+#						print qq|$user_list[$i]|	if $user_list[$i];
+#						print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|	unless $user_list[$i];
 #						print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
 #						print "</tr>";
 #					}
@@ -271,11 +271,11 @@ sub run {
 				print "<table>";
 				for (my $i = 0; $i < $bcount; $i++) {
 					print "<tr><td>".($i+1).".";
-					print qq|@user_list[$i]|	if @user_list[$i];
-##					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|;	unless @user_list[$i] || $cmp_flg;
+					print qq|$user_list[$i]|	if $user_list[$i];
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|;	unless $user_list[$i] || $cmp_flg;
 					print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
-					print "<td>@suser_list[$i]</td>"	if $cmp_flg;
-					print "<td>@item_list[$i]</td>"	if $cmp_flg;
+					print "<td>$suser_list[$i]</td>"	if $cmp_flg;
+					print "<td>$item_list[$i]</td>"	if $cmp_flg;
 					print "</tr>";
 				}
 				print "</table>";
@@ -385,9 +385,9 @@ sub view_amida {
 			my @user_list = split /,/, $busers;
 #			my $user_count = 0;
 #			for (my $i = 0; $i < $bcount; $i++) {
-#				if (@user_list[$i]) {
+#				if ($user_list[$i]) {
 #					$user_count++;
-#					@user_list[$i] = "";
+#					$user_list[$i] = "";
 #				}
 #			}
 
@@ -403,29 +403,29 @@ sub view_amida {
 			print "<table>";
 				for (my $i = 0; $i < $bcount; $i++) {
 					print "<tr><td>".($i+1).".";
-					print qq|@user_list[$i]| if @user_list[$i];
-###					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|;	unless @user_list[$i] || $bcmp;
+					print qq|$user_list[$i]| if $user_list[$i];
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|;	unless $user_list[$i] || $bcmp;
 					print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
-					print "<td>@suser_list[$i]</td>"	if $bcmp;
-					print "<td>@sitem_list[$i]</td>"	if $bcmp;
+					print "<td>$suser_list[$i]</td>"	if $bcmp;
+					print "<td>$sitem_list[$i]</td>"	if $bcmp;
 					print "</tr>";
 				}
 #			if ($bcmp) {
 #				# Q‰ÁÒ‚ª–„‚Ü‚Á‚½‚©ŒöŠJƒtƒ‰ƒO‚ª—§‚Á‚½ƒCƒR[ƒ‹‚­‚¶ŒöŠJ
 #				for (my $i = 0; $i < $bcount; $i++) {
 #					print "<tr><td>".($i+1).".";
-#					print qq|@user_list[$i]|;
+#					print qq|$user_list[$i]|;
 #					print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
-#					print "<td>@suser_list[$i]</td>";
-#					print "<td>@sitem_list[$i]</td>";
+#					print "<td>$suser_list[$i]</td>";
+#					print "<td>$sitem_list[$i]</td>";
 #					print "</tr>";
 #				}
 #			}
 #			else {
 #				for (my $i = 0; $i < $bcount; $i++) {
 #					print "<tr><td>".($i+1).".";
-#					print qq|@user_list[$i]|	if @user_list[$i];
-#					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|	unless @user_list[$i];
+#					print qq|$user_list[$i]|	if $user_list[$i];
+#					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">‚±‚Ì‚­‚¶‚É‚·‚é</a>|	unless $user_list[$i];
 #					print "</td><td>|‚ ‚İ‚¾ü‚ÍÈ—ª|</td>";
 #					print "</tr>";
 #				}
@@ -457,7 +457,7 @@ sub view_amida {
 sub create_user_list {
 	my @user_list = split /,/, $busers;
 	for (my $i = 0; $i < $bcount; $i++) {
-		@user_list[$i] = ""	unless @user_list[$i]; # l”•ª‚¾‚¯”z—ñ‚ğŠg’£
+		$user_list[$i] = ""	unless $user_list[$i]; # l”•ª‚¾‚¯”z—ñ‚ğŠg’£
 	}
 }
 
