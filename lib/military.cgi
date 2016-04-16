@@ -252,7 +252,7 @@ sub form1 {
 	$mes .= "“G•º‚Ì‹C”zy $m{value}% z<br>";
 	$mes .= '‚Ç‚¤‚µ‚Ü‚·‚©?<br>';
 	&menu($_[0],'ˆø‚«‚ ‚°‚é');
-	$m{value} += int(rand(10)+1);
+#	$m{value} += int(rand(10)+1);
 }
 
 
@@ -284,18 +284,18 @@ sub exe2 {
 			++$m{turn};
 			$m{tp} += 10;
 			&{ 'tp_'.$m{tp} };
+			if($m{tp} == 420 && $m{turn} < 7){
+				my $tei_sp = rand($m{tei_c} / 500);
+				$m{value} += $tei_sp > 5 ? int(rand(5)+1): int(rand(10-$tei_sp)+1);
+			}else {
+				if($m{unit} eq '17'){
+					$m{value} += int((rand(10)+1)*(0.7+rand(0.3)));
+				}else {
+					$m{value} += int(rand(10)+1);
+				}
+			}
 			&loop_menu;
 			$m{tp} -= 10;
-		}
-		if($m{tp} == 420 && $m{turn} < 7){
-			my $tei_sp = rand($m{tei_c} / 500);
-			$m{value} += $tei_sp > 5 ? int(rand(5)+1): int(rand(10-$tei_sp)+1);
-		}else {
-			if($m{unit} eq '17'){
-				$m{value} += int((rand(10)+1)*(0.7+rand(0.3)));
-			}else {
-				$m{value} += int(rand(10)+1);
-			}
 		}
 	}
 	elsif ($cmd eq '1') { # ‘Ş‹p
