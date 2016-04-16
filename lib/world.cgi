@@ -4,17 +4,6 @@ sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異
 # 世界情勢 Created by Merino
 #================================================
 
-# ./lib/_war_result.cgi→./lib/world.cgi→./lib/reset.cgi
-
-# 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
-use constant FESTIVAL_TYPE => {
-	'kouhaku' => 1,
-	'sanngokushi' => 3,
-	'konnrann' => 5,
-	'sessoku' => 7,
-	'dokuritsu' => 9
-};
-
 #================================================
 # 選択画面
 #================================================
@@ -332,8 +321,7 @@ sub tp_110 {
 			close $fh;
 		}
 	}elsif ($w{world} eq $#world_states-5) { # 拙速
-#		$migrate_type = 4;
-		$migrate_type = 0;
+		$migrate_type = 4;
 	}
 	
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
@@ -394,12 +382,6 @@ sub add_npc_data {
 	open my $fh, "> $datadir/npc_war_$country.cgi";
 	print $fh $line;
 	close $fh;
-}
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
 }
 
 1; # 削除不可

@@ -4,8 +4,6 @@ use File::Path;
 # 国ﾘｾｯﾄ Created by Merino
 #================================================
 
-# ./lib/_war_result.cgi→./lib/world.cgi→./lib/reset.cgi
-
 # 統一難易度：[難しい 60 ～ 40 簡単]
 my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
 
@@ -178,7 +176,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = &festival_type('kouhaku', 1);
+		$migrate_type = 5;
 
 		for my $i (1 .. $w{country}-2) {
 			$cs{strong}[$i]   = 0;
@@ -268,7 +266,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = &festival_type('sanngokushi', 1);
+		$migrate_type = 6;
 		for my $i (1 .. $w{country}-3) {
 			$cs{strong}[$i]   = 0;
 			$cs{food}[$i]     = 0;
@@ -290,7 +288,7 @@ sub time_limit  {
 		}
 	}
 	elsif ($w{world} eq $#world_states-5) { # 拙速
-		$migrate_type = &festival_type('sessoku', 1);
+		$migrate_type = 4;
 	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	&write_cs;
@@ -323,15 +321,15 @@ sub reset {
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = &festival_type('kouhaku', 0);
+			$migrate_type = 1;
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = &festival_type('sanngokushi', 0);
+			$migrate_type = 2;
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = &festival_type('sessoku', 0);
+			$migrate_type = 3;
 		}else {#混乱
-			$migrate_type = &festival_type('konnrann', 0);
+			$migrate_type = 3;
 		}
 		$w{world} = int(rand($#world_states-5));
 	}
