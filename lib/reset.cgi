@@ -673,34 +673,8 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}elsif($type == 4) {#拙速解除
-		require "./lib/move_player.cgi";
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			if($you_datas{name} eq $m{name}){
-				&move_player($m{name}, $m{country}, 0);
-				$m{country} = 0;
-				&write_user;
-			}
-			&move_player($you_datas{name}, $you_datas{country}, 0);
-			&regist_you_data($you_datas{name}, 'country', 0);
-
-			my($c1, $c2) = split /,/, $w{win_countries};
-			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
-				open my $fh, ">> $userdir/$pid/ex_c.cgi";
-				print $fh "fes_c<>1<>\n";
-				close $fh;
-				
-				&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
-			}
-		}
-		closedir $dh;
 	}
-	}elsif($type == 5){# 混乱設定
+	}elsif($type == 4){# 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
