@@ -328,7 +328,7 @@ sub reset {
 			$migrate_type = 2;
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# Ù‘¬
-			$migrate_type = 3;
+#			$migrate_type = 3;
 		}else {#¬—
 			$migrate_type = 3;
 		}
@@ -345,7 +345,7 @@ sub reset {
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
 		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
-		$w{limit_time} = $time + 3600 * 36;
+		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;;# $time + 3600 * 36;
 		$w{game_lv} = 99;
 	}
 	
