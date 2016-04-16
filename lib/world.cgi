@@ -15,6 +15,12 @@ use constant FESTIVAL_TYPE => {
 	'dokuritsu' => 9
 };
 
+# 祭り情勢の名称と、開始時なら 1 終了時 なら 0を指定する
+sub festival_type {
+	my ($festival_name, $is_start) = @_;
+	return FESTIVAL_TYPE->{$festival_name} + $is_start;
+}
+
 #================================================
 # 選択画面
 #================================================
@@ -397,12 +403,6 @@ sub add_npc_data {
 	open my $fh, "> $datadir/npc_war_$country.cgi";
 	print $fh $line;
 	close $fh;
-}
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
 }
 
 1; # 削除不可
