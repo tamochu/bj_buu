@@ -19,6 +19,18 @@ my $country_name_san_1 = "魏";
 my $country_name_san_2 = "呉";
 my $country_name_san_3 = "蜀";
 
+use constant CONST_HSH => {'key' => 'val'};
+
+# 祭り情勢終了時にも使うので 1 ずつ空ける
+use constant FESTIVAL_TYPE => {
+	'kouhaku' => 1,
+	'sangoku' => 3,
+	'konran' => 5,
+	'sessoku' => 7,
+	'dokuritsu' => 9
+};
+
+
 #================================================
 # 期日が過ぎた場合
 #================================================
@@ -30,6 +42,14 @@ sub time_limit  {
 			if ($cs{strong}[$i] > $max_value) {
 				$strongest_country = $i;
 				$max_value = $cs{strong}[$i];
+			}
+		}
+		my $baby_country = 0;
+		my $min_value = $max_value;
+		for my $i (1 .. $w{country}) {
+			if ($cs{strong}[$i] < $min_value) {
+				$baby_country = $i;
+				$min_value = $cs{strong}[$i];
 			}
 		}
 		&write_world_news("<b>$world_name大陸を全土にわたる国力競争は$cs{name}[$strongest_country]の勝利になりました</b>");
@@ -653,7 +673,34 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}elsif($type == 4){# 混乱設定
+	}elsif($type == 4) {#拙速解除
+		require "./lib/move_player.cgi";
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %you_datas = &get_you_datas($pid, 1);
+			
+			if($you_datas{name} eq $m{name}){
+				&move_player($m{name}, $m{country}, 0);
+				$m{country} = 0;
+				&write_user;
+			}
+			&move_player($you_datas{name}, $you_datas{country}, 0);
+			&regist_you_data($you_datas{name}, 'country', 0);
+
+			my($c1, $c2) = split /,/, $w{win_countries};
+			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
+				open my $fh, ">> $userdir/$pid/ex_c.cgi";
+				print $fh "fes_c<>1<>\n";
+				close $fh;
+				
+				&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
+			}
+		}
+		closedir $dh;
+	}
+	}elsif($type == 5){# 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -884,6 +931,31 @@ sub wt_c_reset{
 		}
 	}
 	closedir $dh;
+}
+
+sub go_neverland {
+	my $from_country = shift;
+	require "./lib/move_player.cgi"; # 何度呼んでもロードは一回みたい
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $pid = readdir $dh) {
+		next if $pid =~ /\./;
+		next if $pid =~ /backup/;
+		my %you_datas = &get_you_datas($pid, 1);
+		next if $you_datas{country} eq 0; # ﾈﾊﾞﾗﾝ民をﾈﾊﾞﾗﾝに送る必要はない
+
+		# もっとコンパクトにできそう
+		# 指定された国に所属しているか全国を指定されたらﾈﾊﾞﾗﾝ移動
+		if ( $you_datas{name} eq $m{name} && ($m{country} eq $from_country || $from_country eq 0) ) {
+			&move_player($m{name}, $m{country}, 0);
+			$m{country} = 0;
+			&write_user;
+		}
+		# 指定された国に所属しているか全国を指定されたらﾈﾊﾞﾗﾝ移動
+		if ($you_datas{country} eq $from_country || $from_country eq 0) {
+			&move_player($you_datas{name}, $you_datas{country}, 0) if $you_datas{country} eq $from_country;
+			&regist_you_data($you_datas{name}, 'country', 0) if $you_datas{country} eq $from_country;
+		}
+	}
 }
 
 sub add_npc_data {
