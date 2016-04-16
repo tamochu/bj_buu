@@ -4,6 +4,8 @@ use File::Path;
 # 国ﾘｾｯﾄ Created by Merino
 #================================================
 
+# ./lib/_war_result.cgi→./lib/world.cgi→./lib/reset.cgi
+
 # 統一難易度：[難しい 60 ～ 40 簡単]
 my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
 
@@ -19,18 +21,6 @@ my $country_name_san_1 = "魏";
 my $country_name_san_2 = "呉";
 my $country_name_san_3 = "蜀";
 
-use constant CONST_HSH => {'key' => 'val'};
-
-# 祭り情勢終了時にも使うので 1 ずつ空ける
-use constant FESTIVAL_TYPE => {
-	'kouhaku' => 1,
-	'sangoku' => 3,
-	'konran' => 5,
-	'sessoku' => 7,
-	'dokuritsu' => 9
-};
-
-
 #================================================
 # 期日が過ぎた場合
 #================================================
@@ -42,14 +32,6 @@ sub time_limit  {
 			if ($cs{strong}[$i] > $max_value) {
 				$strongest_country = $i;
 				$max_value = $cs{strong}[$i];
-			}
-		}
-		my $baby_country = 0;
-		my $min_value = $max_value;
-		for my $i (1 .. $w{country}) {
-			if ($cs{strong}[$i] < $min_value) {
-				$baby_country = $i;
-				$min_value = $cs{strong}[$i];
 			}
 		}
 		&write_world_news("<b>$world_name大陸を全土にわたる国力競争は$cs{name}[$strongest_country]の勝利になりました</b>");
@@ -196,7 +178,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = 5;
+		$migrate_type = &festival_type('kouhaku', 1);
 
 		for my $i (1 .. $w{country}-2) {
 			$cs{strong}[$i]   = 0;
@@ -286,7 +268,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = 6;
+		$migrate_type = &festival_type('sanngokushi', 1);
 		for my $i (1 .. $w{country}-3) {
 			$cs{strong}[$i]   = 0;
 			$cs{food}[$i]     = 0;
@@ -308,8 +290,7 @@ sub time_limit  {
 		}
 	}
 	elsif ($w{world} eq $#world_states-5) { # 拙速
-#		$migrate_type = 4;
-		$migrate_type = 0;
+		$migrate_type = &festival_type('sessoku', 1);
 	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	&write_cs;
@@ -342,15 +323,15 @@ sub reset {
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = 1;
+			$migrate_type = &festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = 2;
+			$migrate_type = &festival_type('sanngokushi', 0);
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-#			$migrate_type = 3;
+			$migrate_type = &festival_type('sessoku', 0);
 		}else {#混乱
-			$migrate_type = 3;
+			$migrate_type = &festival_type('konnrann', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
 	}
@@ -365,7 +346,7 @@ sub reset {
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
 		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
-		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;# $time + 3600 * 36;
+		$w{limit_time} = $time + 3600 * 36;
 		$w{game_lv} = 99;
 	}
 	
@@ -904,31 +885,6 @@ sub wt_c_reset{
 		}
 	}
 	closedir $dh;
-}
-
-sub go_neverland {
-	my $from_country = shift;
-	require "./lib/move_player.cgi"; # 何度呼んでもロードは一回みたい
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		my %you_datas = &get_you_datas($pid, 1);
-		next if $you_datas{country} eq 0; # ﾈﾊﾞﾗﾝ民をﾈﾊﾞﾗﾝに送る必要はない
-
-		# もっとコンパクトにできそう
-		# 指定された国に所属しているか全国を指定されたらﾈﾊﾞﾗﾝ移動
-		if ( $you_datas{name} eq $m{name} && ($m{country} eq $from_country || $from_country eq 0) ) {
-			&move_player($m{name}, $m{country}, 0);
-			$m{country} = 0;
-			&write_user;
-		}
-		# 指定された国に所属しているか全国を指定されたらﾈﾊﾞﾗﾝ移動
-		if ($you_datas{country} eq $from_country || $from_country eq 0) {
-			&move_player($you_datas{name}, $you_datas{country}, 0) if $you_datas{country} eq $from_country;
-			&regist_you_data($you_datas{name}, 'country', 0) if $you_datas{country} eq $from_country;
-		}
-	}
 }
 
 sub add_npc_data {
