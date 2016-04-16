@@ -66,7 +66,7 @@ sub begin {
 	$mes .= $m{valid_blacklist} ? qq|<input type="radio" name="valid_blacklist" value="1" checked>はい <input type="radio" name="valid_blacklist" value="0">いいえ<br>|:
 						qq|<input type="radio" name="valid_blacklist" value="1">はい <input type="radio" name="valid_blacklist" value="0" checked>いいえ<br>|;
 
-	$mes .= '戦争で陣形を選ぶ？<br>';
+	$mes .= '戦争で条件付きじゃんけんする？<br>';
 	$mes .= $m{war_select_switch} ? qq|<input type="radio" name="war_select_switch" value="1" checked>はい <input type="radio" name="war_select_switch" value="0">いいえ<br>|:
 						qq|<input type="radio" name="war_select_switch" value="1">はい <input type="radio" name="war_select_switch" value="0" checked>いいえ<br>|;
 
