@@ -340,7 +340,6 @@ sub tp_110 {
 	}elsif ($w{world} eq $#world_states-5) { # Ù‘¬
 #		$migrate_type = 4;
 		$migrate_type = &festival_type('sessoku', 1);
-	}
 	}elsif ($w{world} eq $#world_states-1) { # ¬—
 		$migrate_type = &festival_type('konnrann', 1);
 	}
