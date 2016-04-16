@@ -673,7 +673,6 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}
 	}elsif($type == 4){# ¬—İ’è
 		# ˆê’Uƒlƒoƒ‰ƒ“‘—‚è
 		require "./lib/move_player.cgi";
