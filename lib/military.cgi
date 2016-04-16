@@ -246,13 +246,14 @@ sub form1 {
 	$mes .= "$c_yに到着しました<br>";
 	$m{tp} += 10;
 	$m{value} = int(rand(20))+5;
+	$m{value} += int(rand(10)+1); # ゲームバランスを考えて初期値ﾌﾞｰｽﾄはそのまま
 	$m{value} += 30 if $y{country} && ($pets[$m{pet}][2] ne 'no_ambush' || ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) && &is_patrol($_[0]);
 	$m{stock} = 0;
 	$m{turn} = 0;
 	$mes .= "敵兵の気配【 $m{value}% 】<br>";
 	$mes .= 'どうしますか?<br>';
 	&menu($_[0],'引きあげる');
-#	$m{value} += int(rand(10)+1);
+#	$m{value} += int(rand(10)+1); merino の消し忘れ？
 }
 
 
