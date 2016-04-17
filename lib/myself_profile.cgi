@@ -110,7 +110,7 @@ sub valid_date {
 		my $day = $3;
 		my(@mlast) = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 		
-		if ($month < 1 || 12 < $month) { return 0; }
+		if ($month < 1 || 12 < $month) { return 1; }
 		
 		if ($month == 2) {
 			if ( (($year % 4 == 0) && ($year % 100 != 0)) || ($year % 400 == 0) ) {
@@ -118,11 +118,11 @@ sub valid_date {
 			}
 		}
 		
-		if ($day < 1 || $mlast[$month-1] < $day) { return 0; }
+		if ($day < 1 || $mlast[$month-1] < $day) { return 1; }
 		
-		return 1;
+		return 0;
 	}
-	return 0;
+	return 1;
 }
 
 1; # íœ•s‰Â
