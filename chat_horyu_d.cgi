@@ -288,6 +288,8 @@ sub no_comment {
 #=================================================
 sub close_line {
 	my $target = $in{target};
+	my @voter = ();
+
 	return 1 if ($target eq "no_write");
 	return 1 if ($m{name} ne $cs{ceo}[$m{country}] && !&delete_check);
 	&error("ファイル名が異常です") if ($target =~ /[^0-9]/);
@@ -297,14 +299,30 @@ sub close_line {
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
 	my ($bgood,$bbad,$limit,$hidden) = split /<>/, $head_line;
+	
+	my @goods = split /,/, $bgood;
+	for my $name ($goods) {
+		push @voter, $name;
+	}
+	my @bads = split /,/, $bbad;
+	for my $name ($bads) {
+		push @voter, $name;
+	}
+	
 	$limit = $time + $in{limit} * 24 * 3600;
 	push @lines, "<><>$limit<>$hidden<>\n";
 	$line = <$fh>;
 	my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bid) = split /<>/, $line;
 	my ($lmin, $lhour, $lday, $lmon) = (localtime($limit))[1, 2, 3, 4];
 	$lmon += 1;
+	$vcomment = $bcomment . "の期限が$lmon月$lday日$lhour時$lmin分に設定されました。";
 	$bcomment .= "<br>議論期限:$lmon月$lday日$lhour時$lmin分";
 	push @lines, "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>\n";
+	
+	for my $vname (@voter) {
+		&system_letter($vname, $vcomment);
+	}
+	
 	while (my $line = <$fh>) {
 		push @lines, $line;
 	}
@@ -378,10 +396,21 @@ sub remind {
 		}
 	}
 	
+	if (&system_letter($aname, "あなたの発議した議論<br>$acomment<br>が3日間進んでません。")) {
+		open my $fh3, ">> $this_dir/$target.cgi" or &error("$this_dir/$target.cgi ﾌｧｲﾙが開けません");
+		print $fh3 "$time<>$date<>システム<>0<><><>発議者に催促状を出しました<><>\n";
+		close $fh3;
+	}
+}
+
+sub system_letter {
+	my $aname = shift;
+	my $content = shift;
+
 	my $send_id = unpack 'H*', $aname;
 	local $this_file = "$userdir/$send_id/letter";
 	if (-f "$this_file.cgi") {
-		$in{comment} = "あなたの発議した議論<br>$acomment<br>が3日間進んでません。";
+		$in{comment} = $content;
 		$mname = $m{name};
 		$m{name} = 'システム';
 		$mcountry = $m{country};
@@ -391,17 +420,16 @@ sub remind {
 		$mshogo = $m{shogo};
 		$m{shogo} = '';
 		&send_letter($aname, 0);
+
 		$in{comment} = "";
 		$m{name} = $mname;
 		$m{country} = $mcountry;
 		$m{icon} = $micon;
 		$m{shogo} = $mshogo;
-		
-		open my $fh3, ">> $this_dir/$target.cgi" or &error("$this_dir/$target.cgi ﾌｧｲﾙが開けません");
-		print $fh3 "$time<>$date<>システム<>0<><><>発議者に催促状を出しました<><>\n";
-		close $fh3;
+		return 1;
 	}
 	
+	return 0;
 }
 
 #=================================================
