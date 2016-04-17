@@ -137,7 +137,7 @@ sub write_user {
 		c_turn c_stock c_value c_type tp_r cataso_ratio
 		no1_c money_overflow random_migrate ceo_c tam_c ban_c wt_c wt_c_latest
 		
-		sox_kind sox_no
+		sox_kind sox_no exchange_count
 	/);
 	# ﾛｸﾞｲﾝ時間　更新日時　作成日時　名前　ﾊﾟｽﾜｰﾄﾞ　ﾗｲﾌﾞﾗﾘ　ﾀｰﾆﾝｸﾞﾎﾟｲﾝﾄ　待ち時間　疲労度　性別　称号　世代　投票　
 	# 所属国　職業　種族　ﾚﾍﾞﾙ　経験値　ﾗﾝｸ　ﾗﾝｸ経験値　兵種　兵士数　士気　勲章　お金　ｺｲﾝ　技(複数)　連続攻めた国　連続ｶｳﾝﾄ　

@@ -3,25 +3,28 @@ $mes .= qq|ｺｲﾝ $m{coin} 枚<br>| if $is_mobile;
 # ｶｼﾞﾉ交換所 Created by Merino
 #================================================
 
+# 値上げ率
+my $price_up = 0.1;
+
 # 交換賞品
 my @prizes = (
 # 種類 1=武器,2=卵,3=ﾍﾟｯﾄ 
 #	[0]種類,[1]No,[2]ﾒﾀﾞﾙ,[3]その他ﾌﾗｸﾞ
-	[0,	0,	0,		0,],
-	[2,	22,	1000,	0,],
-	[2,	24,	3000,	0,],
-	[2,	16,	5000,	0,],
-	[2,	51,	5000,	0,],
-	[2,	23,	5000,	0,],
-	[1,	2,	10000,	0,],
-	[1,	7,	10000,	0,],
-	[1,	22,	10000,	0,],
-	[2,	25,	20000,	0,],
-	[3,	126,40000,	0,],
-	[3,	197,40000,	0,],
-	[2,	3,	100000,	0,],
-	[2,	2,	200000,	0,],
-	[2,	54,	2500000,1,],
+	[0,	0,	0,		0,	0,],
+	[2,	22,	1000,	0,	0,],
+	[2,	24,	3000,	0,	0,],
+	[2,	16,	5000,	0,	0,],
+	[2,	51,	5000,	0,	0,],
+	[2,	23,	5000,	0,	0,],
+	[1,	2,	10000,	0,	0,],
+	[1,	7,	10000,	0,	0,],
+	[1,	22,	10000,	0,	0,],
+	[2,	25,	20000,	0,	0,],
+	[3,	126,40000,	0,	200,],
+	[3,	197,40000,	0,	200,],
+	[2,	3,	100000,	0,	60,],
+	[2,	2,	200000,	0,	30,],
+	[2,	54,	2500000,1,	100,],
 );
 
 
@@ -107,10 +110,11 @@ sub tp_200 {
 			  : $prizes[$i][0] eq '2' ? qq|[卵]$eggs[ $prizes[$i][1] ][1]</td>|
 			  : 						qq|[ペ]$pets[ $prizes[$i][1] ][1]</td>|
 			  ;
+		my $price = &modified_price($i);
 		if($prizes[$i][3]){
-			$mes .= qq|<td align="right">$prizes[$i][2]ｺｲﾝ+所持金すべて(4999999G以上)<br></td></tr>|;
+			$mes .= qq|<td align="right">$priceｺｲﾝ+所持金すべて(4999999G以上)<br></td></tr>|;
 		}else{
-			$mes .= qq|<td align="right">$prizes[$i][2]ｺｲﾝ<br></td></tr>|;
+			$mes .= qq|<td align="right">$priceｺｲﾝ<br></td></tr>|;
 		}
 	}
 	$mes .= qq|</table>|;
@@ -150,8 +154,10 @@ sub tp_210 {
 						$other_flag = 1;
 					}
 					
-					if ($m{coin} >= $prizes[$i][2] && $other_flag) {
-						$m{coin} -= $prizes[$i][2];
+					my $price = &modified_price($i);
+					if ($m{coin} >= $price && $other_flag) {
+						$m{coin} -= $price;
+						&count_up_exchange($i);
 						if($prizes[$i][3]){
 							$m{money} = 0;
 							if($m{bank}){
@@ -206,6 +212,44 @@ sub tp_210 {
 }
 
 
+#=================================================
+# 商品値上げ
+#=================================================
+sub modified_price {
+	my $item_no = shift;
+	
+	unless ($m{exchange_count}) {
+		my @dummy = ();
+		for (1..$#prizes {
+			push @dummy, 0;
+		}
+		$m{exchange_count} = join ":", @dummy;
+	}
+	my @counts = split /:/, $m{exchange_count};
+	if ($prizes[$item_no][4] && $prizes[$item_no][4] < $counts[$item_no]) {
+		return int($prizes[$item_no][2] * (1.0 + $price_up * ($counts[$item_no] - $prizes[$item_no][4])));
+	}
+	return $prizes[$item_no][2];
+}
 
+#=================================================
+# 交換数計上
+#=================================================
+sub count_up_exchange {
+	my $item_no = shift;
+	
+	unless ($m{exchange_count}) {
+		my @dummy = ();
+		for (1..$#prizes {
+			push @dummy, 0;
+		}
+		$m{exchange_count} = join ":", @dummy;
+	}
+	my @counts = split /:/, $m{exchange_count};
+	
+	$counts[$item_no]++;
+	
+	$m{exchange_count} = join ":", @counts;
+}
 
 1; # 削除不可
