@@ -291,6 +291,9 @@ sub time_limit  {
 	elsif ($w{world} eq $#world_states-5) { # Ù‘¬
 		$migrate_type = 4;
 	}
+	elsif ($w{world} eq $#world_states-1) { # ¬—
+		$migrate_type = 4;
+	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	&write_cs;
 	&player_migrate($migrate_type);

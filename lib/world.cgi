@@ -320,7 +320,11 @@ sub tp_110 {
 			open my $fh, "> $logdir/$i/leader.cgi";
 			close $fh;
 		}
-	}elsif ($w{world} eq $#world_states-5) { # Ù‘¬
+	}
+	elsif ($w{world} eq $#world_states-5) { # Ù‘¬
+		$migrate_type = 4;
+	}
+	elsif ($w{world} eq $#world_states-1) { # ¬—
 		$migrate_type = 4;
 	}
 	
