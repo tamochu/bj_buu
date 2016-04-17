@@ -535,7 +535,9 @@ sub name_link {
 	my $name = shift;
 	
 	my $id = unpack("H*", $name);
-	return qq|<a href="profile.cgi?id=$id" class="clickable_name">$name</a>|;
+	my %p = &get_you_datas($id, 1);
+
+	return qq|<a href="profile.cgi?id=$id&country=$p{country}" class="clickable_name">$name</a>|;
 }
 
 #================================================
