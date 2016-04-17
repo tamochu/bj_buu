@@ -42,7 +42,6 @@ sub run {
 	&bad_comment if ($in{mode} eq "bad");
 	&no_comment if ($in{mode} eq "no");
 	&close_line if ($in{mode} eq "close");
-	my($member_c, $member) = &get_member;
 
 	print qq|<form method="$method" action="$headline_script">|;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
@@ -331,45 +330,6 @@ sub close_line {
 	print $fh @lines;
 	close $fh;
 	return 1;
-}
-
-#=================================================
-# ÒİÊŞ°æ“¾
-#=================================================
-sub get_member {
-	my $is_find = 0;
-	my $member  = '';
-	my @members = ();
-	my %sames = ();
-	
-	open my $fh, "+< ${this_list}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	eval { flock $fh, 2; };
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr) = split /<>/, $line;
-		next if $time - $limit_member_time > $mtime;
-		next if $sames{$mname}++; # “¯‚¶l‚È‚çŸ
-		
-		if ($mname eq $m{name}) {
-			push @members, "$time<>$m{name}<>$addr<>\n";
-			$is_find = 1;
-		}
-		else {
-			push @members, $line;
-		}
-		$member .= "$mname,";
-	}
-	unless ($is_find) {
-		push @members, "$time<>$m{name}<>$addr<>\n";
-		$member .= "$m{name},";
-	}
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-
-	my $member_c = @members;
-
-	return ($member_c, $member);
 }
 
 #=================================================
