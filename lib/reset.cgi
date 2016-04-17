@@ -463,7 +463,61 @@ sub reset {
 sub player_migrate {
 	my $type = shift;
 
-	if ($type == &festival_type('kouhaku', 0)) {# 不倶戴天解除
+	if ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
+		# バックアップ作成
+		for my $i (0 .. $w{country} - 2) {
+			my $from = "$logdir/$i";
+			my $backup = $from . "_backup";
+			rcopy($from, $backup);
+		}
+		my $from = "$logdir/countries.cgi";
+		my $backup = "$logdir/countries_backup.cgi";
+		rcopy($from, $backup);
+		
+		require "./lib/move_player.cgi";
+		@sedais=([0, 0],[0, 0],[0, 0],[0, 0]);
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %you_datas = &get_you_datas($pid, 1);
+			
+			my $j = int(rand(2));
+			my $s;
+			if($m{sedai} <= 5){
+				$s = 0;
+			}elsif($m{sedai} <= 10){
+				$s = 1;
+			}elsif($m{sedai} <= 15){
+				$s = 2;
+			}else{
+				$s = 3;
+			}
+			for my $cj (0..1) {
+				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
+					$j = $cj;
+				}
+			}
+			++$sedais[$s][$j];
+			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
+			if ($you_datas{name} eq $m{name}){
+				$m{country} = $w{country} - $j;
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c_t"} = $m{$k."_c"};
+					$m{$k."_c"} = 0;
+				}
+				&write_user;
+			} else {
+				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
+				for my $k (qw/war dom pro mil/) {
+					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+					&regist_you_data($you_datas{name}, $k."_c", 0);
+				}
+			}
+		}
+		closedir $dh;
+	}
+	elsif ($type == &festival_type('kouhaku', 0)) {# 不倶戴天解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -552,6 +606,60 @@ sub player_migrate {
 			++$i;
 		}
 		close $fh;
+	}
+	elsif ($type == &festival_type('sangokusi', 1)) {# 三国志設定
+		# バックアップ作成
+		for my $i (0 .. $w{country} - 3) {
+			my $from = "$logdir/$i";
+			my $backup = $from . "_backup";
+			rcopy($from, $backup);
+		}
+		my $from = "$logdir/countries.cgi";
+		my $backup = "$logdir/countries_backup.cgi";
+		rcopy($from, $backup);
+		
+		require "./lib/move_player.cgi";
+		@sedais=([0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 0, 0]);
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %you_datas = &get_you_datas($pid, 1);
+			
+			my $j = int(rand(3));
+			my $s;
+			if($m{sedai} <= 5){
+				$s = 0;
+			}elsif($m{sedai} <= 10){
+				$s = 1;
+			}elsif($m{sedai} <= 15){
+				$s = 2;
+			}else{
+				$s = 3;
+			}
+			for my $cj (0..2) {
+				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
+					$j = $cj;
+				}
+			}
+			++$sedais[$s][$j];
+			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
+			if ($you_datas{name} eq $m{name}){
+				$m{country} = $w{country} - $j;
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c_t"} = $m{$k."_c"};
+					$m{$k."_c"} = 0;
+				}
+				&write_user;
+			} else {
+				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
+				for my $k (qw/war dom pro mil/) {
+					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+					&regist_you_data($you_datas{name}, $k."_c", 0);
+				}
+			}
+		}
+		closedir $dh;
 	}
 	elsif ($type == &festival_type('sangokusi', 0)){# 三国志解除
 		require "./lib/move_player.cgi";
@@ -642,33 +750,6 @@ sub player_migrate {
 		}
 		close $fh;
 	}
-	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) {#混乱解除
-		require "./lib/move_player.cgi";
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			if($you_datas{name} eq $m{name}){
-				&move_player($m{name}, $m{country}, 0);
-				$m{country} = 0;
-				&write_user;
-			}
-			&move_player($you_datas{name}, $you_datas{country}, 0);
-			&regist_you_data($you_datas{name}, 'country', 0);
-
-			my($c1, $c2) = split /,/, $w{win_countries};
-			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
-				open my $fh, ">> $userdir/$pid/ex_c.cgi";
-				print $fh "fes_c<>1<>\n";
-				close $fh;
-				
-				&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
-			}
-		}
-		closedir $dh;
-	}
 	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) {# 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
@@ -713,63 +794,35 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
-		# バックアップ作成
-		for my $i (0 .. $w{country} - 2) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
-		
+	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) {#混乱解除
 		require "./lib/move_player.cgi";
-		@sedais=([0, 0],[0, 0],[0, 0],[0, 0]);
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
 			next if $pid =~ /backup/;
 			my %you_datas = &get_you_datas($pid, 1);
 			
-			my $j = int(rand(2));
-			my $s;
-			if($m{sedai} <= 5){
-				$s = 0;
-			}elsif($m{sedai} <= 10){
-				$s = 1;
-			}elsif($m{sedai} <= 15){
-				$s = 2;
-			}else{
-				$s = 3;
-			}
-			for my $cj (0..1) {
-				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
-					$j = $cj;
-				}
-			}
-			++$sedais[$s][$j];
-			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $w{country} - $j;
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
+			if($you_datas{name} eq $m{name}){
+				&move_player($m{name}, $m{country}, 0);
+				$m{country} = 0;
 				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
-				for my $k (qw/war dom pro mil/) {
-					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-					&regist_you_data($you_datas{name}, $k."_c", 0);
-				}
+			}
+			&move_player($you_datas{name}, $you_datas{country}, 0);
+			&regist_you_data($you_datas{name}, 'country', 0);
+
+			my($c1, $c2) = split /,/, $w{win_countries};
+			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
+				open my $fh, ">> $userdir/$pid/ex_c.cgi";
+				print $fh "fes_c<>1<>\n";
+				close $fh;
+				
+				&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
 			}
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('sangokusi', 1)) {# 三国志設定
-		# バックアップ作成
-		for my $i (0 .. $w{country} - 3) {
+	elsif ($type == &festival_type('dokuritu', 1)) {# 独立設定
+		for my $i (0 .. $w{country}) {
 			my $from = "$logdir/$i";
 			my $backup = $from . "_backup";
 			rcopy($from, $backup);
@@ -777,49 +830,6 @@ sub player_migrate {
 		my $from = "$logdir/countries.cgi";
 		my $backup = "$logdir/countries_backup.cgi";
 		rcopy($from, $backup);
-		
-		require "./lib/move_player.cgi";
-		@sedais=([0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 0, 0]);
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			my $j = int(rand(3));
-			my $s;
-			if($m{sedai} <= 5){
-				$s = 0;
-			}elsif($m{sedai} <= 10){
-				$s = 1;
-			}elsif($m{sedai} <= 15){
-				$s = 2;
-			}else{
-				$s = 3;
-			}
-			for my $cj (0..2) {
-				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
-					$j = $cj;
-				}
-			}
-			++$sedais[$s][$j];
-			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $w{country} - $j;
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
-				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
-				for my $k (qw/war dom pro mil/) {
-					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-					&regist_you_data($you_datas{name}, $k."_c", 0);
-				}
-			}
-		}
-		closedir $dh;
 	}
 	elsif ($type == &festival_type('dokuritu', 0)) {# 独立解除
 		require "./lib/move_player.cgi";
@@ -873,17 +883,7 @@ sub player_migrate {
 		}
 		close $fh;
 		
-		&cs_data_repair;
-	}
-	elsif ($type == &festival_type('dokuritu', 1)) {# 独立設定
-		for my $i (0 .. $w{country}) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
+		&cs_data_repair;# ???
 	}
 	&cs_data_repair;
 }
