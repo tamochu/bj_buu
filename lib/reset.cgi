@@ -1,6 +1,6 @@
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
-require './lib/world_reset.cgi';
+require './lib/_world_reset.cgi';
 #================================================
 # ‘Ø¾¯Ä Created by Merino
 #================================================

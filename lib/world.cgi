@@ -1,6 +1,6 @@
 sub begin { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Ş×Ñ´×°ˆÙí‚Èˆ—‚Å‚·'); }
 sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Ş×Ñ´×°ˆÙí‚Èˆ—‚Å‚·'); }
-require './lib/world_reset.cgi';
+require './lib/_world_reset.cgi';
 #================================================
 # ¢ŠEî¨ Created by Merino
 #================================================
