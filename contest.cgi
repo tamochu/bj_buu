@@ -146,18 +146,14 @@ sub top {
 	}
 	elsif ($min_entry_contest > $count) {
 		open my $fh, "< $this_dir/prepare.cgi" or &error("$this_dir/prepare.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-		my @lines = ();
-		my $head_line = <$fh>;
+		my $entry_count = -1;
 		while (my $line = <$fh>) {
-			my ($no, $entry_name) = split /<>/, $line;
-			push (@lines, "$no.$entry_name\n");
+			$entry_count++;
 		}
-		my $entry_users = join(', ', @lines);
 		++$round;
 		print qq|<h1>‘æ$round‰ñ$contests[$in{no}][0]</h1>|;
 		print qq|<p>y“Š•[I—¹“úEŸ‰ñºİÃ½Ä $monthŒ$day“ú$hour$min•ªz</p>|;
-		print qq|<p>“o˜^Ò‚ªW‚Ü‚Á‚Ä‚¢‚È‚¢‚½‚ßŠJÃ‰„Šú’†‚Å‚·</p>|;
-		print qq|<p>Œ»İ‚Ì´İÄØ°ÒF$entry_users</p>|;
+		print qq|<p>“o˜^Ò‚ªW‚Ü‚Á‚Ä‚¢‚È‚¢‚½‚ßŠJÃ‰„Šú’†‚Å‚·<br>Œ»İ‚Ì“o˜^Ò”‚Í $entry_count ‚Å‚·</p>|;
 	}
 	elsif ($in{id} && $in{pass}) {
 		print qq|<h1>‘æ$round‰ñ$contests[$in{no}][0]</h1>|;
