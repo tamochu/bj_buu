@@ -50,8 +50,14 @@ sub tp_1 {
 			unless ($in{$profile->[0]} eq $datas{$profile->[0]}) {
 				&error("$profile->[1] に不正な文字( ,\'\"\;<> )が含まれています")	if $in{$profile->[0]} =~ /[;<>]/;
 				&error("$profile->[1] は全角80(半角160)文字以内です")		if length($in{$profile->[0]}) > 160;
-				$datas{$profile->[0]} = $in{$profile->[0]};
-				$is_rewrite = 1;
+				if ($profile->[0] ne 'birthday') {
+					$datas{$profile->[0]} = $in{$profile->[0]};
+					$is_rewrite = 1;
+				} elsif ($datas{$profile->[0]} eq '') {
+					&error("$profile->[1] が不正です(2000/01/01)の形式で入力してください。") if &valid_date($in{$profile->[0]});
+					$datas{$profile->[0]} = $in{$profile->[0]};
+					$is_rewrite = 1;
+				}
 			}
 		}
 		if ($is_rewrite) {
@@ -96,5 +102,27 @@ sub tp_1 {
 	&n_menu;
 }
 
+sub valid_date {
+	my $date = shift;
+	if ($date =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
+		my $year = $1;
+		my $month = $2;
+		my $day = $3;
+		my(@mlast) = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+		
+		if ($month < 1 || 12 < $month) { return 0; }
+		
+		if ($month == 2) {
+			if ( (($year % 4 == 0) && ($year % 100 != 0)) || ($year % 400 == 0) ) {
+				$mlast[1]++;
+			}
+		}
+		
+		if ($day < 1 || $mlast[$month-1] < $day) { return 0; }
+		
+		return 1;
+	}
+	return 0;
+}
 
 1; # 削除不可
