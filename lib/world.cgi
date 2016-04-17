@@ -211,7 +211,7 @@ sub tp_110 {
 				close $fh9;
 			}
 		}
-		$migrate_type = 5;
+		$migrate_type = festival_type('kouhaku', 1);
 		
 		for my $i (1 .. $w{country}-2) {
 			$cs{strong}[$i]   = 0;
@@ -299,7 +299,7 @@ sub tp_110 {
 				close $fh9;
 			}
 		}
-		$migrate_type = 6;
+		$migrate_type = festival_type('sangokusi', 1);
 		for my $i (1 .. $w{country}-3) {
 			$cs{strong}[$i]   = 0;
 			$cs{food}[$i]     = 0;
@@ -322,10 +322,10 @@ sub tp_110 {
 		}
 	}
 	elsif ($w{world} eq $#world_states-5) { # êŸë¨
-		$migrate_type = 4;
+		$migrate_type = festival_type('sessoku', 1);
 	}
 	elsif ($w{world} eq $#world_states-1) { # ç¨óê
-		$migrate_type = 4;
+		$migrate_type = festival_type('konran', 1);
 	}
 	
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};

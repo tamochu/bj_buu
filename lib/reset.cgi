@@ -177,7 +177,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = 5;
+		$migrate_type = festival_type('kouhaku', 1);
 
 		for my $i (1 .. $w{country}-2) {
 			$cs{strong}[$i]   = 0;
@@ -267,7 +267,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = 6;
+		$migrate_type = festival_type('sangokusi', 1);
 		for my $i (1 .. $w{country}-3) {
 			$cs{strong}[$i]   = 0;
 			$cs{food}[$i]     = 0;
@@ -289,10 +289,10 @@ sub time_limit  {
 		}
 	}
 	elsif ($w{world} eq $#world_states-5) { # 拙速
-		$migrate_type = 4;
+		$migrate_type = festival_type('sessoku', 1);
 	}
 	elsif ($w{world} eq $#world_states-1) { # 混乱
-		$migrate_type = 4;
+		$migrate_type = festival_type('konran', 1);
 	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	&write_cs;
@@ -325,15 +325,15 @@ sub reset {
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = 1;
+			$migrate_type = festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = 2;
+			$migrate_type = festival_type('sangokusi', 0);
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = 3;
+			$migrate_type = festival_type('sessoku', 0);
 		}else {#混乱
-			$migrate_type = 3;
+			$migrate_type = festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
 	}
@@ -450,10 +450,10 @@ sub reset {
 	return $migrate_type;
 }
 
-sub player_migrate{
+sub player_migrate {
 	my $type = shift;
 
-	if ($type == 1) {# 不倶戴天解除
+	if ($type == &festival_type('kouhaku', 0)) {# 不倶戴天解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -542,7 +542,8 @@ sub player_migrate{
 			++$i;
 		}
 		close $fh;
-	}elsif($type == 2){# 三国志解除
+	}
+	elsif ($type == &festival_type('sangokusi', 0)){# 三国志解除
 		require "./lib/move_player.cgi";
 		require "./lib/shopping_offertory_box.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -630,7 +631,8 @@ sub player_migrate{
 			++$i;
 		}
 		close $fh;
-	}elsif($type == 3) {#混乱解除
+	}
+	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) {#混乱解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -656,7 +658,8 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}elsif($type == 4){# 混乱設定
+	}
+	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) {# 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -699,7 +702,8 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}elsif($type == 5){# 不倶戴天設定
+	}
+	elsif ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
 		# バックアップ作成
 		for my $i (0 .. $w{country} - 2) {
 			my $from = "$logdir/$i";
@@ -752,7 +756,8 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}elsif($type == 6){# 三国志設定
+	}
+	elsif ($type == &festival_type('sangokusi', 1)) {# 三国志設定
 		# バックアップ作成
 		for my $i (0 .. $w{country} - 3) {
 			my $from = "$logdir/$i";
@@ -805,7 +810,8 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	} elsif($type == 7) {# 独立解除
+	}
+	elsif ($type == &festival_type('dokuritu', 0)) {# 独立解除
 		require "./lib/move_player.cgi";
 		for my $i (1..$w{country}) {
 			my @names = &get_country_members($i);
@@ -858,7 +864,8 @@ sub player_migrate{
 		close $fh;
 		
 		&cs_data_repair;
-	}elsif($type == 8){# 独立設定
+	}
+	elsif ($type == &festival_type('dokuritu', 1)) {# 独立設定
 		for my $i (0 .. $w{country}) {
 			my $from = "$logdir/$i";
 			my $backup = $from . "_backup";
@@ -938,6 +945,5 @@ sub add_npc_data {
 	print $fh $line;
 	close $fh;
 }
-
 
 1; # 削除不可
