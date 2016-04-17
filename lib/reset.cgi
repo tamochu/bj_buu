@@ -323,7 +323,8 @@ sub reset {
 			&delete_npc_country;
 			$w{world} = int(rand($#world_states-5));
 		}
-		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+		# 統一→resetでランダム情勢→ユーザーが情勢決定
+#		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 	}
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
@@ -339,7 +340,8 @@ sub reset {
 			$migrate_type = festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
-		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+		# 根本的に問題があるがとりあえずユーザーが情勢を選ぶ機会がない拙速だけ表示
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") if $w{year} % 40 == 10;
 	}
 	# 仕官できる人数
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
