@@ -426,8 +426,10 @@ sub system_letter {
 		$m{country} = $mcountry;
 		$m{icon} = $micon;
 		$m{shogo} = $mshogo;
+		print qq|aaaaafffff|;
 		return 1;
 	}
+	print qq|nonononono|;
 	
 	return 0;
 }
