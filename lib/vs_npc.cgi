@@ -40,7 +40,7 @@ $npc_war = $npc_war < $war_min ? $war_min:
 #=================================================
 sub add_npc_country {
 	&write_world_news("<i>歴代の覇者達によって封印されていた魔界の結界が弱まり、悪夢が再び甦ろうとしている…</i>");
-	$w{game_lv} = 99;
+	$w{game_lv} = 0;
 	$w{world} = $#world_states;
 	
 	# NPCの国の名前
