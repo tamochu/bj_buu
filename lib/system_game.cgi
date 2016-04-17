@@ -530,6 +530,7 @@ sub write_blog_news      { &_write_news('blog_news',  @_) }
 sub write_colosseum_news { &_write_news('colosseum_news',  @_) }
 sub write_picture_news   { &_write_news('picture_news',  @_) }
 sub write_book_news      { &_write_news('book_news',  @_) }
+sub write_entry_news      { &_write_news('entry_news',  @_) }
 sub _write_news {
 	my($file_name, $message, $is_memory, $memory_name) = @_;
 	
