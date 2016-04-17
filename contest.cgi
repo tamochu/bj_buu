@@ -149,8 +149,8 @@ sub top {
 		my @lines = ();
 		my $head_line = <$fh>;
 		while (my $line = <$fh>) {
-			my $entry_name = split (/<>/, $line)[1];
-			push (@lines, $entry_name);
+			my ($no, $entry_name) = split /<>/, $line;
+			push (@lines, "$no.$entry_name\n");
 		}
 		my $entry_users = join(', ', @lines);
 		++$round;
