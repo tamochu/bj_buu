@@ -62,24 +62,12 @@ sub time_limit  {
 		}
 		push @next_worlds, $new_v unless $old_flag;
 	}
-	if ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
-		if($w{year} % 40 == 0){#•s‹ä‘Õ“V
-			$migrate_type = festival_type('kouhaku', 0);
-			$w{country} -= 2;
-		}elsif($w{year} % 40 == 20){# O‘u
-			$migrate_type = festival_type('sangokusi', 0);
-			$w{country} -= 3;
-		}elsif($w{year} % 40 == 10){# Ù‘¬
-			$migrate_type = festival_type('sessoku', 0);
-		}else {#¬—
-			$migrate_type = festival_type('konran', 0);
-		}
-	}
-	else {
+	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
 		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+		# ˆÃ•‚âÕ‚èî¨ŠúŒÀØ‚ê‚Ìî¨Œˆ’è‚Í reset ‚Å‚â‚é‚Ì‚Å‚±‚±‚Å•\¦‚µ‚È‚­‚Ä—Ç‚¢
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 
-	&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	my $migrate_type = &reset;
 	
 	unshift @old_worlds, $w{world};
@@ -335,6 +323,7 @@ sub reset {
 			&delete_npc_country;
 			$w{world} = int(rand($#world_states-5));
 		}
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
 	# ¢ŠEî¨ ¬—‰ğœ
 	if ($w{year} =~ /0$/) {
@@ -350,6 +339,7 @@ sub reset {
 			$migrate_type = festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
 	# dŠ¯‚Å‚«‚él”
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
@@ -358,7 +348,7 @@ sub reset {
 	# set world
 	$w{year}++;
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 8; #12
-######################	$w{limit_time} = $time + 3600 * 24 * $limit_touitu_day;
+######	$w{limit_time} = $time + 3600 * 24 * $limit_touitu_day;
 	$w{limit_time} = $config_test ? $time: $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
