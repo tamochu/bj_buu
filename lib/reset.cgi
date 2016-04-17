@@ -348,7 +348,7 @@ sub reset {
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
 		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
-		$w{limit_time} = $time + 3600 * 36;
+		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;
 		$w{game_lv} = 99;
 	}
 	
@@ -894,56 +894,6 @@ sub wt_c_reset{
 		}
 	}
 	closedir $dh;
-}
-
-sub add_npc_data {
-	my $country = shift;
-	
-	my %npc_statuss = (
-		max_hp => [999, 600, 400, 300, 99],
-		max_mp => [999, 500, 200, 100, 99],
-		at     => [999, 400, 300, 200, 99],
-		df     => [999, 300, 200, 100, 99],
-		mat    => [999, 400, 300, 200, 99],
-		mdf    => [999, 300, 200, 100, 99],
-		ag     => [999, 500, 300, 200, 99],
-		cha    => [999, 400, 300, 200, 99],
-		lea    => [666, 400, 250, 150, 99],
-		rank   => [$#ranks, $#ranks-2, 10, 7, 4],
-	);
-	my @npc_weas = (
-	#	[0]属性[1]武器No	[2]必殺技
-		['無', [0],			[61..65],],
-		['剣', [1 .. 5],	[1 .. 5],],
-		['槍', [6 ..10],	[11..15],],
-		['斧', [11..15],	[21..25],],
-		['炎', [16..20],	[31..35],],
-		['風', [21..25],	[41..45],],
-		['雷', [26..30],	[51..55],],
-	);
-	my $line = qq|\@npcs = (\n|;
-	my @npc_names = (qw/vipqiv(NPC) kirito(NPC) 亀の家庭医学(NPC) pigure(NPC) ウェル(NPC) vipqiv(NPC) DT(NPC) ハル(NPC) アシュレイ(NPC) ゴミクズ(NPC)/);
-
-	for my $i (0..4) {
-		$line .= qq|\t{\n\t\tname\t\t=> '$npc_names[$i]',\n|;
-		
-		for my $k (qw/max_hp max_mp at df mat mdf ag cha lea rank/) {
-			$line .= qq|\t\t$k\t\t=> $npc_statuss{$k}[$i],\n|;
-		}
-		
-		my $kind = int(rand(@npc_weas));
-		my @weas = @{ $npc_weas[$kind][1] };
-		my $wea  = $npc_weas[$kind][1]->[int(rand(@weas))];
-		$line .= qq|\t\twea\t\t=> $wea,\n|;
-
-		my $skills = join ',', @{ $npc_weas[$kind][2] };
-		$line .= qq|\t\tskills\t\t=> '$skills',\n\t},\n|;
-	}
-	$line .= qq|);\n\n1;\n|;
-	
-	open my $fh, "> $datadir/npc_war_$country.cgi";
-	print $fh $line;
-	close $fh;
 }
 
 1; # 削除不可
