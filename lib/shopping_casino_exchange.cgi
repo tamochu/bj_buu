@@ -220,7 +220,7 @@ sub modified_price {
 	
 	unless ($m{exchange_count}) {
 		my @dummy = ();
-		for (1..$#prizes) {
+		for (0..$#prizes) {
 			push @dummy, 0;
 		}
 		$m{exchange_count} = join ":", @dummy;
@@ -240,7 +240,7 @@ sub count_up_exchange {
 	
 	unless ($m{exchange_count}) {
 		my @dummy = ();
-		for (1..$#prizes) {
+		for (0..$#prizes) {
 			push @dummy, 0;
 		}
 		$m{exchange_count} = join ":", @dummy;
