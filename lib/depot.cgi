@@ -8,6 +8,8 @@ my $this_lock_file = "$userdir/$id/depot_lock.cgi";
 my $max_depot = $m{sedai} > 7 ? 50 : $m{sedai} * 5 + 15;
 $max_depot += $m{depot_bonus} if $m{depot_bonus};
 
+my $lost_depot = $max_depot * 2;
+
 # 相手に送るときの手数料(同国)
 my $need_money = 100;
 
@@ -50,6 +52,7 @@ sub begin {
 		$mes .= "$max_depot個を超えている場合は、$penalty_money Gの罰金を支払ってもらいます<br>";
 		$mes .= "どうしますか?<br>";
 	}
+	&depot_common;
 	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '一括廃棄', 'ロックをかける');
 }
 sub tp_1 {
@@ -64,6 +67,7 @@ sub tp_1 {
 #=================================================
 sub tp_100 {
 	$layout = 2;
+	&depot_common;
 	my($count, $sub_mes) = &radio_my_depot;
 
 	$mes .= "どれを引出しますか? [ $count / $max_depot ]<br>";
@@ -750,5 +754,27 @@ sub get_lock_item {
 	close $lfh;
 
 	return %lock;
+}
+
+#=================================================
+# 共通処理
+#=================================================
+sub depot_common {
+	open my $fh, "+< $this_file" or &error("$this_fileが開けません");
+	eval { flock $fh, 2; };
+	while (my $line = <$fh>) {
+		++$count;
+		if ($count >= $lost_depot) {
+			$is_rewrite = 1;
+		} else {
+			push @lines, $line;
+		}
+	}
+	if ($is_rewrite) {
+		seek  $fh, 0, 0;
+		truncate $fh, 0; 
+		print $fh @lines;
+	}
+	close $fh;
 }
 1; # 削除不可

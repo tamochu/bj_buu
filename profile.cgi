@@ -24,6 +24,7 @@ exit;
 #================================================
 sub status_mobile {
 	%m = &get_you_datas($in{id}, 1);
+	my %m_year = &get_you_year_data($in{id});
 
 	my %collection_pars = &collection_pars;
 	my $skill_par = &skill_par;
@@ -112,6 +113,9 @@ sub status_mobile {
 		•Ší<b>$collection_pars{1}</b>%<br>
 		ÀÏºŞ<b>$collection_pars{2}</b>%<br>
 		Íß¯Ä<b>$collection_pars{3}</b>%<br>
+		<hr>
+		yğ”N“xÀÑz<br>
+		’D‘—Í <b>$m_year{strong}</b>/”_‹Æ <b>$m_year{nou}</b>/¤‹Æ <b>$m_year{sho}</b>/’¥•º <b>$m_year{hei}</b>/<br>
 EOM
 }
 
@@ -120,6 +124,7 @@ EOM
 #================================================
 sub status_pc {
 	%m = &get_you_datas($in{id}, 1);
+	my %m_year = &get_you_year_data($in{id});
 
 	my %collection_pars = &collection_pars;
 	my $skill_par = &skill_par;
@@ -281,6 +286,17 @@ sub status_pc {
 			<tr><th>ÀÏºŞ</th><td align="right"><b>$collection_pars{2}</b>%<br></td></tr>
 			<tr><th>Íß¯Ä</th><td align="right"><b>$collection_pars{3}</b>%<br></td></tr>
 		</table>
+		
+		<hr size="1">
+		yğ”N“xÀÑz<br>
+		<table class="table1" cellpadding="3">
+			<tr>
+				<th>’D‘—Í</th><td align="right"><b>$m_year{strong}</b></td>
+				<th>”_‹Æ</th><td align="right"><b>$m_year{nou}</b></td>
+				<th>¤‹Æ</th><td align="right"><b>$m_year{sho}</b></td>
+				<th>’¥•º</th><td align="right"><b>$m_year{hei}</b><br></td>
+			</tr>
+		</table>
 	</tt></td></tr></table>
 EOM
 }
@@ -369,4 +385,32 @@ sub collection_pars { # ±²ÃÑ
 	return %pars;
 }
 
+#================================================
+# ˆê”Nƒ‰ƒ“ƒLƒ“ƒOƒf[ƒ^æ“¾
+#================================================
+sub get_you_year_data {
+	my $player_id = shift;
+	
+	my $last_year = $w{year} - 1;
+	
+	open my $fh, "< $userdir/$player_id/year_ranking.cgi" or &error("year_ranking.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	while (my $line = <$fh>) {
+		my %ydata;
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$ydata{$k} = $v;
+			if($k eq 'year'){
+				if($v != $last_year){
+					next;
+				}
+			}
+		}
+		if($ydata{year} == $last_year){
+			return %ydata;
+		}
+	}
+	close $fh;
+	
+	return ();
+}
 
