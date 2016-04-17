@@ -64,7 +64,7 @@ sub time_limit  {
 	}
 	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
 		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-		# 暗黒や祭り情勢期限切れ時の情勢決定は reset でやるのでここで表示しなくて良い
+		# 暗黒や祭り情勢後の情勢決定は reset でやるのでここで表示しなくて良い
 		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 
@@ -324,6 +324,7 @@ sub reset {
 			$w{world} = int(rand($#world_states-5));
 		}
 		# 統一→resetでランダム情勢→ユーザーが情勢決定
+		# ユーザーが情勢を選ばない限り暗黒が続くので仕方ないか？
 #		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 	}
 	# 世界情勢 混乱解除
@@ -340,7 +341,9 @@ sub reset {
 			$migrate_type = festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
-		# 根本的に問題があるがとりあえずユーザーが情勢を選ぶ機会がない拙速だけ表示
+		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
+		# おそらく統一期限切れでここを通っているなら他の祭り情勢でも表示しないと今度は何も表示されない
+		# 戦争で統一したのか期限切れなのか要判断
 		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") if $w{year} % 40 == 10;
 	}
 	# 仕官できる人数
