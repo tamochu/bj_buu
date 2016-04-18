@@ -421,6 +421,11 @@ sub header {
 	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	print qq|<title>$title</title>|;
 	print qq|</head><body $body><a name="top"></a>|;
+	if ($config_test) {
+		require './lib/_world_reset.cgi';
+		my $b = &is_festival_world($w{world});
+		print qq|$b $w{world}<br>|;
+	}
 }
 #================================================
 # footer

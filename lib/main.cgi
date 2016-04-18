@@ -281,11 +281,6 @@ sub main_system {
 				$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 				$mes .= qq|<input type="hidden" name="get_salary" value="1">|;
 				$mes .= qq|<input type="submit" value="‹‹—¿‚ðŽó‚¯Žæ‚é" class="button1"></form>|;
-				if ($config_test) {
-					require './lib/_world_reset.cgi';
-					my $b = &is_festival_world($w{world});
-					$mes .= qq|$b $w{world}|;
-				}
 			}else{
 				$m{egg_c} += int(rand(50)+100) if $m{egg};
 				&salary;
