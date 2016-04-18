@@ -147,14 +147,14 @@ sub tp_110 {
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
 	}
-	elsif ($w{world} eq $#world_states-4) { # ‰p—Y
-		$w{game_lv} += 20;
-		for my $i (1 .. $w{country}) {
-			$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-		}
-	}
 	elsif (&is_festival_world($w[world])) {
-		if ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
+		if ($w{world} eq $#world_states-4) { # ‰p—Y
+			$w{game_lv} += 20;
+			for my $i (1 .. $w{country}) {
+				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+			}
+		}
+		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
 			$w{game_lv} = 99;
 			$w{country} += 2;
 			my $max_c = int($w{player} / 2) + 3;

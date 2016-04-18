@@ -53,7 +53,7 @@ sub is_festival_world {
 #		return 0;
 #	}
 
-	return $world_no < $#world_states-5 ? 0 : 1;
+	return $#world_states-5 <= $world_no ? 1 : 0;
 }
 
 sub add_npc_data {
