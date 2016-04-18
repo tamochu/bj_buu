@@ -127,7 +127,7 @@ sub tp_110 {
 		}
 	}
 	elsif (&is_festival_world($w{world})) {
-		&write_world_news("ç’ÇËèÓê®ìÀì¸");
+#		&write_world_news("ç’ÇËèÓê®ìÀì¸");
 		if ($w{world} eq $#world_states-4) { # âpóY
 			$w{game_lv} += 20;
 			for my $i (1 .. $w{country}) {
@@ -136,86 +136,87 @@ sub tp_110 {
 		}
 		elsif ($w{world} eq $#world_states-2) { # ïsã‰ë’ìV
 			$w{game_lv} = 99;
-			$w{country} += 2;
-			my $max_c = int($w{player} / 2) + 3;
-			for my $i ($w{country}-1..$w{country}){
-				mkdir "$logdir/$i" or &error("$logdir/$i Ã´Ÿ¿ﬁÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ") unless -d "$logdir/$i";
-				for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
-					my $output_file = "$logdir/$i/$file_name.cgi";
-					next if -f $output_file;
-					open my $fh, "> $output_file" or &error("$output_file Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ");
-					close $fh;
-					chmod $chmod, $output_file;
-				}
-				for my $file_name (qw/leader member/) {
-					my $output_file = "$logdir/$i/$file_name.cgi";
-					open my $fh, "> $output_file" or &error("$output_file Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ");
-					close $fh;
-					chmod $chmod, $output_file;
-				}
-				&add_npc_data($i);
-				# create union file
-				for my $j (1 .. $i-1) {
-					my $file_name = "$logdir/union/${j}_${i}";
-					$w{ "f_${j}_${i}" } = -99;
-					$w{ "p_${j}_${i}" } = 2;
-					next if -f "$file_name.cgi";
-					open my $fh, "> $file_name.cgi" or &error("$file_name.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
-					close $fh;
-					chmod $chmod, "$file_name.cgi";
-					open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
-					close $fh2;
-					chmod $chmod, "${file_name}_log.cgi";
-					open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
-					close $fh3;
-					chmod $chmod, "${file_name}_member.cgi";
-				}
-				unless (-f "$htmldir/$i.html") {
-					open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
-					close $fh_h;
-				}
-				$cs{name}[$i]     = $i == $w{country} ? "ÇΩÇØÇÃÇ±ÇÃó¢":"Ç´ÇÃÇ±ÇÃéR";
-				$cs{color}[$i]    = $i == $w{country} ? '#ff0000':'#ffffff';
-				$cs{member}[$i]   = 0;
-				$cs{win_c}[$i]    = 999;
-				$cs{tax}[$i]      = 99;
-				$cs{strong}[$i]   = 75000;
-				$cs{food}[$i]     = 0;
-				$cs{money}[$i]    = 0;
-				$cs{soldier}[$i]  = 0;
-				$cs{state}[$i]    = 0;
-				$cs{capacity}[$i] = $max_c;
-				$cs{is_die}[$i]   = 0;
-				my @lines = &get_countries_mes();
-				if ($w{country} > @lines - 2) {
-					open my $fh9, ">> $logdir/countries_mes.cgi";
-					print $fh9 "<>$default_icon<>\n";
-					print $fh9 "<>$default_icon<>\n";
-					close $fh9;
-				}
-			}
-			$migrate_type = festival_type('kouhaku', 1);
-			
-			for my $i (1 .. $w{country}-2) {
-				$cs{strong}[$i]   = 0;
-				$cs{food}[$i]     = 0;
-				$cs{money}[$i]    = 0;
-				$cs{soldier}[$i]  = 0;
-				$cs{state}[$i]    = 0;
-				$cs{capacity}[$i] = 0;
-				$cs{is_die}[$i]   = 1;
-	
-				for my $j ($i+1 .. $w{country}-2) {
-					$w{ "f_${i}_${j}" } = -99;
-					$w{ "p_${i}_${j}" } = 2;
-				}
-	
-				$cs{old_ceo}[$i] = $cs{ceo}[$i];
-				$cs{ceo}[$i] = '';
-				
-				open my $fh, "> $logdir/$i/leader.cgi";
-				close $fh;
-			}
+			$migrate_type = add_festival_country('kouhaku');
+#			$w{country} += 2;
+#			my $max_c = int($w{player} / 2) + 3;
+#			for my $i ($w{country}-1..$w{country}){
+#				mkdir "$logdir/$i" or &error("$logdir/$i Ã´Ÿ¿ﬁÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ") unless -d "$logdir/$i";
+#				for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
+#					my $output_file = "$logdir/$i/$file_name.cgi";
+#					next if -f $output_file;
+#					open my $fh, "> $output_file" or &error("$output_file Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ");
+#					close $fh;
+#					chmod $chmod, $output_file;
+#				}
+#				for my $file_name (qw/leader member/) {
+#					my $output_file = "$logdir/$i/$file_name.cgi";
+#					open my $fh, "> $output_file" or &error("$output_file Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ");
+#					close $fh;
+#					chmod $chmod, $output_file;
+#				}
+#				&add_npc_data($i);
+#				# create union file
+#				for my $j (1 .. $i-1) {
+#					my $file_name = "$logdir/union/${j}_${i}";
+#					$w{ "f_${j}_${i}" } = -99;
+#					$w{ "p_${j}_${i}" } = 2;
+#					next if -f "$file_name.cgi";
+#					open my $fh, "> $file_name.cgi" or &error("$file_name.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+#					close $fh;
+#					chmod $chmod, "$file_name.cgi";
+#					open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+#					close $fh2;
+#					chmod $chmod, "${file_name}_log.cgi";
+#					open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+#					close $fh3;
+#					chmod $chmod, "${file_name}_member.cgi";
+#				}
+#				unless (-f "$htmldir/$i.html") {
+#					open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html Ãß≤ŸÇ™çÏÇÍÇ‹ÇπÇÒ");
+#					close $fh_h;
+#				}
+#				$cs{name}[$i]     = $i == $w{country} ? "ÇΩÇØÇÃÇ±ÇÃó¢":"Ç´ÇÃÇ±ÇÃéR";
+#				$cs{color}[$i]    = $i == $w{country} ? '#ff0000':'#ffffff';
+#				$cs{member}[$i]   = 0;
+#				$cs{win_c}[$i]    = 999;
+#				$cs{tax}[$i]      = 99;
+#				$cs{strong}[$i]   = 75000;
+#				$cs{food}[$i]     = 0;
+#				$cs{money}[$i]    = 0;
+#				$cs{soldier}[$i]  = 0;
+#				$cs{state}[$i]    = 0;
+#				$cs{capacity}[$i] = $max_c;
+#				$cs{is_die}[$i]   = 0;
+#				my @lines = &get_countries_mes();
+#				if ($w{country} > @lines - 2) {
+#					open my $fh9, ">> $logdir/countries_mes.cgi";
+#					print $fh9 "<>$default_icon<>\n";
+#					print $fh9 "<>$default_icon<>\n";
+#					close $fh9;
+#				}
+#			}
+#			$migrate_type = festival_type('kouhaku', 1);
+#			
+#			for my $i (1 .. $w{country}-2) {
+#				$cs{strong}[$i]   = 0;
+#				$cs{food}[$i]     = 0;
+#				$cs{money}[$i]    = 0;
+#				$cs{soldier}[$i]  = 0;
+#				$cs{state}[$i]    = 0;
+#				$cs{capacity}[$i] = 0;
+#				$cs{is_die}[$i]   = 1;
+#	
+#				for my $j ($i+1 .. $w{country}-2) {
+#					$w{ "f_${i}_${j}" } = -99;
+#					$w{ "p_${i}_${j}" } = 2;
+#				}
+#	
+#				$cs{old_ceo}[$i] = $cs{ceo}[$i];
+#				$cs{ceo}[$i] = '';
+#				
+#				open my $fh, "> $logdir/$i/leader.cgi";
+#				close $fh;
+#			}
 		}
 		elsif ($w{world} eq $#world_states-3) { # éOçëéu
 			$w{game_lv} = 99;

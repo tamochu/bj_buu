@@ -19,7 +19,7 @@ use constant FESTIVAL_TYPE => {
 
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 use constant FESTIVAL_COUNTRY_PROPERTY => {
-	'kouhaku' => [2, 75000, ["たけのこの里", "きのこの山"], ["#ff0000", "#ffffff"]],
+	'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
 	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 };
 
