@@ -24,7 +24,7 @@ my $country_name_san_3 = "蜀";
 # 期日が過ぎた場合
 #================================================
 sub time_limit  {
-	if ($w{world} eq $#world_states-5) {
+	if ($w{world} eq $#world_states-5) { # 拙速
 		my $strongest_country = 0;
 		my $max_value = 0;
 		for my $i (1 .. $w{country}) {
@@ -49,22 +49,10 @@ sub time_limit  {
 	close $fh;
 	my @next_worlds;
 	my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-	for my $new_v (@new_worlds){
-		my $old_year = 0;
-		my $old_flag = 0;
-		for my $o (@old_worlds){
-			last if $old_year > 10;
-			if ($new_v == $o){
-				$old_flag = 1;
-				last;
-			}
-			$old_year++;
-		}
-		push @next_worlds, $new_v unless $old_flag;
-	}
-	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
-		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-		# 暗黒や祭り情勢後の情勢決定は reset でやるのでここで表示しなくて良い
+	my @next_worlds = &unique_worlds(@new_worlds);
+	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) { # 特殊情勢終了時でなければ
+		$w{world} = @next_worlds == 0 ? 0: $next_worlds[int(rand(@next_worlds))];
+		# 特殊情勢突入時は専用の情勢表示があるので一般情勢のみ情勢表示
 		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 

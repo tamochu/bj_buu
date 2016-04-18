@@ -1,6 +1,6 @@
 #================================================
 # 世界情勢や国ﾃﾞｰﾀのﾘｾｯﾄで使われるモジュール
-# 祭り情勢に関するものが多いが全体的にもっとシンプルにできそうなので world_reset としておく
+# 祭り情勢に関するものが多いが全体的にもっとシンプルにできそうなので _world_reset としておく
 # world reset vs_npc が使う add_npc_data はさらに外部に置いた方が良さそう
 #================================================
 
@@ -9,6 +9,43 @@
 # ./lib/world.cgi
 # ./lib/reset.cgi
 #================================================
+
+#================================================
+# 情勢全般
+#================================================
+
+# 来年の情勢リストを渡すと直近11年の情勢と重複するものを除外した情勢リストが返ってくる
+sub unique_worlds {
+	my @new_worlds = @_;
+	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
+	my @old_worlds = split /<>/, <$fh>;
+	close $fh;
+	my @next_worlds;
+	for my $new_v (@new_worlds){
+		my $old_year = 0;
+		my $old_flag = 0;
+		for my $o (@old_worlds){
+			last if $old_year > 10;
+			if ($new_v == $o){
+				$old_flag = 1;
+				last;
+			}
+			$old_year++;
+		}
+		push @next_worlds, $new_v unless $old_flag;
+	}
+	return @next_worlds;
+}
+
+#================================================
+# 特殊情勢 暗黒を含む祭り情勢の意
+#================================================
+
+# 渡された情勢ナンバーを渡すと特殊情勢か判断して返す
+sub is_special_world {
+	my $world_no = shift;
+	return $world_no < $#world_states-5 ? 0 : 1;
+}
 
 # 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
 use constant FESTIVAL_TYPE => {
