@@ -49,7 +49,9 @@ sub is_festival_world {
 #		require './lib/_festival_world.cgi'; # Õ‚èî¨‚È‚ç‚Î©“®“I‚Éƒ[ƒh
 		return 1;
 	}
-	return 0;
+	else {
+		return 0;
+	}
 }
 
 sub add_npc_data {
