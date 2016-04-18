@@ -430,16 +430,16 @@ sub reset {
 		require './lib/_festival_world.cgi';
 		if ($w{year} % 40 == 0){ # •s‹ä‘Õ“V
 			$w{world} = $#world_states-2;
-			$migrate_type = &festival_type('kouhaku', 1);
+#			$migrate_type = &festival_type('kouhaku', 1);
 		} elsif ($w{year} % 40 == 20) { # O‘u
 			$w{world} = $#world_states-3;
-			$migrate_type = &festival_type('sangokusi', 1);
+#			$migrate_type = &festival_type('sangokusi', 1);
 		} elsif ($w{year} % 40 == 10) { # Ù‘¬
 			$w{world} = $#world_states-5;
-			$migrate_type = &festival_type('sessoku', 1);
+#			$migrate_type = &festival_type('sessoku', 1);
 		} else { # ¬—
 			$w{world} = $#world_states-1;
-			$migrate_type = &festival_type('konran', 1);
+#			$migrate_type = &festival_type('konran', 1);
 		}
 		
 		&wt_c_reset;
