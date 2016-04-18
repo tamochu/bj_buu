@@ -83,10 +83,10 @@ sub add_festival_country {
 			open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html Ì§²Ù‚ªì‚ê‚Ü‚¹‚ñ");
 			close $fh_h;
 		}
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$i-($w{country}-1)];
-		&write_world_news("1.$i-($w{country}-1)");
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$i-($w{country}-1)];
-		&write_world_news("2.$i-($w{country}-1)");
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$i-($w{country}-$country_num+1)];
+		&write_world_news("1.$i-($w{country}-$country_num+1");
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$i-($w{country}-$country_num+1)];
+		&write_world_news("2.$i-($w{country}-$country_num+1");
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
