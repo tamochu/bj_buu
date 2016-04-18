@@ -43,7 +43,7 @@ sub unique_worlds {
 #================================================
 
 # 渡された情勢ナンバーを渡すと特殊情勢か判断して返す
-sub is_special_world {
+sub is_festival_world {
 	my $world_no = shift;
 #	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
 #		require './lib/_festival_world.cgi'; # 祭り情勢ならば自動的にロード
