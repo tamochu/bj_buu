@@ -319,16 +319,17 @@ sub reset {
 	}
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
+		require './lib/_festival_world.cgi';
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = festival_type('kouhaku', 0);
+			$migrate_type = &festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = festival_type('sangokusi', 0);
+			$migrate_type = &festival_type('sangokusi', 0);
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = festival_type('sessoku', 0);
+			$migrate_type = &festival_type('sessoku', 0);
 		}else {#混乱
-			$migrate_type = festival_type('konran', 0);
+			$migrate_type = &festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
 		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
