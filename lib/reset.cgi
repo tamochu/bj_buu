@@ -1,10 +1,9 @@
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
+require './lib/_world_reset.cgi';
 #================================================
 # 国ﾘｾｯﾄ Created by Merino
 #================================================
-
-# ./lib/_war_result.cgi→./lib/world.cgi→./lib/reset.cgi
 
 # 統一難易度：[難しい 60 ～ 40 簡単]
 my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
@@ -21,21 +20,6 @@ my $country_name_san_1 = "魏";
 my $country_name_san_2 = "呉";
 my $country_name_san_3 = "蜀";
 
-# 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
-use constant FESTIVAL_TYPE => {
-	'kouhaku' => 1,
-	'sanngokushi' => 3,
-	'konnrann' => 5,
-	'sessoku' => 7,
-	'dokuritsu' => 9
-};
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
-}
-
 #================================================
 # 期日が過ぎた場合
 #================================================
@@ -47,14 +31,6 @@ sub time_limit  {
 			if ($cs{strong}[$i] > $max_value) {
 				$strongest_country = $i;
 				$max_value = $cs{strong}[$i];
-			}
-		}
-		my $baby_country = 0;
-		my $min_value = $max_value;
-		for my $i (1 .. $w{country}) {
-			if ($cs{strong}[$i] < $min_value) {
-				$baby_country = $i;
-				$min_value = $cs{strong}[$i];
 			}
 		}
 		&write_world_news("<b>$world_name大陸を全土にわたる国力競争は$cs{name}[$strongest_country]の勝利になりました</b>");
@@ -86,10 +62,12 @@ sub time_limit  {
 		}
 		push @next_worlds, $new_v unless $old_flag;
 	}
-	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/){
+	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
 		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+		# 暗黒や祭り情勢後の情勢決定は reset でやるのでここで表示しなくて良い
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
-	&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
+
 	my $migrate_type = &reset;
 	
 	unshift @old_worlds, $w{world};
@@ -201,7 +179,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = &festival_type('kouhaku', 1);
+		$migrate_type = festival_type('kouhaku', 1);
 
 		for my $i (1 .. $w{country}-2) {
 			$cs{strong}[$i]   = 0;
@@ -291,7 +269,7 @@ sub time_limit  {
 				}
 			}
 		}
-		$migrate_type = &festival_type('sanngokushi', 1);
+		$migrate_type = festival_type('sangokusi', 1);
 		for my $i (1 .. $w{country}-3) {
 			$cs{strong}[$i]   = 0;
 			$cs{food}[$i]     = 0;
@@ -313,12 +291,10 @@ sub time_limit  {
 		}
 	}
 	elsif ($w{world} eq $#world_states-5) { # 拙速
-#		$migrate_type = 4;
-		$migrate_type = &festival_type('sessoku', 1);
+		$migrate_type = festival_type('sessoku', 1);
 	}
 	elsif ($w{world} eq $#world_states-1) { # 混乱
-#		$migrate_type = 4;
-		$migrate_type = &festival_type('konnrann', 1);
+		$migrate_type = festival_type('konran', 1);
 	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	&write_cs;
@@ -347,21 +323,28 @@ sub reset {
 			&delete_npc_country;
 			$w{world} = int(rand($#world_states-5));
 		}
+		# 統一→resetでランダム情勢→ユーザーが情勢決定
+		# ユーザーが情勢を選ばない限り暗黒が続くので仕方ないか？
+#		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 	}
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = &festival_type('kouhaku', 0);
+			$migrate_type = festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = &festival_type('sanngokushi', 0);
+			$migrate_type = festival_type('sangokusi', 0);
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = &festival_type('sessoku', 0);
+			$migrate_type = festival_type('sessoku', 0);
 		}else {#混乱
-			$migrate_type = &festival_type('konnrann', 0);
+			$migrate_type = festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
+		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
+		# おそらく統一期限切れでここを通っているなら他の祭り情勢でも表示しないと今度は何も表示されない
+		# 戦争で統一したのか期限切れなのか要判断
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") if $w{year} % 40 == 10;
 	}
 	# 仕官できる人数
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
@@ -371,10 +354,11 @@ sub reset {
 	$w{year}++;
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 8; #12
 	$w{limit_time} = $time + 3600 * 24 * $limit_touitu_day;
+#	$w{limit_time} = $config_test ? $time: $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
 	if($w{year} % 40 == 10){
 		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
-		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;# $time + 3600 * 36;
+		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;
 		$w{game_lv} = 99;
 	}
 	
@@ -476,10 +460,64 @@ sub reset {
 	return $migrate_type;
 }
 
-sub player_migrate{
+sub player_migrate {
 	my $type = shift;
 
-	if ($type == &festival_type('kouhaku', 0)) {# 不倶戴天解除
+	if ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
+		# バックアップ作成
+		for my $i (0 .. $w{country} - 2) {
+			my $from = "$logdir/$i";
+			my $backup = $from . "_backup";
+			rcopy($from, $backup);
+		}
+		my $from = "$logdir/countries.cgi";
+		my $backup = "$logdir/countries_backup.cgi";
+		rcopy($from, $backup);
+		
+		require "./lib/move_player.cgi";
+		@sedais=([0, 0],[0, 0],[0, 0],[0, 0]);
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %you_datas = &get_you_datas($pid, 1);
+			
+			my $j = int(rand(2));
+			my $s;
+			if($m{sedai} <= 5){
+				$s = 0;
+			}elsif($m{sedai} <= 10){
+				$s = 1;
+			}elsif($m{sedai} <= 15){
+				$s = 2;
+			}else{
+				$s = 3;
+			}
+			for my $cj (0..1) {
+				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
+					$j = $cj;
+				}
+			}
+			++$sedais[$s][$j];
+			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
+			if ($you_datas{name} eq $m{name}){
+				$m{country} = $w{country} - $j;
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c_t"} = $m{$k."_c"};
+					$m{$k."_c"} = 0;
+				}
+				&write_user;
+			} else {
+				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
+				for my $k (qw/war dom pro mil/) {
+					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+					&regist_you_data($you_datas{name}, $k."_c", 0);
+				}
+			}
+		}
+		closedir $dh;
+	}
+	elsif ($type == &festival_type('kouhaku', 0)) {# 不倶戴天解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -568,7 +606,62 @@ sub player_migrate{
 			++$i;
 		}
 		close $fh;
-	}elsif($type == &festival_type('sanngokushi', 0)){# 三国志解除
+	}
+	elsif ($type == &festival_type('sangokusi', 1)) {# 三国志設定
+		# バックアップ作成
+		for my $i (0 .. $w{country} - 3) {
+			my $from = "$logdir/$i";
+			my $backup = $from . "_backup";
+			rcopy($from, $backup);
+		}
+		my $from = "$logdir/countries.cgi";
+		my $backup = "$logdir/countries_backup.cgi";
+		rcopy($from, $backup);
+		
+		require "./lib/move_player.cgi";
+		@sedais=([0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 0, 0]);
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %you_datas = &get_you_datas($pid, 1);
+			
+			my $j = int(rand(3));
+			my $s;
+			if($m{sedai} <= 5){
+				$s = 0;
+			}elsif($m{sedai} <= 10){
+				$s = 1;
+			}elsif($m{sedai} <= 15){
+				$s = 2;
+			}else{
+				$s = 3;
+			}
+			for my $cj (0..2) {
+				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
+					$j = $cj;
+				}
+			}
+			++$sedais[$s][$j];
+			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
+			if ($you_datas{name} eq $m{name}){
+				$m{country} = $w{country} - $j;
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c_t"} = $m{$k."_c"};
+					$m{$k."_c"} = 0;
+				}
+				&write_user;
+			} else {
+				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
+				for my $k (qw/war dom pro mil/) {
+					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+					&regist_you_data($you_datas{name}, $k."_c", 0);
+				}
+			}
+		}
+		closedir $dh;
+	}
+	elsif ($type == &festival_type('sangokusi', 0)){# 三国志解除
 		require "./lib/move_player.cgi";
 		require "./lib/shopping_offertory_box.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -656,33 +749,8 @@ sub player_migrate{
 			++$i;
 		}
 		close $fh;
-	}elsif($type == &festival_type('konnrann', 0)) {#混乱解除
-		require "./lib/move_player.cgi";
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			if($you_datas{name} eq $m{name}){
-				&move_player($m{name}, $m{country}, 0);
-				$m{country} = 0;
-				&write_user;
-			}
-			&move_player($you_datas{name}, $you_datas{country}, 0);
-			&regist_you_data($you_datas{name}, 'country', 0);
-
-			my($c1, $c2) = split /,/, $w{win_countries};
-			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
-				open my $fh, ">> $userdir/$pid/ex_c.cgi";
-				print $fh "fes_c<>1<>\n";
-				close $fh;
-				
-				&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
-			}
-		}
-		closedir $dh;
-	}elsif($type == &festival_type('konnrann', 1)){# 混乱設定
+	}
+	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) {# 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -725,9 +793,36 @@ sub player_migrate{
 			}
 		}
 		closedir $dh;
-	}elsif($type == &festival_type('kouhaku', 1)){# 不倶戴天設定
-		# バックアップ作成
-		for my $i (0 .. $w{country} - 2) {
+	}
+	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) {#混乱解除
+		require "./lib/move_player.cgi";
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %you_datas = &get_you_datas($pid, 1);
+			
+			if($you_datas{name} eq $m{name}){
+				&move_player($m{name}, $m{country}, 0);
+				$m{country} = 0;
+				&write_user;
+			}
+			&move_player($you_datas{name}, $you_datas{country}, 0);
+			&regist_you_data($you_datas{name}, 'country', 0);
+
+			my($c1, $c2) = split /,/, $w{win_countries};
+			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
+				open my $fh, ">> $userdir/$pid/ex_c.cgi";
+				print $fh "fes_c<>1<>\n";
+				close $fh;
+				
+				&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
+			}
+		}
+		closedir $dh;
+	}
+	elsif ($type == &festival_type('dokuritu', 1)) {# 独立設定
+		for my $i (0 .. $w{country}) {
 			my $from = "$logdir/$i";
 			my $backup = $from . "_backup";
 			rcopy($from, $backup);
@@ -735,103 +830,8 @@ sub player_migrate{
 		my $from = "$logdir/countries.cgi";
 		my $backup = "$logdir/countries_backup.cgi";
 		rcopy($from, $backup);
-		
-		require "./lib/move_player.cgi";
-		@sedais=([0, 0],[0, 0],[0, 0],[0, 0]);
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			my $j = int(rand(2));
-			my $s;
-			if($m{sedai} <= 5){
-				$s = 0;
-			}elsif($m{sedai} <= 10){
-				$s = 1;
-			}elsif($m{sedai} <= 15){
-				$s = 2;
-			}else{
-				$s = 3;
-			}
-			for my $cj (0..1) {
-				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
-					$j = $cj;
-				}
-			}
-			++$sedais[$s][$j];
-			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $w{country} - $j;
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
-				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
-				for my $k (qw/war dom pro mil/) {
-					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-					&regist_you_data($you_datas{name}, $k."_c", 0);
-				}
-			}
-		}
-		closedir $dh;
-	}elsif($type == &festival_type('sanngokushi', 1)){# 三国志設定
-		# バックアップ作成
-		for my $i (0 .. $w{country} - 3) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
-		
-		require "./lib/move_player.cgi";
-		@sedais=([0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 0, 0]);
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			my $j = int(rand(3));
-			my $s;
-			if($m{sedai} <= 5){
-				$s = 0;
-			}elsif($m{sedai} <= 10){
-				$s = 1;
-			}elsif($m{sedai} <= 15){
-				$s = 2;
-			}else{
-				$s = 3;
-			}
-			for my $cj (0..2) {
-				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
-					$j = $cj;
-				}
-			}
-			++$sedais[$s][$j];
-			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $w{country} - $j;
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
-				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
-				for my $k (qw/war dom pro mil/) {
-					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-					&regist_you_data($you_datas{name}, $k."_c", 0);
-				}
-			}
-		}
-		closedir $dh;
-	} elsif($type == &festival_type('dokuritsu', 0)) {# 独立解除
+	}
+	elsif ($type == &festival_type('dokuritu', 0)) {# 独立解除
 		require "./lib/move_player.cgi";
 		for my $i (1..$w{country}) {
 			my @names = &get_country_members($i);
@@ -883,16 +883,7 @@ sub player_migrate{
 		}
 		close $fh;
 		
-		&cs_data_repair;
-	}elsif($type == &festival_type('dokuritsu', 1)){# 独立設定
-		for my $i (0 .. $w{country}) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
+		&cs_data_repair;# ???
 	}
 	&cs_data_repair;
 }
@@ -914,81 +905,5 @@ sub wt_c_reset{
 	}
 	closedir $dh;
 }
-
-sub go_neverland {
-	my $from_country = shift;
-	require "./lib/move_player.cgi"; # 何度呼んでもロードは一回みたい
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		my %you_datas = &get_you_datas($pid, 1);
-		next if $you_datas{country} eq 0; # ﾈﾊﾞﾗﾝ民をﾈﾊﾞﾗﾝに送る必要はない
-
-		# もっとコンパクトにできそう
-		# 指定された国に所属しているか全国を指定されたらﾈﾊﾞﾗﾝ移動
-		if ( $you_datas{name} eq $m{name} && ($m{country} eq $from_country || $from_country eq 0) ) {
-			&move_player($m{name}, $m{country}, 0);
-			$m{country} = 0;
-			&write_user;
-		}
-		# 指定された国に所属しているか全国を指定されたらﾈﾊﾞﾗﾝ移動
-		if ($you_datas{country} eq $from_country || $from_country eq 0) {
-			&move_player($you_datas{name}, $you_datas{country}, 0) if $you_datas{country} eq $from_country;
-			&regist_you_data($you_datas{name}, 'country', 0) if $you_datas{country} eq $from_country;
-		}
-	}
-}
-
-sub add_npc_data {
-	my $country = shift;
-	
-	my %npc_statuss = (
-		max_hp => [999, 600, 400, 300, 99],
-		max_mp => [999, 500, 200, 100, 99],
-		at     => [999, 400, 300, 200, 99],
-		df     => [999, 300, 200, 100, 99],
-		mat    => [999, 400, 300, 200, 99],
-		mdf    => [999, 300, 200, 100, 99],
-		ag     => [999, 500, 300, 200, 99],
-		cha    => [999, 400, 300, 200, 99],
-		lea    => [666, 400, 250, 150, 99],
-		rank   => [$#ranks, $#ranks-2, 10, 7, 4],
-	);
-	my @npc_weas = (
-	#	[0]属性[1]武器No	[2]必殺技
-		['無', [0],			[61..65],],
-		['剣', [1 .. 5],	[1 .. 5],],
-		['槍', [6 ..10],	[11..15],],
-		['斧', [11..15],	[21..25],],
-		['炎', [16..20],	[31..35],],
-		['風', [21..25],	[41..45],],
-		['雷', [26..30],	[51..55],],
-	);
-	my $line = qq|\@npcs = (\n|;
-	my @npc_names = (qw/vipqiv(NPC) kirito(NPC) 亀の家庭医学(NPC) pigure(NPC) ウェル(NPC) vipqiv(NPC) DT(NPC) ハル(NPC) アシュレイ(NPC) ゴミクズ(NPC)/);
-
-	for my $i (0..4) {
-		$line .= qq|\t{\n\t\tname\t\t=> '$npc_names[$i]',\n|;
-		
-		for my $k (qw/max_hp max_mp at df mat mdf ag cha lea rank/) {
-			$line .= qq|\t\t$k\t\t=> $npc_statuss{$k}[$i],\n|;
-		}
-		
-		my $kind = int(rand(@npc_weas));
-		my @weas = @{ $npc_weas[$kind][1] };
-		my $wea  = $npc_weas[$kind][1]->[int(rand(@weas))];
-		$line .= qq|\t\twea\t\t=> $wea,\n|;
-
-		my $skills = join ',', @{ $npc_weas[$kind][2] };
-		$line .= qq|\t\tskills\t\t=> '$skills',\n\t},\n|;
-	}
-	$line .= qq|);\n\n1;\n|;
-	
-	open my $fh, "> $datadir/npc_war_$country.cgi";
-	print $fh $line;
-	close $fh;
-}
-
 
 1; # 削除不可

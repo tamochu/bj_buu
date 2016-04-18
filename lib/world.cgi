@@ -1,25 +1,9 @@
 sub begin { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異常な処理です'); }
 sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異常な処理です'); }
+require './lib/_world_reset.cgi';
 #================================================
 # 世界情勢 Created by Merino
 #================================================
-
-# ./lib/_war_result.cgi→./lib/world.cgi→./lib/reset.cgi
-
-# 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
-use constant FESTIVAL_TYPE => {
-	'kouhaku' => 1,
-	'sanngokushi' => 3,
-	'konnrann' => 5,
-	'sessoku' => 7,
-	'dokuritsu' => 9
-};
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
-}
 
 #================================================
 # 選択画面
@@ -119,8 +103,7 @@ sub tp_110 {
 		}else{
 			&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 		}
-	}
-	
+	}	
 	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
 	my $saved_w = 0;
@@ -228,7 +211,7 @@ sub tp_110 {
 				close $fh9;
 			}
 		}
-		$migrate_type = &festival_type('kouhaku', 1);
+		$migrate_type = festival_type('kouhaku', 1);
 		
 		for my $i (1 .. $w{country}-2) {
 			$cs{strong}[$i]   = 0;
@@ -316,7 +299,7 @@ sub tp_110 {
 				close $fh9;
 			}
 		}
-		$migrate_type = &festival_type('sanngokushi', 1);
+		$migrate_type = festival_type('sangokusi', 1);
 		for my $i (1 .. $w{country}-3) {
 			$cs{strong}[$i]   = 0;
 			$cs{food}[$i]     = 0;
@@ -337,11 +320,12 @@ sub tp_110 {
 			open my $fh, "> $logdir/$i/leader.cgi";
 			close $fh;
 		}
-	}elsif ($w{world} eq $#world_states-5) { # 拙速
-#		$migrate_type = 4;
-		$migrate_type = &festival_type('sessoku', 1);
-	}elsif ($w{world} eq $#world_states-1) { # 混乱
-		$migrate_type = &festival_type('konnrann', 1);
+	}
+	elsif ($w{world} eq $#world_states-5) { # 拙速
+		$migrate_type = festival_type('sessoku', 1);
+	}
+	elsif ($w{world} eq $#world_states-1) { # 混乱
+		$migrate_type = festival_type('konran', 1);
 	}
 	
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
@@ -352,56 +336,6 @@ sub tp_110 {
 	
 	require "./lib/reset.cgi";
 	&player_migrate($migrate_type);
-}
-
-sub add_npc_data {
-	my $country = shift;
-	
-	my %npc_statuss = (
-		max_hp => [999, 600, 400, 300, 99],
-		max_mp => [999, 500, 200, 100, 99],
-		at     => [999, 400, 300, 200, 99],
-		df     => [999, 300, 200, 100, 99],
-		mat    => [999, 400, 300, 200, 99],
-		mdf    => [999, 300, 200, 100, 99],
-		ag     => [999, 500, 300, 200, 99],
-		cha    => [999, 400, 300, 200, 99],
-		lea    => [666, 400, 250, 150, 99],
-		rank   => [$#ranks, $#ranks-2, 10, 7, 4],
-	);
-	my @npc_weas = (
-	#	[0]属性[1]武器No	[2]必殺技
-		['無', [0],			[61..65],],
-		['剣', [1 .. 5],	[1 .. 5],],
-		['槍', [6 ..10],	[11..15],],
-		['斧', [11..15],	[21..25],],
-		['炎', [16..20],	[31..35],],
-		['風', [21..25],	[41..45],],
-		['雷', [26..30],	[51..55],],
-	);
-	my $line = qq|\@npcs = (\n|;
-	my @npc_names = (qw/vipqiv(NPC) kirito(NPC) 亀の家庭医学(NPC) pigure(NPC) ウェル(NPC) vipqiv(NPC) DT(NPC) ハル(NPC) アシュレイ(NPC) ゴミクズ(NPC)/);
-
-	for my $i (0..4) {
-		$line .= qq|\t{\n\t\tname\t\t=> '$npc_names[$i]',\n|;
-		
-		for my $k (qw/max_hp max_mp at df mat mdf ag cha lea rank/) {
-			$line .= qq|\t\t$k\t\t=> $npc_statuss{$k}[$i],\n|;
-		}
-		
-		my $kind = int(rand(@npc_weas));
-		my @weas = @{ $npc_weas[$kind][1] };
-		my $wea  = $npc_weas[$kind][1]->[int(rand(@weas))];
-		$line .= qq|\t\twea\t\t=> $wea,\n|;
-
-		my $skills = join ',', @{ $npc_weas[$kind][2] };
-		$line .= qq|\t\tskills\t\t=> '$skills',\n\t},\n|;
-	}
-	$line .= qq|);\n\n1;\n|;
-	
-	open my $fh, "> $datadir/npc_war_$country.cgi";
-	print $fh $line;
-	close $fh;
 }
 
 1; # 削除不可
