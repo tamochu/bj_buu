@@ -1,7 +1,6 @@
 sub begin { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Ş×Ñ´×°ˆÙí‚Èˆ—‚Å‚·'); }
 sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Ş×Ñ´×°ˆÙí‚Èˆ—‚Å‚·'); }
 require './lib/_world_reset.cgi';
-require './lib/_festival_world.cgi';
 #================================================
 # ¢ŠEî¨ Created by Merino
 #================================================
@@ -128,6 +127,7 @@ sub tp_110 {
 		}
 	}
 	elsif (&is_festival_world($w{world})) {
+#		require './lib/_festival_world.cgi';
 		&write_world_news("Õ‚èî¨“Ë“ü");
 		if ($w{world} eq $#world_states-4) { # ‰p—Y
 			$w{game_lv} += 20;
