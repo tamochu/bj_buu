@@ -450,6 +450,7 @@ sub reset {
 }
 
 sub player_migrate {
+	require './lib/_festival_world.cgi';
 	my $type = shift;
 
 	if ($type == &festival_type('kouhaku', 1)) {# •s‹ä‘Õ“Vİ’è
