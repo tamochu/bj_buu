@@ -473,8 +473,8 @@ sub tp_1000{
 	$mes .= qq|</select></p><br>|;
 	$mes .= qq|<input type="radio" name="cmd" value="0">‚â‚ß‚é<br>|;
 	$mes .= qq|<input type="radio" name="cmd" value="1" checked>Íß¯Ä‚ğ‘—‚Á‚½‚Ó‚è‚ğ‚·‚é<br>|;
-	$mes .= qq|<input type="radio" name="cmd" value="2">•z‹U‘•<br>|;
-	$mes .= qq|<input type="radio" name="cmd" value="3">’âí‹U‘•<br>|;
+	$mes .= qq|<input type="radio" name="cmd" value="2">•z‹U‘•<br>| if $m{country};
+	$mes .= qq|<input type="radio" name="cmd" value="3">’âí‹U‘•<br>| if $m{country};
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="‚¢‚½‚¸‚ç" class="button1"></p></form>|;
 	$m{tp} += 10;
@@ -483,12 +483,12 @@ sub tp_1000{
 
 sub tp_1010{
 	if ($in{trick_name} eq '') {
-		$mes .= 'S‘©æ‚ª‹L“ü‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ<br>';
+		$mes .= '‚¢‚½‚¸‚ç–¼‚ª‹L“ü‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ<br>';
 		&begin;
 		return;
 	}
 	if ($cmd eq '1') {
-		&mes_and_send_news("$in{trick_name}‚É$guas[$in{trick_pet}][1]‚ğ‘—‚è‚Ü‚µ‚½");
+		&mes_and_send_news("$in{trick_name}‚É$pets[$in{trick_pet}][1]‚ğ‘—‚è‚Ü‚µ‚½");
 	} elsif ($cmd eq '2') {
 		&write_world_news("<b>$cs{name}[$m{country}]‚Ì$in{trick_name}‚ª</b><b>$cs{name}[$in{trick_country}]‚Æ’âíğ–ñ‚ğŒ‹‚Ñ‚Ü‚µ‚½</b>");
 	} elsif ($cmd eq '3') {
@@ -499,8 +499,8 @@ sub tp_1010{
 		return;
 	}
 	$m{pet} = 0 if rand(7) < 1;
-	&add_prisoner;
 	&refresh;
+	&add_prisoner;
 	&n_menu;
 }
 

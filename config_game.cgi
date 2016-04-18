@@ -656,7 +656,7 @@ require './lib/system_game.cgi';
  	[198,	'ｶｼﾗ',	'myself',	sub{}],# trick.cgiに埋め込み処理
  	[199,	'ｳﾘｴﾙ',	'change_seed',	sub{},'やっと4柱そろいました'], # main.cgiのsub lv_upに直接埋め込み処理
  	[200,	'ｹｯﾄｳ',	'keep_seed',	sub{},'決闘（デュエル）!'], # main.cgiのsub lv_upに直接埋め込み処理
- 	[201,	'ﾎｰﾘｴ',	'myself',	sub{}],# trick.cgiに埋め込み処理
+ 	[201,	'ﾎｰﾘｴ',	'myself',	sub{},'回転回転回転回転ライブドアオート'],# trick.cgiに埋め込み処理
  );
  
  
