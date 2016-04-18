@@ -24,7 +24,7 @@ my $country_name_san_3 = "蜀";
 # 期日が過ぎた場合
 #================================================
 sub time_limit  {
-	if ($w{world} eq $#world_states-5) { # 拙速
+	if ($w{world} eq $#world_states-5) {
 		my $strongest_country = 0;
 		my $max_value = 0;
 		for my $i (1 .. $w{country}) {
@@ -42,16 +42,29 @@ sub time_limit  {
 		$w{win_countries} = '';
 	}
 
-#	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
-#	my $wline;
-#	$wline = <$fh>;
-#	my @old_worlds = split /<>/, $wline;
-#	close $fh;
+	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
+	my $wline;
+	$wline = <$fh>;
+	my @old_worlds = split /<>/, $wline;
+	close $fh;
+	my @next_worlds;
 	my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-	my @next_worlds = &unique_worlds(@new_worlds);
-	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) { # 特殊情勢終了時でなければ
-		$w{world} = @next_worlds == 0 ? 0: $next_worlds[int(rand(@next_worlds))];
-		# 特殊情勢突入時は専用の情勢表示があるので一般情勢のみ情勢表示
+	for my $new_v (@new_worlds){
+		my $old_year = 0;
+		my $old_flag = 0;
+		for my $o (@old_worlds){
+			last if $old_year > 10;
+			if ($new_v == $o){
+				$old_flag = 1;
+				last;
+			}
+			$old_year++;
+		}
+		push @next_worlds, $new_v unless $old_flag;
+	}
+	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
+		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+		# 暗黒や祭り情勢後の情勢決定は reset でやるのでここで表示しなくて良い
 		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 
@@ -97,194 +110,191 @@ sub time_limit  {
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
 	}
-	elsif (&is_festival_world($w[world])) {
-		require './lib/_festival_world.cgi'; # 祭り情勢ならば自動的にロード
-		if ($w{world} eq $#world_states-4) { # 英雄
-			$w{game_lv} += 20;
-			for my $i (1 .. $w{country}) {
-				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-			}
+	elsif ($w{world} eq $#world_states-4) { # 英雄
+		$w{game_lv} += 20;
+		for my $i (1 .. $w{country}) {
+			$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
 		}
-		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
-			$w{game_lv} = 99;
-			if ($cs{name}[$w{country}-1] ne $country_name_hug_1 && $cs{name}[$w{country}] ne $country_name_hug_2) {
-				$w{country} += 2;
-				my $max_c = int($w{player} / 2) + 3;
-				for my $i ($w{country}-1..$w{country}){
-					mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
-					for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
-						my $output_file = "$logdir/$i/$file_name.cgi";
-						next if -f $output_file;
-						open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-						close $fh;
-						chmod $chmod, $output_file;
-					}
-					for my $file_name (qw/leader member/) {
-						my $output_file = "$logdir/$i/$file_name.cgi";
-						open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-						close $fh;
-						chmod $chmod, $output_file;
-					}
-					&add_npc_data($i);
-					# create union file
-					for my $j (1 .. $i-1) {
-						my $file_name = "$logdir/union/${j}_${i}";
-						$w{ "f_${j}_${i}" } = -99;
-						$w{ "p_${j}_${i}" } = 2;
-	
-						next if -f "$file_name.cgi";
-						open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
-						close $fh;
-						chmod $chmod, "$file_name.cgi";
-						open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
-						close $fh2;
-						chmod $chmod, "${file_name}_log.cgi";
-						open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
-						close $fh3;
-						chmod $chmod, "${file_name}_member.cgi";
-					}
-					unless (-f "$htmldir/$i.html") {
-						open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html ﾌｧｲﾙが作れません");
-						close $fh_h;
-					}
-					$cs{name}[$i]     = $i == $w{country} ? $country_name_hug_1 : $country_name_hug_2;
-					$cs{color}[$i]    = $i == $w{country} ? '#ff0000':'#ffffff';
-					$cs{member}[$i]   = 0;
-					$cs{win_c}[$i]    = 999;
-					$cs{tax}[$i]      = 99;
-					$cs{strong}[$i]   = 75000;
-					$cs{food}[$i]     = 0;
-					$cs{money}[$i]    = 0;
-					$cs{soldier}[$i]  = 0;
-					$cs{state}[$i]    = 0;
-					$cs{capacity}[$i] = $max_c;
-					$cs{is_die}[$i]   = 0;
-					my @lines = &get_countries_mes();
-					if ($w{country} > @lines - 2) {
-						open my $fh9, ">> $logdir/countries_mes.cgi";
-						print $fh9 "<>$default_icon<>\n";
-						print $fh9 "<>$default_icon<>\n";
-						close $fh9;
-					}
+	}
+	elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+		$w{game_lv} = 99;
+		if ($cs{name}[$w{country}-1] ne $country_name_hug_1 && $cs{name}[$w{country}] ne $country_name_hug_2) {
+			$w{country} += 2;
+			my $max_c = int($w{player} / 2) + 3;
+			for my $i ($w{country}-1..$w{country}){
+				mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
+				for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
+					my $output_file = "$logdir/$i/$file_name.cgi";
+					next if -f $output_file;
+					open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+					close $fh;
+					chmod $chmod, $output_file;
 				}
-			}
-			$migrate_type = festival_type('kouhaku', 1);
+				for my $file_name (qw/leader member/) {
+					my $output_file = "$logdir/$i/$file_name.cgi";
+					open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+					close $fh;
+					chmod $chmod, $output_file;
+				}
+				&add_npc_data($i);
+				# create union file
+				for my $j (1 .. $i-1) {
+					my $file_name = "$logdir/union/${j}_${i}";
+					$w{ "f_${j}_${i}" } = -99;
+					$w{ "p_${j}_${i}" } = 2;
 
-			for my $i (1 .. $w{country}-2) {
-				$cs{strong}[$i]   = 0;
+					next if -f "$file_name.cgi";
+					open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
+					close $fh;
+					chmod $chmod, "$file_name.cgi";
+					open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
+					close $fh2;
+					chmod $chmod, "${file_name}_log.cgi";
+					open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
+					close $fh3;
+					chmod $chmod, "${file_name}_member.cgi";
+				}
+				unless (-f "$htmldir/$i.html") {
+					open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html ﾌｧｲﾙが作れません");
+					close $fh_h;
+				}
+				$cs{name}[$i]     = $i == $w{country} ? $country_name_hug_1 : $country_name_hug_2;
+				$cs{color}[$i]    = $i == $w{country} ? '#ff0000':'#ffffff';
+				$cs{member}[$i]   = 0;
+				$cs{win_c}[$i]    = 999;
+				$cs{tax}[$i]      = 99;
+				$cs{strong}[$i]   = 75000;
 				$cs{food}[$i]     = 0;
 				$cs{money}[$i]    = 0;
 				$cs{soldier}[$i]  = 0;
 				$cs{state}[$i]    = 0;
-				$cs{capacity}[$i] = 0;
-				$cs{is_die}[$i]   = 1;
-
-				for my $j ($i+1 .. $w{country}-2) {
-					$w{ "f_${i}_${j}" } = -99;
-					$w{ "p_${i}_${j}" } = 2;
+				$cs{capacity}[$i] = $max_c;
+				$cs{is_die}[$i]   = 0;
+				my @lines = &get_countries_mes();
+				if ($w{country} > @lines - 2) {
+					open my $fh9, ">> $logdir/countries_mes.cgi";
+					print $fh9 "<>$default_icon<>\n";
+					print $fh9 "<>$default_icon<>\n";
+					close $fh9;
 				}
-
-				$cs{ceo}[$i] = '';
-				
-				open my $fh, "> $logdir/$i/leader.cgi";
-				close $fh;
 			}
 		}
-		elsif ($w{world} eq $#world_states-3) { # 三国志
-			$w{game_lv} = 99;
-			if ($cs{name}[$w{country} - 2] ne $country_name_san_1 && $cs{name}[$w{country} - 1] ne $country_name_san_2 && $cs{name}[$w{country}] ne $country_name_san_3) {
-				$w{country} += 3;
-				my $max_c = int($w{player} / 3) + 3;
-				for my $i ($w{country}-2..$w{country}){
-					mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
-					for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
-						my $output_file = "$logdir/$i/$file_name.cgi";
-						next if -f $output_file;
-						open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-						close $fh;
-						chmod $chmod, $output_file;
-					}
-					for my $file_name (qw/leader member/) {
-						my $output_file = "$logdir/$i/$file_name.cgi";
-						open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-						close $fh;
-						chmod $chmod, $output_file;
-					}
-					&add_npc_data($i);
-					# create union file
-					for my $j (1 .. $i-1) {
-						my $file_name = "$logdir/union/${j}_${i}";
-						$w{ "f_${j}_${i}" } = -99;
-						$w{ "p_${j}_${i}" } = 2;
-	
-						next if -f "$file_name.cgi";
-						open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
-						close $fh;
-						chmod $chmod, "$file_name.cgi";
-						open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
-						close $fh2;
-						chmod $chmod, "${file_name}_log.cgi";
-						open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
-						close $fh3;
-						chmod $chmod, "${file_name}_member.cgi";
-					}
-					unless (-f "$htmldir/$i.html") {
-						open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html ﾌｧｲﾙが作れません");
-						close $fh_h;
-					}
-					$cs{name}[$i]     = $i == $w{country}-2 ? $country_name_san_1:
-										$i == $w{country}-1 ? $country_name_san_2:
-															$country_name_san_3;
-					$cs{color}[$i]    = $i == $w{country}-2 ? '#4444ff':
-										$i == $w{country}-1 ? '#ff4444':
-															'#44ff44';
-					$cs{member}[$i]   = 0;
-					$cs{win_c}[$i]    = 999;
-					$cs{tax}[$i]      = 99;
-					$cs{strong}[$i]   = 50000;
-					$cs{food}[$i]     = 0;
-					$cs{money}[$i]    = 0;
-					$cs{soldier}[$i]  = 0;
-					$cs{state}[$i]    = 0;
-					$cs{capacity}[$i] = $max_c;
-					$cs{is_die}[$i]   = 0;
-					my @lines = &get_countries_mes();
-					if ($w{country} > @lines - 3) {
-						open my $fh9, ">> $logdir/countries_mes.cgi";
-						print $fh9 "<>$default_icon<>\n";
-						print $fh9 "<>$default_icon<>\n";
-						print $fh9 "<>$default_icon<>\n";
-						close $fh9;
-					}
-				}
+		$migrate_type = festival_type('kouhaku', 1);
+
+		for my $i (1 .. $w{country}-2) {
+			$cs{strong}[$i]   = 0;
+			$cs{food}[$i]     = 0;
+			$cs{money}[$i]    = 0;
+			$cs{soldier}[$i]  = 0;
+			$cs{state}[$i]    = 0;
+			$cs{capacity}[$i] = 0;
+			$cs{is_die}[$i]   = 1;
+
+			for my $j ($i+1 .. $w{country}-2) {
+				$w{ "f_${i}_${j}" } = -99;
+				$w{ "p_${i}_${j}" } = 2;
 			}
-			$migrate_type = festival_type('sangokusi', 1);
-			for my $i (1 .. $w{country}-3) {
-				$cs{strong}[$i]   = 0;
+
+			$cs{ceo}[$i] = '';
+			
+			open my $fh, "> $logdir/$i/leader.cgi";
+			close $fh;
+		}
+	}
+	elsif ($w{world} eq $#world_states-3) { # 三国志
+		$w{game_lv} = 99;
+		if ($cs{name}[$w{country} - 2] ne $country_name_san_1 && $cs{name}[$w{country} - 1] ne $country_name_san_2 && $cs{name}[$w{country}] ne $country_name_san_3) {
+			$w{country} += 3;
+			my $max_c = int($w{player} / 3) + 3;
+			for my $i ($w{country}-2..$w{country}){
+				mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
+				for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
+					my $output_file = "$logdir/$i/$file_name.cgi";
+					next if -f $output_file;
+					open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+					close $fh;
+					chmod $chmod, $output_file;
+				}
+				for my $file_name (qw/leader member/) {
+					my $output_file = "$logdir/$i/$file_name.cgi";
+					open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+					close $fh;
+					chmod $chmod, $output_file;
+				}
+				&add_npc_data($i);
+				# create union file
+				for my $j (1 .. $i-1) {
+					my $file_name = "$logdir/union/${j}_${i}";
+					$w{ "f_${j}_${i}" } = -99;
+					$w{ "p_${j}_${i}" } = 2;
+
+					next if -f "$file_name.cgi";
+					open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
+					close $fh;
+					chmod $chmod, "$file_name.cgi";
+					open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
+					close $fh2;
+					chmod $chmod, "${file_name}_log.cgi";
+					open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
+					close $fh3;
+					chmod $chmod, "${file_name}_member.cgi";
+				}
+				unless (-f "$htmldir/$i.html") {
+					open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html ﾌｧｲﾙが作れません");
+					close $fh_h;
+				}
+				$cs{name}[$i]     = $i == $w{country}-2 ? $country_name_san_1:
+									$i == $w{country}-1 ? $country_name_san_2:
+														$country_name_san_3;
+				$cs{color}[$i]    = $i == $w{country}-2 ? '#4444ff':
+									$i == $w{country}-1 ? '#ff4444':
+														'#44ff44';
+				$cs{member}[$i]   = 0;
+				$cs{win_c}[$i]    = 999;
+				$cs{tax}[$i]      = 99;
+				$cs{strong}[$i]   = 50000;
 				$cs{food}[$i]     = 0;
 				$cs{money}[$i]    = 0;
 				$cs{soldier}[$i]  = 0;
 				$cs{state}[$i]    = 0;
-				$cs{capacity}[$i] = 0;
-				$cs{is_die}[$i]   = 1;
-	
-				for my $j ($i+1 .. $w{country}-3) {
-					$w{ "f_${i}_${j}" } = -99;
-					$w{ "p_${i}_${j}" } = 2;
+				$cs{capacity}[$i] = $max_c;
+				$cs{is_die}[$i]   = 0;
+				my @lines = &get_countries_mes();
+				if ($w{country} > @lines - 3) {
+					open my $fh9, ">> $logdir/countries_mes.cgi";
+					print $fh9 "<>$default_icon<>\n";
+					print $fh9 "<>$default_icon<>\n";
+					print $fh9 "<>$default_icon<>\n";
+					close $fh9;
 				}
-	
-				$cs{ceo}[$i] = '';
-				
-				open my $fh, "> $logdir/$i/leader.cgi";
-				close $fh;
 			}
 		}
-		elsif ($w{world} eq $#world_states-5) { # 拙速
-			$migrate_type = festival_type('sessoku', 1);
+		$migrate_type = festival_type('sangokusi', 1);
+		for my $i (1 .. $w{country}-3) {
+			$cs{strong}[$i]   = 0;
+			$cs{food}[$i]     = 0;
+			$cs{money}[$i]    = 0;
+			$cs{soldier}[$i]  = 0;
+			$cs{state}[$i]    = 0;
+			$cs{capacity}[$i] = 0;
+			$cs{is_die}[$i]   = 1;
+
+			for my $j ($i+1 .. $w{country}-3) {
+				$w{ "f_${i}_${j}" } = -99;
+				$w{ "p_${i}_${j}" } = 2;
+			}
+
+			$cs{ceo}[$i] = '';
+			
+			open my $fh, "> $logdir/$i/leader.cgi";
+			close $fh;
 		}
-		elsif ($w{world} eq $#world_states-1) { # 混乱
-			$migrate_type = festival_type('konran', 1);
-		}
+	}
+	elsif ($w{world} eq $#world_states-5) { # 拙速
+		$migrate_type = festival_type('sessoku', 1);
+	}
+	elsif ($w{world} eq $#world_states-1) { # 混乱
+		$migrate_type = festival_type('konran', 1);
 	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	&write_cs;
@@ -319,17 +329,16 @@ sub reset {
 	}
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
-		require './lib/_festival_world.cgi';
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = &festival_type('kouhaku', 0);
+			$migrate_type = festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = &festival_type('sangokusi', 0);
+			$migrate_type = festival_type('sangokusi', 0);
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = &festival_type('sessoku', 0);
+			$migrate_type = festival_type('sessoku', 0);
 		}else {#混乱
-			$migrate_type = &festival_type('konran', 0);
+			$migrate_type = festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
 		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
@@ -427,7 +436,6 @@ sub reset {
 	}
 	# 世界情勢 混乱突入
 	if ($w{year} =~ /0$/) {
-		require './lib/_festival_world.cgi';
 		if ($w{year} % 40 == 0){ # 不倶戴天
 			$w{world} = $#world_states-2;
 		} elsif ($w{year} % 40 == 20) { # 三国志
@@ -437,7 +445,7 @@ sub reset {
 		} else { # 混乱
 			$w{world} = $#world_states-1;
 		}
-
+		
 		&wt_c_reset;
 	}
 	
@@ -447,7 +455,7 @@ sub reset {
 			$cs{win_c}[$i] = 0;
 		}
 	}
-
+	
 	&write_cs;
 	return $migrate_type;
 }
@@ -455,7 +463,6 @@ sub reset {
 sub player_migrate {
 	my $type = shift;
 
-	require './lib/_festival_world.cgi';
 	if ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
 		# バックアップ作成
 		for my $i (0 .. $w{country} - 2) {
