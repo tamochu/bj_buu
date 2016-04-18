@@ -86,12 +86,12 @@ sub add_festival_country {
 
 #		&write_world_news("$a");
 		my $a = $i-($w{country}+1-$country_num);
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$a];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$a];
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}->[2][$a];
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}->[3][$a];
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
-		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1];
+		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}->[1];
 		$cs{food}[$i]     = 0;
 		$cs{money}[$i]    = 0;
 		$cs{soldier}[$i]  = 0;
