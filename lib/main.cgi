@@ -244,7 +244,7 @@ sub main_system {
 		if ($datas{birthday}) {
 			if ($datas{birthday} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
 				my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
-				if ($tyear == $1 && $tmon + 1 == $2 && $tmday == $3) {
+				if ($tmon + 1 == $2 && $tmday == $3) {
 					$mes .= "íaê∂ì˙Ç®ÇﬂÇ≈Ç∆Ç§";
 					require './lib/shopping_offertory_box.cgi';
 					&get_god_item($m{sedai});

@@ -456,4 +456,52 @@ sub tp_910{
 	&n_menu;
 }
 
+#================================================
+# ﾎｰﾘｴ
+#================================================
+sub tp_1000{
+	$mes .= qq|<form method="$method" action="$script"><p>偽装プレイヤー名：<input type="text" name="trick_name" class="text_box1"></p><br>|;
+	$mes .= qq|<p>偽装国：<select name="trick_country" class="menu1">|;
+	for my $i (1..$w{country}) {
+		$mes .= qq|<option value="$i">$cs{name}[$i]</option>|;
+	}
+	$mes .= qq|</select></p><br>|;
+	$mes .= qq|<p>ﾍﾟｯﾄ：<select name="trick_pet" class="menu1">|;
+	for my $i (1..$#pets) {
+		$mes .= qq|<option value="$i">$pets[$i][1]</option>|;
+	}
+	$mes .= qq|</select></p><br>|;
+	$mes .= qq|<input type="radio" name="cmd" value="0">やめる<br>|;
+	$mes .= qq|<input type="radio" name="cmd" value="1" checked>ﾍﾟｯﾄを送ったふりをする<br>|;
+	$mes .= qq|<input type="radio" name="cmd" value="2">布告偽装<br>|;
+	$mes .= qq|<input type="radio" name="cmd" value="3">停戦偽装<br>|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
+	$m{tp} += 10;
+
+}
+
+sub tp_1010{
+	if ($in{trick_name} eq '') {
+		$mes .= '拘束先が記入されていません<br>';
+		&begin;
+		return;
+	}
+	if ($cmd eq '1') {
+		&mes_and_send_news("$in{trick_name}に$guas[$in{trick_pet}][1]を送りました");
+	} elsif ($cmd eq '2') {
+		&write_world_news("<b>$cs{name}[$m{country}]の$in{trick_name}が</b><b>$cs{name}[$in{trick_country}]と停戦条約を結びました</b>");
+	} elsif ($cmd eq '3') {
+		&write_world_news("<b>$cs{name}[$m{country}]の$in{trick_name}が</b><b>$cs{name}[$in{trick_country}]に宣戦布告をしました</b>");
+	} else {
+		$mes .= 'やめました<br>';
+		&begin;
+		return;
+	}
+	$m{pet} = 0 if rand(7) < 1;
+	&add_prisoner;
+	&refresh;
+	&n_menu;
+}
+
 1; # 削除不可

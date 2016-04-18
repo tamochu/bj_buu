@@ -148,6 +148,12 @@ sub tp_1 {
 			$m{lib} = 'trick';
 			$m{tp}  = 900;
 		}
+		elsif ($m{pet} == 201){
+			$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ÍA•—à‚Ì—¬•z‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚é<br>";
+
+			$m{lib} = 'trick';
+			$m{tp}  = 1000;
+		}
 		else {
 			my $use_flag = 1;
 			if(($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))){
