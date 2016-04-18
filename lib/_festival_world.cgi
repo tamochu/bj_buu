@@ -19,8 +19,8 @@ use constant FESTIVAL_TYPE => {
 
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 use constant FESTIVAL_COUNTRY_PROPERTY => {
-	'kouhaku' => [2, 75000, ["たけのこの里", "きのこの山"], ['#ff0000'. '#ffffff']],
-	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ['#4444ff'. '#ff4444', '#44ff44']]
+	'kouhaku' => [2, 75000, ["たけのこの里", "きのこの山"], ["#ff0000", "#ffffff"]],
+	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 };
 
 # 不倶戴天国名
@@ -86,12 +86,12 @@ sub add_festival_country {
 
 #		&write_world_news("$a");
 		my $a = $i-($w{country}+1-$country_num);
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}->[2][$a];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}->[3][$a];
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$a];
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$a];
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
-		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}->[1];
+		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1];
 		$cs{food}[$i]     = 0;
 		$cs{money}[$i]    = 0;
 		$cs{soldier}[$i]  = 0;
