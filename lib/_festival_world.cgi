@@ -84,7 +84,9 @@ sub add_festival_country {
 			close $fh_h;
 		}
 		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][($w{country}-1)-$i];
+		&write_world_news("1.($w{country}-1)-$i");
 		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][($w{country}-1)-$i];
+		&write_world_news("2.($w{country}-1)-$i");
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
