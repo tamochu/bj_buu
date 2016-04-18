@@ -145,6 +145,7 @@ sub tp_110 {
 		}
 	}
 	elsif (&is_festival_world($w[world])) {
+		require './lib/_festival_world.cgi'; # Õ‚èî¨‚È‚ç‚Î©“®“I‚Éƒ[ƒh
 		if ($w{world} eq $#world_states-4) { # ‰p—Y
 			$w{game_lv} += 20;
 			for my $i (1 .. $w{country}) {
