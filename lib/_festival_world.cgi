@@ -39,7 +39,7 @@ sub festival_type {
 	return FESTIVAL_TYPE->{$festival_name} + $is_start;
 }
 
-# 指定された祭り情勢用の国を追加する
+# 指定された祭り情勢用の国を追加しその情勢の開始フラグを返す
 # 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
 sub add_festival_country {
 	my $festival_name = shift;
@@ -84,10 +84,9 @@ sub add_festival_country {
 			close $fh_h;
 		}
 
-#		&write_world_news("$a");
-		my $a = $i-($w{country}+1-$country_num);
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$a];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$a];
+		my $num = $i-($w{country}+1-$country_num);
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$num];
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
