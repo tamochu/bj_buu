@@ -20,7 +20,7 @@ use constant FESTIVAL_TYPE => {
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 use constant FESTIVAL_COUNTRY_PROPERTY => {
 	'kouhaku' => [2, 75000, ["たけのこの里", "きのこの山"], ['#ff0000'. '#ffffff']],
-	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ['#4444ff'. '#ff4444', '#4444ff']]
+	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ['#4444ff'. '#ff4444', '#44ff44']]
 };
 
 # 不倶戴天国名
@@ -85,8 +85,9 @@ sub add_festival_country {
 		}
 
 #		&write_world_news("$a");
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$i-($w{country}+1-$country_num)];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$i-($w{country}+1-$country_num)];
+		my $a = $i-($w{country}+1-$country_num);
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$a];
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$a];
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
@@ -115,7 +116,7 @@ sub add_festival_country {
 		$cs{capacity}[$i] = 0;
 		$cs{is_die}[$i]   = 1;
 
-		for my $j ($i+1 .. $w{country}-2) {
+		for my $j ($i+1 .. $w{country}-$country_num) {
 			$w{ "f_${i}_${j}" } = -99;
 			$w{ "p_${i}_${j}" } = 2;
 		}
