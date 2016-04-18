@@ -118,6 +118,9 @@ sub tp_110 {
 	print $fh "$nline\n";
 	close $fh;
 	
+	require './lib/_world_reset.cgi';
+	my $b = &is_festival_world($w{world});
+	&write_world_news("$b $w{world}");
 	my $migrate_type = 0;
 	if ($w{world} eq '0') { # •½˜a
 		$w{reset_time} += 3600 * 12;
