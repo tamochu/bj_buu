@@ -42,12 +42,11 @@ sub time_limit  {
 		$w{win_countries} = '';
 	}
 
-	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	my $wline;
-	$wline = <$fh>;
-	my @old_worlds = split /<>/, $wline;
-	close $fh;
-	my @next_worlds;
+#	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+#	my $wline;
+#	$wline = <$fh>;
+#	my @old_worlds = split /<>/, $wline;
+#	close $fh;
 	my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 	my @next_worlds = &unique_worlds(@new_worlds);
 	unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) { # “Áêî¨I—¹‚Å‚È‚¯‚ê‚Î
@@ -98,7 +97,7 @@ sub time_limit  {
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
 	}
-	elsif (&is_special_world($w[world])) {
+	elsif (&is_festival_world($w[world])) {
 		if ($w{world} eq $#world_states-4) { # ‰p—Y
 			$w{game_lv} += 20;
 			for my $i (1 .. $w{country}) {

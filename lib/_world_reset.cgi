@@ -8,6 +8,7 @@
 # 主な呼び出し元
 # ./lib/world.cgi
 # ./lib/reset.cgi
+# 戦争勝利時の統一や統一期限が切れた時に必要になる
 #================================================
 
 #================================================
@@ -41,25 +42,14 @@ sub unique_worlds {
 # 特殊情勢 暗黒を含む祭り情勢の意
 #================================================
 
-# 渡された情勢ナンバーを渡すと特殊情勢か判断して返す
-sub is_special_world {
+# 渡された情勢ナンバーを渡すと祭り情勢か判断して返す
+sub is_festival_world {
 	my $world_no = shift;
-	return $world_no < $#world_states-5 ? 0 : 1;
-}
-
-# 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
-use constant FESTIVAL_TYPE => {
-	'kouhaku' => 1,
-	'sangokusi' => 3,
-	'konran' => 5,
-	'sessoku' => 7,
-	'dokuritu' => 9
-};
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0 を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
+	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
+		require './lib/_festival_world.cgi'; # 祭り情勢ならば自動的にロード
+		return 1;
+	}
+	return 0;
 }
 
 sub add_npc_data {
