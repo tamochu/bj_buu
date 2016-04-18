@@ -231,6 +231,27 @@ sub main_system {
 		$m{tp} = 100;
 		close $fh;
 	}
+	elsif (&last_login_check) {
+		my %datas = ();
+		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
+		my $line = <$fh>;
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$datas{$k} = $v;
+		}
+		close $fh;
+		
+		if ($datas{birthday}) {
+			if ($datas{birthday} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
+				my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
+				if ($tyear == $1 && $tmon + 1 == $2 && $tmday == $3) {
+					$mes .= "誕生日おめでとう";
+					require './lib/shopping_offertory_box.cgi';
+					&get_god_item($m{sedai});
+				}
+			}
+		}
+	}
 	# 国に所属している場合
 	elsif ($m{country}) {
 		# Rank UP
@@ -565,6 +586,18 @@ sub graduate {
 	&regist_you_data($m{master}, 'master', '');
 	$m{master} = '';
 	$m{master_c} = '';
+}
+
+#================================================
+# その日最初のアクセスか
+#================================================
+sub last_login_check {
+	my($lmin,$lhour,$lmday,$lmon,$lyear) = (localtime($m{ltime}))[1..5];
+	my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
+	if ($lmday ne $tmday || $lmon ne $tmon || $lyear ne $tyear) {
+		return 1;
+	}
+	return 0;
 }
 
 1; # 削除不可
