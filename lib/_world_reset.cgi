@@ -42,16 +42,18 @@ sub unique_worlds {
 # 特殊情勢 暗黒を含む祭り情勢の意
 #================================================
 
-# 渡された情勢ナンバーを渡すと祭り情勢か判断して返す
-sub is_festival_world {
+# 渡された情勢ナンバーを渡すと特殊情勢か判断して返す
+sub is_special_world {
 	my $world_no = shift;
-	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
+#	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
 #		require './lib/_festival_world.cgi'; # 祭り情勢ならば自動的にロード
-		return 1;
-	}
-	else {
-		return 0;
-	}
+#		return 1;
+#	}
+#	else {
+#		return 0;
+#	}
+
+	return $world_no < $#world_states-5 ? 0 : 1;
 }
 
 sub add_npc_data {
