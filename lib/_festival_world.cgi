@@ -47,7 +47,7 @@ sub add_festival_country {
 	my $country_num = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[0];
 	$w{country} += $country_num;
 	my $max_c = int($w{player} / $country_num) + 3;
-	for my $i ($w{country}-1..$w{country}){
+	for my $i ($w{country}-($country_num-1)..$w{country}){
 		mkdir "$logdir/$i" or &error("$logdir/$i Ã´Ÿ¿ﬁÇ™çÏÇÍÇ‹ÇπÇÒÇ≈ÇµÇΩ") unless -d "$logdir/$i";
 		for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
 			my $output_file = "$logdir/$i/$file_name.cgi";
