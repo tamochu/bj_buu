@@ -283,7 +283,8 @@ sub main_system {
 				$mes .= qq|<input type="submit" value="‹‹—¿‚ðŽó‚¯Žæ‚é" class="button1"></form>|;
 				if ($config_test) {
 					require './lib/_world_reset.cgi';
-					$mes .= qq|&is_festival_world($w{world})|;
+					my $b = &is_festival_world($w{world});
+					$mes .= qq|$b $w{world}|;
 				}
 			}else{
 				$m{egg_c} += int(rand(50)+100) if $m{egg};
