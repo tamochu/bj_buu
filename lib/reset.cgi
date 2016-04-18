@@ -450,9 +450,9 @@ sub reset {
 }
 
 sub player_migrate {
-	require './lib/_festival_world.cgi';
 	my $type = shift;
 
+	require './lib/_festival_world.cgi';
 	if ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
 		# バックアップ作成
 		for my $i (0 .. $w{country} - 2) {
