@@ -17,12 +17,12 @@ sub tp_100 {
 sub tp_110 {
 	my $old_world = $w{world};
 	require './lib/_festival_world.cgi';
-	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	my $wline;
-	$wline = <$fh>;
-	my @old_worlds = split /<>/, $wline;
-	close $fh;
-	my @next_worlds;
+#	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+#	my $wline;
+#	$wline = <$fh>;
+#	my @old_worlds = split /<>/, $wline;
+#	close $fh;
+#	my @next_worlds;
 	my @new_worlds;
 	
 	if ($cmd eq '1') { # Šó–]
@@ -42,19 +42,20 @@ sub tp_110 {
 		@new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 	}
 
-	for my $new_v (@new_worlds){
-		my $old_year = 0;
-		my $old_flag = 0;
-		for my $o (@old_worlds){
-			last if $old_year > 10;
-			if ($new_v == $o){
-				$old_flag = 1;
-				last;
-			}
-			$old_year++;
-		}
-		push @next_worlds, $new_v unless $old_flag;
-	}
+#	for my $new_v (@new_worlds){
+#		my $old_year = 0;
+#		my $old_flag = 0;
+#		for my $o (@old_worlds){
+#			last if $old_year > 10;
+#			if ($new_v == $o){
+#				$old_flag = 1;
+#				last;
+#			}
+#			$old_year++;
+#		}
+#		push @next_worlds, $new_v unless $old_flag;
+#	}
+	my @next_worlds = &unique_worlds(@new_worlds);
 
 	$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
 	$w{world_sub} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
