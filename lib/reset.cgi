@@ -12,14 +12,6 @@ my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
 # 統一期限(日)
 my $limit_touitu_day = int( rand(6)+5 );
 
-# 不倶戴天国名
-my $country_name_hug_1 = "たけのこの里";
-my $country_name_hug_2 = "きのこの山";
-
-# 三国志国名
-my $country_name_san_1 = "魏";
-my $country_name_san_2 = "呉";
-my $country_name_san_3 = "蜀";
 
 #================================================
 # 期日が過ぎた場合
