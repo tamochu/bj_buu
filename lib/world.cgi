@@ -10,27 +10,6 @@ require './lib/_world_reset.cgi';
 # ‘I‘ğ‰æ–Ê
 #================================================
 sub tp_100 {
-	# “ˆêworld‚ÆŠúŒÀØ‚êreset‚Å‘Î‚É‚µ‚½‚©‚Á‚½‚ª“ˆêÒ‚Ì‰æ–Ê‚É‚à•\¦‚·‚é‚½‚ß’f”O
-	# “Áêî¨‚É‚¨‚¯‚é“ˆê‚Ì•¶Œ¾‚Í _war_result.cgi ‚ğ‘‚«Š·‚¦‚é
-
-	# Õ‚èî¨‚É“ˆê
-#	if (&is_festival_world) {
-#		if ($w{world} eq $#world_states-1) { # ¬—
-#			$migrate_type = &festival_type('konran', 0);
-#		}
-#		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
-#			$migrate_type = &festival_type('kouhaku', 0);
-#			$w{country} -= 2;
-#		}
-#		elsif ($w{world} eq $#world_states-3) { # O‘u
-#			$migrate_type = &festival_type('sangokusi', 0);
-#			$w{country} -= 3;
-#		}
-#		&player_migrate($migrate_type);
-#	}
-
-#	&reset;
-
 	$mes .= "‚ ‚È‚½‚Í‚±‚Ì¢ŠE‚É‰½‚ğ‹‚ß‚Ü‚·‚©?<br>";
 	&menu('ŠF‚ª–]‚Ş‚à‚Ì','Šó–]','â–]','•½˜a');
 	$m{tp} += 10;
@@ -39,7 +18,18 @@ sub tp_100 {
 sub tp_110 {
 	my $old_world = $w{world};
 
-	&show_desire;
+	if ($cmd eq '1') { # Šó–]
+		&mes_and_world_news("<b>¢ŠE‚ÉŠó–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
+	}
+	elsif ($cmd eq '2') { # â–]
+		&mes_and_world_news("<b>¢ŠE‚Éâ–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
+	}
+	elsif ($cmd eq '3') { # •½˜a
+		&mes_and_world_news("<b>¢ŠE‚É•½˜a‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
+	}
+	else {
+		&mes_and_world_news('<b>¢ŠE‚É‚İ‚È‚ª–]‚Ş‚à‚Ì‚ğ–]‚İ‚Ü‚µ‚½</b>', 1);
+	}
 	if (&is_special_world) { # “Áêî¨‚ÌŠJn
 		if ($w{year} =~ /6$/) { # ˆÃ•E‰p—Y
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‚©‚«Á‚³‚ê‚Ü‚µ‚½</i>");
@@ -83,35 +73,11 @@ sub tp_110 {
 			&write_world_news("<i>¢ŠE‚Í $world_states[$old_world] ‚Æ‚È‚è‚Üc‚¹‚ñ $world_states[$w{world}]‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		}
 		else {
-			if ($w{world} eq '0') { # •½˜a
-#				Unrecognized character \x90; marked by <-- HERE after
-				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
-#				&write_world_news('<i>¢ŠE‚Í '.$world_states[$w{world}].' ‚É‚È‚è‚Ü‚µ‚½</i>');
-			}
-			elsif ($w{world} eq '18') { # E”°
-				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
-			}
-			else {
-				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
+			&opening_common;
 		}
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
 	}# else { # “Áêî¨ˆÈŠO‚ÌŠJn
 
-#	require './lib/reset.cgi';
-#	&reset; # ‚±‚±‚Ü‚Å¡Šú“ˆê‚Ìˆ—
-
-#	my $migrate_type = 0;
-	# ¢ŠEî¨ ¬—“Ë“ü
-#		&show_desire;
-#	}
-#	elsif ($w{year} =~ /0$/) {
-#		require './lib/_festival_world.cgi';
-#		$migrate_type = &opening_festival;
-#		&wt_c_reset;
-#	}
-
-#	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	my $saved_w = 0;
 	$nline = "";
@@ -124,55 +90,12 @@ sub tp_110 {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-#	my $migrate_type = 0;
 	&opening_common;
-#	elsif (&is_festival_world) { # Õ‚èî¨‚È‚ç‚Î
-#		if ($w{world} eq $#world_states-1) { # ¬—
-#			$migrate_type = &festival_type('konran', 1);
-#		}
-#		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
-#			$w{game_lv} = 99;
-#			$migrate_type = &add_festival_country('kouhaku');
-#		}
-#		elsif ($w{world} eq $#world_states-3) { # O‘u
-#			$w{game_lv} = 99;
-#			$migrate_type = &add_festival_country('sangokusi');
-#		}
-#		elsif ($w{world} eq $#world_states-4) { # ‰p—Y
-#			$w{game_lv} += 20;
-#			for my $i (1 .. $w{country}) {
-#				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-#			}
-#		}
-#		elsif ($w{world} eq $#world_states-5) { # Ù‘¬
-#			$migrate_type = &festival_type('sessoku', 1);
-#		}
-#	}
 
 	$w{game_lv} = 0;
 	&refresh;
 	&n_menu;
 	&write_cs;
-
-#	require "./lib/reset.cgi";
-#	&player_migrate($migrate_type);
-#	&player_migrate($migrate_type) if &is_festival_world;
-}
-
-# ƒvƒŒƒCƒ„[‚Ì–]‚İ‚ğ•\¦‚·‚é
-sub show_desire {
-	if ($cmd eq '1') { # Šó–]
-		&mes_and_world_news("<b>¢ŠE‚ÉŠó–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
-	}
-	elsif ($cmd eq '2') { # â–]
-		&mes_and_world_news("<b>¢ŠE‚Éâ–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
-	}
-	elsif ($cmd eq '3') { # •½˜a
-		&mes_and_world_news("<b>¢ŠE‚É•½˜a‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
-	}
-	else {
-		&mes_and_world_news('<b>¢ŠE‚É‚İ‚È‚ª–]‚Ş‚à‚Ì‚ğ–]‚İ‚Ü‚µ‚½</b>', 1);
-	}
 }
 
 1; # íœ•s‰Â

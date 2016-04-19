@@ -64,20 +64,11 @@ sub time_limit {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-	if ($w{world} eq '0') { # 平和
-		&write_world_news("<i>世界は $world_states[$w{world}] になりました</i>");
-	}
-	elsif ($w{world} eq '18') { # 殺伐
-		&write_world_news("<i>世界は $world_states[$w{world}] としたふいんき(←なぜか変換できない)になりました</i>");
-	}
-	else {
-		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
-	}
+	&opening_common;
 
 	$w{game_lv} = 0;
 
 	&write_cs;
-#	&player_migrate($migrate_type) if &is_festival_world;
 }
 
 #================================================
@@ -111,39 +102,6 @@ sub reset {
 		$w{world} = int(rand($#world_states-5));
 	}
 
-	# 世界情勢 暗黒解除
-#	if ($w{year} =~ /6$/) {
-#		$w{world} = int(rand($#world_states-5));
-#		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
-#			$w{world} = int(rand($#world_states-5));
-#		} else {
-#			require './lib/vs_npc.cgi';
-#			&delete_npc_country;
-#			$w{world} = int(rand($#world_states-5));
-#		}
-		# 統一→resetでランダム情勢→ユーザーが情勢決定
-		# ユーザーが情勢を選ばない限り暗黒が続くので仕方ないか？
-#		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
-#	}
-#	# 世界情勢 混乱解除
-#	if ($w{year} =~ /0$/) {
-#		if($w{year} % 40 == 0){ #不倶戴天
-#			$migrate_type = &festival_type('kouhaku', 0);
-#			$w{country} -= 2;
-#		}elsif($w{year} % 40 == 20){ # 三国志
-#			$migrate_type = &festival_type('sangokusi', 0);
-#			$w{country} -= 3;
-#		}elsif($w{year} % 40 == 10){ # 拙速
-#			$migrate_type = &festival_type('sessoku', 0);
-#		}else { #混乱
-#			$migrate_type = &festival_type('konran', 0);
-#		}
-#		$w{world} = int(rand($#world_states-5));
-#		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
-#		# おそらく統一期限切れでここを通っているなら他の祭り情勢でも表示しないと今度は何も表示されない
-#		# 戦争で統一したのか期限切れなのか要判断
-#		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") if $w{year} % 40 == 10;
-#	}
 	# 仕官できる人数
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	my $ave_c = int($w{player} / $country);
@@ -241,67 +199,11 @@ sub reset {
 		else { # 祭り情勢開始
 			require './lib/_festival_world.cgi';
 			my $migrate_type = &opening_festival;
-#			if ($w{year} % 40 == 0){ # 不倶戴天
-#				$migrate_type = &festival_type('kouhaku', 1);
-#				$w{world} = $#world_states-2;
-#			} elsif ($w{year} % 40 == 20) { # 三国志
-#				$migrate_type = &festival_type('sangokusi', 1);
-#				$w{world} = $#world_states-3;
-#			} elsif ($w{year} % 40 == 10) { # 拙速
-#				$migrate_type = &festival_type('sessoku', 1);
-#				$w{world} = $#world_states-5;
-#			} else { # 混乱
-#				$migrate_type = &festival_type('konran', 1);
-#				$w{world} = $#world_states-1;
-#			}
 			&wt_c_reset;
-#			if ($w{world} eq $#world_states-1) { # 混乱
-#			}
-#			elsif ($w{world} eq $#world_states-2) { # 不倶戴天
-#				$migrate_type = &festival_type('kouhaku', 0);
-#				$w{country} -= 2;
-#			}
-#			elsif ($w{world} eq $#world_states-3) { # 三国志
-#				$w{country} -= 3;
-#			}
-#			elsif ($w{world} eq $#world_states-5) { # 拙速
-#			}
 			&player_migrate($migrate_type);
 		}
-#		$w{world} = int(rand($#world_states-5));
-	}
-	else {
-		&opening_common;
 	}
 
-	# 世界情勢 暗黒突入
-#	if ($w{year} =~ /6$/) {
-#		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # 英雄
-#			$w{world} = $#world_states-4;
-#			$w{game_lv} += 20;
-#			for my $i (1 .. $w{country}) {
-#				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-#			}
-#		} else {
-#			require './lib/vs_npc.cgi';
-#			&add_npc_country;
-#		}
-#	}
-#	# 世界情勢 混乱突入
-#	if ($w{year} =~ /0$/) {
-#		require './lib/_festival_world.cgi';
-#		if ($w{year} % 40 == 0){ # 不倶戴天
-#			$w{world} = $#world_states-2;
-#		} elsif ($w{year} % 40 == 20) { # 三国志
-#			$w{world} = $#world_states-3;
-#		} elsif ($w{year} % 40 == 10) { # 拙速
-#			$w{world} = $#world_states-5;
-#		} else { # 混乱
-#			$w{world} = $#world_states-1;
-#		}
-#		&wt_c_reset;
-#	}
-	
 	# 1000年デフォルト
 	if ($w{year} =~ /000$/) {
 		for my $i (1 .. $w{country}) {
@@ -310,7 +212,6 @@ sub reset {
 	}
 
 	&write_cs;
-#	return $migrate_type;
 }
 
 1; # 削除不可
