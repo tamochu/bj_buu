@@ -6,6 +6,11 @@ require 'config_game.cgi';
 # Ò²İCGI Created by Merino
 #================================================
 &get_data;
+	if ($config_test) {
+		require './lib/_world_reset.cgi';
+		my $b = &is_festival_world($w{world});
+		print qq|$b $w{world}<br>|;
+	}
 &error("Œ»İÒİÃÅİ½’†‚Å‚·B‚µ‚Î‚ç‚­‚¨‘Ò‚¿‚­‚¾‚³‚¢(–ñ $mente_min •ªŠÔ)") if ($mente_min);
 &before_bj;
 if ($m{wt} > 0) { # S‘©ŠÔ
