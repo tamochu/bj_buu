@@ -43,7 +43,24 @@ sub time_limit  {
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 
-	&player_migrate($migrate_type) if &is_festival_world($w{world});
+	if (&is_festival_world($w{world})) {
+		if ($w{world} eq $#world_states-1) { # ¬—
+			$migrate_type = &festival_type('konran', 0);
+		}
+		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
+			$migrate_type = &festival_type('kouhaku', 0);
+			$w{country} -= 2;
+		}
+		elsif ($w{world} eq $#world_states-3) { # O‘u
+			$migrate_type = &festival_type('sangokusi', 0);
+			$w{country} -= 3;
+		}
+		elsif ($w{world} eq $#world_states-5) { # Ù‘¬
+			$migrate_type = &festival_type('sessoku', 0);
+		}
+		&player_migrate($migrate_type);
+	}
+
 	my $migrate_type = &reset;
 
 #	unshift @old_worlds, $w{world};
