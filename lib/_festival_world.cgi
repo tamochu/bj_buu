@@ -50,19 +50,16 @@ sub opening_festival {
 
 # 祭り情勢を解除して各種祭り情勢の終了フラグを返す
 sub ending_festival {
-	if ($w{world} eq $#world_states-1) { # 混乱
-		return &festival_type('konran', 0);
-	}
-	elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{country} -= 2;
 		return &festival_type('kouhaku', 0);
-	}
-	elsif ($w{world} eq $#world_states-3) { # 三国志
+	} elsif ($w{year} % 40 == 20) { # 三国志
 		$w{country} -= 3;
 		return &festival_type('sangokusi', 0);
-	}
-	elsif ($w{world} eq $#world_states-5) { # 拙速
+	} elsif ($w{year} % 40 == 10) { # 拙速
 		return &festival_type('sessoku', 0);
+	} else { # 混乱
+		return &festival_type('konran', 0);
 	}
 }
 
