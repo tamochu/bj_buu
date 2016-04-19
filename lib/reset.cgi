@@ -20,14 +20,20 @@ sub time_limit {
 	if (&is_festival_world($w{world})) {
 		if ($w{world} eq $#world_states-1) { # ¬—
 			$migrate_type = &festival_type('konran', 0);
+			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
+			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
 		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
 			$migrate_type = &festival_type('kouhaku', 0);
 			$w{country} -= 2;
+			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
+			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
 		elsif ($w{world} eq $#world_states-3) { # O‘u
 			$migrate_type = &festival_type('sangokusi', 0);
 			$w{country} -= 3;
+			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
+			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
 		elsif ($w{world} eq $#world_states-5) { # Ù‘¬
 			$migrate_type = &festival_type('sessoku', 0);
