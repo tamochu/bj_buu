@@ -86,6 +86,9 @@ sub time_limit  {
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
 	}
+	elsif ($w{world} eq $#world_states) { # ˆÃ•‚È‚ç‚Î
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+	}
 	elsif (&is_festival_world($w{world})) {# Õ‚èî¨‚È‚ç‚Î
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		if ($w{world} eq $#world_states-1) { # ¬—
