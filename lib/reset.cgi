@@ -17,7 +17,7 @@ my $limit_touitu_day = int( rand(6)+5 );
 #================================================
 sub time_limit {
 	# Õ‚èî¨‚ÉŠúŒÀØ‚ê
-	if (&is_festival_world($w{world})) {
+	if (&is_festival_world) {
 		if ($w{world} eq $#world_states-1) { # ¬—
 			$migrate_type = &festival_type('konran', 0);
 			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
@@ -59,18 +59,18 @@ sub time_limit {
 		$w{win_countries} = '';
 
 		# “Áêî¨‘OŠú‚È‚ç
-		if ($w{year} =~ /9$/) {
-#		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
+#		if ($w{year} =~ /9$/) {
+		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
 			my $year = $w{year} + 1;
-#			if ($w{year} =~ /5$/) { # ˆÃ•Eñë‚È‚ç
-#				if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ñë
-#					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#				}
-#				else { # ˆÃ•
-#					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#				}
-#			}
-			if ($year % 40 == 0) { # •s‹ä‘Õ“V
+			if ($w{year} =~ /5$/) { # ˆÃ•E‰p—Y‚È‚ç
+				if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—Y
+					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+				}
+				else { # ˆÃ•
+					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+				}
+			}
+			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 			elsif ($year % 40 == 20) { # O‘u
@@ -156,18 +156,18 @@ sub time_limit {
 	elsif ($w{world} eq $#world_states) { # ˆÃ•‚È‚ç‚Î
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
-	elsif ($w{world} eq $#world_states-4) { # ‰p—Y
-		$w{game_lv} += 20;
-		for my $i (1 .. $w{country}) {
-			$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-		}
-	}
+#	elsif ($w{world} eq $#world_states-4) { # ‰p—Y
+#		$w{game_lv} += 20;
+#		for my $i (1 .. $w{country}) {
+#			$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+#		}
+#	}
 
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	$w{game_lv} = 0;
 
 	&write_cs;
-	&player_migrate($migrate_type) if &is_festival_world($w{world});
+	&player_migrate($migrate_type) if &is_festival_world;
 }
 
 #================================================
@@ -303,8 +303,12 @@ sub reset {
 	
 	# ¢ŠEî¨ ˆÃ•“Ë“ü
 	if ($w{year} =~ /6$/) {
-		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
+		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—Y
 			$w{world} = $#world_states-4;
+			$w{game_lv} += 20;
+			for my $i (1 .. $w{country}) {
+				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+			}
 		} else {
 			require './lib/vs_npc.cgi';
 			&add_npc_country;

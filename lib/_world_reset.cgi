@@ -46,21 +46,27 @@ sub unique_worlds {
 
 # 渡された情勢ナンバーを渡すと特殊情勢か判断して返す
 sub is_special_world {
-	my $world_no = shift;
-	if ($#world_states-5 <= $world_no) {
-		return 1;
-	}
-	return 0;
+	return ($w{year} =~ /6$/ || $w{year} =~ /0$/);
+#	my $world_no = shift;
+#	if ($#world_states-5 <= $world_no) {
+#		return 1;
+#	}
+#	return 0;
 }
 
 # 渡された情勢ナンバーを渡すと祭り情勢か判断して返す
 sub is_festival_world {
-	my $world_no = shift;
-	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
+	if ($w{year} =~ /0$/) {
 		require './lib/_festival_world.cgi'; # 祭り情勢用モジュールをロード
 		return 1;
 	}
 	return 0;
+#	my $world_no = shift;
+#	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
+#		require './lib/_festival_world.cgi'; # 祭り情勢用モジュールをロード
+#		return 1;
+#	}
+#	return 0;
 }
 
 sub add_npc_data {

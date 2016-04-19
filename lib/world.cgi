@@ -9,40 +9,23 @@ require './lib/_world_reset.cgi';
 # 選択画面
 #================================================
 sub tp_100 {
-	# _war_result.cgi にあったもの
-	# 統一時worldと期限切れ時resetで対にするため移動
-	my $mname = &name_link($m{name});
-	if ($w{world} eq $#world_states) {
-		if ($m{country} eq $w{country} || $union eq $w{country}) { # NPC国側の勝利
-			&mes_and_world_news("<em>悪魔達の率先者として$world_name大陸を支配することに成功しました</em>",1);
-			&write_legend('touitu', "深き闇より目覚めた$cs{name}[$w{country}]の猛者達が$mnameを筆頭とし$world_name大陸を支配する");
-			$is_npc_win = 1;
+	# 統一時worldと期限切れ時resetで対にしたかったが統一者の画面にも表示するため断念
+	# 特殊情勢における統一時の文言は _war_result.cgi を書き換える
+
+	# 祭り情勢時に統一
+	if (&is_festival_world) {
+		if ($w{world} eq $#world_states-1) { # 混乱
+			$migrate_type = &festival_type('konran', 0);
 		}
-		else {
-			&mes_and_world_news("<em>魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれました</em>",1);
-			&write_legend('touitu', "$c_mの$mnameとその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
+		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+			$migrate_type = &festival_type('kouhaku', 0);
+			$w{country} -= 2;
 		}
-	}
-	elsif ($w{world} eq $#world_states-2) {
-		&mes_and_world_news("<em>$world_name大陸を二分する戦いは$c_mの$mnameとその仲間達の勝利に終わった</em>",1);
-		&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
-		$w{win_countries} = $m{country};
-	}
-	elsif ($w{world} eq $#world_states-3) {
-		&mes_and_world_news("<em>$world_name大陸を三分する戦いは$c_mの$mnameとその仲間達の勝利に終わった</em>",1);
-		&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
-		$w{win_countries} = $m{country};
-	}
-	else {
-		if ($union) {
-			$mes .= "<em>$world_name大陸を統一しました</em>";
-			&write_world_news("<em>$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一しました</em>",1);
-			&write_legend('touitu', "$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一する")
+		elsif ($w{world} eq $#world_states-3) { # 三国志
+			$migrate_type = &festival_type('sangokusi', 0);
+			$w{country} -= 3;
 		}
-		else {
-			&mes_and_world_news("<em>$world_name大陸を統一しました</em>",1);
-			&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
-		}
+		&player_migrate($migrate_type);
 	}
 
 	$mes .= "あなたはこの世界に何を求めますか?<br>";
@@ -54,27 +37,25 @@ sub tp_110 {
 	my $old_world = $w{world};
 
 	&show_desire;
-	if (&is_special_world($w{world})) {# 特殊情勢である
-		if ($old_world eq $#world_states) {# 暗黒開始メッセージ
+	if ($w{year} =~ /5$/ || $w{year} =~ /9$/) { # 特殊情勢開始時
+		my $year = $w{year} + 1;
+		if ($w{year} =~ /5$/) { # 暗黒・英雄
 			&write_world_news("<i>$m{name}の願いはかき消されました</i>");
 		}
-		elsif ($old_world eq $#world_states-1) {# 混乱開始メッセージ
-			&write_world_news("<i>$m{name}の願いは空しく世界は混乱に陥りました</i>");
-		}
-		elsif ($old_world eq $#world_states-2) {# 紅白開始メッセージ
+		elsif ($year % 40 == 0) { # 不倶戴天
 			&write_world_news("<i>$m{name}の願いは空しく世界は二つに分かれました</i>");
 		}
-		elsif ($old_world eq $#world_states-3) {# 三国志開始メッセージ
+		elsif ($year % 40 == 20) { # 三国志
 			&write_world_news("<i>$m{name}の願いも空しく分裂した世界を統一すべく三国が台頭しました</i>");
 		}
-		elsif ($old_world eq $#world_states-4) {# 英雄開始メッセージ
-			&write_world_news("<i>$m{name}の願いは空しく世界は英雄が伝説を作り出す時代になりました</i>");
-		}
-		elsif ($old_world eq $#world_states-5) {# 拙速開始メッセージ
+		elsif ($year % 40 == 10) { # 拙速
 			&write_world_news("<i>$m{name}の願いも空しく世界が競い合うことに</i>");
 		}
-	}# if (&is_special_world($w{world})) {# 特殊情勢である
-	else {# 特殊情勢ではない
+		else { # 混乱
+			&write_world_news("<i>$m{name}の願いは空しく世界は混乱に陥りました</i>");
+		}
+	}
+	else {# 特殊情勢開始時ではない
 		my @new_worlds;
 		if ($cmd eq '1') {# 希望
 			@new_worlds = (1,2,3,4,5,6,7,17,18,19,20);
@@ -111,9 +92,17 @@ sub tp_110 {
 			}
 		}
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
-	}# else {# 特殊情勢ではない
+	}# else {# 特殊情勢開始時ではない
 
 	&reset; # ここまで今期統一時の処理
+
+	my $migrate_type = 0;
+	# 世界情勢 混乱突入
+	if ($w{year} =~ /0$/) {
+		require './lib/_festival_world.cgi';
+		$migrate_type = &opening_festival;
+		&wt_c_reset;
+	}
 
 #	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
@@ -128,7 +117,7 @@ sub tp_110 {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-	my $migrate_type = 0;
+#	my $migrate_type = 0;
 	if ($w{world} eq '0') { # 平和
 		$w{reset_time} += 3600 * 12;
 	}
@@ -156,28 +145,29 @@ sub tp_110 {
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
 	}
-	elsif (&is_festival_world($w{world})) {# 祭り情勢ならば
-		if ($w{world} eq $#world_states-1) { # 混乱
-			$migrate_type = &festival_type('konran', 1);
-		}
-		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
-			$w{game_lv} = 99;
-			$migrate_type = &add_festival_country('kouhaku');
-		}
-		elsif ($w{world} eq $#world_states-3) { # 三国志
-			$w{game_lv} = 99;
-			$migrate_type = &add_festival_country('sangokusi');
-		}
-		elsif ($w{world} eq $#world_states-4) { # 英雄
-			$w{game_lv} += 20;
-			for my $i (1 .. $w{country}) {
-				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-			}
-		}
-		elsif ($w{world} eq $#world_states-5) { # 拙速
-			$migrate_type = &festival_type('sessoku', 1);
-		}
-	}
+#	elsif (&is_festival_world) {# 祭り情勢ならば
+#		if ($w{world} eq $#world_states-1) { # 混乱
+#			$migrate_type = &festival_type('konran', 1);
+#		}
+#		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+#			$w{game_lv} = 99;
+#			$migrate_type = &add_festival_country('kouhaku');
+#		}
+#		elsif ($w{world} eq $#world_states-3) { # 三国志
+#			$w{game_lv} = 99;
+#			$migrate_type = &add_festival_country('sangokusi');
+#		}
+#		elsif ($w{world} eq $#world_states-4) { # 英雄
+#			$w{game_lv} += 20;
+#			for my $i (1 .. $w{country}) {
+#				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+#			}
+#		}
+#		elsif ($w{world} eq $#world_states-5) { # 拙速
+#			$migrate_type = &festival_type('sessoku', 1);
+#		}
+#	}
+
 	$w{game_lv} = 0;
 	&refresh;
 	&n_menu;
@@ -185,7 +175,7 @@ sub tp_110 {
 
 #	require "./lib/reset.cgi";
 #	&player_migrate($migrate_type);
-	&player_migrate($migrate_type) if &is_festival_world($w{world});
+	&player_migrate($migrate_type) if &is_festival_world;
 }
 
 # プレイヤーの望みを表示する
