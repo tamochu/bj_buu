@@ -182,7 +182,7 @@ sub reset {
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
 	}
-	
+
 	# ¢ŠEî¨ ˆÃ•‰ğœ
 	if ($w{year} =~ /6$/) {
 		$w{world} = int(rand($#world_states-5));

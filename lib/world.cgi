@@ -27,6 +27,10 @@ sub tp_100 {
 		}
 		&player_migrate($migrate_type);
 	}
+	elsif (&is_special_world) {
+		require './lib/reset.cgi';
+		&reset;
+	}
 
 	$mes .= "‚ ‚È‚½‚Í‚±‚Ì¢ŠE‚É‰½‚ğ‹‚ß‚Ü‚·‚©?<br>";
 	&menu('ŠF‚ª–]‚Ş‚à‚Ì','Šó–]','â–]','•½˜a');
