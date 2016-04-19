@@ -43,6 +43,7 @@ sub time_limit  {
 		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 
+	# 祭り情勢時に期限切れ
 	if (&is_festival_world($w{world})) {
 		if ($w{world} eq $#world_states-1) { # 混乱
 			$migrate_type = &festival_type('konran', 0);
@@ -58,6 +59,8 @@ sub time_limit  {
 		elsif ($w{world} eq $#world_states-5) { # 拙速
 			$migrate_type = &festival_type('sessoku', 0);
 		}
+		$w{world} = int(rand($#world_states-5));
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 		&player_migrate($migrate_type);
 	}
 
@@ -163,25 +166,25 @@ sub reset {
 		# ユーザーが情勢を選ばない限り暗黒が続くので仕方ないか？
 #		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 	}
-	# 世界情勢 混乱解除
-	if ($w{year} =~ /0$/) {
-		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = &festival_type('kouhaku', 0);
-			$w{country} -= 2;
-		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = &festival_type('sangokusi', 0);
-			$w{country} -= 3;
-		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = &festival_type('sessoku', 0);
-		}else {#混乱
-			$migrate_type = &festival_type('konran', 0);
-		}
-		$w{world} = int(rand($#world_states-5));
-		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
-		# おそらく統一期限切れでここを通っているなら他の祭り情勢でも表示しないと今度は何も表示されない
-		# 戦争で統一したのか期限切れなのか要判断
-		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") if $w{year} % 40 == 10;
-	}
+#	# 世界情勢 混乱解除
+#	if ($w{year} =~ /0$/) {
+#		if($w{year} % 40 == 0){#不倶戴天
+#			$migrate_type = &festival_type('kouhaku', 0);
+#			$w{country} -= 2;
+#		}elsif($w{year} % 40 == 20){# 三国志
+#			$migrate_type = &festival_type('sangokusi', 0);
+#			$w{country} -= 3;
+#		}elsif($w{year} % 40 == 10){# 拙速
+#			$migrate_type = &festival_type('sessoku', 0);
+#		}else {#混乱
+#			$migrate_type = &festival_type('konran', 0);
+#		}
+#		$w{world} = int(rand($#world_states-5));
+#		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示
+#		# おそらく統一期限切れでここを通っているなら他の祭り情勢でも表示しないと今度は何も表示されない
+#		# 戦争で統一したのか期限切れなのか要判断
+#		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>") if $w{year} % 40 == 10;
+#	}
 	# 仕官できる人数
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	my $ave_c = int($w{player} / $country);
