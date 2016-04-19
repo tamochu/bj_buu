@@ -13,8 +13,12 @@ sub run {
 	    $in{comment} = &koikoi;
 	    &write_comment if $in{comment};
 	}
+	elsif ($in{mode} eq "win_teyaku") {
+	    $in{comment} = &win_game(1);
+	    &write_comment if $in{comment};
+	}
 	elsif ($in{mode} eq "win") {
-	    $in{comment} = &win_game;
+	    $in{comment} = &win_game(0);
 	    &write_comment if $in{comment};
 	}
 	elsif ($in{mode} eq "leader") {
@@ -34,7 +38,7 @@ sub run {
 	    &write_comment if $in{comment};
 	}
 	elsif ($in{mode} eq "reset") {
-	    $in{comment} = &reset_game;
+	    $in{comment} = &reset_game($m{name});
 	    &write_comment if $in{comment};
 	}
 	&write_comment if ($in{mode} eq "write") && $in{comment};
@@ -48,6 +52,12 @@ sub run {
 		print qq|<input type="hidden" name="mode" value="exit">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 		print qq|<input type="submit" value="やめる" class="button_s"></form><br>|;
+	}
+	if ($leader && &is_player) {
+		print qq|<form method="$method" action="$this_script" name="form">|;
+		print qq|<input type="hidden" name="mode" value="reset">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="ちゃぶ台返し" class="button_s"></form><br>|;
 	}
 	print qq|<h2>$this_title</h2>|;
 	print qq|<form method="$method" action="$this_script" name="form">|;
@@ -73,6 +83,13 @@ sub run {
 			&print_hand;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 			print qq|<input type="submit" value="札を出す" class="button_s"></form><br>|;
+			
+			if (&is_teyaku) {
+				print qq|<form method="$method" action="$this_script" name="form">|;
+				print qq|<input type="hidden" name="mode" value="win_teyaku">|;
+				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+				print qq|<input type="submit" value="手上がり" class="button_s"></form><br>|;
+			}
 		}elsif(($state eq $m{name}.'_こいこい' || $state eq $m{name}.'_山札_こいこい') && $m{c_turn}){
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="continue">|;
@@ -92,11 +109,6 @@ sub run {
 			print qq|<input type="hidden" name="mode" value="start">|;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
 			print qq|<input type="submit" value="開始" class="button_s"></form><br>|;
-		}elsif($state eq 'waiting' && $m{name} eq $leader && $in{mode} ne 'leader' && !$waiting) {
-			print qq|<form method="$method" action="$this_script" name="form">|;
-			print qq|<input type="hidden" name="mode" value="reset">|;
-			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
-			print qq|<input type="submit" value="やめる" class="button_s"></form><br>|;
 		}
 		&print_my_hand;
 	}else {
@@ -391,6 +403,7 @@ sub koikoi {
 }
 
 sub win_game {
+	my $teyaku = shift;
 	my $hand_value;
 	my $yaku;
 	my $e_name;
@@ -408,6 +421,16 @@ sub win_game {
 	}
 	close $fh;
 	($hand_value, $yaku) = &h_value($m{c_value});
+	if ($teyaku) {
+		my $mteyaku = &is_teyaku;
+		if ($mteyaku eq '1') {
+			$hand_value = 6;
+			$yaku = '手四';
+		} elsif ($mteyaku eq '2') {
+			$hand_value = 6;
+			$yaku = 'くっつき';
+		}
+	}
 	$ret_mes .= "$yaku $hand_value 文 勝利";
 	my $mcoin = $rate*$hand_value;
 	if($koikoi){
@@ -750,6 +773,53 @@ sub exit_game{
 	return("$m{name} は やめました");
 }
 
+sub is_teyaku {
+	my $ret = 0;
+	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	my $head_line = <$fh>;
+	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
+	while (my $line = <$fh>) {
+		my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($mturn > 0 && $mname eq $m{name}) {
+			my @mhand = split /,/, $mstock;
+			my @mmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
+			for my $mh (@mhand) {
+				$mmonth[int($mh / 10) - 1]++;
+			}
+			my $dcount = 0;
+			for my $mm (@mmonth) {
+				if ($mm == 4) {
+					$ret = 1;
+				}
+				if ($mm == 2) {
+					$dcount++;
+				}
+				print qq|$mm,|;
+			}
+			if ($dcount == 4) {
+				$ret = 2;
+			}
+		}
+	}
+	close $fh;
+	return $ret;
+}
+
+sub is_player {
+	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	my $head_line = <$fh>;
+	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
+	while (my $line = <$fh>) {
+		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
+		if ($mturn > 0 && $mname eq $m{name}) {
+			return 1;
+		}
+	}
+	close $fh;
+	
+	return 0;
+}
+
 sub h_value{
 	my $hvalue = shift;
 	my @cards = split /,/, $hvalue;
@@ -873,12 +943,12 @@ sub shuffled_deck{
 			push @deck, $i*10+$j;
 		}
 	}
-	for my $i (0..47){
-		my $j = int(rand(48-$i)) + $i;
-		my $temp = $deck[$i];
- 		$deck[$i] = $deck[$j];
- 		$deck[$j] = $temp;
-	}
+#	for my $i (0..47){
+#		my $j = int(rand(48-$i)) + $i;
+#		my $temp = $deck[$i];
+#		$deck[$i] = $deck[$j];
+#		$deck[$j] = $temp;
+#	}
 	return @deck;
 }
 1;#削除不可

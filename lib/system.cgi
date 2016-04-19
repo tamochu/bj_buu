@@ -533,11 +533,13 @@ sub log_errors {
 #================================================
 sub name_link {
 	my $name = shift;
-	
-	my $id = unpack("H*", $name);
-	my %p = &get_you_datas($id, 1);
+	if (&you_exists($name)) {
+		my $id = unpack("H*", $name);
+		my %p = &get_you_datas($id, 1);
 
-	return qq|<a href="profile.cgi?id=$id&country=$p{country}" class="clickable_name">$name</a>|;
+		return qq|<a href="profile.cgi?id=$id&country=$p{country}" class="clickable_name">$name</a>|;
+	}
+	return $name;
 }
 
 #================================================

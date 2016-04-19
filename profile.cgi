@@ -393,24 +393,25 @@ sub get_you_year_data {
 	
 	my $last_year = $w{year} - 1;
 	
-	open my $fh, "< $userdir/$player_id/year_ranking.cgi" or &error("year_ranking.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	while (my $line = <$fh>) {
-		my %ydata;
-		for my $hash (split /<>/, $line) {
-			my($k, $v) = split /;/, $hash;
-			$ydata{$k} = $v;
-			if($k eq 'year'){
-				if($v != $last_year){
-					next;
+	if (-f "$userdir/$player_id/year_ranking.cgi") {
+		open my $fh, "< $userdir/$player_id/year_ranking.cgi" or &error("year_ranking.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		while (my $line = <$fh>) {
+			my %ydata;
+			for my $hash (split /<>/, $line) {
+				my($k, $v) = split /;/, $hash;
+				$ydata{$k} = $v;
+				if($k eq 'year'){
+					if($v != $last_year){
+						next;
+					}
 				}
 			}
+			if($ydata{year} == $last_year){
+				return %ydata;
+			}
 		}
-		if($ydata{year} == $last_year){
-			return %ydata;
-		}
+		close $fh;
 	}
-	close $fh;
-	
 	return ();
 }
 
