@@ -15,21 +15,21 @@ my $limit_touitu_day = int( rand(6)+5 );
 #================================================
 # 期日が過ぎた場合
 #================================================
-sub time_limit  {
+sub time_limit {
 	# 祭り情勢時に期限切れ
 	if (&is_festival_world($w{world})) {
-		if ($w{world} eq $#world_states-1) { # 混乱
+		if ($w{world} eq @world_states-2) { # 混乱
 			$migrate_type = &festival_type('konran', 0);
 		}
-		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+		elsif ($w{world} eq @world_states-3) { # 不倶戴天
 			$migrate_type = &festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}
-		elsif ($w{world} eq $#world_states-3) { # 三国志
+		elsif ($w{world} eq @world_states-4) { # 三国志
 			$migrate_type = &festival_type('sangokusi', 0);
 			$w{country} -= 3;
 		}
-		elsif ($w{world} eq $#world_states-5) { # 拙速
+		elsif ($w{world} eq @world_states-6) { # 拙速
 			$migrate_type = &festival_type('sessoku', 0);
 			my $strongest_country = 0;
 			my $max_value = 0;
@@ -54,13 +54,16 @@ sub time_limit  {
 
 		# 祭り前期なら
 		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
-			if ($w{year} % 40 == 0){ # 不倶戴天
+			if ($w{year} % 40 == 0) { # 不倶戴天
 				&write_world_news("<i>世界は $world_states[$#world_states-2}] となりました</i>");
-			} elsif ($w{year} % 40 == 20) { # 三国志
+			}
+			elsif ($w{year} % 40 == 20) { # 三国志
 				&write_world_news("<i>世界は $world_states[$#world_states-3}] となりました</i>");
-			} elsif ($w{year} % 40 == 10) { # 拙速
+			}
+			elsif ($w{year} % 40 == 10) { # 拙速
 				&write_world_news("<i>世界は $world_states[$#world_states-5}] となりました</i>");
-			} else { # 混乱
+			}
+			else { # 混乱
 				&write_world_news("<i>世界は $world_states[$#world_states-1}] となりました</i>");
 			}
 		}
@@ -75,6 +78,7 @@ sub time_limit  {
 			}
 		}
 	}
+}
 
 	&reset; # ここまで今期期限切れ時の処理
 
@@ -290,7 +294,6 @@ sub reset {
 #		} else { # 混乱
 #			$w{world} = $#world_states-1;
 #		}
-
 #		&wt_c_reset;
 #	}
 	
