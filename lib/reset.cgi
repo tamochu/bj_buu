@@ -91,15 +91,15 @@ sub time_limit  {
 	elsif (&is_festival_world($w{world})) {# 祭り情勢ならば
 		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 		if ($w{world} eq $#world_states-1) { # 混乱
-			$migrate_type = festival_type('konran', 1);
+			$migrate_type = &festival_type('konran', 1);
 		}
 		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
 			$w{game_lv} = 99;
-			$migrate_type = add_festival_country('kouhaku');
+			$migrate_type = &add_festival_country('kouhaku');
 		}
 		elsif ($w{world} eq $#world_states-3) { # 三国志
 			$w{game_lv} = 99;
-			$migrate_type = add_festival_country('sangokusi');
+			$migrate_type = &add_festival_country('sangokusi');
 		}
 		elsif ($w{world} eq $#world_states-4) { # 英雄
 			$w{game_lv} += 20;
@@ -108,7 +108,7 @@ sub time_limit  {
 			}
 		}
 		elsif ($w{world} eq $#world_states-5) { # 拙速
-			$migrate_type = festival_type('sessoku', 1);
+			$migrate_type = &festival_type('sessoku', 1);
 		}
 	}
 
@@ -146,15 +146,15 @@ sub reset {
 	# 世界情勢 混乱解除
 	if ($w{year} =~ /0$/) {
 		if($w{year} % 40 == 0){#不倶戴天
-			$migrate_type = festival_type('kouhaku', 0);
+			$migrate_type = &festival_type('kouhaku', 0);
 			$w{country} -= 2;
 		}elsif($w{year} % 40 == 20){# 三国志
-			$migrate_type = festival_type('sangokusi', 0);
+			$migrate_type = &festival_type('sangokusi', 0);
 			$w{country} -= 3;
 		}elsif($w{year} % 40 == 10){# 拙速
-			$migrate_type = festival_type('sessoku', 0);
+			$migrate_type = &festival_type('sessoku', 0);
 		}else {#混乱
-			$migrate_type = festival_type('konran', 0);
+			$migrate_type = &festival_type('konran', 0);
 		}
 		$w{world} = int(rand($#world_states-5));
 		# とりあえずユーザーが情勢を選ぶ余地がない拙速だけ表示

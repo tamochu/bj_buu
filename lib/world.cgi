@@ -120,15 +120,15 @@ sub tp_110 {
 	}
 	elsif (&is_festival_world($w{world})) {# Õ‚èî¨‚È‚ç‚Î
 		if ($w{world} eq $#world_states-1) { # ¬—
-			$migrate_type = festival_type('konran', 1);
+			$migrate_type = &festival_type('konran', 1);
 		}
 		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
 			$w{game_lv} = 99;
-			$migrate_type = add_festival_country('kouhaku');
+			$migrate_type = &add_festival_country('kouhaku');
 		}
 		elsif ($w{world} eq $#world_states-3) { # O‘u
 			$w{game_lv} = 99;
-			$migrate_type = add_festival_country('sangokusi');
+			$migrate_type = &add_festival_country('sangokusi');
 		}
 		elsif ($w{world} eq $#world_states-4) { # ‰p—Y
 			$w{game_lv} += 20;
@@ -137,7 +137,7 @@ sub tp_110 {
 			}
 		}
 		elsif ($w{world} eq $#world_states-5) { # Ù‘¬
-			$migrate_type = festival_type('sessoku', 1);
+			$migrate_type = &festival_type('sessoku', 1);
 		}
 	}
 
