@@ -37,7 +37,7 @@ sub tp_110 {
 		elsif ($old_world eq $#world_states-5) {# 拙速開始メッセージ
 			&write_world_news("<i>$m{name}の願いも空しく世界が競い合うことに</i>");
 		}
-	}
+	}# if (&is_special_world($w{world})) {# 特殊情勢である
 	else {# 特殊情勢ではない
 		my @new_worlds;
 		if ($cmd eq '1') {# 希望
@@ -52,7 +52,6 @@ sub tp_110 {
 		else {
 			@new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 		}
-	
 		my @next_worlds = &unique_worlds(@new_worlds);
 		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
 		$w{world_sub} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
@@ -75,8 +74,8 @@ sub tp_110 {
 				&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 			}
 		}
-		$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7) : $w{game_lv};
-	}
+		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
+	}# else {# 特殊情勢ではない
 
 	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
@@ -145,7 +144,7 @@ sub tp_110 {
 	&refresh;
 	&n_menu;
 	&write_cs;
-	
+
 	require "./lib/reset.cgi";
 	&player_migrate($migrate_type);
 }
