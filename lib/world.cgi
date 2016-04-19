@@ -1,5 +1,6 @@
 sub begin { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Ş×Ñ´×°ˆÙí‚Èˆ—‚Å‚·'); }
 sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Ş×Ñ´×°ˆÙí‚Èˆ—‚Å‚·'); }
+require './lib/reset.cgi';
 require './lib/_world_reset.cgi';
 #================================================
 # ¢ŠEî¨ Created by Merino
@@ -27,10 +28,8 @@ sub tp_100 {
 		}
 		&player_migrate($migrate_type);
 	}
-	elsif (&is_special_world) {
-		require './lib/reset.cgi';
-		&reset;
-	}
+
+	&reset;
 
 	$mes .= "‚ ‚È‚½‚Í‚±‚Ì¢ŠE‚É‰½‚ğ‹‚ß‚Ü‚·‚©?<br>";
 	&menu('ŠF‚ª–]‚Ş‚à‚Ì','Šó–]','â–]','•½˜a');
@@ -40,7 +39,7 @@ sub tp_100 {
 sub tp_110 {
 	my $old_world = $w{world};
 
-	&show_desire unless $w{year} =~ /5$/;
+	&show_desire unless $w{year} =~ /6$/;
 	if ($w{year} =~ /9$/) { # Õ‚èî¨ŠJn
 		my $year = $w{year} + 1;
 		if ($year % 40 == 0) { # •s‹ä‘Õ“V
@@ -96,7 +95,7 @@ sub tp_110 {
 	}# else {# “Áêî¨ŠJn‚Å‚Í‚È‚¢
 
 	require './lib/reset.cgi';
-	&reset; # ‚±‚±‚Ü‚Å¡Šú“ˆê‚Ìˆ—
+#	&reset; # ‚±‚±‚Ü‚Å¡Šú“ˆê‚Ìˆ—
 
 	my $migrate_type = 0;
 	# ¢ŠEî¨ ¬—“Ë“ü
