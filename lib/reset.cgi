@@ -44,6 +44,7 @@ sub time_limit  {
 	}
 
 	my $migrate_type = &reset;
+	&player_migrate($migrate_type);
 
 #	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
