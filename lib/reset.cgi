@@ -35,9 +35,7 @@ sub time_limit {
 			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
 			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
-		$w{world} = int(rand($#world_states-5));
-#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#		&player_migrate($migrate_type);
+#		$w{world} = int(rand($#world_states-5));
 	}
 	else { # ’Êíî¨‚ÅŠúŒÀØ‚ê
 		&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
@@ -49,42 +47,7 @@ sub time_limit {
 			my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 			my @next_worlds = &unique_worlds(@new_worlds);
 			$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-#			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		}
-#			my $year = $w{year} + 1;
-#			if ($year =~ /06$/ || $year =~ /26$/ || $year =~ /46$/ || $year =~ /66$/ || $year =~ /86$/) { # ‰p—Y
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($w{year} =~ /5$/) { # ˆÃ•
-##				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($year % 40 == 20) { # O‘u
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($year % 40 == 10) { # Ù‘¬
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			else { # ¬—
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-1] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#		}
-#		else {
-#			unless ($w{year} =~ /5$/ || $w{year} =~ /6$/) {
-#			}
-#			if ($w{year} =~ /6$/) { # ˆÃ•I—¹‚È‚ç
-#				$w{world} = int(rand($#world_states-5));
-#			}
-#			else {
-#				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-#				my @next_worlds = &unique_worlds(@new_worlds);
-#				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-#			}
-
-#			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#		}
 	}
 
 	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
@@ -110,62 +73,6 @@ sub time_limit {
 	else {
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
-
-#			my $year = $w{year} + 1;
-#			if ($year =~ /06$/ || $year =~ /26$/ || $year =~ /46$/ || $year =~ /66$/ || $year =~ /86$/) { # ‰p—Y
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($w{year} =~ /5$/) { # ˆÃ•
-##				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($year % 40 == 20) { # O‘u
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			elsif ($year % 40 == 10) { # Ù‘¬
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#			else { # ¬—
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-1] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#			}
-#		}
-#		else {
-#			unless ($w{year} =~ /5$/ || $w{year} =~ /6$/) {
-#			}
-#			if ($w{year} =~ /6$/) { # ˆÃ•I—¹‚È‚ç
-#				$w{world} = int(rand($#world_states-5));
-#			}
-#			else {
-#				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-#				my @next_worlds = &unique_worlds(@new_worlds);
-#				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-#			}
-
-#			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#		}
-#	}
-
-#	my $migrate_type = 0;
-#	# ¢ŠEî¨ ¬—“Ë“ü
-#	if ($w{year} =~ /0$/) {
-#		require './lib/_festival_world.cgi';
-#		$migrate_type = &opening_festival;
-#		&wt_c_reset;
-#	}
-
-#	unshift @old_worlds, $w{world};
-
-#	elsif ($w{world} eq $#world_states) { # ˆÃ•‚È‚ç‚Î
-#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-#	}
-#	elsif ($w{world} eq $#world_states-4) { # ‰p—Y
-#		$w{game_lv} += 20;
-#		for my $i (1 .. $w{country}) {
-#			$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-#		}
-#	}
 
 	$w{game_lv} = 0;
 
@@ -201,7 +108,7 @@ sub reset {
 			my $migrate_type = &ending_festival;
 			&player_migrate($migrate_type);
 		}
-#		$w{world} = int(rand($#world_states-5));
+		$w{world} = int(rand($#world_states-5));
 	}
 
 	# ¢ŠEî¨ ˆÃ•‰ğœ
