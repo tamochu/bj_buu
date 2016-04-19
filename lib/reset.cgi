@@ -45,7 +45,7 @@ sub time_limit  {
 
 	my $migrate_type = &reset;
 
-	unshift @old_worlds, $w{world};
+#	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	my $saved_w = 0;
 	$nline = "";
@@ -55,7 +55,7 @@ sub time_limit  {
 		last if $saved_w > 15;
 		$saved_w++;
 	}
-	print $fh "$nline\n";
+	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
 	my $migrate_type = 0;
