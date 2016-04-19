@@ -113,6 +113,7 @@ sub time_limit  {
 	}
 
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
+	$w{game_lv} = 0;
 	&write_cs;
 	&player_migrate($migrate_type);
 }

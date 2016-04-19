@@ -140,7 +140,7 @@ sub tp_110 {
 			$migrate_type = &festival_type('sessoku', 1);
 		}
 	}
-
+	$w{game_lv} = 0;
 	&refresh;
 	&n_menu;
 	&write_cs;
