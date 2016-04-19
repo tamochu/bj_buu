@@ -94,6 +94,7 @@ sub tp_110 {
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
 	}# else {# “Áêî¨ŠJn‚Å‚Í‚È‚¢
 
+	require './lib/reset.cgi';
 	&reset; # ‚±‚±‚Ü‚Å¡Šú“ˆê‚Ìˆ—
 
 	my $migrate_type = 0;
