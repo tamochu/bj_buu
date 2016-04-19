@@ -18,7 +18,7 @@ sub tp_110 {
 	my $old_world = $w{world};
 
 	&show_desire;
-	if (&is_special_world($w{world})) {# “Áêî¨‚È‚ç‚Î
+	if (&is_special_world($w{world})) {# “Áêî¨‚Å‚ ‚é
 		if ($old_world eq $#world_states) {# ˆÃ•ŠJnƒƒbƒZ[ƒW
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‚©‚«Á‚³‚ê‚Ü‚µ‚½</i>");
 		}
@@ -38,15 +38,15 @@ sub tp_110 {
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚à‹ó‚µ‚­¢ŠE‚ª‹£‚¢‡‚¤‚±‚Æ‚É</i>");
 		}
 	}
-	else {# “Áêî¨‚Å‚Í‚È‚¢‚È‚ç‚Î
+	else {# “Áêî¨‚Å‚Í‚È‚¢
 		my @new_worlds;
-		if ($cmd eq '1') { # Šó–]
+		if ($cmd eq '1') {# Šó–]
 			@new_worlds = (1,2,3,4,5,6,7,17,18,19,20);
 		}
-		elsif ($cmd eq '2') { # â–]
+		elsif ($cmd eq '2') {# â–]
 			@new_worlds = (8,9,10,11,12,13,14,15,16);
 		}
-		elsif ($cmd eq '3') { # •½˜a
+		elsif ($cmd eq '3') {# •½˜a
 			@new_worlds = (0);
 		}
 		else {
@@ -75,6 +75,7 @@ sub tp_110 {
 				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 		}
+		$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7) : $w{game_lv};
 	}
 
 	unshift @old_worlds, $w{world};
@@ -118,12 +119,9 @@ sub tp_110 {
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
 	}
-	elsif (&is_festival_world($w{world})) {
-		if ($w{world} eq $#world_states-4) { # ‰p—Y
-			$w{game_lv} += 20;
-			for my $i (1 .. $w{country}) {
-				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
-			}
+	elsif (&is_festival_world($w{world})) {# Õ‚èî¨‚È‚ç‚Î
+		if ($w{world} eq $#world_states-1) { # ¬—
+			$migrate_type = festival_type('konran', 1);
 		}
 		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
 			$w{game_lv} = 99;
@@ -133,16 +131,17 @@ sub tp_110 {
 			$w{game_lv} = 99;
 			$migrate_type = add_festival_country('sangokusi');
 		}
+		elsif ($w{world} eq $#world_states-4) { # ‰p—Y
+			$w{game_lv} += 20;
+			for my $i (1 .. $w{country}) {
+				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+			}
+		}
 		elsif ($w{world} eq $#world_states-5) { # Ù‘¬
 			$migrate_type = festival_type('sessoku', 1);
 		}
-		elsif ($w{world} eq $#world_states-1) { # ¬—
-			$migrate_type = festival_type('konran', 1);
-		}
 	}
-	
-	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
-	
+
 	&refresh;
 	&n_menu;
 	&write_cs;
@@ -153,13 +152,13 @@ sub tp_110 {
 
 # ƒvƒŒƒCƒ„[‚Ì–]‚İ‚ğ•\¦‚·‚é
 sub show_desire {
-	if ($cmd eq '1') { # Šó–]
+	if ($cmd eq '1') {# Šó–]
 		&mes_and_world_news("<b>¢ŠE‚ÉŠó–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
 	}
-	elsif ($cmd eq '2') { # â–]
+	elsif ($cmd eq '2') {# â–]
 		&mes_and_world_news("<b>¢ŠE‚Éâ–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
 	}
-	elsif ($cmd eq '3') { # •½˜a
+	elsif ($cmd eq '3') {# •½˜a
 		&mes_and_world_news("<b>¢ŠE‚É•½˜a‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
 	}
 	else {

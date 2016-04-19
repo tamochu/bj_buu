@@ -55,7 +55,7 @@ sub is_special_world {
 sub is_festival_world {
 	my $world_no = shift;
 	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
-		require './lib/_festival_world.cgi'; # 祭り情勢ならば自動的にロード
+		require './lib/_festival_world.cgi'; # 祭り情勢用モジュールをロード
 		return 1;
 	}
 	return 0;

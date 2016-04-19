@@ -16,6 +16,11 @@ use constant FESTIVAL_TYPE => {
 	'sessoku' => 7,
 	'dokuritu' => 9
 };
+# 祭り情勢の名称と、開始時なら 1 終了時 なら 0 を指定する
+sub festival_type {
+	my ($festival_name, $is_start) = @_;
+	return FESTIVAL_TYPE->{$festival_name} + $is_start;
+}
 
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 use constant FESTIVAL_COUNTRY_PROPERTY => {
@@ -31,13 +36,6 @@ my $country_name_hug_2 = "きのこの山";
 my $country_name_san_1 = "魏";
 my $country_name_san_2 = "呉";
 my $country_name_san_3 = "蜀";
-
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0 を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
-}
 
 # 指定された祭り情勢用の国を追加しその情勢の開始フラグを返す
 # 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
