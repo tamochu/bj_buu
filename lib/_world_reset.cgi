@@ -20,7 +20,8 @@
 sub unique_worlds {
 	my @new_worlds = @_;
 	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	my @old_worlds = split /<>/, <$fh>;
+	my $line = <$fh>;
+	my @old_worlds = split /<>/, $line;
 	close $fh;
 	my @next_worlds;
 	for my $new_v (@new_worlds){
