@@ -145,8 +145,9 @@ sub tp_110 {
 	&n_menu;
 	&write_cs;
 
-	require "./lib/reset.cgi";
-	&player_migrate($migrate_type);
+#	require "./lib/reset.cgi";
+#	&player_migrate($migrate_type);
+	&player_migrate($migrate_type) if &is_festival_world($w{world});
 }
 
 # プレイヤーの望みを表示する
