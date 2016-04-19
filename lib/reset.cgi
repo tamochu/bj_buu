@@ -58,10 +58,13 @@ sub time_limit {
 		&write_legend('touitu', "$world_name大陸を統一する者は現れませんでした");
 		$w{win_countries} = '';
 
-		# 祭り前期なら
+		# 特殊情勢前期なら
 		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
 			my $year = $w{year} + 1;
-			if ($year % 40 == 0) { # 不倶戴天
+			if ($w{year} =~ /6$/) {
+				&write_world_news("<i>世界は $world_states[$#world_states] となりました</i>");
+			}
+			elsif ($year % 40 == 0) { # 不倶戴天
 				&write_world_news("<i>世界は $world_states[$#world_states-2] となりました</i>");
 			}
 			elsif ($year % 40 == 20) { # 三国志
