@@ -43,6 +43,15 @@ sub unique_worlds {
 #================================================
 
 # “n‚³‚ê‚½î¨ƒiƒ“ƒo[‚ğ“n‚·‚Æ“Áêî¨‚©”»’f‚µ‚Ä•Ô‚·
+sub is_special_world {
+	my $world_no = shift;
+	if ($#world_states-5 <= $world_no) {
+		return 1;
+	}
+	return 0;
+}
+
+# “n‚³‚ê‚½î¨ƒiƒ“ƒo[‚ğ“n‚·‚ÆÕ‚èî¨‚©”»’f‚µ‚Ä•Ô‚·
 sub is_festival_world {
 	my $world_no = shift;
 	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
