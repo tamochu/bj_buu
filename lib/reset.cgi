@@ -59,17 +59,18 @@ sub time_limit {
 		$w{win_countries} = '';
 
 		# “Áêî¨‘OŠú‚È‚ç
-		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
+		if ($w{year} =~ /9$/) {
+#		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
 			my $year = $w{year} + 1;
-			if ($w{year} =~ /5$/) { # ˆÃ•‚È‚ç
-				if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ñë
-					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-				}
-				else { # ˆÃ•
-					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-				}
-			}
-			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
+#			if ($w{year} =~ /5$/) { # ˆÃ•Eñë‚È‚ç
+#				if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ñë
+#					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#				}
+#				else { # ˆÃ•
+#					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#				}
+#			}
+			if ($year % 40 == 0) { # •s‹ä‘Õ“V
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 			elsif ($year % 40 == 20) { # O‘u
@@ -83,7 +84,7 @@ sub time_limit {
 			}
 		}
 		else {
-			unless ($w{year} =~ /6$/) {
+			unless ($w{year} =~ /5$/ || $w{year} =~ /6$/) {
 				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 				my @next_worlds = &unique_worlds(@new_worlds);
 				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
