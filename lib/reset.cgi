@@ -54,13 +54,14 @@ sub time_limit {
 
 		# Õ‚è‘OŠú‚È‚ç
 		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
-			if ($w{year} % 40 == 0) { # •s‹ä‘Õ“V
+			my $year = $w{year} + 1;
+			if ($year % 40 == 0) { # •s‹ä‘Õ“V
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
-			elsif ($w{year} % 40 == 20) { # O‘u
+			elsif ($year % 40 == 20) { # O‘u
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
-			elsif ($w{year} % 40 == 10) { # Ù‘¬
+			elsif ($year % 40 == 10) { # Ù‘¬
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 			else { # ¬—
