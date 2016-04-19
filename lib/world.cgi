@@ -37,7 +37,7 @@ sub tp_110 {
 	my $old_world = $w{world};
 
 	&show_desire unless $w{year} =~ /5$/;
-	if ($w{year} =~ /5$/ || $w{year} =~ /9$/) { # 特殊情勢開始時
+	if ($w{year} =~ /9$/) { # 祭り情勢開始時
 		my $year = $w{year} + 1;
 		if ($year % 40 == 0) { # 不倶戴天
 			&write_world_news("<i>$m{name}の願いは空しく世界は二つに分かれました</i>");
@@ -52,7 +52,7 @@ sub tp_110 {
 			&write_world_news("<i>$m{name}の願いは空しく世界は混乱に陥りました</i>");
 		}
 	}
-	else {# 特殊情勢開始時ではない
+	elsif (!$w{year} =~ /5$/) {# 特殊情勢開始時ではない
 		my @new_worlds;
 		if ($cmd eq '1') {# 希望
 			@new_worlds = (1,2,3,4,5,6,7,17,18,19,20);
