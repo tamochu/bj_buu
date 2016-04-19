@@ -36,7 +36,7 @@ sub time_limit {
 			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
 		$w{world} = int(rand($#world_states-5));
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 #		&player_migrate($migrate_type);
 	}
 	else { # ’Êíî¨‚ÅŠúŒÀØ‚ê
