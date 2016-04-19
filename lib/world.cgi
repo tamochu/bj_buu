@@ -1,6 +1,6 @@
 sub begin { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異常な処理です'); }
 sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異常な処理です'); }
-require './lib/reset.cgi';
+#require './lib/reset.cgi';
 require './lib/_world_reset.cgi';
 #================================================
 # 世界情勢 Created by Merino
@@ -14,22 +14,22 @@ sub tp_100 {
 	# 特殊情勢における統一時の文言は _war_result.cgi を書き換える
 
 	# 祭り情勢時に統一
-	if (&is_festival_world) {
-		if ($w{world} eq $#world_states-1) { # 混乱
-			$migrate_type = &festival_type('konran', 0);
-		}
-		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
-			$migrate_type = &festival_type('kouhaku', 0);
-			$w{country} -= 2;
-		}
-		elsif ($w{world} eq $#world_states-3) { # 三国志
-			$migrate_type = &festival_type('sangokusi', 0);
-			$w{country} -= 3;
-		}
-		&player_migrate($migrate_type);
-	}
+#	if (&is_festival_world) {
+#		if ($w{world} eq $#world_states-1) { # 混乱
+#			$migrate_type = &festival_type('konran', 0);
+#		}
+#		elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+#			$migrate_type = &festival_type('kouhaku', 0);
+#			$w{country} -= 2;
+#		}
+#		elsif ($w{world} eq $#world_states-3) { # 三国志
+#			$migrate_type = &festival_type('sangokusi', 0);
+#			$w{country} -= 3;
+#		}
+#		&player_migrate($migrate_type);
+#	}
 
-	&reset;
+#	&reset;
 
 	$mes .= "あなたはこの世界に何を求めますか?<br>";
 	&menu('皆が望むもの','希望','絶望','平和');
@@ -39,10 +39,12 @@ sub tp_100 {
 sub tp_110 {
 	my $old_world = $w{world};
 
-	&show_desire unless $w{year} =~ /6$/;
-	if ($w{year} =~ /9$/) { # 祭り情勢開始時
-		my $year = $w{year} + 1;
-		if ($year % 40 == 0) { # 不倶戴天
+	&show_desire;
+	if (&is_special_world) { # 特殊情勢の開始時
+		if ($w{year} =~ /6$/) { # 暗黒・英雄
+			&write_world_news("<i>$m{name}の願いはかき消されました</i>");
+		}
+		elsif ($year % 40 == 0) { # 不倶戴天
 			&write_world_news("<i>$m{name}の願いは空しく世界は二つに分かれました</i>");
 		}
 		elsif ($year % 40 == 20) { # 三国志
@@ -55,7 +57,7 @@ sub tp_110 {
 			&write_world_news("<i>$m{name}の願いは空しく世界は混乱に陥りました</i>");
 		}
 	}
-	elsif (!$w{year} =~ /5$/) {# 特殊情勢開始時ではない
+	else (!$w{year} =~ /5$) {# 特殊情勢以外の開始時
 		my @new_worlds;
 		if ($cmd eq '1') {# 希望
 			@new_worlds = (1,2,3,4,5,6,7,17,18,19,20);
@@ -92,22 +94,20 @@ sub tp_110 {
 			}
 		}
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
-	}# else {# 特殊情勢開始時ではない
+	}# else {# 特殊情勢以外の開始時
 
-	require './lib/reset.cgi';
+#	require './lib/reset.cgi';
 #	&reset; # ここまで今期統一時の処理
 
-	my $migrate_type = 0;
+#	my $migrate_type = 0;
 	# 世界情勢 混乱突入
-	if ($w{year} =~ /6$/) { # 暗黒・英雄
-		&show_desire;
-		&write_world_news("<i>$m{name}の願いはかき消されました</i>");
-	}
-	elsif ($w{year} =~ /0$/) {
-		require './lib/_festival_world.cgi';
-		$migrate_type = &opening_festival;
-		&wt_c_reset;
-	}
+#		&show_desire;
+#	}
+#	elsif ($w{year} =~ /0$/) {
+#		require './lib/_festival_world.cgi';
+#		$migrate_type = &opening_festival;
+#		&wt_c_reset;
+#	}
 
 #	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
@@ -123,33 +123,7 @@ sub tp_110 {
 	close $fh;
 
 #	my $migrate_type = 0;
-	if ($w{world} eq '0') { # 平和
-		$w{reset_time} += 3600 * 12;
-	}
-	elsif ($w{world} eq '6') { # 結束
-		my @win_cs = ();
-		for my $i (1 .. $w{country}) {
-			push @win_cs, [$i, $cs{win_c}[$i]];
-		}
-		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
-		
-		# 奇数の場合は一番国は除く
-		shift @win_cs if @win_cs % 2 == 1;
-		
-		my $half_c = int(@win_cs*0.5-1);
-		for my $i (0 .. $half_c) {
-			my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
-			$w{'p_'.$c_c} = 1;
-		}
-	}
-	elsif ($w{world} eq '18') { # 殺伐
-		$w{reset_time} = $time;
-		for my $i (1 .. $w{country}) {
-			$cs{food}[$i]     = int(rand(300)) * 1000;
-			$cs{money}[$i]    = int(rand(300)) * 1000;
-			$cs{soldier}[$i]  = int(rand(300)) * 1000;
-		}
-	}
+	&opening_common;
 #	elsif (&is_festival_world) {# 祭り情勢ならば
 #		if ($w{world} eq $#world_states-1) { # 混乱
 #			$migrate_type = &festival_type('konran', 1);
@@ -180,7 +154,7 @@ sub tp_110 {
 
 #	require "./lib/reset.cgi";
 #	&player_migrate($migrate_type);
-	&player_migrate($migrate_type) if &is_festival_world;
+#	&player_migrate($migrate_type) if &is_festival_world;
 }
 
 # プレイヤーの望みを表示する

@@ -364,34 +364,7 @@ sub reset {
 #		$w{world} = int(rand($#world_states-5));
 	}
 	else {
-		if ($w{world} eq '0') { # •½˜a
-			$w{reset_time} += 3600 * 12;
-		}
-		elsif ($w{world} eq '6') { # Œ‹‘©
-			my @win_cs = ();
-			for my $i (1 .. $w{country}) {
-				push @win_cs, [$i, $cs{win_c}[$i]];
-			}
-			@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
-
-			# Šï”‚Ìê‡‚Íˆê”Ô‘‚Íœ‚­
-			shift @win_cs if @win_cs % 2 == 1;
-			
-			my $half_c = int(@win_cs*0.5-1);
-			for my $i (0 .. $half_c) {
-				my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
-				$w{'p_'.$c_c} = 1;
-			}
-		}
-		elsif ($w{world} eq '18') { # E”°
-			$w{reset_time} = $time;
-			for my $i (1 .. $w{country}) {
-				$cs{food}[$i]     = int(rand(300)) * 1000;
-				$cs{money}[$i]    = int(rand(300)) * 1000;
-				$cs{soldier}[$i]  = int(rand(300)) * 1000;
-			}
-		}
-		$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
+		&opening_common;
 	}
 
 	# ¢ŠEî¨ ˆÃ•“Ë“ü
