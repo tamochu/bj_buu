@@ -93,8 +93,6 @@ sub tp_110 {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-	&opening_common;
-
 	$w{game_lv} = 0;
 	&refresh;
 	&n_menu;

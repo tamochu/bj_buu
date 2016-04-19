@@ -538,9 +538,6 @@ sub _touitu {
 
 	require "./lib/reset.cgi";
 	&reset;
-#	require "./lib/_world_reset.cgi";
-#	&reset;
-#	&player_migrate($migrate_type) if &is_festival_world($w{world});
 
 	$m{lib} = 'world';
 	$m{tp}  = 100;
