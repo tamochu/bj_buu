@@ -43,6 +43,7 @@ sub time_limit  {
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
 	}
 
+	&player_migrate($migrate_type) if &is_festival_world($w{world});
 	my $migrate_type = &reset;
 
 #	unshift @old_worlds, $w{world};
