@@ -9,6 +9,42 @@ require './lib/_world_reset.cgi';
 # 選択画面
 #================================================
 sub tp_100 {
+	# _war_result.cgi にあったもの
+	# 統一時worldと期限切れ時resetで対にするため移動
+	my $mname = &name_link($m{name});
+	if ($w{world} eq $#world_states) {
+		if ($m{country} eq $w{country} || $union eq $w{country}) { # NPC国側の勝利
+			&mes_and_world_news("<em>悪魔達の率先者として$world_name大陸を支配することに成功しました</em>",1);
+			&write_legend('touitu', "深き闇より目覚めた$cs{name}[$w{country}]の猛者達が$mnameを筆頭とし$world_name大陸を支配する");
+			$is_npc_win = 1;
+		}
+		else {
+			&mes_and_world_news("<em>魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれました</em>",1);
+			&write_legend('touitu', "$c_mの$mnameとその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
+		}
+	}
+	elsif ($w{world} eq $#world_states-2) {
+		&mes_and_world_news("<em>$world_name大陸を二分する戦いは$c_mの$mnameとその仲間達の勝利に終わった</em>",1);
+		&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
+		$w{win_countries} = $m{country};
+	}
+	elsif ($w{world} eq $#world_states-3) {
+		&mes_and_world_news("<em>$world_name大陸を三分する戦いは$c_mの$mnameとその仲間達の勝利に終わった</em>",1);
+		&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
+		$w{win_countries} = $m{country};
+	}
+	else {
+		if ($union) {
+			$mes .= "<em>$world_name大陸を統一しました</em>";
+			&write_world_news("<em>$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一しました</em>",1);
+			&write_legend('touitu', "$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一する")
+		}
+		else {
+			&mes_and_world_news("<em>$world_name大陸を統一しました</em>",1);
+			&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
+		}
+	}
+
 	$mes .= "あなたはこの世界に何を求めますか?<br>";
 	&menu('皆が望むもの','希望','絶望','平和');
 	$m{tp} += 10;
@@ -76,6 +112,8 @@ sub tp_110 {
 		}
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
 	}# else {# 特殊情勢ではない
+
+	&reset; # ここまで今期統一時の処理
 
 #	unshift @old_worlds, $w{world};
 	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
