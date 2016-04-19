@@ -17,26 +17,8 @@ my $limit_touitu_day = int( rand(6)+5 );
 #================================================
 sub time_limit {
 	# Õ‚èî¨‚ÉŠúŒÀØ‚ê
-	if (&is_festival_world) {
-		if ($w{world} eq $#world_states-1) { # ¬—
-#			$migrate_type = &festival_type('konran', 0);
-			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
-			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
-		}
-		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
-#			$migrate_type = &festival_type('kouhaku', 0);
-#			$w{country} -= 2;
-			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
-			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
-		}
-		elsif ($w{world} eq $#world_states-3) { # O‘u
-			$migrate_type = &festival_type('sangokusi', 0);
-			$w{country} -= 3;
-			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
-			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
-		}
-		elsif ($w{world} eq $#world_states-5) { # Ù‘¬
-			$migrate_type = &festival_type('sessoku', 0);
+	if (&is_special_world) {
+		if ($w{world} eq $#world_states-5) { # Ù‘¬
 			my $strongest_country = 0;
 			my $max_value = 0;
 			for my $i (1 .. $w{country}) {
@@ -49,45 +31,49 @@ sub time_limit {
 			&write_legend('touitu', "$world_name‘å—¤‚ğ‘S“y‚É‚í‚½‚é‘—Í‹£‘ˆ‚Í$cs{name}[$strongest_country]‚ÌŸ—˜‚É‚È‚è‚Ü‚µ‚½");
 			$w{win_countries} = $strongest_country;
 		}
+		else {
+			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
+			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
+		}
 		$w{world} = int(rand($#world_states-5));
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-		&player_migrate($migrate_type);
+#		&player_migrate($migrate_type);
 	}
-	else { # ˆÃ•E’Êíî¨‚ÅŠúŒÀØ‚ê
+	else { # ’Êíî¨‚ÅŠúŒÀØ‚ê
 		&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
 		&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		$w{win_countries} = '';
 
-		# “Áêî¨‘OŠú‚È‚ç
-#		if ($w{year} =~ /9$/) {
-		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
-			my $year = $w{year} + 1;
-			if ($w{year} =~ /05$/ || $w{year} =~ /25$/ || $w{year} =~ /45$/ || $w{year} =~ /65$/ || $w{year} =~ /85$/) { # ‰p—Y
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
-			elsif ($w{year} =~ /5$/) { # ˆÃ•
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
-			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
-				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
-			elsif ($year % 40 == 20) { # O‘u
-				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
-			elsif ($year % 40 == 10) { # Ù‘¬
-				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
-			else { # ¬—
-				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-1] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
+		# “Áêî¨‘OŠú‚Å‚Í‚È‚¢‚È‚ç
+		unless ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
+			my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+			my @next_worlds = &unique_worlds(@new_worlds);
+			$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		}
-		else {
-			unless ($w{year} =~ /5$/ || $w{year} =~ /6$/) {
-				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-				my @next_worlds = &unique_worlds(@new_worlds);
-				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-			}
+#			my $year = $w{year} + 1;
+#			if ($year =~ /06$/ || $year =~ /26$/ || $year =~ /46$/ || $year =~ /66$/ || $year =~ /86$/) { # ‰p—Y
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($w{year} =~ /5$/) { # ˆÃ•
+##				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($year % 40 == 20) { # O‘u
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($year % 40 == 10) { # Ù‘¬
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			else { # ¬—
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-1] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#		}
+#		else {
+#			unless ($w{year} =~ /5$/ || $w{year} =~ /6$/) {
+#			}
 #			if ($w{year} =~ /6$/) { # ˆÃ•I—¹‚È‚ç
 #				$w{world} = int(rand($#world_states-5));
 #			}
@@ -98,62 +84,70 @@ sub time_limit {
 #			}
 
 #			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-		}
+#		}
 	}
 
 	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
 
-	my $migrate_type = 0;
-	# ¢ŠEî¨ ¬—“Ë“ü
-	if ($w{year} =~ /0$/) {
-		require './lib/_festival_world.cgi';
-		$migrate_type = &opening_festival;
-		&wt_c_reset;
+	if ($w{world} eq '0') {# •½˜a
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
 	}
-
-#	unshift @old_worlds, $w{world};
-	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	my $saved_w = 0;
-	$nline = "";
-	for my $old_w (@old_worlds){
-		next if $old_w =~ /[^0-9]/;
-		$nline .= "$old_w<>";
-		last if $saved_w > 15;
-		$saved_w++;
+	elsif ($w{world} eq '18') {# E”°
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
 	}
-	print $fh "$w{world}<>$nline\n";
-	close $fh;
-
-	if ($w{world} eq '0') { # •½˜a
-		$w{reset_time} += 3600 * 12;
-	}
-	elsif ($w{world} eq '6') { # Œ‹‘©
-		my @win_cs = ();
-		for my $i (1 .. $w{country}) {
-			push @win_cs, [$i, $cs{win_c}[$i]];
-		}
-		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
-
-		# Šï”‚Ìê‡‚Íˆê”Ô‘‚Íœ‚­
-		shift @win_cs if @win_cs % 2 == 1;
-		
-		my $half_c = int(@win_cs*0.5-1);
-		for my $i (0 .. $half_c) {
-			my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
-			$w{'p_'.$c_c} = 1;
-		}
-	}
-	elsif ($w{world} eq '18') { # E”°
-		$w{reset_time} = $time;
-		for my $i (1 .. $w{country}) {
-			$cs{food}[$i]     = int(rand(300)) * 1000;
-			$cs{money}[$i]    = int(rand(300)) * 1000;
-			$cs{soldier}[$i]  = int(rand(300)) * 1000;
-		}
-	}
-	elsif ($w{world} eq $#world_states) { # ˆÃ•‚È‚ç‚Î
+	else {
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
+
+#			my $year = $w{year} + 1;
+#			if ($year =~ /06$/ || $year =~ /26$/ || $year =~ /46$/ || $year =~ /66$/ || $year =~ /86$/) { # ‰p—Y
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($w{year} =~ /5$/) { # ˆÃ•
+##				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($year % 40 == 20) { # O‘u
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			elsif ($year % 40 == 10) { # Ù‘¬
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#			else { # ¬—
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-1] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			}
+#		}
+#		else {
+#			unless ($w{year} =~ /5$/ || $w{year} =~ /6$/) {
+#			}
+#			if ($w{year} =~ /6$/) { # ˆÃ•I—¹‚È‚ç
+#				$w{world} = int(rand($#world_states-5));
+#			}
+#			else {
+#				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+#				my @next_worlds = &unique_worlds(@new_worlds);
+#				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+#			}
+
+#			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#		}
+	}
+
+#	my $migrate_type = 0;
+#	# ¢ŠEî¨ ¬—“Ë“ü
+#	if ($w{year} =~ /0$/) {
+#		require './lib/_festival_world.cgi';
+#		$migrate_type = &opening_festival;
+#		&wt_c_reset;
+#	}
+
+#	unshift @old_worlds, $w{world};
+
+#	elsif ($w{world} eq $#world_states) { # ˆÃ•‚È‚ç‚Î
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#	}
 #	elsif ($w{world} eq $#world_states-4) { # ‰p—Y
 #		$w{game_lv} += 20;
 #		for my $i (1 .. $w{country}) {
@@ -161,11 +155,10 @@ sub time_limit {
 #		}
 #	}
 
-	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	$w{game_lv} = 0;
 
 	&write_cs;
-	&player_migrate($migrate_type) if &is_festival_world;
+#	&player_migrate($migrate_type) if &is_festival_world;
 }
 
 #================================================
@@ -196,7 +189,7 @@ sub reset {
 			my $migrate_type = &ending_festival;
 			&player_migrate($migrate_type);
 		}
-		$w{world} = int(rand($#world_states-5));
+#		$w{world} = int(rand($#world_states-5));
 	}
 
 	# ¢ŠEî¨ ˆÃ•‰ğœ
@@ -358,6 +351,48 @@ sub reset {
 		}
 #		$w{world} = int(rand($#world_states-5));
 	}
+	else {
+		if ($w{world} eq '0') { # •½˜a
+			$w{reset_time} += 3600 * 12;
+		}
+		elsif ($w{world} eq '6') { # Œ‹‘©
+			my @win_cs = ();
+			for my $i (1 .. $w{country}) {
+				push @win_cs, [$i, $cs{win_c}[$i]];
+			}
+			@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
+
+			# Šï”‚Ìê‡‚Íˆê”Ô‘‚Íœ‚­
+			shift @win_cs if @win_cs % 2 == 1;
+			
+			my $half_c = int(@win_cs*0.5-1);
+			for my $i (0 .. $half_c) {
+				my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
+				$w{'p_'.$c_c} = 1;
+			}
+		}
+		elsif ($w{world} eq '18') { # E”°
+			$w{reset_time} = $time;
+			for my $i (1 .. $w{country}) {
+				$cs{food}[$i]     = int(rand(300)) * 1000;
+				$cs{money}[$i]    = int(rand(300)) * 1000;
+				$cs{soldier}[$i]  = int(rand(300)) * 1000;
+			}
+		}
+		$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
+	}
+
+	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	my $saved_w = 0;
+	$nline = "";
+	for my $old_w (@old_worlds){
+		next if $old_w =~ /[^0-9]/;
+		$nline .= "$old_w<>";
+		last if $saved_w > 15;
+		$saved_w++;
+	}
+	print $fh "$w{world}<>$nline\n";
+	close $fh;
 
 	# ¢ŠEî¨ ˆÃ•“Ë“ü
 #	if ($w{year} =~ /6$/) {
