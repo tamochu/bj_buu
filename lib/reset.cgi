@@ -133,7 +133,7 @@ sub time_limit {
 
 #			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 #		}
-	}
+#	}
 
 #	my $migrate_type = 0;
 #	# ¢ŠEî¨ ¬—“Ë“ü
