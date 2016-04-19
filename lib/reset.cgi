@@ -115,6 +115,7 @@ sub time_limit  {
 
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	$w{game_lv} = 0;
+
 	&write_cs;
 	&player_migrate($migrate_type);
 }
@@ -515,6 +516,7 @@ sub player_migrate {
 					$m{$k."_c"} = $m{$k."_c_t"};
 					$m{$k."_c_t"} = 0;
 				}
+				&write_user;
 			} else {
 				&regist_you_data($you_datas{name}, 'country', 0);
 				&regist_you_data($you_datas{name}, 'y_country', 0);
