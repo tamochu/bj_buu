@@ -57,7 +57,7 @@ sub tp_110 {
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‹ó‚µ‚­¢ŠE‚Í¬—‚ÉŠ×‚è‚Ü‚µ‚½</i>");
 		}
 	}
-	else (!$w{year} =~ /5$) { # “Áêî¨ˆÈŠO‚ÌŠJn
+	else { # “Áêî¨ˆÈŠO‚ÌŠJn
 		my @new_worlds;
 		if ($cmd eq '1') { # Šó–]
 			@new_worlds = (1,2,3,4,5,6,7,17,18,19,20);
@@ -85,7 +85,8 @@ sub tp_110 {
 		else {
 			if ($w{world} eq '0') { # •½˜a
 #				Unrecognized character \x90; marked by <-- HERE after
-				&write_world_news('<i>¢ŠE‚Í '.$world_states[$w{world}].' ‚É‚È‚è‚Ü‚µ‚½</i>');
+				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
+#				&write_world_news('<i>¢ŠE‚Í '.$world_states[$w{world}].' ‚É‚È‚è‚Ü‚µ‚½</i>');
 			}
 			elsif ($w{world} eq '18') { # E”°
 				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
