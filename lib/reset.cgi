@@ -64,6 +64,7 @@ sub time_limit {
 			my $year = $w{year} + 1;
 			if ($w{year} =~ /05$/ || $w{year} =~ /25$/ || $w{year} =~ /45$/ || $w{year} =~ /65$/ || $w{year} =~ /85$/) { # ‰p—Y
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+			}
 			elsif ($w{year} =~ /5$/) { # ˆÃ•
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
