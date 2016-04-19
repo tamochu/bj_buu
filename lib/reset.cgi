@@ -78,16 +78,22 @@ sub time_limit {
 			}
 		}
 		else {
-			if ($w{year} =~ /6$/) { # 暗黒終了時なら
-				$w{world} = int(rand($#world_states-5));
-			}
-			else {
+			unless ($w{year} =~ /6$/) {
 				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 				my @next_worlds = &unique_worlds(@new_worlds);
 				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+				&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 			}
+#			if ($w{year} =~ /6$/) { # 暗黒終了時なら
+#				$w{world} = int(rand($#world_states-5));
+#			}
+#			else {
+#				my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+#				my @next_worlds = &unique_worlds(@new_worlds);
+#				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+#			}
 
-			&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+#			&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 		}
 	}
 
@@ -160,8 +166,8 @@ sub time_limit {
 
 #================================================
 # 国ﾃﾞｰﾀﾘｾｯﾄ処理
-# 統一時と期限切れ時で呼ばれるので
-# 抽象的にしないとどちらかに偏ってしまう
+# 統一時と期限切れ時で呼ばれるので抽象的にする
+# そしてそれぞれの場合分けを外部でやる
 #================================================
 sub reset {
 	require './lib/casino_toto.cgi';
@@ -175,16 +181,21 @@ sub reset {
 	
 	# 世界情勢 暗黒解除
 	if ($w{year} =~ /6$/) {
-		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
-#			$w{world} = int(rand($#world_states-5));
-		} else {
+		$w{world} = int(rand($#world_states-5));
+		unless ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
 			require './lib/vs_npc.cgi';
 			&delete_npc_country;
-#			$w{world} = int(rand($#world_states-5));
 		}
+#		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
+#			$w{world} = int(rand($#world_states-5));
+#		} else {
+#			require './lib/vs_npc.cgi';
+#			&delete_npc_country;
+#			$w{world} = int(rand($#world_states-5));
+#		}
 		# 統一→resetでランダム情勢→ユーザーが情勢決定
 		# ユーザーが情勢を選ばない限り暗黒が続くので仕方ないか？
-#		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 	}
 #	# 世界情勢 混乱解除
 #	if ($w{year} =~ /0$/) {
