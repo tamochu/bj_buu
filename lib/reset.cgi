@@ -62,13 +62,10 @@ sub time_limit {
 #		if ($w{year} =~ /9$/) {
 		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
 			my $year = $w{year} + 1;
-			if ($w{year} =~ /5$/) { # ˆÃ•E‰p—Y‚È‚ç
-				if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—Y
-					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-				}
-				else { # ˆÃ•
-					&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-				}
+			if ($w{year} =~ /05$/ || $w{year} =~ /25$/ || $w{year} =~ /45$/ || $w{year} =~ /65$/ || $w{year} =~ /85$/) { # ‰p—Y
+				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+			elsif ($w{year} =~ /5$/) { # ˆÃ•
+				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");

@@ -36,13 +36,10 @@ sub tp_100 {
 sub tp_110 {
 	my $old_world = $w{world};
 
-	&show_desire;
+	&show_desire unless $w{year} =~ /5$/;
 	if ($w{year} =~ /5$/ || $w{year} =~ /9$/) { # “Áêî¨ŠJn
 		my $year = $w{year} + 1;
-		if ($w{year} =~ /5$/) { # ˆÃ•E‰p—Y
-			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‚©‚«Á‚³‚ê‚Ü‚µ‚½</i>");
-		}
-		elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
+		if ($year % 40 == 0) { # •s‹ä‘Õ“V
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‹ó‚µ‚­¢ŠE‚Í“ñ‚Â‚É•ª‚©‚ê‚Ü‚µ‚½</i>");
 		}
 		elsif ($year % 40 == 20) { # O‘u
@@ -99,7 +96,11 @@ sub tp_110 {
 
 	my $migrate_type = 0;
 	# ¢ŠEî¨ ¬—“Ë“ü
-	if ($w{year} =~ /0$/) {
+	if ($w{year} =~ /6$/) { # ˆÃ•E‰p—Y
+		&show_desire;
+		&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‚©‚«Á‚³‚ê‚Ü‚µ‚½</i>");
+	}
+	elsif ($w{year} =~ /0$/) {
 		require './lib/_festival_world.cgi';
 		$migrate_type = &opening_festival;
 		&wt_c_reset;
