@@ -58,7 +58,6 @@ sub time_limit  {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-	my $migrate_type = 0;
 	if ($w{world} eq '0') { # •½˜a
 		$w{reset_time} += 3600 * 12;
 	}
@@ -272,7 +271,7 @@ sub reset {
 			$cs{win_c}[$i] = 0;
 		}
 	}
-	
+
 	&write_cs;
 	return $migrate_type;
 }
