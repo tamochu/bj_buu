@@ -57,15 +57,15 @@ sub tp_110 {
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‹ó‚µ‚­¢ŠE‚Í¬—‚ÉŠ×‚è‚Ü‚µ‚½</i>");
 		}
 	}
-	else (!$w{year} =~ /5$) {# “Áêî¨ˆÈŠO‚ÌŠJn
+	else (!$w{year} =~ /5$) { # “Áêî¨ˆÈŠO‚ÌŠJn
 		my @new_worlds;
-		if ($cmd eq '1') {# Šó–]
+		if ($cmd eq '1') { # Šó–]
 			@new_worlds = (1,2,3,4,5,6,7,17,18,19,20);
 		}
-		elsif ($cmd eq '2') {# â–]
+		elsif ($cmd eq '2') { # â–]
 			@new_worlds = (8,9,10,11,12,13,14,15,16);
 		}
-		elsif ($cmd eq '3') {# •½˜a
+		elsif ($cmd eq '3') { # •½˜a
 			@new_worlds = (0);
 		}
 		else {
@@ -83,11 +83,11 @@ sub tp_110 {
 			&write_world_news("<i>¢ŠE‚Í $world_states[$old_world] ‚Æ‚È‚è‚Üc‚¹‚ñ $world_states[$w{world}]‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		}
 		else {
-			if ($w{world} eq '0') {# •½˜a
+			if ($w{world} eq '0') { # •½˜a
 #				Unrecognized character \x90; marked by <-- HERE after
 #				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
 			}
-			elsif ($w{world} eq '18') {# E”°
+			elsif ($w{world} eq '18') { # E”°
 				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
 			}
 			else {
@@ -95,7 +95,7 @@ sub tp_110 {
 			}
 		}
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
-	}# else {# “Áêî¨ˆÈŠO‚ÌŠJn
+	}# else { # “Áêî¨ˆÈŠO‚ÌŠJn
 
 #	require './lib/reset.cgi';
 #	&reset; # ‚±‚±‚Ü‚Å¡Šú“ˆê‚Ìˆ—
@@ -125,7 +125,7 @@ sub tp_110 {
 
 #	my $migrate_type = 0;
 	&opening_common;
-#	elsif (&is_festival_world) {# Õ‚èî¨‚È‚ç‚Î
+#	elsif (&is_festival_world) { # Õ‚èî¨‚È‚ç‚Î
 #		if ($w{world} eq $#world_states-1) { # ¬—
 #			$migrate_type = &festival_type('konran', 1);
 #		}
@@ -160,13 +160,13 @@ sub tp_110 {
 
 # ƒvƒŒƒCƒ„[‚Ì–]‚İ‚ğ•\¦‚·‚é
 sub show_desire {
-	if ($cmd eq '1') {# Šó–]
+	if ($cmd eq '1') { # Šó–]
 		&mes_and_world_news("<b>¢ŠE‚ÉŠó–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
 	}
-	elsif ($cmd eq '2') {# â–]
+	elsif ($cmd eq '2') { # â–]
 		&mes_and_world_news("<b>¢ŠE‚Éâ–]‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
 	}
-	elsif ($cmd eq '3') {# •½˜a
+	elsif ($cmd eq '3') { # •½˜a
 		&mes_and_world_news("<b>¢ŠE‚É•½˜a‚ğ–]‚İ‚Ü‚µ‚½</b>", 1);
 	}
 	else {

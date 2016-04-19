@@ -101,10 +101,10 @@ sub time_limit {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-	if ($w{world} eq '0') {# •½˜a
+	if ($w{world} eq '0') { # •½˜a
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
 	}
-	elsif ($w{world} eq '18') {# E”°
+	elsif ($w{world} eq '18') { # E”°
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
 	}
 	else {
@@ -220,15 +220,15 @@ sub reset {
 #	}
 #	# ¢ŠEî¨ ¬—‰ğœ
 #	if ($w{year} =~ /0$/) {
-#		if($w{year} % 40 == 0){#•s‹ä‘Õ“V
+#		if($w{year} % 40 == 0){ #•s‹ä‘Õ“V
 #			$migrate_type = &festival_type('kouhaku', 0);
 #			$w{country} -= 2;
-#		}elsif($w{year} % 40 == 20){# O‘u
+#		}elsif($w{year} % 40 == 20){ # O‘u
 #			$migrate_type = &festival_type('sangokusi', 0);
 #			$w{country} -= 3;
-#		}elsif($w{year} % 40 == 10){# Ù‘¬
+#		}elsif($w{year} % 40 == 10){ # Ù‘¬
 #			$migrate_type = &festival_type('sessoku', 0);
-#		}else {#¬—
+#		}else { #¬—
 #			$migrate_type = &festival_type('konran', 0);
 #		}
 #		$w{world} = int(rand($#world_states-5));

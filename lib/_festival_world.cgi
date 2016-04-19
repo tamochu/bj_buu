@@ -157,7 +157,7 @@ sub add_festival_country {
 sub player_migrate {
 	my $type = shift;
 
-	if ($type == &festival_type('kouhaku', 1)) {# 不倶戴天設定
+	if ($type == &festival_type('kouhaku', 1)) { # 不倶戴天設定
 		# バックアップ作成
 		for my $i (0 .. $w{country} - 2) {
 			my $from = "$logdir/$i";
@@ -211,7 +211,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('kouhaku', 0)) {# 不倶戴天解除
+	elsif ($type == &festival_type('kouhaku', 0)) { # 不倶戴天解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -301,7 +301,7 @@ sub player_migrate {
 		}
 		close $fh;
 	}
-	elsif ($type == &festival_type('sangokusi', 1)) {# 三国志設定
+	elsif ($type == &festival_type('sangokusi', 1)) { # 三国志設定
 		# バックアップ作成
 		for my $i (0 .. $w{country} - 3) {
 			my $from = "$logdir/$i";
@@ -355,7 +355,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('sangokusi', 0)){# 三国志解除
+	elsif ($type == &festival_type('sangokusi', 0)){ # 三国志解除
 		require "./lib/move_player.cgi";
 		require "./lib/shopping_offertory_box.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -445,7 +445,7 @@ sub player_migrate {
 		}
 		close $fh;
 	}
-	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) {# 混乱設定
+	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) { # 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -489,7 +489,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) {#混乱解除
+	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) { #混乱解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -516,7 +516,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('dokuritu', 1)) {# 独立設定
+	elsif ($type == &festival_type('dokuritu', 1)) { # 独立設定
 		for my $i (0 .. $w{country}) {
 			my $from = "$logdir/$i";
 			my $backup = $from . "_backup";
@@ -526,7 +526,7 @@ sub player_migrate {
 		my $backup = "$logdir/countries_backup.cgi";
 		rcopy($from, $backup);
 	}
-	elsif ($type == &festival_type('dokuritu', 0)) {# 独立解除
+	elsif ($type == &festival_type('dokuritu', 0)) { # 独立解除
 		require "./lib/move_player.cgi";
 		for my $i (1..$w{country}) {
 			my @names = &get_country_members($i);
