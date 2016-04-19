@@ -31,7 +31,10 @@ sub tp_110 {
 		&mes_and_world_news('<b>¢ŠE‚É‚İ‚È‚ª–]‚Ş‚à‚Ì‚ğ–]‚İ‚Ü‚µ‚½</b>', 1);
 	}
 	if (&is_special_world) { # “Áêî¨‚ÌŠJn
-		if ($w{year} =~ /6$/) { # ˆÃ•E‰p—Y
+		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—Y
+			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‹ó‚µ‚­¢ŠE‚Í‰p—Y‚ª“`à‚ğì‚èo‚·‘ã‚É‚È‚è‚Ü‚µ‚½</i>");
+		}
+		elsif ($w{year} =~ /6$/) { # ˆÃ•
 			&write_world_news("<i>$m{name}‚ÌŠè‚¢‚Í‚©‚«Á‚³‚ê‚Ü‚µ‚½</i>");
 		}
 		elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
