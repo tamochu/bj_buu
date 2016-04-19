@@ -49,7 +49,7 @@ sub time_limit {
 			my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 			my @next_worlds = &unique_worlds(@new_worlds);
 			$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		}
 #			my $year = $w{year} + 1;
 #			if ($year =~ /06$/ || $year =~ /26$/ || $year =~ /46$/ || $year =~ /66$/ || $year =~ /86$/) { # ‰p—Y
@@ -88,6 +88,18 @@ sub time_limit {
 	}
 
 	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
+
+	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	my $saved_w = 0;
+	$nline = "";
+	for my $old_w (@old_worlds){
+		next if $old_w =~ /[^0-9]/;
+		$nline .= "$old_w<>";
+		last if $saved_w > 15;
+		$saved_w++;
+	}
+	print $fh "$w{world}<>$nline\n";
+	close $fh;
 
 	if ($w{world} eq '0') {# •½˜a
 		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
@@ -164,7 +176,7 @@ sub time_limit {
 #================================================
 # ‘ÃŞ°ÀØ¾¯Äˆ—
 # “ˆê‚ÆŠúŒÀØ‚ê‚ÅŒÄ‚Î‚ê‚é‚Ì‚Å’ŠÛ“I‚Æ‚·‚é
-# ‚»‚µ‚Ä‚»‚ê‚¼‚ê‚Ìê‡•ª‚¯‚ğŠO•”‚Å‚â‚é
+# resetŒã‚Éî¨‚ªŠm’è‚·‚é‚½‚ßA‚±‚±‚ğ’Ê‚Á‚Ä‚©‚çî¨‚ğ•\¦‚·‚é‚±‚Æ
 #================================================
 sub reset {
 	require './lib/casino_toto.cgi';
@@ -228,7 +240,7 @@ sub reset {
 	# dŠ¯‚Å‚«‚él”
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	my $ave_c = int($w{player} / $country);
-	
+
 	# set world
 	$w{year}++;
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 8; #12
@@ -381,18 +393,6 @@ sub reset {
 		}
 		$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 	}
-
-	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	my $saved_w = 0;
-	$nline = "";
-	for my $old_w (@old_worlds){
-		next if $old_w =~ /[^0-9]/;
-		$nline .= "$old_w<>";
-		last if $saved_w > 15;
-		$saved_w++;
-	}
-	print $fh "$w{world}<>$nline\n";
-	close $fh;
 
 	# ¢ŠEî¨ ˆÃ•“Ë“ü
 #	if ($w{year} =~ /6$/) {
