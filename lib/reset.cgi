@@ -87,6 +87,7 @@ sub time_limit  {
 		}
 	}
 	elsif (&is_festival_world($w{world})) {# Õ‚èî¨‚È‚ç‚Î
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		if ($w{world} eq $#world_states-1) { # ¬—
 			$migrate_type = festival_type('konran', 1);
 		}
