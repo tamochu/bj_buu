@@ -29,14 +29,24 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 #	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 };
 
-# 不倶戴天国名
-my $country_name_hug_1 = "たけのこの里";
-my $country_name_hug_2 = "きのこの山";
-
-# 三国志国名
-my $country_name_san_1 = "魏";
-my $country_name_san_2 = "呉";
-my $country_name_san_3 = "蜀";
+# 祭り情勢の設定をして各種祭り情勢の開始フラグを返す
+sub opening_festival {
+	if ($w{year} % 40 == 0){ # 不倶戴天
+		$w{world} = $#world_states-2;
+		$w{game_lv} = 99;
+		return &add_festival_country('kouhaku');
+	} elsif ($w{year} % 40 == 20) { # 三国志
+		$w{world} = $#world_states-3;
+		$w{game_lv} = 99;
+		return &add_festival_country('sangokusi');
+	} elsif ($w{year} % 40 == 10) { # 拙速
+		$w{world} = $#world_states-5;
+		return &festival_type('sessoku', 1);
+	} else { # 混乱
+		$w{world} = $#world_states-1;
+		return &festival_type('konran', 1);
+	}
+}
 
 # 指定された祭り情勢用の国を追加しその情勢の開始フラグを返す
 # 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく

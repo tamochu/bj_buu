@@ -52,39 +52,37 @@ sub time_limit  {
 		&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		$w{win_countries} = '';
 
-		my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-		my @next_worlds = &unique_worlds(@new_worlds);
+		# Õ‚è‘OŠú‚È‚ç
+		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
+			if ($w{year} % 40 == 0){ # •s‹ä‘Õ“V
+				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+			} elsif ($w{year} % 40 == 20) { # O‘u
+				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-3}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+			} elsif ($w{year} % 40 == 10) { # Ù‘¬
+				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-5}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+			} else { # ¬—
+				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-1}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+			}
+		}
+		else {
+			my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+			my @next_worlds = &unique_worlds(@new_worlds);
 
-		unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
-			$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-			# ˆÃ•‚âÕ‚èî¨Œã‚Ìî¨Œˆ’è‚Í reset ‚Å‚â‚é‚Ì‚Å‚±‚±‚Å•\¦‚µ‚È‚­‚Ä—Ç‚¢
-			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
+			unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
+				$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+				# ˆÃ•‚âÕ‚èî¨Œã‚Ìî¨Œˆ’è‚Í reset ‚Å‚â‚é‚Ì‚Å‚±‚±‚Å•\¦‚µ‚È‚­‚Ä—Ç‚¢
+				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>") unless $w{year} =~ /5$/ || $w{year} =~ /9$/;
+			}
 		}
 	}
 
-	my $migrate_type = &reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
+	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
 
+	my $migrate_type = 0;
 	# ¢ŠEî¨ ¬—“Ë“ü
 	if ($w{year} =~ /0$/) {
 		require './lib/_festival_world.cgi';
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-	# opening_festival‚Æ‚Å‚à
-		if ($w{year} % 40 == 0){ # •s‹ä‘Õ“V
-			$w{world} = $#world_states-2;
-			$w{game_lv} = 99;
-			$migrate_type = &add_festival_country('kouhaku');
-		} elsif ($w{year} % 40 == 20) { # O‘u
-			$w{world} = $#world_states-3;
-			$w{game_lv} = 99;
-			$migrate_type = &add_festival_country('sangokusi');
-		} elsif ($w{year} % 40 == 10) { # Ù‘¬
-			$w{world} = $#world_states-5;
-			$migrate_type = &festival_type('sessoku', 1);
-		} else { # ¬—
-			$w{world} = $#world_states-1;
-			$migrate_type = &festival_type('konran', 1);
-		}
-
+		$migrate_type = &opening_festival;
 		&wt_c_reset;
 	}
 
@@ -147,12 +145,14 @@ sub time_limit  {
 
 #================================================
 # ‘ÃŞ°ÀØ¾¯Äˆ—
+# “ˆê‚ÆŠúŒÀØ‚ê‚ÅŒÄ‚Î‚ê‚é‚Ì‚Å
+# ’ŠÛ“I‚É‚µ‚È‚¢‚Æ‚Ç‚¿‚ç‚©‚É•Î‚Á‚Ä‚µ‚Ü‚¤
 #================================================
 sub reset {
 	require './lib/casino_toto.cgi';
 	&pay_back($w{year});
 	
-	my $migrate_type = 0;
+#	my $migrate_type = 0;
 	# reset countries
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
@@ -302,7 +302,7 @@ sub reset {
 	}
 
 	&write_cs;
-	return $migrate_type;
+#	return $migrate_type;
 }
 
 1; # íœ•s‰Â
