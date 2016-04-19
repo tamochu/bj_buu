@@ -48,6 +48,24 @@ sub opening_festival {
 	}
 }
 
+# 祭り情勢を解除して各種祭り情勢の終了フラグを返す
+sub ending_festival {
+	if ($w{world} eq $#world_states-1) { # 混乱
+		return &festival_type('konran', 0);
+	}
+	elsif ($w{world} eq $#world_states-2) { # 不倶戴天
+		$w{country} -= 2;
+		return &festival_type('kouhaku', 0);
+	}
+	elsif ($w{world} eq $#world_states-3) { # 三国志
+		$w{country} -= 3;
+		return &festival_type('sangokusi', 0);
+	}
+	elsif ($w{world} eq $#world_states-5) { # 拙速
+		return &festival_type('sessoku', 0);
+	}
+}
+
 # 指定された祭り情勢用の国を追加しその情勢の開始フラグを返す
 # 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
 sub add_festival_country {

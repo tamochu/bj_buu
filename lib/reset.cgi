@@ -19,13 +19,13 @@ sub time_limit {
 	# Õ‚èî¨‚ÉŠúŒÀØ‚ê
 	if (&is_festival_world) {
 		if ($w{world} eq $#world_states-1) { # ¬—
-			$migrate_type = &festival_type('konran', 0);
+#			$migrate_type = &festival_type('konran', 0);
 			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
 			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
 		elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
-			$migrate_type = &festival_type('kouhaku', 0);
-			$w{country} -= 2;
+#			$migrate_type = &festival_type('kouhaku', 0);
+#			$w{country} -= 2;
 			&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
 			&write_legend('touitu', "$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		}
@@ -63,10 +63,10 @@ sub time_limit {
 		if ($w{year} =~ /5$/ || $w{year} =~ /9$/) {
 			my $year = $w{year} + 1;
 			if ($w{year} =~ /05$/ || $w{year} =~ /25$/ || $w{year} =~ /45$/ || $w{year} =~ /65$/ || $w{year} =~ /85$/) { # ‰p—Y
-				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-4] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 			elsif ($w{year} =~ /5$/) { # ˆÃ•
-				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 			}
 			elsif ($year % 40 == 0) { # •s‹ä‘Õ“V
 				&write_world_news("<i>¢ŠE‚Í $world_states[$#world_states-2] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
@@ -176,20 +176,32 @@ sub time_limit {
 sub reset {
 	require './lib/casino_toto.cgi';
 	&pay_back($w{year});
-	
-#	my $migrate_type = 0;
+
 	# reset countries
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
 	}
 
-	# ¢ŠEî¨ ˆÃ•‰ğœ
-	if ($w{year} =~ /6$/) {
-		$w{world} = int(rand($#world_states-5));
-		unless ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
-			require './lib/vs_npc.cgi';
-			&delete_npc_country;
+	# I—¹ˆ—
+	if (&is_special_world) { # “Áêî¨I—¹
+		if ($w{year} =~ /6$/) { # ˆÃ•E‰p—YI—¹
+			unless ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ˆÃ•I—¹
+				require './lib/vs_npc.cgi';
+				&delete_npc_country;
+			}
+			# ‰p—YI—¹ˆ—‚Í“Á‚É‚È‚µ
 		}
+		else { # Õ‚èî¨I—¹
+			require './lib/_festival_world.cgi';
+			my $migrate_type = &ending_festival;
+			&player_migrate($migrate_type);
+		}
+		$w{world} = int(rand($#world_states-5));
+	}
+
+	# ¢ŠEî¨ ˆÃ•‰ğœ
+#	if ($w{year} =~ /6$/) {
+#		$w{world} = int(rand($#world_states-5));
 #		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) {
 #			$w{world} = int(rand($#world_states-5));
 #		} else {
@@ -199,8 +211,8 @@ sub reset {
 #		}
 		# “ˆê¨reset‚Åƒ‰ƒ“ƒ_ƒ€î¨¨ƒ†[ƒU[‚ªî¨Œˆ’è
 		# ƒ†[ƒU[‚ªî¨‚ğ‘I‚Î‚È‚¢ŒÀ‚èˆÃ•‚ª‘±‚­‚Ì‚Åd•û‚È‚¢‚©H
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
-	}
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#	}
 #	# ¢ŠEî¨ ¬—‰ğœ
 #	if ($w{year} =~ /0$/) {
 #		if($w{year} % 40 == 0){#•s‹ä‘Õ“V
@@ -298,20 +310,68 @@ sub reset {
 	if ($w{year} % $reset_daihyo_cycle_year == 0) {
 		&write_world_news("<b>Še‘‚Ì‘ã•\\Ò‚Ì”CŠú‚ª–—¹‚Æ‚È‚è‚Ü‚µ‚½</b>");
 	}
-	
-	# ¢ŠEî¨ ˆÃ•“Ë“ü
-	if ($w{year} =~ /6$/) {
-		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—Y
-			$w{world} = $#world_states-4;
-			$w{game_lv} += 20;
-			for my $i (1 .. $w{country}) {
-				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+
+	# “Áêî¨ŠJnˆ—
+	if (&is_special_world) { # “Áêî¨ŠJn
+		if ($w{year} =~ /6$/) { # ˆÃ•E‰p—YŠJn
+			if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—YŠJn
+				$w{world} = $#world_states-4;
+				$w{game_lv} += 20;
+				for my $i (1 .. $w{country}) {
+					$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+				}
 			}
-		} else {
-			require './lib/vs_npc.cgi';
-			&add_npc_country;
+			else { # ˆÃ•ŠJn
+				require './lib/vs_npc.cgi';
+				&add_npc_country;
+			}
 		}
+		else { # Õ‚èî¨ŠJn
+			require './lib/_festival_world.cgi';
+			my $migrate_type = &opening_festival;
+#			if ($w{year} % 40 == 0){ # •s‹ä‘Õ“V
+#				$migrate_type = &festival_type('kouhaku', 1);
+#				$w{world} = $#world_states-2;
+#			} elsif ($w{year} % 40 == 20) { # O‘u
+#				$migrate_type = &festival_type('sangokusi', 1);
+#				$w{world} = $#world_states-3;
+#			} elsif ($w{year} % 40 == 10) { # Ù‘¬
+#				$migrate_type = &festival_type('sessoku', 1);
+#				$w{world} = $#world_states-5;
+#			} else { # ¬—
+#				$migrate_type = &festival_type('konran', 1);
+#				$w{world} = $#world_states-1;
+#			}
+			&wt_c_reset;
+#			if ($w{world} eq $#world_states-1) { # ¬—
+#			}
+#			elsif ($w{world} eq $#world_states-2) { # •s‹ä‘Õ“V
+#				$migrate_type = &festival_type('kouhaku', 0);
+#				$w{country} -= 2;
+#			}
+#			elsif ($w{world} eq $#world_states-3) { # O‘u
+#				$w{country} -= 3;
+#			}
+#			elsif ($w{world} eq $#world_states-5) { # Ù‘¬
+#			}
+			&player_migrate($migrate_type);
+		}
+#		$w{world} = int(rand($#world_states-5));
 	}
+
+	# ¢ŠEî¨ ˆÃ•“Ë“ü
+#	if ($w{year} =~ /6$/) {
+#		if ($w{year} =~ /06$/ || $w{year} =~ /26$/ || $w{year} =~ /46$/ || $w{year} =~ /66$/ || $w{year} =~ /86$/) { # ‰p—Y
+#			$w{world} = $#world_states-4;
+#			$w{game_lv} += 20;
+#			for my $i (1 .. $w{country}) {
+#				$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
+#			}
+#		} else {
+#			require './lib/vs_npc.cgi';
+#			&add_npc_country;
+#		}
+#	}
 #	# ¢ŠEî¨ ¬—“Ë“ü
 #	if ($w{year} =~ /0$/) {
 #		require './lib/_festival_world.cgi';
