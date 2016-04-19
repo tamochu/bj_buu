@@ -43,7 +43,7 @@ sub unique_worlds {
 # ’Êíî¨‚Ìİ’è‚ğ‚·‚é
 sub opening_common {
 	if ($w{world} eq '0') { # •½˜a
-		$w{reset_time} += 3600 * 12;
+		$w{reset_time} += $config_test ? 0 : 3600 * 12;
 	}
 	elsif ($w{world} eq '6') { # Œ‹‘©
 		my @win_cs = ();
