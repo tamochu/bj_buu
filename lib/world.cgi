@@ -85,7 +85,7 @@ sub tp_110 {
 		else {
 			if ($w{world} eq '0') { # •½˜a
 #				Unrecognized character \x90; marked by <-- HERE after
-#				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
+				&write_world_news('<i>¢ŠE‚Í '.$world_states[$w{world}].' ‚É‚È‚è‚Ü‚µ‚½</i>');
 			}
 			elsif ($w{world} eq '18') { # E”°
 				&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
