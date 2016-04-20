@@ -637,26 +637,44 @@ sub start_game{
 	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
 	$state = $leader;
 	$koikoi = 0;
-	my @decks = &shuffled_deck;
-	$field_card = shift @decks;
-	for(2..8){
-		my $card = shift @decks;
-		$field_card .= ",$card";
-	}
-	my $e_card = shift @decks;
-	for(2..8){
-		my $card = shift @decks;
-		$e_card .= ",$card";
-	}
-	$m{c_stock} = shift @decks;
-	for(2..8){
-		my $card = shift @decks;
-		$m{c_stock} .= ",$card";
-		&write_user;
-	}
-	$deck = shift @decks;
-	for my $card (@decks){
-		$deck .= ",$card";
+	while (1) {
+		my @decks = &shuffled_deck;
+		my @fmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
+		$field_card = shift @decks;
+		$mmonth[int($field_card / 10) - 1]++;
+		for(2..8){
+			my $card = shift @decks;
+			$mmonth[int($card / 10) - 1]++;
+			$field_card .= ",$card";
+		}
+		my $bayon = 0;
+		for my $mm (@mmonth) {
+			if ($mm == 4) {
+				$bayon++;
+			}
+		}
+
+		my $e_card = shift @decks;
+		for(2..8){
+			my $card = shift @decks;
+			$e_card .= ",$card";
+		}
+		$m{c_stock} = shift @decks;
+		for(2..8){
+			my $card = shift @decks;
+			$m{c_stock} .= ",$card";
+			&write_user;
+		}
+		$deck = shift @decks;
+		for my $card (@decks){
+			$deck .= ",$card";
+		}
+		if ($bayon) {
+			$koikoi++;
+			&system_comment("èÍélé™Ç´íºÇµ");
+		} else {
+			last;
+		}
 	}
 	
 	push @members, "$leader<>$rate<>$state<>$field_card<>$deck<>$koikoi<>\n";
