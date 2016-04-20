@@ -40,77 +40,111 @@ sub unique_worlds {
 	return @next_worlds;
 }
 
+# 通常情勢の設定をする
+sub opening_common {
+	if ($w{world} eq '0') { # 平和
+		$w{reset_time} += $config_test ? 0 : 3600 * 12;
+		&write_world_news("<i>世界は $world_states[$w{world}] になりました</i>");
+	}
+	elsif ($w{world} eq '6') { # 結束
+		my @win_cs = ();
+		for my $i (1 .. $w{country}) {
+			push @win_cs, [$i, $cs{win_c}[$i]];
+		}
+		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
+
+		# 奇数の場合は一番国は除く
+		shift @win_cs if @win_cs % 2 == 1;
+		
+		my $half_c = int(@win_cs*0.5-1);
+		for my $i (0 .. $half_c) {
+			my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
+			$w{'p_'.$c_c} = 1;
+		}
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+	}
+	elsif ($w{world} eq '18') { # 殺伐
+		$w{reset_time} = $time;
+		for my $i (1 .. $w{country}) {
+			$cs{food}[$i]     = int(rand(300)) * 1000;
+			$cs{money}[$i]    = int(rand(300)) * 1000;
+			$cs{soldier}[$i]  = int(rand(300)) * 1000;
+		}
+		&write_world_news("<i>世界は $world_states[$w{world}] としたふいんき(←なぜか変換できない)になりました</i>");
+	}
+	else {
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+	}
+	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
+}
+
 #================================================
 # 特殊情勢 暗黒を含む祭り情勢の意
 #================================================
 
-# 渡された情勢ナンバーを渡すと特殊情勢か判断して返す
+# 年数を渡すと特殊情勢か判断して返す
 sub is_special_world {
-	my $world_no = shift;
-	if ($#world_states-5 <= $world_no) {
-		return 1;
-	}
-	return 0;
+	return ($w{year} =~ /6$/ || $w{year} =~ /0$/);
 }
 
-# 渡された情勢ナンバーを渡すと祭り情勢か判断して返す
+# 年数を渡すと祭り情勢か判断して返す
+# 祭り情勢ならばモジュールもロード
 sub is_festival_world {
-	my $world_no = shift;
-	if ($#world_states-5 <= $world_no && $world_no < $#world_states) {
-		require './lib/_festival_world.cgi'; # 祭り情勢用モジュールをロード
+	if ($w{year} =~ /0$/) {
+		require './lib/_festival_world.cgi';
 		return 1;
 	}
 	return 0;
 }
 
-sub add_npc_data {
-	my $country = shift;
-	
-	my %npc_statuss = (
-		max_hp => [999, 600, 400, 300, 99],
-		max_mp => [999, 500, 200, 100, 99],
-		at     => [999, 400, 300, 200, 99],
-		df     => [999, 300, 200, 100, 99],
-		mat    => [999, 400, 300, 200, 99],
-		mdf    => [999, 300, 200, 100, 99],
-		ag     => [999, 500, 300, 200, 99],
-		cha    => [999, 400, 300, 200, 99],
-		lea    => [666, 400, 250, 150, 99],
-		rank   => [$#ranks, $#ranks-2, 10, 7, 4],
-	);
-	my @npc_weas = (
-	#	[0]属性[1]武器No	[2]必殺技
-		['無', [0],			[61..65],],
-		['剣', [1 .. 5],	[1 .. 5],],
-		['槍', [6 ..10],	[11..15],],
-		['斧', [11..15],	[21..25],],
-		['炎', [16..20],	[31..35],],
-		['風', [21..25],	[41..45],],
-		['雷', [26..30],	[51..55],],
-	);
-	my $line = qq|\@npcs = (\n|;
-	my @npc_names = (qw/vipqiv(NPC) kirito(NPC) 亀の家庭医学(NPC) pigure(NPC) ウェル(NPC) vipqiv(NPC) DT(NPC) ハル(NPC) アシュレイ(NPC) ゴミクズ(NPC)/);
-
-	for my $i (0..4) {
-		$line .= qq|\t{\n\t\tname\t\t=> '$npc_names[$i]',\n|;
-		
-		for my $k (qw/max_hp max_mp at df mat mdf ag cha lea rank/) {
-			$line .= qq|\t\t$k\t\t=> $npc_statuss{$k}[$i],\n|;
-		}
-		
-		my $kind = int(rand(@npc_weas));
-		my @weas = @{ $npc_weas[$kind][1] };
-		my $wea  = $npc_weas[$kind][1]->[int(rand(@weas))];
-		$line .= qq|\t\twea\t\t=> $wea,\n|;
-
-		my $skills = join ',', @{ $npc_weas[$kind][2] };
-		$line .= qq|\t\tskills\t\t=> '$skills',\n\t},\n|;
-	}
-	$line .= qq|);\n\n1;\n|;
-	
-	open my $fh, "> $datadir/npc_war_$country.cgi";
-	print $fh $line;
-	close $fh;
-}
+#sub add_npc_data {
+#	my $country = shift;
+#	
+#	my %npc_statuss = (
+#		max_hp => [999, 600, 400, 300, 99],
+#		max_mp => [999, 500, 200, 100, 99],
+#		at     => [999, 400, 300, 200, 99],
+#		df     => [999, 300, 200, 100, 99],
+#		mat    => [999, 400, 300, 200, 99],
+#		mdf    => [999, 300, 200, 100, 99],
+#		ag     => [999, 500, 300, 200, 99],
+#		cha    => [999, 400, 300, 200, 99],
+#		lea    => [666, 400, 250, 150, 99],
+#		rank   => [$#ranks, $#ranks-2, 10, 7, 4],
+#	);
+#	my @npc_weas = (
+#	#	[0]属性[1]武器No	[2]必殺技
+#		['無', [0],			[61..65],],
+#		['剣', [1 .. 5],	[1 .. 5],],
+#		['槍', [6 ..10],	[11..15],],
+#		['斧', [11..15],	[21..25],],
+#		['炎', [16..20],	[31..35],],
+#		['風', [21..25],	[41..45],],
+#		['雷', [26..30],	[51..55],],
+#	);
+#	my $line = qq|\@npcs = (\n|;
+#	my @npc_names = (qw/vipqiv(NPC) kirito(NPC) 亀の家庭医学(NPC) pigure(NPC) ウェル(NPC) vipqiv(NPC) DT(NPC) ハル(NPC) アシュレイ(NPC) ゴミクズ(NPC)/);
+#
+#	for my $i (0..4) {
+#		$line .= qq|\t{\n\t\tname\t\t=> '$npc_names[$i]',\n|;
+#		
+#		for my $k (qw/max_hp max_mp at df mat mdf ag cha lea rank/) {
+#			$line .= qq|\t\t$k\t\t=> $npc_statuss{$k}[$i],\n|;
+#		}
+#		
+#		my $kind = int(rand(@npc_weas));
+#		my @weas = @{ $npc_weas[$kind][1] };
+#		my $wea  = $npc_weas[$kind][1]->[int(rand(@weas))];
+#		$line .= qq|\t\twea\t\t=> $wea,\n|;
+#
+#		my $skills = join ',', @{ $npc_weas[$kind][2] };
+#		$line .= qq|\t\tskills\t\t=> '$skills',\n\t},\n|;
+#	}
+#	$line .= qq|);\n\n1;\n|;
+#	
+#	open my $fh, "> $datadir/npc_war_$country.cgi";
+#	print $fh $line;
+#	close $fh;
+#}
 
 1;

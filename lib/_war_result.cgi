@@ -501,7 +501,7 @@ sub _touitu {
 		$w{win_countries} = $m{country};
 	}
 	++$cs{win_c}[$m{country}];
-	
+
 	my $mname = &name_link($m{name});
 	if ($w{world} eq $#world_states) {
 		if ($m{country} eq $w{country} || $union eq $w{country}) { # NPC‘‘¤‚ÌŸ—˜
@@ -537,9 +537,7 @@ sub _touitu {
 	}
 
 	require "./lib/reset.cgi";
-	my $migrate_type =  &reset;
-	require "./lib/_world_reset.cgi";
-	&player_migrate($migrate_type) if &is_festival_world($w{world});
+	&reset;
 
 	$m{lib} = 'world';
 	$m{tp}  = 100;
