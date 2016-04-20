@@ -19,7 +19,12 @@ sub begin {
 	$mes .= qq|$m{name}のﾌﾟﾛﾌｨｰﾙ：全角80文字(半角160)まで<br>|;
 	$mes .= qq|<form method="$method" action="$script"><input type="hidden" name="mode" value="write">|;
 	for my $profile (@profiles) {
-		$mes .= qq|<hr>$profile->[1]<br><input type="text" name="$profile->[0]" value="$datas{$profile->[0]}" class="text_box_b"><br>|; 
+		if ($profile->[1] eq "誕生日") {
+			$mes .= qq|<hr>$profile->[1] 入力例：2000/01/01 生年月日を入力した場合には二度と変更できません<br><input type="text" name="$profile->[0]" value="$datas{$profile->[0]}" class="text_box_b"><br>|; 
+		}
+		else {
+			$mes .= qq|<hr>$profile->[1]<br><input type="text" name="$profile->[0]" value="$datas{$profile->[0]}" class="text_box_b"><br>|; 
+		}
 	}
 	if($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24'){
 		my $boch_pet = $m{sex} eq '1' ? '脳内嫁' : 'ﾏｽｺｯﾄｷｬﾗ';
@@ -53,8 +58,8 @@ sub tp_1 {
 				if ($profile->[0] ne 'birthday') {
 					$datas{$profile->[0]} = $in{$profile->[0]};
 					$is_rewrite = 1;
-				} elsif ($datas{$profile->[0]} eq '' || &valid_date($datas{$profile->[0]})) {
-					&error("$profile->[1] が不正です(2000/01/01)の形式で入力してください。") if &valid_date($in{$profile->[0]});
+				} elsif (!$datas{$profile->[0]} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
+#					&error("$profile->[1] が不正です(2000/01/01)の形式で入力してください。") if &valid_date($in{$profile->[0]});
 					$datas{$profile->[0]} = $in{$profile->[0]};
 					$is_rewrite = 1;
 				}
