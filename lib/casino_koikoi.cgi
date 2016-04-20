@@ -794,7 +794,6 @@ sub is_teyaku {
 				if ($mm == 2) {
 					$dcount++;
 				}
-				print qq|$mm,|;
 			}
 			if ($dcount == 4) {
 				$ret = 2;
@@ -943,12 +942,12 @@ sub shuffled_deck{
 			push @deck, $i*10+$j;
 		}
 	}
-#	for my $i (0..47){
-#		my $j = int(rand(48-$i)) + $i;
-#		my $temp = $deck[$i];
-#		$deck[$i] = $deck[$j];
-#		$deck[$j] = $temp;
-#	}
+	for my $i (0..47){
+		my $j = int(rand(48-$i)) + $i;
+		my $temp = $deck[$i];
+		$deck[$i] = $deck[$j];
+		$deck[$j] = $temp;
+	}
 	return @deck;
 }
 1;#íœ•s‰Â

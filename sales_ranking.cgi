@@ -111,7 +111,7 @@ sub update_sales_ranking  {
 			unlink "$userdir/$id/shop_sale${type}.cgi";
 			&write_send_news("<b>$name‚ÌŒo‰c‚·‚é$shop_name‚Í‘—a‹àŠz‚ª100–œ–¢–‚Ì‚½‚ß“|Y‚µ‚Ü‚µ‚½</b>", 1, $name);
 			open my $fh, ">> $userdir/$id/ex_c.cgi";
-			print $fh "ceo_c<>1<>\n";
+			print $fh "ban_c<>1<>\n";
 			close $fh;
 		}
 		# ”„ã‹à‚ª 0G ‚È‚çíœ
@@ -127,7 +127,7 @@ sub update_sales_ranking  {
 				&write_send_news("<b>$name‚ÌŒo‰c‚·‚é$shop_name‚ÍŒo‰c”j’]‚Ì‚½‚ß•Â“X‚µ‚Ü‚µ‚½</b>", 1, $name);
 			}
 			open my $fh, ">> $userdir/$id/ex_c.cgi";
-			print $fh "ceo_c<>1<>\n";
+			print $fh "ban_c<>1<>\n";
 			close $fh;
 		}
 		# ¤l‚Ì‚¨“X‚ÍÅ’áŒÀ•K—v‚È”„ã”‚àƒ`ƒFƒbƒN
@@ -137,7 +137,7 @@ sub update_sales_ranking  {
 			unlink "$userdir/$id/shop_sale${type}.cgi";
 			&write_send_news("<b>$name‚ÌŒo‰c‚·‚é$shop_name‚ÍŒo‰c”j’]‚Ì‚½‚ß•Â“X‚µ‚Ü‚µ‚½</b>", 1, $name);
 			open my $fh, ">> $userdir/$id/ex_c.cgi";
-			print $fh "ceo_c<>1<>\n";
+			print $fh "ban_c<>1<>\n";
 			close $fh;
 		}
 		else {
@@ -150,14 +150,47 @@ sub update_sales_ranking  {
 		}
 	}
 	@lines = map{ $_->[0] } sort { $b->[4] <=> $a->[4] } map { [$_, split /<>/] } @lines;
+	my @new_lines = ();
+	if (@lines) {
+		my $line = pop @lines;
+		my $min_sale_c = 0;
+		while (@lines) {
+			my($shop_name, $name, $message, $sale_c, $sale_money, $display, $guild_number) = split /<>/, $line;
+			if (!$min_sale_c) {
+				$min_sale_c = $sale_c;
+			}
+			if ($sale_c == $min_sale_c) {
+				my $id = unpack 'H*', $name;
+				unlink "$userdir/$id/shop${type}.cgi";
+				unlink "$userdir/$id/shop_sale${type}.cgi";
+				&write_send_news("<b>$name‚ÌŒo‰c‚·‚é$shop_name‚ÍŒo‰c”j’]‚Ì‚½‚ß•Â“X‚µ‚Ü‚µ‚½</b>", 1, $name);
+				open my $fh, ">> $userdir/$id/ex_c.cgi";
+				print $fh "ban_c<>1<>\n";
+				close $fh;
+			} else {
+				unshift @new_lines, $line;
+			}
+			$line = pop @lines;
+		}
+		unshift @new_lines, $line;
+	}
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
-	print $fh @lines;
+	print $fh @new_lines;
 	close $fh;
 	
 	# XVüŠúÌ×¸ŞÌ§²Ù‚ğXV
 	open my $fh9, "> $flag_file";
 	close $fh9;
+	
+	if (${type} eq '') {
+		my @plist = get_player_name_list;
+		for my $name (@plist) {
+			if (&you_exist($name)) {
+				&regist_you_data($name, 'exchange_count', '');
+			}
+		}
+	}
 }
 
 sub is_the_end {

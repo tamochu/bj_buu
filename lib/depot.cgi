@@ -760,6 +760,7 @@ sub get_lock_item {
 # ‹¤’Êˆ—
 #=================================================
 sub depot_common {
+	my $count = 0;
 	open my $fh, "+< $this_file" or &error("$this_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
