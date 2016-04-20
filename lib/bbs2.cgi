@@ -111,7 +111,7 @@ sub run {
 
 sub write_res{
 	&error('–{•¶‚É‰½‚à‘‚©‚ê‚Ä‚¢‚Ü‚¹‚ñ') if $in{comment} eq '';
-	&error("–{•¶‚ª’·‚·‚¬‚Ü‚·(”¼Šp$max_comment•¶Žš‚Ü‚Å)") if length $in{comment} > $rmax_comment;
+	&error("–{•¶‚ª’·‚·‚¬‚Ü‚·(”¼Šp$rmax_comment•¶Žš‚Ü‚Å)") if length $in{comment} > $rmax_comment;
 
 	my @lines = ();
 	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgi Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
