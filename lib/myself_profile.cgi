@@ -53,7 +53,7 @@ sub tp_1 {
 				if ($profile->[0] ne 'birthday') {
 					$datas{$profile->[0]} = $in{$profile->[0]};
 					$is_rewrite = 1;
-				} elsif ($datas{$profile->[0]} eq '') {
+				} elsif ($datas{$profile->[0]} eq '' || &valid_date($datas{$profile->[0]})) {
 					&error("$profile->[1] ‚ª•s³‚Å‚·(2000/01/01)‚ÌŒ`Ž®‚Å“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B") if &valid_date($in{$profile->[0]});
 					$datas{$profile->[0]} = $in{$profile->[0]};
 					$is_rewrite = 1;
