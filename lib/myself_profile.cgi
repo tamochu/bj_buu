@@ -20,7 +20,7 @@ sub begin {
 	$mes .= qq|<form method="$method" action="$script"><input type="hidden" name="mode" value="write">|;
 	for my $profile (@profiles) {
 		if ($profile->[1] eq "誕生日") {
-			$mes .= qq|<hr>$profile->[1] 入力例：2000/01/01 生年月日を入力した場合には二度と変更できません<br><input type="text" name="$profile->[0]" value="$datas{$profile->[0]}" class="text_box_b"><br>|; 
+			$mes .= qq|<hr>$profile->[1] 入力例：2000/01/01<br><input type="text" name="$profile->[0]" value="$datas{$profile->[0]}" class="text_box_b"><br>|; 
 		}
 		else {
 			$mes .= qq|<hr>$profile->[1]<br><input type="text" name="$profile->[0]" value="$datas{$profile->[0]}" class="text_box_b"><br>|; 
