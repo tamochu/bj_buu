@@ -65,7 +65,7 @@ sub reset {
 
 	# reset countries
 	for my $i (1 .. $w{country}) {
-		$cs{strong}[$i] = 8000 if $cs{is_die}[$i] != 2;
+		$cs{strong}[$i] = 8000;
 	}
 
 	# I—¹ˆ—
@@ -112,12 +112,17 @@ sub reset {
 		$cs{money}[$i]    = int(rand(30) + 5) * 1000;
 		$cs{soldier}[$i]  = int(rand(30) + 5) * 1000;
 		$cs{capacity}[$i] = $ave_c;
-		$cs{is_die}[$i]   = 0;
+		if ($cs{is_die}[$i] == 2) {
+			$cs{strong}[$i] = 0;
+		}
+		else {
+			$cs{is_die}[$i]   = 0;
+		}
 		$cs{modify_war}[$i]   = 0;
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
 		$cs{modify_pro}[$i]   = 0;
-		
+
 		for my $j ($i+1 .. $w{country}) {
 			$w{ "f_${i}_${j}" } = int(rand(40));
 			$w{ "p_${i}_${j}" } = 0;
