@@ -543,10 +543,10 @@ sub player_migrate {
 		closedir $dh;
 	}
 	elsif ($type == &festival_type('sessoku', 1)) { # Ù‘¬ŠJn
-		&write_user;
+		&write_cs;
 	}
 	elsif ($type == &festival_type('sessoku', 0)) { # Ù‘¬I—¹
-		&write_user;
+		&write_cs;
 	}
 	elsif ($type == &festival_type('dokuritu', 1)) { # “Æ—§İ’è
 		for my $i (0 .. $w{country}) {
