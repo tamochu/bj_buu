@@ -76,7 +76,7 @@ sub ending_festival {
 # Õ‚èî¨‚ªŠúŒÀØ‚ê‚ğŒ}‚¦‚½‚Ìˆ—
 sub time_limit_festival {
 	if ($w{world} eq $#world_states-5) { # Ù‘¬
-#		my @strong_rank = &get_strong_ranking;
+		my @strong_rank = &get_strong_ranking;
 #		my $strongest_country = 0;
 #		my $max_value = 0;
 #		for my $i (1 .. $w{country}) {
