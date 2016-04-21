@@ -18,6 +18,7 @@ sub time_limit {
 	$w{win_countries} = '';
 	if (&is_festival_world) { # Õ‚èî¨‚ÉŠúŒÀØ‚ê
 		&time_limit_festival;
+		&write_cs;
 	}
 	else { # ˆÃ•E’Êíî¨‚ÅŠúŒÀØ‚ê
 		&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
