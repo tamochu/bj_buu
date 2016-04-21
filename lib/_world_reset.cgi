@@ -117,7 +117,7 @@ sub get_strong_ranking {
 	my @result = ();
 	for my $i (0 .. $#data) {
 		my $j = int(rand($data[$i][0])+$data[$i][1]);
-		push (@result, @{splice(@strong_rank, $j, 1)}[0] );
+		push (@result, @{splice(@strong_rank, $j, 1)}[0] + 1 );
 		for my $k ($i+1 .. $#data) {
 			if ($j > $data[$k][1]) {
 				$data[$k][0]--;
