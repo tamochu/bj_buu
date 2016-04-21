@@ -82,6 +82,8 @@ sub time_limit_festival {
 		&write_legend('touitu', "$world_name‘å—¤‚ğ‘S“y‚É‚í‚½‚é‘—Í‹£‘ˆ‚Í$cs{name}[$strong_rank[0]]‚ÌŸ—˜‚É‚È‚è‚Ü‚µ‚½");
 
 		$w{win_countries} = "$strong_rank[0],$strong_rank[1]";
+		$cs{strong}[$strong_rank[2]] = 0;
+		$cs{is_die}[$strong_rank[2]] = 2;
 	}
 	else {
 		&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
@@ -172,7 +174,7 @@ sub add_festival_country {
 
 		$cs{old_ceo}[$i] = $cs{ceo}[$i];
 		$cs{ceo}[$i] = '';
-		
+
 		open my $fh, "> $logdir/$i/leader.cgi";
 		close $fh;
 	}

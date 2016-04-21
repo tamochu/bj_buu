@@ -64,7 +64,7 @@ sub reset {
 
 	# reset countries
 	for my $i (1 .. $w{country}) {
-		$cs{strong}[$i] = 8000;
+		$cs{strong}[$i] = 8000 if $cs{is_die}[$i] != 2;
 	}
 
 	# I—¹ˆ—
