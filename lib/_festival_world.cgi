@@ -76,15 +76,15 @@ sub ending_festival {
 # Õ‚èî¨‚ªŠúŒÀØ‚ê‚ğŒ}‚¦‚½‚Ìˆ—
 sub time_limit_festival {
 	if ($w{world} eq $#world_states-5) { # Ù‘¬
-		my @strong_rank = $get_strong_ranking;
-		my $strongest_country = 0;
-		my $max_value = 0;
-		for my $i (1 .. $w{country}) {
-			if ($cs{strong}[$i] > $max_value) {
-				$strongest_country = $i;
-				$max_value = $cs{strong}[$i];
-			}
-		}
+		my @strong_rank = &get_strong_ranking;
+#		my $strongest_country = 0;
+#		my $max_value = 0;
+#		for my $i (1 .. $w{country}) {
+#			if ($cs{strong}[$i] > $max_value) {
+#				$strongest_country = $i;
+#				$max_value = $cs{strong}[$i];
+#			}
+#		}
 
 		&write_world_news("<b>$world_name‘å—¤‚ğ‘S“y‚É‚í‚½‚é‘—Í‹£‘ˆ‚Í$cs{name}[$strong_rank[0]]‚ÌŸ—˜‚É‚È‚è‚Ü‚µ‚½</b>");
 		&write_legend('touitu', "$world_name‘å—¤‚ğ‘S“y‚É‚í‚½‚é‘—Í‹£‘ˆ‚Í$cs{name}[$strong_rank[0]]‚ÌŸ—˜‚É‚È‚è‚Ü‚µ‚½");
@@ -387,7 +387,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('sangokusi', 0)){ # O‘u‰ğœ
+	elsif ($type == &festival_type('sangokusi', 0)) { # O‘u‰ğœ
 		require "./lib/move_player.cgi";
 		require "./lib/shopping_offertory_box.cgi";
 		opendir my $dh, "$userdir" or &error("Õ°»Ş°ÃŞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
