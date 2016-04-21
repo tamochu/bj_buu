@@ -76,7 +76,7 @@ sub ending_festival {
 # 祭り情勢が期限切れを迎えた時の処理
 sub time_limit_festival {
 	if ($w{world} eq $#world_states-5) { # 拙速
-		my @strong_rank = &get_strong_ranking;
+#		my @strong_rank = &get_strong_ranking;
 #		my $strongest_country = 0;
 #		my $max_value = 0;
 #		for my $i (1 .. $w{country}) {
@@ -477,7 +477,7 @@ sub player_migrate {
 		}
 		close $fh;
 	}
-	elsif ($type == &festival_type('konran', 1)) { # 混乱設定
+	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) { # 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -521,7 +521,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('konran', 0)) { #混乱解除
+	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) { #混乱解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -548,10 +548,10 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('sessoku', 1)) { # 拙速開始
-	}
-	elsif ($type == &festival_type('sessoku', 0)) { # 拙速終了
-	}
+#	elsif ($type == &festival_type('sessoku', 1)) { # 拙速開始
+#	}
+#	elsif ($type == &festival_type('sessoku', 0)) { # 拙速終了
+#	}
 	elsif ($type == &festival_type('dokuritu', 1)) { # 独立設定
 		for my $i (0 .. $w{country}) {
 			my $from = "$logdir/$i";
