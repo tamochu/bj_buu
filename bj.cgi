@@ -8,7 +8,7 @@ require 'config_game.cgi';
 &get_data;
 	if ($config_test) {
 		my %tmp_cs;
-	for my $i (1 .. $#w{country}) {
+	for my $i (1 .. $w{country}) {
 		$tmp_cs{$i-1} = $cs{strong}[$i];
 	}
 
