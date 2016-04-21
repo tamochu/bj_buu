@@ -37,13 +37,13 @@ sub tp_110 {
 		elsif ($w{year} =~ /6$/) { # 暗黒
 			&write_world_news("<i>$m{name}の願いはかき消されました</i>");
 		}
-		elsif ($year % 40 == 0) { # 不倶戴天
+		elsif ($w{year} % 40 == 0) { # 不倶戴天
 			&write_world_news("<i>$m{name}の願いは空しく世界は二つに分かれました</i>");
 		}
-		elsif ($year % 40 == 20) { # 三国志
+		elsif ($w{year} % 40 == 20) { # 三国志
 			&write_world_news("<i>$m{name}の願いも空しく分裂した世界を統一すべく三国が台頭しました</i>");
 		}
-		elsif ($year % 40 == 10) { # 拙速
+		elsif ($w{year} % 40 == 10) { # 拙速
 			&write_world_news("<i>$m{name}の願いも空しく世界が競い合うことに</i>");
 		}
 		else { # 混乱
