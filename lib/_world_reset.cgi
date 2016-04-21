@@ -78,6 +78,62 @@ sub opening_common {
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 }
 
+# 1位 (int(国数/2)+1)位 国数位 の国力順位を配列で返す
+sub get_strong_ranking {
+	# lstrcpy でガッとやるようにもっと簡単にコピペできそうだけど分からんちん
+	my %tmp_cs;
+	for my $i (1 .. $w{country}) {
+		$tmp_cs{$i-1} = $cs{strong}[$i];
+	}
+
+	# 国力に着目して降順ソート
+	my @strong_rank = ();
+	foreach(sort {$tmp_cs{$b} <=> $tmp_cs{$a}} keys %tmp_cs){
+		push(@strong_rank, [$_, $tmp_cs{$_}]);
+	}
+
+	my $_country = $w{country} - 1; # ﾈﾊﾞﾗﾝを除く国数
+	my $center = int($_country / 2);
+
+	# top center bottom のダブり数と先頭インデックスの取得
+	my @data = ([0,-1], [0,-1], [0,-1]);
+	for my $i (0 .. $_country) {
+		if ($strong_rank[$i][1] == $strong_rank[0][1]) {
+			$data[0][0]++;
+			$data[0][1] = $i if $data[0][1] < 0;
+		}
+		if ($strong_rank[$i][1] == $strong_rank[$center][1]) {
+			$data[1][0]++;
+			$data[1][1] = $i if $data[1][1] < 0;
+		}
+		if ($strong_rank[$i][1] == $strong_rank[$c][1]) {
+			$data[2][0]++;
+			$data[2][1] = $i if $data[2][1] < 0;
+		}
+	}
+
+	# 同一国力があるなら重複しないように rand 選択
+	# 重複しない値を引くまで while rand した方が速いか？
+	my @result = ();
+	for my $i (0 .. $#data) {
+		my $j = int(rand($data[$i][0])+$data[$i][1]);
+		push (@result, @{splice(@strong_rank, $j, 1)}[0] );
+		for my $k ($i+1 .. $#data) {
+			if ($j > $data[$k][1]) {
+				$data[$k][0]--;
+			}
+			elsif ($j < $data[$k][1]) {
+				$data[$k][1]--;
+			}
+			else {
+				$data[$k][0]--;
+				$data[$k][1]--;
+			}
+		}
+	}
+	return @result;
+}
+
 #================================================
 # 特殊情勢 暗黒を含む祭り情勢の意
 #================================================
