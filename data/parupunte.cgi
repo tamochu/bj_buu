@@ -228,7 +228,7 @@
 			close $fh;
 		}
 		for my $i (1..$w{country}){
-			$cs{is_die}[$i] = 0;
+			$cs{is_die}[$i] = 0 if $cs{is_die}[$i] < 2;
 			$cs{state}[$i] = 0;
 			$cs{tax}[$i] = 1;
 			for my $j ($i+1..$w{country}){

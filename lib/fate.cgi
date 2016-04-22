@@ -186,7 +186,7 @@ $cooldown_time = 6 * 3600;
 		$v = shift;
 		for my $i (1..$w{country}) {
 			if ($cs{is_die}[$i]) {
-				$cs{is_die}[$i] = 0;
+				$cs{is_die}[$i] = 0 if $cs{is_die}[$i] < 2;
 				--$w{game_lv};
 			}
 		};
@@ -207,7 +207,7 @@ $cooldown_time = 6 * 3600;
 		$v = shift;
 		$c = &get_most_strong_country;
 		$cs{strong}[$c] = 0;
-		$cs{is_die}[$c] = 1;
+		$cs{is_die}[$c] = 1 if $cs{is_die}[$i] < 2;
 		&write_cs;
 	},	0,	"$cs{name}[$c]‚É¹Œ•‚ð•ú‚Á‚½"],
 );

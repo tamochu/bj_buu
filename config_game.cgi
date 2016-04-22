@@ -603,7 +603,7 @@ require './lib/system_game.cgi';
  	[150,	'ﾀﾞｰｸﾀｰﾄﾙ',	'speed_down',sub{},'いいよな、馬は人気で･･････。'], # war_form.cgiに埋め込み処理
  
  # Ver1.66,Ver2.46以降追加
- 	[151,	'ｲｰｽﾀｰ',	'myself',	sub{ return unless $m{country}; return if ($w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3); for my $i (1..$w{country}) { $cs{is_die}[$i] = 0; }; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い全ての国が復興しました</b>");	}],
+ 	[151,	'ｲｰｽﾀｰ',	'myself',	sub{ return unless $m{country}; return if ($w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3); for my $i (1..$w{country}) { $cs{is_die}[$i] = 0 if $cs{is_die}[$i] < 2; }; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い全ての国が復興しました</b>");	}],
  	[152,	'ﾛｽﾀｲﾑ',	'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; $w{limit_time} += 3600 * 12; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い統一期限が少し延びました</b>");	},'ままままだ慌てるような時間じゃない'],
  
  # Ver1.80, Ver2.60以降追加

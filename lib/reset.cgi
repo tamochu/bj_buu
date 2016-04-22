@@ -64,8 +64,10 @@ sub reset {
 	&pay_back($w{year});
 
 	# reset countries
+	my $sleep_num = 0;
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
+		$sleep_num++ if $cs{is_die}[$i] > 1;
 	}
 
 	# I—¹ˆ—
@@ -86,10 +88,6 @@ sub reset {
 	}
 
 	# dŠ¯‚Å‚«‚él”
-	my $sleep_num = 0;
-	for my $i (1 .. $w{country}) {
-		$sleep_num++ if $cs{is_die}[$i] > 1;
-	}
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	$country -= $sleep_num if $sleep_num > 0;
 	my $ave_c = int($w{player} / $country);
