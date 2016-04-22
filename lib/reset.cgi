@@ -67,6 +67,9 @@ sub reset {
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
 	}
+	# 仕官できる人数
+	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
+	my $ave_c = int($w{player} / $country);
 
 	# 終了処理
 	if (&is_special_world) { # 特殊情勢終了
@@ -81,13 +84,13 @@ sub reset {
 			require './lib/_festival_world.cgi';
 			my $migrate_type = &ending_festival;
 			&player_migrate($migrate_type);
+			if ($migrate_type == &festival_type('sessoku', 0)) {
+				$country--;
+				$ave_c = int($w{player} / $country);
+			}
 		}
 		$w{world} = int(rand($#world_states-5));
 	}
-
-	# 仕官できる人数
-	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
-	my $ave_c = int($w{player} / $country);
 
 	# set world
 	$w{year}++;
@@ -112,7 +115,7 @@ sub reset {
 		$cs{money}[$i]    = int(rand(30) + 5) * 1000;
 		$cs{soldier}[$i]  = int(rand(30) + 5) * 1000;
 		$cs{capacity}[$i] = $ave_c;
-		$cs{is_die}[$i]   = 0;
+		$cs{is_die}[$i]   = 0 if $cs{is_die} < 2;
 		$cs{modify_war}[$i]   = 0;
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
