@@ -647,7 +647,7 @@ require './lib/system_game.cgi';
  	[189,	'ﾒｶﾞﾎﾝ',	'myself',	sub{}],# 処理が似ているのでtrick.cgiに埋め込み処理
  	[190,	'ｱﾘﾖｼ',	'myself',	sub{},'おしゃべりクソ野郎'],# trick.cgiに埋め込み処理
  	[191,	'ﾃﾝﾁﾄﾋﾄﾂ',	'myself',	sub{}],# 処理が似ているのでtrick.cgiに埋め込み処理
-	[192,	'ﾊﾟﾗﾃﾞｨﾝ',			'lv_up',	sub{ ++$m{$_} for (qw/max_hp max_mp/);		$mes .= qq|<br><font color="#CC00FF">$e2j{hp}+1 $e2j{mp}+1 </font>|; }],
+	[192,	'ﾊﾟﾗﾃﾞｨﾝ',			'lv_up',	sub{ ++$m{$_} for (qw/max_hp max_mp mdf/);		$mes .= qq|<br><font color="#CC00FF">$e2j{hp}+1 $e2j{mp}+1 $e2j{mdf}+1</font>|; }],
 	[193,	'ﾀﾞｰｸﾗﾋﾞｯﾄ',	'war_result',sub{ return if (rand(1000) < 600 + $m{pet_c} * $m{pet_c}); $mes.="$pets[$m{pet}][1]★$m{pet_c}の力が開放された!力を使い果たした$pets[$m{pet}][1]★$m{pet_c}は消えてしまった!<br>"; $m{pet}=0; $m{renzoku_c}=99 if $_[0] eq '0';}, 'あぁ^～心がぴょんぴょんするんじゃぁ^～', 1],
  	[194,	'ﾈｸﾛﾏﾝｻｰ',	'salary',	sub{ &_pet_summon(int(rand(16807)));},'夜、一人では遊ばないでください。'],
  	[195,	'ﾈｸﾛﾏｿｻｰ',	'salary',	sub{ &_pet_summon(99999);},'自分まだ見習いなので･･･さーせんｗｗｗ'],
