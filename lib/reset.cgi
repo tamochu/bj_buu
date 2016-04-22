@@ -88,7 +88,7 @@ sub reset {
 	# ŽdŠ¯‚Å‚«‚él”
 	my $sleep_num = 0;
 	for my $i (1 .. $w{country}) {
-		$sleep_num++ if $cs{is_die} > 1;
+		$sleep_num++ if $cs{is_die}[$i] > 1;
 	}
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	$country -= $sleep_num if $sleep_num > 0;
