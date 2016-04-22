@@ -82,8 +82,8 @@ sub tp_100 {
 	while (my $line = <$fh>) {
 		my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
 		next if $name eq $m{name};
-		$name .= "[$shogo]" if $shogo;
 		my $rank_name = &get_rank_name($rank, $name);
+		$name .= "[$shogo]" if $shogo;
 		$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank\name/$message<br>|
 			: qq|<tr><td><input type="radio" name="cmd" value="$no">$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 	}
@@ -238,8 +238,8 @@ sub tp_200 {
 	open my $fh, "< $entry_file" or &error("$entry_fileÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $line = <$fh>) {
 		my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
-		$name .= "[$shogo]" if $shogo;
 		my $rank_name = &get_rank_name($rank, $name);
+		$name .= "[$shogo]" if $shogo;
 		$mes .= $is_mobile ? qq|<hr>$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
 			 : qq|<tr><td>$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 	}
@@ -306,8 +306,8 @@ sub tp_300 {
 		open my $fh, "< $this_file" or &error("$this_file ‚ªŠJ‚¯‚Ü‚¹‚ñ");
 		while (my $line = <$fh>) {
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
-			$name .= "[$shogo]" if $shogo;
 			my $rank_name = &get_rank_name($rank, $name);
+			$name .= "[$shogo]" if $shogo;
 			$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
 				: qq|<tr><td><input type="radio" name="cmd" value="$no">$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 		}

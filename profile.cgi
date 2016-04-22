@@ -137,8 +137,8 @@ sub status_pc {
 		$skill_info .= qq|<tr><td align="center">$skills[$m_skill][2]</td><td>$skills[$m_skill][1]</td></tr>|;
 	}
 	
-	$m{name} .= "[$m{shogo}]" if $m{shogo};
 	my $rank_name = &get_rank_name($m{rank}, $m{name});
+	$m{name} .= "[$m{shogo}]" if $m{shogo};
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'Åö' for 1 .. $m{super_rank};
