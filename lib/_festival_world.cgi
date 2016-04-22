@@ -94,7 +94,7 @@ sub time_limit_festival {
 			next if $pid =~ /backup/;
 			my %p = &get_you_datas($pid, 1);
 
-			if ($p{country} == $target_country) {
+			if ($p{country} == $strong_rank[2]) {
 				my $to_country = 0;
 				do {
 					$to_country = int(rand($w{country}) + 1);
