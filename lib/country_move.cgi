@@ -159,7 +159,9 @@ sub tp_300 {
 			&refresh;
 			&wait;
 		}else {
-			$cmd = int(rand($w{country}) + 1);
+			do {
+				$cmd = int(rand($w{country}) + 1);
+			} while ($cs{is_die}[$cmd] > 1);
 			# à√çï
 			if ($w{world} eq $#world_states) {
 				if ($m{country} eq $w{country}) {
