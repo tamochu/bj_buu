@@ -106,6 +106,10 @@ sub exe1 {
 		$mes .= '©‘‚Í‘I‚×‚Ü‚¹‚ñ<br>';
 		&begin;
 	}
+	elsif ($cs{is_die}[$cmd] > 1) {
+		$mes .= 'l‚Ì‚¢‚È‚¢‘‚Æ‚ÍŒğÂ‚Å‚«‚Ü‚¹‚ñ<br>';
+		&begin;
+	}
 	else {
 		$m{tp} += 10;
 		$y{country} = $cmd;
@@ -211,7 +215,7 @@ sub tp_410 {
 		$mes .= "¢ŠEî¨‚ª$world_states[$w{world}]‚È‚Ì‚ÅA“¯–¿‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ<br>";
 		&failed;
 	}
-	elsif ( !$union && $w{"p_$u"} eq '0' && $w{"f_$u"} >= 80 && !&is_other_union($y{country}) ) {
+	elsif ( !$union && $w{"p_$u"} eq '0' && $w{"f_$u"} >= 80 && !&is_other_union($y{country}) && $cs{is_die}[$y{country}] < 2 ) {
 		&mes_and_world_news("<b>$c_y‚Æ‹¦í“¯–¿‚ğŒ‹‚Ñ‚Ü‚µ‚½</b>");
 		$w{"p_$u"} = 1;
 		&write_yran('dai', 1, 1);
