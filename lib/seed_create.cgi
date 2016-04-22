@@ -31,7 +31,7 @@ sub tp_200 {
 	for my $i (0..$#seed_templates) {
 		if ($in{'check_' . $seed_templates[$i][0]}) {
 			$pt += $seed_templates[$i][3];
-			my @seed_keys = keys($seed_templates[$i][2]);
+			my @seed_keys = keys(%{$seed_templates[$i][2]});
 			for my $key (@seed_keys) {
 				if ($sames{$key}++) {
 					$mes .= "同系統のステータス($key)は同時に選べません。";
@@ -81,7 +81,7 @@ EOM
 	my $pt = 0;
 	for my $i (0..$#seed_templates) {
 		if ($in{'check_' . $seed_templates[$i][0]}) {
-			for my $key (keys($seed_templates[$i][2])) {
+			for my $key (keys(%{$seed_templates[$i][2]})) {
 				if ($key eq 'fecundity') {
 					$fecundity += $seed_templates[$i][2]->{$key};
 				} else {

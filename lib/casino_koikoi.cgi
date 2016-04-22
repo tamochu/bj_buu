@@ -637,6 +637,7 @@ sub start_game{
 	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
 	$state = $leader;
 	$koikoi = 0;
+	my $e_card = '';
 	while (1) {
 		my @decks = &shuffled_deck;
 		my @fmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
@@ -654,7 +655,7 @@ sub start_game{
 			}
 		}
 
-		my $e_card = shift @decks;
+		$e_card = shift @decks;
 		for(2..8){
 			my $card = shift @decks;
 			$e_card .= ",$card";
@@ -796,25 +797,27 @@ sub is_teyaku {
 	open my $fh, "< ${this_file}_member.cgi" or &error('ÒÝÊÞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	my $head_line = <$fh>;
 	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
-		if ($mturn > 0 && $mname eq $m{name}) {
-			my @mhand = split /,/, $mstock;
-			my @mmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
-			for my $mh (@mhand) {
-				$mmonth[int($mh / 10) - 1]++;
-			}
-			my $dcount = 0;
-			for my $mm (@mmonth) {
-				if ($mm == 4) {
-					$ret = 1;
+	if ($state eq $m{name}) {
+		while (my $line = <$fh>) {
+			my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+			if ($mturn > 0 && $mname eq $m{name}) {
+				my @mhand = split /,/, $mstock;
+				my @mmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
+				for my $mh (@mhand) {
+					$mmonth[int($mh / 10) - 1]++;
 				}
-				if ($mm == 2) {
-					$dcount++;
+				my $dcount = 0;
+				for my $mm (@mmonth) {
+					if ($mm == 4) {
+						$ret = 1;
+					}
+					if ($mm == 2) {
+						$dcount++;
+					}
 				}
-			}
-			if ($dcount == 4) {
-				$ret = 2;
+				if ($dcount == 4) {
+					$ret = 2;
+				}
 			}
 		}
 	}
