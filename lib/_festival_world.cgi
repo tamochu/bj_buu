@@ -84,7 +84,7 @@ sub time_limit_festival {
 		$w{win_countries} = "$strong_rank[0],$strong_rank[1]";
 
 		$cs{strong}[$strong_rank[2]] = 0;
-		$cs{is_die}[$strong_rank[2]] = 4;
+		$cs{is_die}[$strong_rank[2]] = 3;
 		&write_cs;
 	}
 	else {
