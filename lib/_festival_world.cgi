@@ -85,6 +85,42 @@ sub time_limit_festival {
 
 		$cs{strong}[$strong_rank[2]] = 0;
 		$cs{is_die}[$strong_rank[2]] = 3;
+
+		require "./lib/move_player.cgi";
+		my %members = ();
+		opendir my $dh, "$userdir" or &error("Õ°»Þ°ÃÞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %p = &get_you_datas($pid, 1);
+
+			if ($p{country} == $target_country) {
+				my $to_country = 0;
+				do {
+					$to_country = int(rand($w{country}) + 1);
+				} while ($cs{is_die}[$to_country] > 1);
+				if ($p{name} ne $m{name}) {
+					&move_player($line, $p{country}, $to_country);
+					&regist_you_data($p{name}, 'country', $to_country);
+				} else {
+					$m{country} = $to_country;
+				}
+				$p{country} = $to_country;
+			}
+			if ($m{lib} eq 'prison') {
+				&regist_you_data($p{name}, 'lib', '');
+			}
+			&regist_you_data($p{name}, 'random_migrate', '');
+
+			push @{ $members{$p{country}} }, "$p{name}\n";
+		}
+		for my $i (0 .. $w{country}) {
+			open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			print $fh @{ $members{$i} };
+			close $fh;
+
+			$cs{member}[$i] = @{ $members{$i} } || 0;
+		}
 		&write_cs;
 	}
 	else {
