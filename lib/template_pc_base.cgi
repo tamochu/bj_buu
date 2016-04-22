@@ -388,7 +388,19 @@ sub countries_html {
 	unless ($w{world} eq '10') {
 		print qq|<tr><th>$e2j{strong}</th>|;
 		for my $i (1 .. $w{country}) {
-			print $cs{is_die}[$i] ? qq|<td align="center">–Å –S</td>| : qq|<td align="center">$cs{strong}[$i]</td>|;
+			my $status = $cs{strong}[$i];
+			if ($cs{is_die}[$i] == 1) {
+				$status = "–Å –S";
+			}
+			elsif ($cs{is_die}[$i] == 2) {
+				$status = "•• ½";
+			}
+			elsif ($cs{is_die}[$i] == 3) {
+				$status = "•ö ‰ó";
+			}
+			print qq|<td align="center">$status</td>|;
+
+#			print $cs{is_die}[$i] ? qq|<td align="center">–Å –S</td>| : qq|<td align="center">$cs{strong}[$i]</td>|;
 		}
 		print qq|</tr>\n|;
 	}

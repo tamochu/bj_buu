@@ -7,9 +7,57 @@ require 'config_game.cgi';
 #================================================
 &get_data;
 	if ($config_test) {
-		require './lib/_world_reset.cgi';
-		my $b = &is_festival_world($w{world});
-		print qq|$b $w{world}<br>|;
+		my %tmp_cs;
+	for my $i (1 .. $w{country}) {
+		$tmp_cs{$i-1} = $cs{strong}[$i];
+	}
+
+my @strong_rank = ();
+foreach(sort {$tmp_cs{$b} <=> $tmp_cs{$a}} keys %tmp_cs){
+  push(@strong_rank, [$_, $tmp_cs{$_}]);
+}
+
+my $c = $#strong_rank;
+my $center = int($c/2);
+
+my @rank_data = (
+	[0,-1], # top
+	[0,-1], # center
+	[0,-1] # bottom
+);
+my @result = ();
+for my $i (0 .. $c) {
+	if ($strong_rank[$i][1] == $strong_rank[0][1]) {
+		$rank_data[0][0]++;
+		$rank_data[0][1] = $i if $rank_data[0][1] < 0;
+	}
+	if ($strong_rank[$i][1] == $strong_rank[$center][1]) {
+		$rank_data[1][0]++;
+		$rank_data[1][1] = $i if $rank_data[1][1] < 0;
+	}
+	if ($strong_rank[$i][1] == $strong_rank[$c][1]) {
+		$rank_data[2][0]++;
+		$rank_data[2][1] = $i if $rank_data[2][1] < 0;
+	}
+}
+for my $i (0 .. $#rank_data) {
+	my $j = int(rand($rank_data[$i][0])+$rank_data[$i][1]);
+	push (@result, @{splice(@strong_rank, $j, 1)}[0] );
+	for my $k ($i+1 .. $#rank_data) {
+		if ($j > $rank_data[$k][1]) {
+			$rank_data[$k][0]--;
+		}
+		elsif ($j < $rank_data[$k][1]) {
+			$rank_data[$k][1]--;
+		}
+		else {
+			$rank_data[$k][0]--;
+			$rank_data[$k][1]--;
+		}
+	}
+}
+
+		print "1位国：$result[0] 2位国：$result[1] ビリ国：$result[2]<br>";
 	}
 &error("現在ﾒﾝﾃﾅﾝｽ中です。しばらくお待ちください(約 $mente_min 分間)") if ($mente_min);
 &before_bj;

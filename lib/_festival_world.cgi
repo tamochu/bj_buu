@@ -1,3 +1,5 @@
+use File::Copy::Recursive qw(rcopy);
+use File::Path;
 #================================================
 # 祭り情勢の開始・終了で使われるモジュール
 #================================================
@@ -5,7 +7,6 @@
 #================================================
 # 主な呼び出し元
 # ./lib/_world_reset.cgi
-# 自動的に呼ばれるので意識してロードする必要なし
 #================================================
 
 # 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
@@ -21,7 +22,6 @@ sub festival_type {
 	my ($festival_name, $is_start) = @_;
 	return FESTIVAL_TYPE->{$festival_name} + $is_start;
 }
-
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 use constant FESTIVAL_COUNTRY_PROPERTY => {
 	'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
@@ -29,18 +29,28 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 #	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 };
 
-# 祭り情勢の設定をして各種祭り情勢の開始フラグを返す
+# 祭り情勢開始時の国や情勢を設定して各種祭り情勢の開始フラグを返す
 sub opening_festival {
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
-		return &add_festival_country('kouhaku');
+		&add_festival_country('kouhaku');
+		return &festival_type('kouhaku', 1);
 	} elsif ($w{year} % 40 == 20) { # 三国志
 		$w{world} = $#world_states-3;
 		$w{game_lv} = 99;
-		return &add_festival_country('sangokusi');
+		&add_festival_country('sangokusi');
+		return &festival_type('sangokusi', 1);
 	} elsif ($w{year} % 40 == 10) { # 拙速
 		$w{world} = $#world_states-5;
+		$w{game_lv} = 99;
+		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
+		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;
+		for my $i (1 .. $w{country}) {
+			$cs{strong}[$i] = 5000;
+			$cs{tax}[$i] = 99;
+			$cs{state}[$i] = 5;
+		}
 		return &festival_type('sessoku', 1);
 	} else { # 混乱
 		$w{world} = $#world_states-1;
@@ -63,7 +73,27 @@ sub ending_festival {
 	}
 }
 
-# 指定された祭り情勢用の国を追加しその情勢の開始フラグを返す
+# 祭り情勢が期限切れを迎えた時の処理
+sub time_limit_festival {
+	if ($w{world} eq $#world_states-5) { # 拙速
+		my @strong_rank = &get_strong_ranking;
+
+		&write_world_news("<b>$world_name大陸を全土にわたる国力競争は$cs{name}[$strong_rank[0]]の勝利になりました</b>");
+		&write_legend('touitu', "$world_name大陸を全土にわたる国力競争は$cs{name}[$strong_rank[0]]の勝利になりました");
+
+		$w{win_countries} = "$strong_rank[0],$strong_rank[1]";
+
+		$cs{strong}[$strong_rank[2]] = 0;
+		$cs{is_die}[$strong_rank[2]] = 3;
+		&write_cs;
+	}
+	else {
+		&write_world_news("<b>$world_name大陸を統一する者は現れませんでした</b>");
+		&write_legend('touitu', "$world_name大陸を統一する者は現れませんでした");
+	}
+}
+
+# 指定された祭り情勢用の国を追加する
 # 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
 sub add_festival_country {
 	my $festival_name = shift;
@@ -146,12 +176,10 @@ sub add_festival_country {
 
 		$cs{old_ceo}[$i] = $cs{ceo}[$i];
 		$cs{ceo}[$i] = '';
-		
+
 		open my $fh, "> $logdir/$i/leader.cgi";
 		close $fh;
 	}
-
-	return &festival_type($festival_name, 1);
 }
 
 sub player_migrate {
@@ -355,7 +383,7 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('sangokusi', 0)){ # 三国志解除
+	elsif ($type == &festival_type('sangokusi', 0)) { # 三国志解除
 		require "./lib/move_player.cgi";
 		require "./lib/shopping_offertory_box.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -445,7 +473,8 @@ sub player_migrate {
 		}
 		close $fh;
 	}
-	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) { # 混乱設定
+#	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) { # 混乱設定
+	elsif ($type == &festival_type('konran', 1)) { # 混乱設定
 		# 一旦ネバラン送り
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -489,7 +518,8 @@ sub player_migrate {
 		}
 		closedir $dh;
 	}
-	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) { #混乱解除
+#	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) { #混乱解除
+	elsif ($type == &festival_type('konran', 0)) { #混乱解除
 		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -515,6 +545,12 @@ sub player_migrate {
 			}
 		}
 		closedir $dh;
+	}
+	elsif ($type == &festival_type('sessoku', 1)) { # 拙速開始
+		&write_cs;
+	}
+	elsif ($type == &festival_type('sessoku', 0)) { # 拙速終了
+		&write_cs;
 	}
 	elsif ($type == &festival_type('dokuritu', 1)) { # 独立設定
 		for my $i (0 .. $w{country}) {

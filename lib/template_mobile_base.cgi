@@ -216,10 +216,22 @@ sub countries_info {
 	print  "<hr>Še‘‚Ì$e2j{strong}<br>";
 	for my $i (1 .. $w{country}) {
 		print qq|<font color="$cs{color}[$i]">$cs{name}[$i]</font>|;
-		print $w{world} eq '10' ? ''
-			: $cs{is_die}[$i]   ? "–Å–S"
-			:                     "$cs{strong}[$i]"
-			;
+		my $status = $cs{strong}[$i];
+		if ($cs{is_die}[$i] == 1) {
+			$status = "–Å –S";
+		}
+		elsif ($cs{is_die}[$i] == 2) {
+			$status = "•• ½";
+		}
+		elsif ($cs{is_die}[$i] == 3) {
+			$status = "•ö ‰ó";
+		}
+		print $w{world} eq '10' ? '' : $status;
+
+#		print $w{world} eq '10' ? ''
+#			: $cs{is_die}[$i]   ? "–Å–S"
+#			:                     "$cs{strong}[$i]"
+#			;
 		
 		if ($m{country} && $m{country} ne $i) {
 			my $c_c = &union($m{country}, $i);

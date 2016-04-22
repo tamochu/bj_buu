@@ -1168,9 +1168,11 @@ sub add_npc_data {
 }
 #================================================
 # 国削除
+# $target_country 0（ﾈﾊﾞﾗﾝ）から始まる国番号
+# $mode 削除された国に属していた人の仕官先 0 でﾈﾊﾞﾗﾝ 1 でﾈﾊﾞﾗﾝ除くﾗﾝﾀﾞﾑ
 #================================================
 sub delete_country {
-	$target_country = shift;
+	my ($target_country, $mode) = @_;
 	
 	require "./lib/move_player.cgi";
 	my %members = ();
@@ -1189,13 +1191,14 @@ sub delete_country {
 			}
 			$p{country} = $p{country} - 1;
 		} elsif ($p{country} == $target_country) {
+			my $to_country = $mode ? int(rand($w{country}-1)+1) : 0;
 			if ($p{name} ne $m{name}) {
-				&move_player($line, $p{country}, 0);
-				&regist_you_data($p{name}, 'country', 0);
+				&move_player($line, $p{country}, $to_country);
+				&regist_you_data($p{name}, 'country', $to_country);
 			} else {
-				$m{country} = 0;
+				$m{country} = $to_country;
 			}
-			$p{country} = 0;
+			$p{country} = $to_country;
 		}
 		if ($m{lib} eq 'prison') {
 			&regist_you_data($p{name}, 'lib', '');

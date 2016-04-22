@@ -358,7 +358,18 @@ sub countries_info {
 	unless ($w{world} eq '10') {
 		print qq|<tr><th style="border: 2px solid #999; background: #336; white-space: nowrap;">$e2j{strong}</th>|;
 		for my $i (1 .. $w{country}) {
-			print $cs{is_die}[$i] ? qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">–Å –S</td>| : qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">$cs{strong}[$i]</td>|;
+			my $status = $cs{strong}[$i];
+			if ($cs{is_die}[$i] == 1) {
+				$status = "–Å –S";
+			}
+			elsif ($cs{is_die}[$i] == 2) {
+				$status = "•• ½";
+			}
+			elsif ($cs{is_die}[$i] == 3) {
+				$status = "•ö ‰ó";
+			}
+			print qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">$status</td>|;
+#			print $cs{is_die}[$i] ? qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">–Å –S</td>| : qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">$cs{strong}[$i]</td>|;
 		}
 		print qq|</tr>\n|;
 	}
