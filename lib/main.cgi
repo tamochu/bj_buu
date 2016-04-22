@@ -258,7 +258,8 @@ sub main_system {
 		if ($m{rank_exp} >= $m{rank} * $m{rank} * 10 && $m{rank} < $#ranks) {
 			$m{rank_exp} -= $m{rank} * $m{rank} * 10;
 			++$m{rank};
-			$mes .= "“ú ‚Ì‘‚Ö‚ÌvŒ£‚ª”F‚ß‚ç‚êA$m{name}‚ÌŠK‹‰‚ª$ranks[$m{rank}]‚É¸i‚µ‚Ü‚µ‚½<br>";
+			my $rank_name = &get_rank_name($m{rank}, $m{name});
+			$mes .= "“ú ‚Ì‘‚Ö‚ÌvŒ£‚ª”F‚ß‚ç‚êA$m{name}‚ÌŠK‹‰‚ª$rank_name‚É¸i‚µ‚Ü‚µ‚½<br>";
 		}
 		# Rank Down
 		elsif ($m{rank_exp} < 0) {
@@ -268,7 +269,8 @@ sub main_system {
 			else {
 				--$m{rank};
 				$m{rank_exp} = int($m{rank} * $m{rank} * 10 + $m{rank_exp});
-				$mes .= "$m{name}‚ÌŠK‹‰‚ª$ranks[$m{rank}]‚É~Ši‚µ‚Ü‚µ‚½<br>";
+				my $rank_name = &get_rank_name($m{rank}, $m{name});
+				$mes .= "$m{name}‚ÌŠK‹‰‚ª$rank_name‚É~Ši‚µ‚Ü‚µ‚½<br>";
 				if($m{super_rank}){
 					$mes .= "‚µ‚©‚µ$m{rank_name}‚Í–¼—_E‚È‚Ì‚Å–¼Ì‚Í‚»‚Ì‚Ü‚Ü‚Å‚·<br>";
 				}

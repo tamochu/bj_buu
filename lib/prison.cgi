@@ -187,7 +187,8 @@ sub tp_200 {
 
 			$m{rank} -= $m{rank} > 10 ? 2 : 1;
 			$m{rank} = 1 if $m{rank} < 1;
-			$mes .= "ŠK‹‰‚ª$ranks[$m{rank}]‚É‚È‚è‚Ü‚µ‚½<br>";
+			my $rank_name = &get_rank_name($m{rank}, $m{name});
+			$mes .= "ŠK‹‰‚ª$rank_name‚É‚È‚è‚Ü‚µ‚½<br>";
 			if($m{super_rank}){
 				$mes .= "‚µ‚©‚µ$m{rank_name}‚Í–¼—_E‚È‚Ì‚Å–¼Ì‚Í‚»‚Ì‚Ü‚Ü‚Å‚·<br>";
 			}

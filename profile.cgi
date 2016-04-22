@@ -52,7 +52,7 @@ sub status_mobile {
 			print qq|’íq <a href="profile.cgi?id=$yid">$m{master}</a><br>|;
 		}
 	}
-	my $rank_name = $ranks[$m{rank}];
+	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};
@@ -138,7 +138,7 @@ sub status_pc {
 	}
 	
 	$m{name} .= "[$m{shogo}]" if $m{shogo};
-	my $rank_name = $ranks[$m{rank}];
+	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};

@@ -114,7 +114,7 @@ sub tp_100 {
 
 		my $yid = unpack 'H*', $y{name};
 		if (-d "$userdir/$yid") {
-			my $rank_name = $ranks[$m{rank}];
+			my $rank_name = &get_rank_name($m{rank}, $m{name});
 			if ($m{super_rank}){
 				$rank_name = '';
 				$rank_name .= 'š' for 1 .. $m{super_rank};

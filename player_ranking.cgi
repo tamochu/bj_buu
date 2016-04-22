@@ -195,7 +195,7 @@ sub update_player_ranking  {
 			$data[1] =~ tr/\x0D\x0A//d;
 			my $player_id = unpack 'H*', $data[1];
 			my %p = &get_you_datas($player_id, 1);
-			my $rank_name = $ranks[$p{rank}];
+			my $rank_name = &get_rank_name($p{rank}, $p{name});
 			if ($p{super_rank}){
 				$rank_name = '';
 				$rank_name .= 'š' for 1 .. $p{super_rank};

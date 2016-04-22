@@ -1453,4 +1453,23 @@ sub create_sale_data_chart {
 	}
 }
 
+#================================================
+# ŠK‹‰–¼æ“¾
+#================================================
+sub get_rank_name {
+	my($rank, $name) = @_;
+	my $is_ceo = 0;
+	if ($name) {
+		for my $i (1..$w{country}) {
+			if ($name eq $cs{ceo}[$i]) {
+				$is_ceo = 1;
+			}
+		}
+	}
+	if ($rank == $#ranks && $is_ceo) {
+		return 'c’é';
+	}
+	return $ranks[$rank];
+}
+
 1; # íœ•s‰Â

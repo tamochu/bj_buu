@@ -84,7 +84,8 @@ sub update_pop_ranking  {
 	for my $name (keys(%ranks)) {
 		my $p_id = unpack 'H*', $name;
 		my %p = &get_you_datas($p_id, 1);
-		push @lines, "$name<>$ranks{$name}<>$p{country}<>\n";
+		my $rank_name = &get_rank_name($p{rank}, $name);
+		push @lines, "$name<>$rank_name<>$p{country}<>\n";
 	}
 	# •[‚ª‘½‚¢‡‚É•À‚Ñ‘Ö‚¦
 	@lines = map { $_->[0] } sort { $b->[2] <=> $a->[2]  } map { [$_, split/<>/] } @lines;

@@ -26,7 +26,7 @@ require './lib/system_game.cgi';
  #                 0        1      2      3      4      5      6      7      8      9      10     11     12     13     14       15     16     17     18     19    20     21     22      23        24       25        26
  
  # ŠK‹‰–¼‚Æ•ºm” ’Ç‰Á/•ÏX/íœ/•À‚Ñ‘Ö‚¦©—R
- @ranks     = (qw/—b•º Œ©K‚¢•º ˆê”Ê•º ã‹‰•º ‘à’· yˆÑ ­ˆÑ ’†ˆÑ ‘åˆÑ ­² ’†²  ‘å²  ­«  ’†«  ‘å«  c’é/);
+ @ranks     = (qw/—b•º ˆê”Ê•º   ã‹‰•º ‘à’·   yˆÑ ­ˆÑ ’†ˆÑ ‘åˆÑ ­² ’†² ‘å²  ­«  ’†«  ‘å«  Œ³ƒ  ‘åŒ³ƒ/);
  @rank_sols = (qw/0    1000     2000   3000   4000 5000 6000 7000 8000 9000 10000 12000 14000 16000 18000 20000/);
  #                0    1        2      3      4    5    6    7    8    9    10    11    12    13    14    15
  
@@ -498,7 +498,7 @@ require './lib/system_game.cgi';
  	# ‚»‚Ì‘¼
  	[61,	'±ÏÂĞ',		'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; return if $time + 3600 * 4 * 24 > $w{limit_time}; $w{limit_time} -= 3600 * 24; &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]š$m{pet_c}‚ğg‚¢“ˆêŠúŒÀ‚ª­‚µ’Z‚­‚È‚è‚Ü‚µ‚½</b>");	}],
  	[62,	'Ï°Ò²ÄŞ',	'myself',	sub{ return if ($m{sedai} <= 2); $m{lv}-=20; $m{lv}=1 if $m{lv} < 1; $mes.="$pets[$m{pet}][1]š$m{pet_c}‚Ì—Í‚É‚æ‚è$m{name}‚ÌLv‚ª‰º‚ª‚è‚Ü‚µ‚½<br>";	}],
- 	[63,	'²³Ş',		'myself',	sub{ $m{rank}=$#ranks; $mes.="$pets[$m{pet}][1]š$m{pet_c}‚Ì—Í‚É‚æ‚è$m{name}‚Í$ranks[$m{rank}]‚É‚È‚è‚Ü‚µ‚½<br>";	},'–l‚ÆŒ_–ñ‚µ‚Äc’é‚É‚È‚Á‚Ä‚æI'],
+ 	[63,	'²³Ş',		'myself',	sub{ $m{rank}=$#ranks; my $rank_name = &get_rank_name($m{rank}, $m{name}); $mes.="$pets[$m{pet}][1]š$m{pet_c}‚Ì—Í‚É‚æ‚è$m{name}‚Í$rank_name‚É‚È‚è‚Ü‚µ‚½<br>";	},'–l‚ÆŒ_–ñ‚µ‚Äc’é‚É‚È‚Á‚Ä‚æI'],
  
  #	# ‘‚É‰e‹¿ 
  	[64,	'¾Ş³½',		'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; $cs{strong}[$m{country}] +=1000;  &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]š$m{pet_c}‚ğg‚¢$c_m‚Ì$e2j{strong}‚ª1000‘‰Á‚µ‚Ü‚µ‚½</b>");  &_pet_status_up('rank_exp', 50);  	}],

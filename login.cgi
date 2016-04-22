@@ -147,10 +147,11 @@ sub write_players_html {
 		$start_date = sprintf("%d/%d %02d:%02d", $mon+1,$mday,$hour,$min);
 
 #		$html .= $count % 2 == 0 ? qq|<tr class="stripe1">| : qq|<tr>|;
+		my $rank_name = &get_rank_name($p{rank}, $name);
 		$html .= qq|<tr>|;
 		$html .= qq|<td><a href="../profile.cgi?id=$player_id&country=$country">$name</a></td>|;
 		$html .= qq|<td>$sexes[$p{sex}]</td>|;
-		$html .= qq|<td>$ranks[$p{rank}]</td>|;
+		$html .= qq|<td>$rank_name</td>|;
 		$html .= qq|<td>$units[$p{unit}][1]</td>|;
 		$html .= qq|<td>$jobs[$p{job}][1]</td>|;
 		$html .= qq|<td>$weas[$p{wea}][1]</td>|;
@@ -259,10 +260,11 @@ sub write_all_players_html {
 			my($min,$hour,$mday,$mon,$year) = (localtime($p{start_time}))[1..4];
 			$start_date = sprintf("%d/%d %02d:%02d", $mon+1,$mday,$hour,$min);
 
+			my $rank_name = &get_rank_name($p{rank}, $name);
 			$html .= qq|<tr>|;
 			$html .= qq|<td><a href="../profile.cgi?id=$player_id&country=$country">$name</a></td>|;
 			$html .= qq|<td>$sexes[$p{sex}]</td>|;
-			$html .= qq|<td>$ranks[$p{rank}]</td>|;
+			$html .= qq|<td>$rank_name</td>|;
 			$html .= qq|<td>$units[$p{unit}][1]</td>|;
 			$html .= qq|<td>$jobs[$p{job}][1]</td>|;
 			$html .= qq|<td>$weas[$p{wea}][1]</td>|;

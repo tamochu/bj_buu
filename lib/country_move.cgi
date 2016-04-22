@@ -173,7 +173,9 @@ sub tp_300 {
 					$need_money = $need_money_npc;
 					$m{money} -= $need_money;
 					$mes .= "ˆÚĞ—¿‚Æ‚µ‚Ä $need_money Gx•¥‚¢‚Ü‚µ‚½<br>";
-					$mes .= "ŠK‹‰‚ª$ranks[$m{rank}]‚É‚È‚è‚Ü‚µ‚½<br>";
+					
+					my $rank_name = &get_rank_name($m{rank}, $m{name});
+					$mes .= "ŠK‹‰‚ª$rank_name‚É‚È‚è‚Ü‚µ‚½<br>";
 					$mes .= "ˆÚĞ‚Ìè‘±‚«‚É$GWT•ª‚©‚©‚è‚Ü‚·<br>" ;
 					&wait;
 				}
@@ -260,7 +262,8 @@ sub tp_300 {
 			unless ($union eq $cmd) {
 				$m{rank} -= $m{rank} > 10 ? 2 : 1;
 				$m{rank} = 1 if $m{rank} < 1;
-				$mes .= "ŠK‹‰‚ª$ranks[$m{rank}]‚É‚È‚è‚Ü‚µ‚½<br>";
+				my $rank_name = &get_rank_name($m{rank}, $m{name});
+				$mes .= "ŠK‹‰‚ª$rank_name‚É‚È‚è‚Ü‚µ‚½<br>";
 
 				# ‘ã•\Îß²İÄ”¼•ª
 				for my $k (qw/war dom mil pro/) {
@@ -294,7 +297,8 @@ sub tp_300 {
 					$need_money = $need_money_npc;
 					$m{money} -= $need_money;
 					$mes .= "ˆÚĞ—¿‚Æ‚µ‚Ä $need_money Gx•¥‚¢‚Ü‚µ‚½<br>";
-					$mes .= "ŠK‹‰‚ª$ranks[$m{rank}]‚É‚È‚è‚Ü‚µ‚½<br>";
+					my $rank_name = &get_rank_name($m{rank}, $m{name});
+					$mes .= "ŠK‹‰‚ª$rank_name‚É‚È‚è‚Ü‚µ‚½<br>";
 					$mes .= "ˆÚĞ‚Ìè‘±‚«‚É$GWT•ª‚©‚©‚è‚Ü‚·<br>" ;
 					&wait;
 				}

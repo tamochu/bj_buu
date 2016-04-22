@@ -237,7 +237,7 @@ sub status_html {
 		}
 	}
 	my $fuka = $m{egg} ? int($m{egg_c} / $eggs[$m{egg}][2] * 100) : 0;
-	my $rank_name = $ranks[$m{rank}];
+	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};
@@ -352,7 +352,7 @@ sub war_html {
 	my $m_tokkou = $is_m_tokkou ? '<font color="#FFFF00"><b>š“ÁUš</b></font>' : '';
 	my $y_tokkou = $is_y_tokkou ? '<font color="#FFFF00"><b>š“ÁUš</b></font>' : '';
 	
-	my $rank_name = $ranks[$m{rank}];
+	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};
@@ -365,7 +365,8 @@ sub war_html {
 	$main_screen .= qq|<tr><td>m‹CF</td><td><div class="bar2"><img src="$htmldir/space.gif" style="width: $m{sol_lv}%"></div></td><td> (<b>$m{sol_lv}</b>%)<br></td></tr>|;
 	$main_screen .= qq|</table>|;
 	$main_screen .= qq|@ VS@ c‚è$m{turn}À°İ<br>|;
-	$main_screen .= qq|$y_icon $y{name} [$ranks[$y{rank}]] $y_mes<br>|;
+	my $yrank_name = &get_rank_name($y{rank}, $y{name});
+	$main_screen .= qq|$y_icon $y{name} [$yrank_name] $y_mes<br>|;
 	$main_screen .= qq|$y_tokkou$units[$y{unit}][1] “—¦[<b>$y{lea}</b>]<br>|;
 	$main_screen .= qq|<table border="0">|;
 	$main_screen .= qq|<tr><td>•ºmF</td><td><div class="bar1"><img src="$htmldir/space.gif" style="width: $y_sol_par%"></div></td><td> (<b>$y{sol}</b>•º)<br></td></tr>|;

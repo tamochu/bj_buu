@@ -176,7 +176,7 @@ sub my_country_info {
 	my $offertory_time = $m{offertory_time} - $time;
 	$offertory_time = 0 if $offertory_time < 0;
 
-	my $rank_name = $ranks[$m{rank}];
+	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};
