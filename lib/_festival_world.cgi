@@ -85,7 +85,7 @@ sub time_limit_festival {
 #		$cs{strong}[$strong_rank[2]] = 0;
 #		$cs{is_die}[$strong_rank[2]] = 2;
 
-		&delete_country($strong_rank[2]);
+		&delete_country($strong_rank[2], 1);
 	}
 	else {
 		&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
