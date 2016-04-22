@@ -112,6 +112,14 @@ sub tp_300 {
 		$mes .= "©‘‚ÉdŠ¯‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
 		&begin;
 	}
+	elsif ($cs{is_die}[$cmd] eq '2') {
+		$mes .= "‚»‚Ì‘‚Í“ü‘‹Ö~‚Æ‚È‚Á‚Ä‚¢‚Ü‚·<br>";
+		&begin;
+	}
+	elsif ($cs{is_die}[$cmd] eq '3') {
+		$mes .= "‚»‚Ì‘‚Íl‚ªZ‚ß‚éŠÂ‹«‚Å‚Í‚ ‚è‚Ü‚¹‚ñ<br>";
+		&begin;
+	}
 	# ‘¨•ú˜Q
 	elsif ($cmd == $w{country} + 1) {
 	      	if($m{country}){
