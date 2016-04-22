@@ -120,7 +120,7 @@ sub reset {
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
 		$cs{modify_pro}[$i]   = 0;
-		if ($cs{is_die} > 1) {
+		if ($cs{is_die}[$i] > 1) {
 			$cs{strong}[$i]   = 0;
 			$cs{capacity}[$i] = 0;
 		}
