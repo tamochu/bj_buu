@@ -49,6 +49,7 @@ sub opening_common {
 	elsif ($w{world} eq '6') { # Œ‹‘©
 		my @win_cs = ();
 		for my $i (1 .. $w{country}) {
+			next if $cs{is_die}[$i] > 1;
 			push @win_cs, [$i, $cs{win_c}[$i]];
 		}
 		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
