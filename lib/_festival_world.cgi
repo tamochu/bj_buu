@@ -94,7 +94,16 @@ sub time_limit_festival {
 			next if $pid =~ /backup/;
 			my %p = &get_you_datas($pid, 1);
 
-			if ($p{country} == $strong_rank[2]) {
+			if ($strong_rank[0] eq $p{country}) {
+				require './lib/shopping_offertory_box.cgi';
+				for my $k (qw/war dom pro mil ceo/) {
+					if ($cs{$k}[$p{country}] eq $p{name}) {
+						&send_god_item(5, $cs{$k}[$p{country}]);
+					}
+				}
+				&send_item($p{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
+			}
+			if ($strong_rank[2] eq $p{country}) {
 				my $to_country = 0;
 				do {
 					$to_country = int(rand($w{country}) + 1);
