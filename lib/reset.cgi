@@ -49,7 +49,7 @@ sub time_limit {
 
 	&opening_common;
 
-	$w{game_lv} = 0;
+#	$w{game_lv} = 0;
 
 	&write_cs;
 }

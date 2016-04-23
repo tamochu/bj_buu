@@ -75,9 +75,7 @@ sub tp_110 {
 			$w{world} = int(rand(10)) if $w{world} >= $#world_states-5;
 			&write_world_news("<i>世界は $world_states[$old_world] となりま…せん $world_states[$w{world}]となりました</i>");
 		}
-		else {
-			&opening_common;
-		}
+		&opening_common;
 		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
 	}# else { # 特殊情勢以外の開始時
 
@@ -93,7 +91,7 @@ sub tp_110 {
 	print $fh "$w{world}<>$nline\n";
 	close $fh;
 
-	$w{game_lv} = 0;
+#	$w{game_lv} = 0;
 	&refresh;
 	&n_menu;
 	&write_cs;
