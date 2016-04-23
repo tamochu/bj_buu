@@ -25,8 +25,8 @@ sub festival_type {
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 use constant FESTIVAL_COUNTRY_PROPERTY => {
 	'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
-	'sangokusi' => [3, 5, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
-#	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
+#	'sangokusi' => [3, 5, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
+	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 };
 
 # 祭り情勢開始時の国や情勢を設定して各種祭り情勢の開始フラグを返す
@@ -85,6 +85,51 @@ sub time_limit_festival {
 
 		$cs{strong}[$strong_rank[2]] = 0;
 		$cs{is_die}[$strong_rank[2]] = 3;
+
+		require "./lib/move_player.cgi";
+		my %members = ();
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			my %p = &get_you_datas($pid, 1);
+
+			if ($strong_rank[0] eq $p{country}) {
+				require './lib/shopping_offertory_box.cgi';
+				for my $k (qw/war dom pro mil ceo/) {
+					if ($cs{$k}[$p{country}] eq $p{name}) {
+						&send_god_item(5, $cs{$k}[$p{country}]);
+					}
+				}
+				&send_item($p{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
+			}
+			if ($strong_rank[2] eq $p{country}) {
+				my $to_country = 0;
+				do {
+					$to_country = int(rand($w{country}) + 1);
+				} while ($cs{is_die}[$to_country] > 1);
+				if ($p{name} ne $m{name}) {
+					&move_player($line, $p{country}, $to_country);
+					&regist_you_data($p{name}, 'country', $to_country);
+				} else {
+					$m{country} = $to_country;
+				}
+				$p{country} = $to_country;
+			}
+			if ($m{lib} eq 'prison') {
+				&regist_you_data($p{name}, 'lib', '');
+			}
+			&regist_you_data($p{name}, 'random_migrate', '');
+
+			push @{ $members{$p{country}} }, "$p{name}\n";
+		}
+		for my $i (0 .. $w{country}) {
+			open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiﾌｧｲﾙが開けません");
+			print $fh @{ $members{$i} };
+			close $fh;
+
+			$cs{member}[$i] = @{ $members{$i} } || 0;
+		}
 		&write_cs;
 	}
 	else {
