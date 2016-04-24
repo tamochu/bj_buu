@@ -302,6 +302,8 @@ sub war_win {
 
 	&refresh;
 
+	&daihyo_c_up('war_c'); # 代表熟練度
+	
 	# 暗黒
 	if ($w{world} eq $#world_states) {
 		my $ahoalia = 1;
@@ -438,7 +440,6 @@ sub war_win {
 	}
 	
 
-	&daihyo_c_up('war_c'); # 代表熟練度
 	&write_cs;
 
 	&n_menu;
