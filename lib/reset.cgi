@@ -256,7 +256,7 @@ sub add_world_log {
 		$saved_w++;
 	}
 	seek $fh 0, 0;
-	truncate $fh 0;
+	truncate $fh, 0;
 	print $fh "$nline\n";
 	close $fh;
 }
