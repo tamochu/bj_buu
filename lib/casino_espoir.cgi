@@ -135,6 +135,7 @@ sub get_member {
 sub get_state {
 	my @all_players = ();
 	my $participate = 0;
+	my $star;
 	my $my_rest_a = 0;
 	my $my_rest_b = 0;
 	my $my_rest_c = 0;
@@ -156,7 +157,7 @@ sub get_state {
 	if ($participate) {
 		open my $fhm, "< $my_espoir_file" or &error('Q‰ÁÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 		my $headline = <$fhm>;
-		my($star, $rest_a, $rest_b, $rest_c) = split /<>/, $headline;
+		($star, $my_rest_a, $my_rest_b, $my_rest_c) = split /<>/, $headline;
 		close $fhm;
 	}
 	
