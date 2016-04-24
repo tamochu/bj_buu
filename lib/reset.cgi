@@ -33,7 +33,7 @@ sub time_limit {
 	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
 	&add_world_log($w{world});
 
-	&begin_common_world_common;
+	&begin_common_world;
 
 #	$w{game_lv} = 0;
 
