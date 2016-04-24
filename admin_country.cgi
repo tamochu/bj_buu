@@ -118,7 +118,7 @@ sub step_1 {
 	<br>
 	<div class="mes">
 		<ul>
-			<li>世界の国の数と始まりの年を入力してください。
+			<li>世界の国の数と始まりの年と情勢を入力してください。
 			<li>国を途中で増やしたり減らしたりすることは可能\です。
 			<li>特にこだわりがない場合はﾃﾞﾌｫﾙﾄのままでOKです。
 			<li>国の数は１国からいくらでも増やすことが可能\です。
@@ -126,10 +126,17 @@ sub step_1 {
 		</ul>
 	</div>
 	<br>
-	
 	<form method="$method" action="$this_script">
 		<input type="text" name="country" value="6" class="text_box_s" style="text-align: right">国<br>
 		<input type="text" name="year"    value="1" class="text_box_s" style="text-align: right">年<br>
+		<select name="world">
+EOM
+		for my $i (0 .. $#world_states) {
+			my $selected = $in{world} == $i ? " selected=\"selected\"" : "";
+			print qq|<option value="$i" label="$world_states[$i]"$selected>$world_states[$i]</option>|;
+		}
+	print <<"EOM";
+		</select>情勢<br>
 		<input type="hidden" name="step" value="2">
 		<input type="hidden" name="pass" value="$in{pass}">
 		<p><input type="submit" value="決定" class="button_s"></p>
@@ -177,10 +184,11 @@ EOM
 #=================================================
 sub step_2 {
 	print <<"EOM";
-	<p>全$in{country}カ国。$in{year}年目から始まり</p>
+	<p>全$in{country}カ国。$in{year}年目の$world_states[$in{world}]から始まり</p>
 	<p>国の名前と色を決めてください</p>
 	<form method="$method" action="$this_script">
 		<input type="hidden" name="year" value="$in{year}">
+		<input type="hidden" name="world" value="$in{world}">
 		<input type="hidden" name="step" value="2">
 		<input type="hidden" name="country" value="$in{country}">
 		<input type="hidden" name="omakase" value="1">
@@ -206,6 +214,7 @@ EOM
 	
 	print <<"EOM";
 		<input type="hidden" name="year" value="$in{year}">
+		<input type="hidden" name="world" value="$in{world}">
 		<input type="hidden" name="country" value="$in{country}">
 		<input type="hidden" name="pass" value="$in{pass}">
 		<input type="hidden" name="step" value="3">
@@ -222,10 +231,12 @@ sub step_3 {
 	
 	$in{year} = 1 if $in{year} < 0;
 	--$in{year};
+print "$w{country}<br>" if $config_test;
 	
 	$w{country} = $in{country};
+print "$w{country}<br>" if $config_test;
 	$w{year}    = $in{year};
-	$w{world}   = 0;
+	$w{world}   = $in{world};
 	$w{playing} = 0;
 
 	for my $i (1 .. $in{country}) {

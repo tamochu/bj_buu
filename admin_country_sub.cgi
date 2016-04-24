@@ -132,6 +132,13 @@ sub step_1 {
 		<input type="hidden" name="step" value="2">
 		<input type="hidden" name="pass" value="$in{pass}">
 		<p><input type="submit" value="Œˆ’è" class="button_s"></p>
+		<select name="world">
+EOM
+		for my $i (0 .. $#world_states) {
+			my $selected = $in{world} == $i ? " selected=\"selected\"" : "";
+			print qq|<option value="$i" label="$world_states[$i]"$selected>$world_states[$i]</option>|;
+		}
+	print <<"EOM";
 	</form>
 EOM
 	if (-s "$logdir/countries.cgi") {

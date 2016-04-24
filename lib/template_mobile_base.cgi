@@ -218,13 +218,13 @@ sub countries_info {
 		print qq|<font color="$cs{color}[$i]">$cs{name}[$i]</font>|;
 		my $status = $cs{strong}[$i];
 		if ($cs{is_die}[$i] == 1) {
-			$status = "–Å –S";
+			$status = "–Å–S";
 		}
 		elsif ($cs{is_die}[$i] == 2) {
-			$status = "•• ½";
+			$status = "••½";
 		}
 		elsif ($cs{is_die}[$i] == 3) {
-			$status = "•ö ‰ó";
+			$status = "•ö‰ó";
 		}
 		print $w{world} eq '10' ? '' : $status;
 
