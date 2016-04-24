@@ -110,6 +110,10 @@ sub tp_110 {
 				$m{money} -= $need_ad_money;
 			}elsif($in{is_send_public}){
 				my $def_file_title = unpack 'H*', "$time 作:$m{name}";
+				$def_file_title .= $goods_type eq 'img'  ? '.jpeg'
+					 : $goods_type eq 'html' ? '.html'
+					 :                         '.cgi'
+					 ;
 				rename "$this_path_dir/$file_title", "$icondir/_add_$def_file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
 				$mes .= "デフォルトアイコンに追加しました<br>";
 			}elsif($in{is_send_library}){
