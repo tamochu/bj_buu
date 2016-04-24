@@ -1,7 +1,7 @@
 sub begin { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異常な処理です'); }
 sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異常な処理です'); }
-#require './lib/reset.cgi';
-require './lib/_world_reset.cgi';
+require './lib/reset.cgi';
+#require './lib/_world_reset.cgi';
 #================================================
 # 世界情勢 Created by Merino
 #================================================
@@ -64,9 +64,12 @@ sub tp_110 {
 		else {
 			@new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 		}
-		my @next_worlds = &unique_worlds(@new_worlds);
-		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
-		$w{world_sub} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+
+		($w{world}, $w{world_sub}) = &choice_unique_world(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+
+#		my @next_worlds = &unique_worlds(@new_worlds);
+#		$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+#		$w{world_sub} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
 
 		# 同じのじゃつまらないので
 		if ($w{world} eq $old_world) {
@@ -75,21 +78,21 @@ sub tp_110 {
 			$w{world} = int(rand(10)) if $w{world} >= $#world_states-5;
 			&write_world_news("<i>世界は $world_states[$old_world] となりま…せん $world_states[$w{world}]となりました</i>");
 		}
-		&opening_common;
-		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
+		&begin_common_world;
+#		$w{game_lv} = int($w{game_lv} * 0.7) if $w{world} eq '15' || $w{world} eq '17';
 	}# else { # 特殊情勢以外の開始時
-
-	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
-	my $saved_w = 0;
-	$nline = "";
-	for my $old_w (@old_worlds){
-		next if $old_w =~ /[^0-9]/;
-		$nline .= "$old_w<>";
-		last if $saved_w > 15;
-		$saved_w++;
-	}
-	print $fh "$w{world}<>$nline\n";
-	close $fh;
+	&add_world_log($w{world});
+#	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
+#	my $saved_w = 0;
+#	$nline = "";
+#	for my $old_w (@old_worlds){
+#		next if $old_w =~ /[^0-9]/;
+#		$nline .= "$old_w<>";
+#		last if $saved_w > 15;
+#		$saved_w++;
+#	}
+#	print $fh "$w{world}<>$nline\n";
+#	close $fh;
 
 #	$w{game_lv} = 0;
 	&refresh;

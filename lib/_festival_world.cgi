@@ -30,7 +30,7 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 };
 
 # 祭り情勢開始時の国や情勢を設定して各種祭り情勢の開始フラグを返す
-sub opening_festival {
+sub begin_festival_world {
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
@@ -58,8 +58,10 @@ sub opening_festival {
 	}
 }
 
+#================================================
 # 祭り情勢を解除して各種祭り情勢の終了フラグを返す
-sub ending_festival {
+#================================================
+sub end_festival_world {
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{country} -= 2;
 		return &festival_type('kouhaku', 0);
@@ -73,7 +75,9 @@ sub ending_festival {
 	}
 }
 
+#================================================
 # 祭り情勢が期限切れを迎えた時の処理
+#================================================
 sub time_limit_festival {
 	if ($w{world} eq $#world_states-5) { # 拙速
 		my @strong_rank = &get_strong_ranking;
@@ -136,6 +140,66 @@ sub time_limit_festival {
 		&write_world_news("<b>$world_name大陸を統一する者は現れませんでした</b>");
 		&write_legend('touitu', "$world_name大陸を統一する者は現れませんでした");
 	}
+}
+
+#================================================
+# 1位 (int(国数/2)+1)位 国数位 の国力順位を配列で返す
+# 拙速用だけどなんか使い道あるかも？
+#================================================
+sub get_strong_ranking {
+	# lstrcpy とか memcpy でガッとやるようにもっと簡単にコピペできそうだけど分からんちん
+	my %tmp_cs;
+	for my $i (1 .. $w{country}) {
+		$tmp_cs{$i-1} = $cs{strong}[$i];
+	}
+
+	# 国力に着目して降順ソート
+	my @strong_rank = ();
+	foreach(sort {$tmp_cs{$b} <=> $tmp_cs{$a}} keys %tmp_cs){
+		push(@strong_rank, [$_, $tmp_cs{$_}]);
+	}
+
+	my $_country = $w{country} - 1; # ﾈﾊﾞﾗﾝを除く国数
+	my $center = int($_country / 2);
+
+	# top center bottom のダブり数と先頭インデックスの取得
+	my @data = ([0,-1], [0,-1], [0,-1]);
+	for my $i (0 .. $_country) {
+		if ($strong_rank[$i][1] == $strong_rank[0][1]) {
+			$data[0][0]++;
+			$data[0][1] = $i if $data[0][1] < 0;
+		}
+		if ($strong_rank[$i][1] == $strong_rank[$center][1]) {
+			$data[1][0]++;
+			$data[1][1] = $i if $data[1][1] < 0;
+		}
+		if ($strong_rank[$i][1] == $strong_rank[$c][1]) {
+			$data[2][0]++;
+			$data[2][1] = $i if $data[2][1] < 0;
+		}
+	}
+
+	# 同一国力があるなら重複しないように rand 選択
+	# 重複しない値を引くまで while rand した方が速いか？
+	my @result = ();
+	for my $i (0 .. $#data) {
+		my $j = int(rand($data[$i][0])+$data[$i][1]); # ダブりの先頭インデックスからダブり数-1の乱数
+		push (@result, @{splice(@strong_rank, $j, 1)}[0] + 1 ); # rand選択された国を候補から抜く 0 はﾈﾊﾞﾗﾝなので +1
+		# ダブり数や先頭インデックスの修正
+		for my $k ($i+1 .. $#data) {
+			if ($j > $data[$k][1]) {
+				$data[$k][0]--;
+			}
+			elsif ($j < $data[$k][1]) {
+				$data[$k][1]--;
+			}
+			else {
+				$data[$k][0]--;
+				$data[$k][1]--;
+			}
+		}
+	}
+	return @result;
 }
 
 # 指定された祭り情勢用の国を追加する

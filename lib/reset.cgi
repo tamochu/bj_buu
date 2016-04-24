@@ -1,6 +1,5 @@
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
-require './lib/_world_reset.cgi';
 #================================================
 # 国ﾘｾｯﾄ Created by Merino
 #================================================
@@ -27,27 +26,14 @@ sub time_limit {
 		# 特殊情勢前期でもなく暗黒終了時でもないなら
 		# 特殊情勢で上書きされるので計算するだけ無駄
 		unless ($w{year} =~ /5$/ || $w{year} =~ /6$/ || $w{year} =~ /9$/) {
-			my @new_worlds = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
-			my @next_worlds = &unique_worlds(@new_worlds);
-			$w{world} = @next_worlds == 0 ? 0:$next_worlds[int(rand(@next_worlds))];
+			($w{world}, $w{world_sub}) = &choice_unique_world(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
 		}
 	}
 
 	&reset; # ここまで今期期限切れ時の処理
+	&add_world_log($w{world});
 
-	open my $fh, "> $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
-	my $saved_w = 0;
-	$nline = "";
-	for my $old_w (@old_worlds){
-		next if $old_w =~ /[^0-9]/;
-		$nline .= "$old_w<>";
-		last if $saved_w > 15;
-		$saved_w++;
-	}
-	print $fh "$w{world}<>$nline\n";
-	close $fh;
-
-	&opening_common;
+	&begin_common_world_common;
 
 #	$w{game_lv} = 0;
 
@@ -55,9 +41,11 @@ sub time_limit {
 }
 
 #================================================
-# 国ﾃﾞｰﾀﾘｾｯﾄ処理
+# 国ﾃﾞｰﾀﾘｾｯﾄ処理（情勢は含まれないっぽい）
 # 統一と期限切れで呼ばれるので抽象的とする
+# 基本的にここで $w{world} を書き換えてはいけない
 # reset後に情勢が確定するため、ここを通ってから情勢を表示すること
+# reset 前か後に $w{world} を変える処理があるので情勢を決める関数として使うものではないと思われる
 #================================================
 sub reset {
 	require './lib/casino_toto.cgi';
@@ -81,7 +69,7 @@ sub reset {
 		}
 		else { # 祭り情勢終了
 			require './lib/_festival_world.cgi';
-			my $migrate_type = &ending_festival;
+			my $migrate_type = &end_festival_world;
 			&player_migrate($migrate_type);
 		}
 		$w{world} = int(rand($#world_states-5));
@@ -91,12 +79,12 @@ sub reset {
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	$country -= $sleep_num if $sleep_num > 0;
 	my $ave_c = int($w{player} / $country);
+	$ave_c = $ave_c < 1 ? 1 : $ave_c;
 
 	# set world
 	$w{year}++;
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 8; #12
-#	$w{limit_time} = $time + 3600 * 24 * $limit_touitu_day;
-	$w{limit_time} = $config_test ? $time: $time + 3600 * 24 * $limit_touitu_day;
+	$w{limit_time} = $config_test ? $time : $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
 
 	# set countries
@@ -186,7 +174,7 @@ sub reset {
 		}
 		else { # 祭り情勢開始
 			require './lib/_festival_world.cgi';
-			my $migrate_type = &opening_festival;
+			my $migrate_type = &begin_festival_world;
 			&wt_c_reset;
 			&player_migrate($migrate_type);
 		}
@@ -200,6 +188,116 @@ sub reset {
 	}
 
 	&write_cs;
+}
+
+#================================================
+# 年数を渡すと特殊情勢か判断して返す
+#================================================
+sub is_special_world {
+	return $w{year} > 0 ? ($w{year} =~ /6$/ || $w{year} =~ /0$/) : 0 ;
+}
+
+#================================================
+# 年数を渡すと祭り情勢か判断して返す
+# 祭り情勢ならばモジュールもロード
+#================================================
+sub is_festival_world {
+	if ($w{year} > 9 && $w{year} =~ /0$/) {
+		require './lib/_festival_world.cgi';
+		return 1;
+	}
+	return 0;
+}
+
+#================================================
+# 情勢リストを渡すと直近11年の情勢と重複するものを除外した中からランダムで情勢を選んでくれる
+# 戻り値は (world, world_sub)
+#================================================
+sub choice_unique_world {
+	my @new_worlds = @_;
+	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
+	my $line = <$fh>;
+	close $fh;
+	my @old_worlds = split /<>/, $line;
+	my @next_worlds;
+	for my $new_v (@new_worlds){
+		my $old_year = 0;
+		my $old_flag = 0;
+		for my $o (@old_worlds){
+			last if $old_year > 10;
+			if ($new_v == $o){
+				$old_flag = 1;
+				last;
+			}
+			$old_year++;
+		}
+		push @next_worlds, $new_v unless $old_flag;
+	}
+
+	# 重複するものばかりだった場合には「平和」になるようになっていたが「謎」の方が適当かと
+	return ( $next_worlds[int(rand(@next_worlds))], int(rand($#world_states-5)) ) if @next_worlds;
+	return ( 19, int(rand($#world_states-5)) );
+}
+
+#================================================
+# 情勢ログの先頭に渡された情勢を挿入する
+#================================================
+sub add_world_log {
+	my $world = shift;
+	my $nline = "$world<>";
+	my $saved_w = 0;
+	open my $fh, "+< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
+	my $line = <$fh>;
+	my @old_worlds = split /<>/, $line;
+	for my $old_w (@old_worlds){
+		next if $old_w =~ /[^0-9]/;
+		$nline .= "$old_w<>";
+		last if $saved_w > 15;
+		$saved_w++;
+	}
+	print $fh "$nline\n";
+	close $fh;
+}
+
+#================================================
+# 通常情勢の設定をする
+#================================================
+sub begin_common_world {
+	if ($w{world} eq '0') { # 平和
+		$w{reset_time} += $config_test ? 0 : 3600 * 12;
+		&write_world_news("<i>世界は $world_states[$w{world}] になりました</i>");
+	}
+	elsif ($w{world} eq '6') { # 結束
+		my @win_cs = ();
+		for my $i (1 .. $w{country}) {
+			next if $cs{is_die}[$i] > 1;
+			push @win_cs, [$i, $cs{win_c}[$i]];
+		}
+		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
+
+		# 奇数の場合は一番国は除く
+		shift @win_cs if @win_cs % 2 == 1;
+		
+		my $half_c = int(@win_cs*0.5-1);
+		for my $i (0 .. $half_c) {
+			my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
+			$w{'p_'.$c_c} = 1;
+		}
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+	}
+	elsif ($w{world} eq '18') { # 殺伐
+		$w{reset_time} = $time;
+		for my $i (1 .. $w{country}) {
+			$cs{food}[$i]     = int(rand(300)) * 1000;
+			$cs{money}[$i]    = int(rand(300)) * 1000;
+			$cs{soldier}[$i]  = int(rand(300)) * 1000;
+		}
+		&write_world_news("<i>世界は $world_states[$w{world}] としたふいんき(←なぜか変換できない)になりました</i>");
+	}
+	else {
+		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
+	}
+	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 }
 
 1; # 削除不可
