@@ -255,7 +255,7 @@ sub add_world_log {
 		last if $saved_w > 15;
 		$saved_w++;
 	}
-	seek $fh 0, 0;
+	seek $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh "$nline\n";
 	close $fh;
