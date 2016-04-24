@@ -51,6 +51,7 @@ elsif ($in{mode} eq 'admin_expendable')   { &admin_expendable; }
 elsif ($in{mode} eq 'admin_parupunte')   { &admin_parupunte; }
 elsif ($in{mode} eq 'admin_compare')   { &admin_compare; }
 elsif ($in{mode} eq 'migrate_reset')   { &migrate_reset; }
+elsif ($in{mode} eq 'admin_all_pet_check')   { &admin_all_pet_check; }
 
 &top;
 &footer;
@@ -974,17 +975,45 @@ sub bug_prize {
 }
 
 #=================================================
-# 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
+# 鯖内の全ﾍﾟｯﾄ表示
 #=================================================
-sub admin_expendable {
+sub admin_all_pet_check {
+	my @lines = ();
 	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 	while (my $pid = readdir $dh) {
 		next if $pid =~ /\./;
 		next if $pid =~ /backup/;
-		
+		my $depot_file = "$userdir/$pid/depot.cgi";
 		my %pm = &get_you_datas($pid, 1);
-		&regist_you_data($pm{name}, "seed", 'human');
+
+		if ($pm{pet} && $pm{pet_c} >= 15) {
+			push @lines, "$pm{name}<>3<>$pm{pet}<>$pm{pet_c}<>0<>\n";
+		}
+		open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
+		while (my $line = <$fh>) {
+			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+			if ($kind eq '3' && $item_c >= 15) {
+				push @lines, "$pm{name}<>$line";
+			}
+		}
+		close $fh;
 	}
+	@lines = map { $_->[0] } sort { $a->[2] <=> $b->[2] || $a->[3] <=> $b->[3] || $a->[4] <=> $b->[4] || $a->[1] cmp $b->[1] } map { [$_, split /<>/] } @lines;
+	for my $line (@lines) {
+		my($name, $kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+		$mes .= $kind eq '1' ? qq|$name:[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])<br>|
+				  : $kind eq '2' ? qq|$name:[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])<br>|
+				  : $kind eq '3' ? qq|$name:[ぺ]$pets[$item_no][1]★$item_c<br>|
+				  :			       qq|$name:[$guas[$item_no][2]]$guas[$item_no][1]<br>|
+				  ;
+	}
+}
+
+#=================================================
+# 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
+#=================================================
+sub admin_expendable {
+
 }
 
 #=================================================
