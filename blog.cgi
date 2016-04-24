@@ -11,7 +11,7 @@ require "$datadir/profile.cgi";
 $bad_time    = 60;
 
 # Å‘åÛ¸Ş•Û‘¶Œ”
-$max_log     = 30;
+$blog_max_log     = 30;
 
 # Å‘åºÒİÄ”(”¼Šp)
 $max_comment = 3000;
@@ -74,7 +74,7 @@ sub myself_blog {
 	&header_myroom;
 	
 	print qq|$delete_message| if $delete_message;
-	print qq|<ul><li>$max_logŒ‚Ü‚Å•Û‘¶(ŒÃ‚¢‚à‚Ì‚©‚ç©“®íœ)</ul>|;
+	print qq|<ul><li>$blog_max_logŒ‚Ü‚Å•Û‘¶(ŒÃ‚¢‚à‚Ì‚©‚ç©“®íœ)</ul>|;
 
 	my $rows = $is_mobile ? 2 : 14;
 	print qq|<form method="$method" action="blog.cgi"><input type="hidden" name="mode" value="write"><input type="hidden" name="no" value="$in{no}">|;
@@ -114,7 +114,7 @@ sub myself_blog {
 	}
 	close $fh;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-	print qq|<p><input type="submit" value="íœ" class="button_s"> ($count/$max_log)</p></form>|;
+	print qq|<p><input type="submit" value="íœ" class="button_s"> ($count/$blog_max_log)</p></form>|;
 }
 
 #================================================
