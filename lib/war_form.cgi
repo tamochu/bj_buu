@@ -192,7 +192,10 @@ sub tp_100 {
 			$m{renzoku} = $y{country};
 			$m{renzoku_c} = 1;
 		}
-	
+
+		require "./lib/hardworker_country.cgi";
+		&write_action_log("war", $GWT);
+
 		&wait;
 		&write_cs;
 	}

@@ -7,8 +7,10 @@ my %action_weight = (
 
 #================================================
 # 行動ログの書き込み
+# 全員が全員いきなり国別の行動ログに書き込むとヤバそうなのでまずは個人ファイルに溜めておく
 #================================================
 sub write_action_log {
+	return 0 unless $w{year} =~ /[1-5]$/;
 	my ($action_type, $wait_time) = @_;
 	my $key = $action_type."_".$wait_time;
 	my %action_log = ($key => 1);
@@ -40,28 +42,27 @@ sub write_action_log {
 }
 
 #================================================
-# 行動ログを国へ計上する
+# プレイヤーログイン時に行動ログを国別の行動ログへ計上する
+# ファイル操作よく分からんし壊れるのが怖いからなんとなく読んで読んで書いて書いて
 #================================================
 sub add_action_log_country {
-#	my ($action_type, $wait_time) = @_;
-#	return 0 unless -e "$userdir/$id/action_log.cgi";
-
-#	my @actions = ("dom_12", "dom_20", "dom_40");
-	&read_user;
-	my %action_log;
+	return 0 unless $w{year} =~ /[1-6]$/;
+	my %action_log = ();
 	my $line = "";
 	my $nline = "";
+	my $fh1;
+	my $fh2;
 
-	open my $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
+	open $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
 	$line = <$fh1>;
 	$line =~ tr/\x0D\x0A//d;
 	for my $hash (split /<>/, $line) {
 		my($k, $v) = split /;/, $hash;
-		$action_log{$k} += $v;
+		$action_log{$k} = $v;
 	}
 	close $fh1;
 
-	open my $fh2, "< $userdir/$id/action_log.cgi" or &error("action_log.cgiが開けません");
+	open $fh2, "< $userdir/$id/action_log.cgi" or &error("action_log.cgiが開けません");
 	$line = <$fh2>;
 	$line =~ tr/\x0D\x0A//d;
 	for my $hash (split /<>/, $line) {
@@ -74,12 +75,12 @@ sub add_action_log_country {
 		$nline .= "$k;$action_log{$k}<>";
 	}
 
-	open my $fh1, "> $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
+	open $fh1, "> $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
 	eval { flock $fh1, 2; };
 	print $fh1 "$nline";
 	close $fh1;
 
-	open my $fh2, "> $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
+	open $fh2, "> $userdir/$id/action_log.cgi" or &error("action_log.cgiが開けません");
 	print $fh2 "";
 	close $fh2;
 }

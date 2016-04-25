@@ -25,6 +25,9 @@ if ($time > $w{limit_time}) {
 	&time_limit;
 }
 
+require "./lib/hardworker_country.cgi";
+&add_action_log_country;
+
 # htmlÌ§²Ùì¬ & ŠúŒÀØ‚êÌßÚ²Ô°íœ
 for my $i (0 .. $w{country}) {
 	if (-M "./html/$i.html" >= $update_cycle_day) {
@@ -44,8 +47,8 @@ if (-M "./html/all.html" >= $update_cycle_day) {
 }
 &make_player_name_list;
 &refresh_new_commer;
-exit;
 
+exit;
 
 #=================================================
 # ¸¯·°¾¯Ä

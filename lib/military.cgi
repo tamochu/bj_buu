@@ -89,7 +89,10 @@ sub tp_600 {
 		open my $fh, ">> $logdir/$m{country}/patrol.cgi" or &error("$logdir/$m{country}/patrol.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 		print $fh "$time<>$m{name}<>\n";
 		close $fh;
-		
+
+		require "./lib/hardworker_country.cgi";
+		&write_action_log("mil", $GWT);
+
 		&wait;
 	}
 	elsif ($cmd eq '2') {
@@ -98,6 +101,10 @@ sub tp_600 {
 		$mes .= "Ÿ‚És“®‚Å‚«‚é‚Ì‚Í$GWT•ªŒã‚Å‚·<br>";
 		$m{value} = 'ambush';
 		$m{tp} += 10;
+
+		require "./lib/hardworker_country.cgi";
+		&write_action_log("mil", $GWT);
+
 		&wait;
 	}
 	else {
@@ -227,6 +234,10 @@ sub exe1 {
 			$m{renzoku} = $y{country};
 			$m{renzoku_c} = 1;
 		}
+
+		require "./lib/hardworker_country.cgi";
+		&write_action_log("mil", $GWT);
+
 		&wait;
 	}
 }

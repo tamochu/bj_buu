@@ -76,7 +76,10 @@ sub exe1 {
 		 : $cmd eq '3' ? $GWT_b
 		 :               $GWT
 		 ;
-	
+
+	require "./lib/hardworker_country.cgi";
+	&write_action_log("dom", $GWT);
+
 	$m{tp} += 10;
 	$m{turn} = $cmd;
 	$mes .= "$_[0]Œ‹‰Ê‚Í$GWT•ªŒã<br>";
