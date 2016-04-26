@@ -363,7 +363,7 @@ sub countries_info {
 				$status = "–Å –S";
 			}
 			elsif ($cs{is_die}[$i] == 2) {
-				$status = "•• ½";
+				$status = "½ ‘";
 			}
 			elsif ($cs{is_die}[$i] == 3) {
 				$status = "•ö ‰ó";
