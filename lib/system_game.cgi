@@ -785,6 +785,9 @@ sub write_yran {
 	my($data_name, $data_value, $is_add) = @_;
 	&error("ÌßÚ²Ô°ÃŞ°À‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½") if !$data_name || !$data_value;
 	# -------------------
+	if ($data_name =~ /contr_.*/ && $w{year} !~ /[1-5]$/) {
+		return;
+	}
 	
 	my @lines = ();
 	my $y_find = 0;
@@ -838,6 +841,52 @@ sub write_yran {
 	print $fh @lines;
 	close $fh;
 }
+#================================================
+# ‘vŒ£WŒv
+#================================================
+sub summary_contribute {
+	return if $w{year} !~ /[1-6]$/;
+	return unless (-e "$userdir/$id/year_ranking.cgi");
+
+	my %action_log = ();
+	my @lines = ();
+	open my $fh, "< $userdir/$id/year_ranking.cgi" or &error("Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	while (my $line = <$fh>) {
+		my $new_line = '';
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			if ($k =~ /contr_(.*)/) {
+				$action_log{$1} += $v;
+				$v = 0;
+			}
+			$new_line .= "$k;$v<>";
+		}
+		push @lines, "$new_line\n";
+	}
+	close $fh;
+
+	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	print $fh @lines;
+	close $fh;
+
+	open $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	$line = <$fh1>;
+	$line =~ tr/\x0D\x0A//d;
+	for my $hash (split /<>/, $line) {
+		my($k, $v) = split /;/, $hash;
+		$action_log{$k} += $v;
+	}
+	close $fh1;
+
+	for my $k (keys(%action_log)) {
+		$nline .= "$k;$action_log{$k}<>";
+	}
+
+	open $fh1, "> $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	print $fh1 "$nline\n";
+	close $fh1;
+}
+
 #================================================
 # ’¼‰c“X–vû
 #================================================
