@@ -47,29 +47,34 @@ sub write_action_log {
 #================================================
 sub add_action_log_country {
 	return 0 unless $w{year} =~ /[1-6]$/;
+	return 0 unless -e "$userdir/$id/action_log.cgi";
 	my %action_log = ();
 	my $line = "";
 	my $nline = "";
 	my $fh1;
 	my $fh2;
 
-	open $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	$line = <$fh1>;
-	$line =~ tr/\x0D\x0A//d;
-	for my $hash (split /<>/, $line) {
-		my($k, $v) = split /;/, $hash;
-		$action_log{$k} = $v;
-	}
-	close $fh1;
-
 	open $fh2, "< $userdir/$id/action_log.cgi" or &error("action_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	$line = <$fh2>;
 	$line =~ tr/\x0D\x0A//d;
+	unless ($line) {
+		close $fh2;
+		return 0;
+	}
 	for my $hash (split /<>/, $line) {
 		my($k, $v) = split /;/, $hash;
 		$action_log{$k} += $v;
 	}
 	close $fh2;
+
+	open $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	$line = <$fh1>;
+	$line =~ tr/\x0D\x0A//d;
+	for my $hash (split /<>/, $line) {
+		my($k, $v) = split /;/, $hash;
+		$action_log{$k} += $v;
+	}
+	close $fh1;
 
 	for my $k (keys(%action_log)) {
 		$nline .= "$k;$action_log{$k}<>";
