@@ -63,7 +63,7 @@ sub add_action_log_country {
 	}
 	for my $hash (split /<>/, $line) {
 		my($k, $v) = split /;/, $hash;
-		$action_log{$k} += $v;
+		$action_log{$k} = $v;
 	}
 	close $fh2;
 

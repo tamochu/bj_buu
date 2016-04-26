@@ -104,6 +104,10 @@ sub tp_400 {
 			$m{turn} = 5;
 		}
 		$mes .= "$_[0]Œ‹‰Ê‚Í$GWT•ªŒã<br>";
+
+		require "./lib/hardworker_country.cgi";
+		&write_action_log("dom", $GWT);
+
 		&wait;
 	}
 	else {
