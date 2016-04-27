@@ -45,6 +45,29 @@ sub tp_1 { $cmd ? &b_menu(@menus) : &begin; }
 # ﾒｲﾝｼｽﾃﾑ
 #================================================
 sub main_system {
+	# 誕生日プレゼント
+	# メインの elsif に組み込むと他が優先された場合にログイン時間が更新され二度とここを通らなくなる
+	if (&last_login_check) {
+		my %datas = ();
+		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
+		my $line = <$fh>;
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$datas{$k} = $v;
+		}
+		close $fh;
+		
+		if ($datas{birthday}) {
+			if ($datas{birthday} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
+				my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
+				if ($tmon + 1 == $2 && $tmday == $3) {
+					$mes .= "誕生日おめでとう";
+					require './lib/shopping_offertory_box.cgi';
+					&get_god_item($m{sedai});
+				}
+			}
+		}
+	}
 	# Lv up
 	if ($m{exp} >= 100) {
 		if ($m{egg}) {
@@ -230,27 +253,6 @@ sub main_system {
 		$m{lib} = 'country_move';
 		$m{tp} = 100;
 		close $fh;
-	}
-	elsif (&last_login_check) {
-		my %datas = ();
-		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
-		my $line = <$fh>;
-		for my $hash (split /<>/, $line) {
-			my($k, $v) = split /;/, $hash;
-			$datas{$k} = $v;
-		}
-		close $fh;
-		
-		if ($datas{birthday}) {
-			if ($datas{birthday} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
-				my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
-				if ($tmon + 1 == $2 && $tmday == $3) {
-					$mes .= "誕生日おめでとう";
-					require './lib/shopping_offertory_box.cgi';
-					&get_god_item($m{sedai});
-				}
-			}
-		}
 	}
 	# 国に所属している場合
 	elsif ($m{country}) {
