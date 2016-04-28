@@ -47,6 +47,7 @@ sub tp_1 { $cmd ? &b_menu(@menus) : &begin; }
 sub main_system {
 	# 誕生日プレゼント
 	# メインの elsif に組み込むと他が優先された場合にログイン時間が更新され二度とここを通らなくなる
+	# 毎日必ず通る処理だから読み込むユーザーデータに次の誕生日を持たせた方がファイルオープン減らせそう？
 	if (&last_login_check) {
 		my %datas = ();
 		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
@@ -312,10 +313,12 @@ sub main_system {
 		$mes .= &check_losscut;
 	}
 	
-	if ($config_test) {
+	if ($m{name} eq "nanamie") {
 		if ($in{seed_change}) {
 			&seed_change('change');
 		} else {
+#			require './lib/shopping_offertory_box.cgi';
+#			&get_god_item(6);
 #			$mes .= qq|<form method="$method" action="$script">|;
 #			$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 #			$mes .= qq|<input type="hidden" name="seed_change" value="1">|;
