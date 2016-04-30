@@ -290,6 +290,9 @@ sub update_main_player  {
 			elsif (($p{win_c} > $p{dom3} * 2) && ($p{win_c} > $p{mil5} *2)) { # 戦争が内政軍事の倍なら特化と判定
 				$p{type} = "戦争屋";
 			}
+			else {
+				$p{type} = "器用貧乏";
+			}
 
 			# 内政しないで戦争ばっかアーサー
 
