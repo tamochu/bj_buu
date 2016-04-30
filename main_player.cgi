@@ -274,7 +274,7 @@ sub update_main_player  {
 
 			if (($p{dom3} > $p{mil5} * 2) && ($p{dom3} > $p{win_c} * 2)) { # “à­‚ªŒR–í‘ˆ‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
 				$p{type} = "“à­‰®";
-				if ( ($p{dom3}/3) > $p{hei_c} ) {
+				if ( ($p{dom3}-$p{hei_c}) > $p{hei_c} * 4 ) {
 					$p{type} .= "iç‘K“zj";
 				}
 			}
