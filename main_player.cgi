@@ -273,22 +273,22 @@ sub update_main_player  {
 			$p{draw_c} *= 3;
 
 			if (($p{dom3} > $p{mil5} * 2) && ($p{dom3} > $p{win_c} * 2)) { # 内政が軍事戦争の倍なら特化と判定
-				$p{$type} = "内政廃人";
+				$p{type} = "内政屋";
 				if ( ($p{dom3}/3) > $p{hei_c} ) {
-					$p{$type} .= "（守銭奴）";
+					$p{type} .= "（守銭奴）";
 				}
 			}
 			elsif (($p{mil5} > $p{dom3} * 2) && ($p{mil5} > $p{win_c} *2)) { # 軍事が内政戦争の倍なら特化と判定
-				$p{$type} = "軍事廃人";
+				$p{type} = "軍事屋";
 				if ( ($p{mil5}/5) < $p{gik_c} ) {
-					$p{$type} .= "（ナナコ）";
+					$p{type} .= "（ナナコ）";
 				}
 				elsif ( ($p{mil5}/5) < $p{gik_c} ) {
-					$p{$type} .= "（アクロマ）";
+					$p{type} .= "（アクロマ）";
 				}
 			}
 			elsif (($p{win_c} > $p{dom3} * 2) && ($p{win_c} > $p{mil5} *2)) { # 戦争が内政軍事の倍なら特化と判定
-				$p{$type} = "戦争廃人";
+				$p{type} = "戦争屋";
 			}
 
 			# 内政しないで戦争ばっかアーサー
