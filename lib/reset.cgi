@@ -79,7 +79,7 @@ sub reset {
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 	$country -= $sleep_num if $sleep_num > 0;
 	my $ave_c = int($w{player} / $country);
-	$ave_c = $ave_c < 1 ? 1 : $ave_c;
+	$ave_c = $ave_c < 2 ? 2 : $ave_c;
 
 	# set world
 	$w{year}++;

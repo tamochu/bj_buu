@@ -19,7 +19,7 @@ $max_comment = 3000;
 # ‘¼l‚Ì“ú‹L‚ÉºÒİÄ‚Â‚¯‚ç‚ê‚é‹@”\(0:g‚í‚È‚¢,1:g‚¤)
 $is_comment = 1;
 
-
+# ºÒİÄÛ¸Şƒtƒ@ƒCƒ‹‚ÍŠeƒvƒŒƒCƒ„[Q“ü‚É‹ó‚Ì‚ğ—pˆÓ‚·‚é‚æ‚¤‚É•ÏX‚µƒtƒ@ƒCƒ‹”ñ‘¶İ‚Ìˆ—‚ğí‚é
 #================================================
 
 &decode;
@@ -28,6 +28,7 @@ $this_file = "$userdir/$in{id}/blog"; # _bbs_chat.cgi‚ğg‚¤‚Í.cgi‚ğ‚Â‚¯‚½‚çƒ_ƒ
 &header;
 if ($in{id} && $in{pass}) {
 	if ($in{mode} eq 'comment_exe') { &header_profile; &comment_exe; } # ºÒİÄ’Ç‰Áˆ—
+	elsif ($in{mode} eq 'comment_log') { &view_comment_log; } # ºÒİÄÛ¸Ş•\¦ˆ—
 	else                            { &myself_blog; } # ©•ª—p
 }
 elsif ($in{mode} eq 'comment_form') { &header_profile; &comment_form; } # ºÒİÄ’Ç‰ÁÌ«°Ñ
@@ -72,8 +73,9 @@ sub myself_blog {
 	
 	require "$datadir/header_myroom.cgi";
 	&header_myroom;
-	
+
 	print qq|$delete_message| if $delete_message;
+	print qq|<p>“ú‹L / <a href="?id=$id&pass=$pass&no=$in{no}&mode=comment_log">ºÒİÄÛ¸Ş</a></p>|;
 	print qq|<ul><li>$blog_max_logŒ‚Ü‚Å•Û‘¶(ŒÃ‚¢‚à‚Ì‚©‚ç©“®íœ)</ul>|;
 
 	my $rows = $is_mobile ? 2 : 14;
@@ -116,6 +118,31 @@ sub myself_blog {
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	print qq|<p><input type="submit" value="íœ" class="button_s"> ($count/$blog_max_log)</p></form>|;
 }
+
+#================================================
+# ©•ª‚ÌºÒİÄÛ¸Ş‚ğŒ©‚é
+#================================================
+sub view_comment_log {
+	&read_user;
+
+	require "$datadir/header_myroom.cgi";
+	&header_myroom;
+
+	print qq|<p><a href="?id=$id&pass=$pass&no=$in{no}">“ú‹L</a> / ºÒİÄÛ¸Ş</p>|;
+	my $comment_file = "$userdir/$in{id}/comment_log";
+	&error("$comment_file.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ") unless (-e "$comment_file.cgi");
+
+	print qq|<ul>|;
+	open $fh, "< $comment_file.cgi" or &error("$comment_file.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	while (my $line = <$fh>) {
+		$line =~ tr/\x0D\x0A//d;
+		my($bno,$bid,$btitle,$bname,$bcountry,$btime) = split /<>/, $line;
+		print qq|<li>$btime <a href="?id=$bid&country=$bcountry&kiji=$bno&mode=comment_form">$btitle</a> $bname‚³‚ñ‚Ö‚ÌºÒİÄ</li>|;
+	}
+	close $fh;
+	print qq|</ul>|;
+}
+
 
 #================================================
 # ‘¼l‚Ì“ú‹L‚ğŒ©‚é
@@ -214,10 +241,12 @@ sub comment_exe {
 		return;
 	}
 	&error("•¶š”µ°ÊŞ°‘SŠp300(”¼Šp600)•¶š‚Ü‚Å‚Å‚·") if length $in{comment} > 600;
-	
-	my $blog_uid = $in{id};
-	my $send_name = pack 'H*', $in{id};
-	$in{id} = unpack 'H*', $in{name};
+
+	# ‘S‘Ì“I‚É‚à‚Á‚Æ‚È‚ñ‚©ƒXƒ}[ƒg‚É‘‚«’¼‚¹‚é‹C‚ª‚·‚é‚¯‚Ç–Ê“|‚È‚Ì‚Å•ú’u
+	my $blog_uid = $in{id}; # “Ç‚ñ‚Å‚½ƒuƒƒO‚ÌIDi‘¼ƒvƒŒƒCƒ„[‚ÌIDj
+	my $send_name = pack 'H*', $in{id}; # ƒuƒƒO‚ğ‘‚¢‚½l‚Ì–¼‘O
+	$in{id} = unpack 'H*', $in{name}; # ©•ª‚Ì–¼‘O‚ğID‚É•ÏŠ·
+	my $m_id = $in{id}; # ‚ ‚Æ‚Åg‚¤‚Ì‚Å‘Ş”ğ
 	&read_user;
 	# ª©•ª‚ª‘¶İ‚·‚é‚©‚Ìƒ`ƒFƒbƒNŒã‚É“Ç‚ñ‚Å‚½ƒuƒƒOID‚ğ–ß‚³‚È‚¢‚ÆA
 	# ƒRƒƒ“ƒg“Še’¼Œã‚É•\¦‚³‚ê‚éƒuƒƒO‚ÌuºÒİÄ‚ğ‘‚­væ‚ª©•ª‚Ì“ú‹L‚É‚È‚Á‚Ä‚µ‚Ü‚¤
@@ -236,21 +265,24 @@ sub comment_exe {
 
 	my $is_rewrite = 0;
 	my @lines = ();
+	my @log_lines = ();
 	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		$line =~ tr/\x0D\x0A//d;
 		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
-		
 		if (!$bicon && $in{kiji} eq $btime) {
 			$is_rewrite = 1;
 			push @bcomments, qq|<><b>$m{name}</b>w$in{comment}x<font size="1">($date)</font><br>|;
 			$line = "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>@bcomments<>";
-			
+
 			unless ($send_name eq $m{name}) {
 				# ºÒİÄè†‚ğ‘—‚é 
 				$in{comment} .= "<hr>y“ú‹L$baddr‚Ö‚ÌºÒİÄz";
 				&send_letter($send_name);
+
+				#ºÒİÄƒƒO‚É’Ç‰Á
+				push(@log_lines, "$btime<>$blog_uid<>$baddr<>$send_name<>$bcountry<>$date<>\n");
 			}
 		}
 		push @lines, "$line\n";
@@ -260,12 +292,33 @@ sub comment_exe {
 		truncate $fh, 0;
 		print $fh @lines;
 		close $fh;
-		
+
+		# ŠeƒvƒŒƒCƒ„[Q“ü‚ÉºÒİÄÛ¸Şƒtƒ@ƒCƒ‹‚ğ€”õ‚·‚é‚æ‚¤‚É‚·‚ê‚Î”ñ‘¶İƒ`ƒFƒbƒN‚Í•s—v
+		my $lfh;
+		my $comment_file = "$userdir/$m_id/comment_log";
+		if (-e "$comment_file.cgi") {
+			my $i = 1;
+			open $lfh, "+< $comment_file.cgi" or &error("$comment_file.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			eval { flock $lfh, 2; };
+			while (my $line2 = <$lfh>) {
+				push(@log_lines, "$line2") if $i < 30; # ºÒİÄÛ¸Ş‚Í30Œ
+				$i++;
+			}
+			seek  $lfh, 0, 0;
+			truncate $lfh, 0;
+		}
+		else {
+			open $lfh, "> $comment_file.cgi" or &error("$comment_file.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		}
+		print $lfh @log_lines;
+		close $lfh;
+
 		print "ºÒİÄ‚ğ‘‚«‚İ‚Ü‚µ‚½<br>";
 		&view_blog;
 	}
 	else {
 		close $fh;
+		close $lfh;
 		print "ŠY“–‹L–‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ<br>";
 	}
 }
