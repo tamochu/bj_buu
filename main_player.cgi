@@ -267,18 +267,18 @@ sub update_main_player  {
 			next if $p{pt} < $in{min};
 
 			# “Á’¥Œˆ’è ‚½‚µ‚© “à­*1 ŒR–*0.3 í‘ˆ*3 ‚ÅŒvZ‚µ‚Ä‚½‹C‚ª‚·‚é
-			$p{mil5} *= 0.5;
+			$p{mil5} *= 0.3;
 			$p{win_c} *= 3;
 			$p{lose_c} *= 3;
 			$p{draw_c} *= 3;
 
-			if ($p{dom3} > ($p{mil5} * 2) && $p{dom3} > ($p{win_c} * 2)) { # “à­‚ªŒR–í‘ˆ‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
+			if (($p{dom3} > $p{mil5} * 2) && ($p{dom3} > $p{win_c} * 2)) { # “à­‚ªŒR–í‘ˆ‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
 				$p{$type} = "“à­”pl";
 				if ( ($p{dom3}/3) > $p{hei_c} ) {
 					$p{$type} .= "iç‘K“zj";
 				}
 			}
-			elsif ($p{mil5} > ($p{dom3} * 2) && $p{mil5} > ($p{win_c} *2)) { # ŒR–‚ª“à­í‘ˆ‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
+			elsif (($p{mil5} > $p{dom3} * 2) && ($p{mil5} > $p{win_c} *2)) { # ŒR–‚ª“à­í‘ˆ‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
 				$p{$type} = "ŒR–”pl";
 				if ( ($p{mil5}/5) < $p{gik_c} ) {
 					$p{$type} .= "iƒiƒiƒRj";
@@ -287,7 +287,7 @@ sub update_main_player  {
 					$p{$type} .= "iƒAƒNƒƒ}j";
 				}
 			}
-			elsif ($p{win_c} > ($p{dom3} * 2) && $p{win_c} > ($p{mil5} *2)) { # í‘ˆ‚ª“à­ŒR–‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
+			elsif (($p{win_c} > $p{dom3} * 2) && ($p{win_c} > $p{mil5} *2)) { # í‘ˆ‚ª“à­ŒR–‚Ì”{‚È‚ç“Á‰»‚Æ”»’è
 				$p{$type} = "í‘ˆ”pl";
 			}
 
