@@ -519,6 +519,9 @@ sub write_world_news     {
 	my($message, $is_memory, $memory_name) = @_;
 	if ($w{world} ne '10' || $message =~ /^</) { # h¢ŠEî¨y’¾–ÙzˆÈŠOh‚Ü‚½‚Í‘å‚«‚Èo—ˆ–
 		&_write_news('world_news', @_);
+		my $tm = $message;
+		$tm =~ s/<.*?>//g;
+		&send_twitter($tm);
 	}
 	elsif ($is_memory) { # ¢ŠEî¨y’¾–Ùz‚Åí—ğƒtƒ‰ƒO‚ª‚ ‚Á‚½ê‡
 		$message = &coloration_country($message);

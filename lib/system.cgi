@@ -2,6 +2,8 @@ require './lib/jcode.pl';
 require './lib/summer_system.cgi';
 use Time::Local;
 &get_date; # 時間と日付は常時必要なので常に取得
+use LWP::UserAgent;
+
 #================================================
 # ﾒｲﾝでよく使う処理 Created by Merino
 #================================================
@@ -616,7 +618,30 @@ sub get_player_name_list {
 	return @names;
 }
 
+#================================================
+# Twitterに投稿
+#================================================
+sub send_twitter {
+	my $message = shift;
 
+	my $pid = fork;
+	die unless defined $pid;
+	if ($pid) {
+		return;
+	}
+	close STDOUT;
+	close STDIN;
+	close STDERR;
+
+	my $ua = new LWP::UserAgent;
+	$ua->agent("AgentName/0.1 " . $ua->agent);
+	my %params = (
+		pass => $twitter_pass,
+		mes => $message
+	);
+	my $res = $ua->post('http://bj.ecb.mydns.jp/twitter/', [%params]);
+	exit;
+}
 
 
 1; # 削除不可
