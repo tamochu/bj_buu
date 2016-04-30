@@ -267,7 +267,7 @@ sub update_main_player  {
 			next if $p{pt} < $in{min};
 
 			# “Á’¥Œˆ’è ‚½‚µ‚© “à­*1 ŒRŽ–*0.3 í‘ˆ*3 ‚ÅŒvŽZ‚µ‚Ä‚½‹C‚ª‚·‚é
-			$p{mil5} *= 0.3;
+			$p{mil5} *= 0.4;
 			$p{win_c} *= 3;
 			$p{lose_c} *= 3;
 			$p{draw_c} *= 3;
