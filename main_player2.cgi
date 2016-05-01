@@ -126,7 +126,7 @@ sub run {
 		print qq|<input type="button" value="’Ç‰Á" class="make_calc_list_add button1"/>|;
 		print qq|ŠK‹‰‚Í|;
 		for my $r (0..$#ranks) {
-			print qq|$tanks[$r]:$r,|;
+			print qq|$ranks[$r]:$r,|;
 		}
 		print qq|‚Æ‚È‚è‚Ü‚·B<br>|;
 		print qq|<input type="hidden" name="calc" value="$default_calc" id="calc"/><br>|;
