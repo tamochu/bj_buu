@@ -58,9 +58,9 @@ sub write_cs {
 sub _get_world_line { # Get %w line
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可)
 	my @keys = (qw/
-		country year game_lv limit_time reset_time win_countries player world playing world_sub sub_time
+		country year game_lv limit_time reset_time win_countries player world playing world_sub sub_time twitter_bot
 	/);
-	# 国の数　年　難易度　統一期限　ﾘｾｯﾄされた時間　前回の統一国(複数)　ﾌﾟﾚｲﾔｰ人数　世界情勢　ﾌﾟﾚｲ中人数　サブ情勢　サブ時間
+	# 国の数　年　難易度　統一期限　ﾘｾｯﾄされた時間　前回の統一国(複数)　ﾌﾟﾚｲﾔｰ人数　世界情勢　ﾌﾟﾚｲ中人数　サブ情勢　サブ時間　twitter用カウント
 	
 	my $line = '';
 	for my $k (@keys) {
@@ -519,14 +519,12 @@ sub write_world_news     {
 	my($message, $is_memory, $memory_name) = @_;
 	if ($w{world} ne '10' || $message =~ /^</) { # ”世界情勢【沈黙】以外”または大きな出来事
 		&_write_news('world_news', @_);
-		my $tm = $message;
-		$tm =~ s/<.*?>//g;
-		&send_twitter($tm);
 	}
 	elsif ($is_memory) { # 世界情勢【沈黙】で戦歴フラグがあった場合
 		$message = &coloration_country($message);
 		&write_memory($message, $memory_name);
 	}
+	&twitter_bot;
 }
 sub write_send_news      { &_write_news('send_news',  @_) }
 sub write_blog_news      { &_write_news('blog_news',  @_) }
@@ -1523,5 +1521,20 @@ sub get_rank_name {
 	}
 	return $ranks[$rank];
 }
+
+#================================================
+# Twitterボット
+#================================================
+sub twitter_bot {
+	require "$datadir/twitter_bots.cgi";
+	my $mes = &{$twitter_bots[$w{twitter_bot}]};
+	&send_twitter($mes);
+	$w{twitter_bot}++;
+	if ($w{twitter_bot} >= @twitter_bots) {
+		$w{twitter_bot} = 0;
+	}
+	&write_cs;
+}
+
 
 1; # 削除不可

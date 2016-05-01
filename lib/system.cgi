@@ -643,5 +643,4 @@ sub send_twitter {
 	exit;
 }
 
-
 1; # íœ•s‰Â
