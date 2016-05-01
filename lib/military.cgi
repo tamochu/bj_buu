@@ -78,6 +78,8 @@ sub tp_1 {
 # ‘Ò‚¿•š‚¹
 #=================================================
 sub tp_600 {
+	&write_yran("contr_mil_$GWT", 1, 1);
+
 	if ($cmd eq '1') {
 		$mes .= "“G‘‚©‚ç‚ÌŒR–sˆ×‚ª‚È‚¢‚©©‘‚ğ„‰ñ‚µŠÄ‹‚µ‚Ü‚·<br>";
 		$mes .= "‘Ò‚¿•š‚¹‚Ì—LŒøŠÔ‚ÍÅ‚‚Å$max_ambush_hourŠÔ‚Ü‚Å‚Å‚·<br>";
@@ -90,8 +92,8 @@ sub tp_600 {
 		print $fh "$time<>$m{name}<>\n";
 		close $fh;
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("mil", $GWT);
+#		require "./lib/hardworker_country.cgi";
+#		&write_action_log("mil", $GWT);
 
 		&wait;
 	}
@@ -102,8 +104,8 @@ sub tp_600 {
 		$m{value} = 'ambush';
 		$m{tp} += 10;
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("mil", $GWT);
+#		require "./lib/hardworker_country.cgi";
+#		&write_action_log("mil", $GWT);
 
 		&wait;
 	}
@@ -235,8 +237,9 @@ sub exe1 {
 			$m{renzoku_c} = 1;
 		}
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("mil", $GWT);
+		&write_yran("contr_mil_$GWT", 1, 1);
+#		require "./lib/hardworker_country.cgi";
+#		&write_action_log("mil", $GWT);
 
 		&wait;
 	}

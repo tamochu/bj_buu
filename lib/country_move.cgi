@@ -122,7 +122,7 @@ sub tp_300 {
 	}
 	# ‘¨•ú˜Q
 	elsif ($cmd == $w{country} + 1) {
-	      	if($m{country}){
+		if($m{country}){
 			# —§Œó•âÒ
 			if ($m{name} eq $m{vote}) {
 			   $mes .= "$c_m‚Ì$e2j{ceo}‚Ì—§Œó•â‚ğ«”C‚·‚é•K—v‚ª‚ ‚è‚Ü‚·<br>";
@@ -143,6 +143,7 @@ sub tp_300 {
 				     &begin;
 				     return;
 			}
+			&summary_contribute;
 			&move_player($m{name}, $m{country}, 0);
 			$m{country} = 0;
 			$m{rank} = 0;
@@ -158,7 +159,7 @@ sub tp_300 {
 			$mes .= "Ÿ‚És“®‚Å‚«‚é‚Ì‚Í$GWT•ªŒã‚Å‚·<br>";
 			&refresh;
 			&wait;
-		}else {
+		} else {
 			do {
 				$cmd = int(rand($w{country}) + 1);
 			} while ($cs{is_die}[$cmd] > 1);
@@ -280,6 +281,7 @@ sub tp_300 {
 					$m{$k.'_c'} = int($m{$k.'_c'} * 0.5);
 				}
 			}
+			&summary_contribute;
 			
 			$mes .= "ˆÚĞ‚Ìè‘±‚«‚É$GWT•ª‚©‚©‚è‚Ü‚·<br>" ;
 			&wait;
@@ -325,7 +327,7 @@ sub tp_300 {
 		} elsif($w{world} eq $#world_states-1) {
 			$cmd = int(rand($w{country}) + 1);
 		}
-		
+
 		&move_player($m{name}, $m{country}, $cmd);
 		$m{next_salary} = $time + 3600 * $salary_hour;
 		$m{country} = $cmd;

@@ -846,13 +846,15 @@ sub write_yran {
 # 国貢献集計
 #================================================
 sub summary_contribute {
-	return if $w{year} !~ /[1-6]$/;
+#	return if $w{year} !~ /[1-6]$/;
+	return if ($w{year} !~ /[1-6]$/) || ($w{year} =~ /6$/ && $m{country} == $w{country}); # 年の一桁目が 0,7,8,9 か暗黒民なら書き込まない
 	return unless (-e "$userdir/$id/year_ranking.cgi");
 
 	my %action_log = ();
 	my @lines = ();
 	open my $fh, "< $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
 	while (my $line = <$fh>) {
+		$line =~ tr/\x0D\x0A//d;
 		my $new_line = '';
 		for my $hash (split /<>/, $line) {
 			my($k, $v) = split /;/, $hash;
@@ -864,10 +866,6 @@ sub summary_contribute {
 		}
 		push @lines, "$new_line\n";
 	}
-	close $fh;
-
-	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
-	print $fh @lines;
 	close $fh;
 
 	open $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
@@ -886,6 +884,10 @@ sub summary_contribute {
 	open $fh1, "> $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgiが開けません");
 	print $fh1 "$nline\n";
 	close $fh1;
+
+	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
+	print $fh @lines;
+	close $fh;
 }
 
 #================================================
