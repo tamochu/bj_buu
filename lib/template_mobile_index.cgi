@@ -39,6 +39,7 @@ sub index {
 <li><a href="reset_player.cgi">ﾘｾｯﾄ処理</a>
 <li><a href="player_ranking.cgi">廃人ﾗﾝｷﾝｸﾞ</a>
 <li><a href="main_player.cgi">主力表\</a>
+<li><a href="main_player2.cgi">主力表\2</a>
 <li><a href="year_player_ranking.cgi">一年ﾗﾝｷﾝｸﾞ</a>
 <li><a href="year_player_ranking_country.cgi">国別ﾗﾝｷﾝｸﾞ</a>
 <li><a href="pop_ranking_gold.cgi">人気ﾗﾝｷﾝｸﾞ(金)</a>

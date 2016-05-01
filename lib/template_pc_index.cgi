@@ -91,6 +91,9 @@ form { margin: 0; padding: 7px; }
 		<form method="$method" action="main_player.cgi">
 			<input type="submit" value="主力表\ " class="button1">
 		</form>
+		<form method="$method" action="main_player2.cgi">
+			<input type="submit" value="主力表\2 " class="button1">
+		</form>
 		<form method="$method" action="year_player_ranking.cgi">
 			<input type="submit" value="一年ﾗﾝｷﾝｸﾞ" class="button1">
 			<br><span class="text_small">1年ごとに更新</span>
