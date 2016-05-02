@@ -17,7 +17,7 @@ sub time_limit {
 	$w{win_countries} = '';
 	if (&is_festival_world) { # Õ‚èî¨‚ÉŠúŒÀØ‚ê
 		&time_limit_festival;
-		&write_cs;
+#		&write_cs;
 	}
 	else { # ˆÃ•E’Êíî¨‚ÅŠúŒÀØ‚ê
 		&write_world_news("<b>$world_name‘å—¤‚ğ“ˆê‚·‚éÒ‚ÍŒ»‚ê‚Ü‚¹‚ñ‚Å‚µ‚½</b>");
@@ -91,14 +91,14 @@ sub reset {
 	my($c1, $c2) = split /,/, $w{win_countries};
 	for my $i (1 .. $w{country}) {
 		# “ˆê‘‚Ìê‡‚ÍNPCã‘Ì
-		if($w{year} % 40 == 10){
-			$cs{strong}[$i] = 5000;
-			$cs{tax}[$i] = 99;
-			$cs{state}[$i] = 5;
-		} else {
+#		if($w{year} % 40 == 10){
+#			$cs{strong}[$i] = 5000;
+#			$cs{tax}[$i] = 99;
+#			$cs{state}[$i] = 5;
+#		} else {
 			$cs{strong}[$i] = $c1 eq $i || $c2 eq $i ? 8000 : int(rand(6) + 10) * 1000;
 			$cs{state}[$i]    = rand(2) > 1 ? 0 : int(rand(@country_states));
-		}
+#		}
 		$cs{food}[$i]     = int(rand(30) + 5) * 1000;
 		$cs{money}[$i]    = int(rand(30) + 5) * 1000;
 		$cs{soldier}[$i]  = int(rand(30) + 5) * 1000;
@@ -186,6 +186,10 @@ sub reset {
 			$cs{win_c}[$i] = 0;
 		}
 	}
+
+#	for my $i (1 .. $w{country}) {
+#			$cs{capacity}[$i] = 10;
+#	}
 
 	&write_cs;
 }

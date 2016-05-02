@@ -437,6 +437,7 @@ sub player_migrate {
 			++$i;
 		}
 		close $fh;
+		&cs_data_repair;
 	}
 	elsif ($type == &festival_type('sangokusi', 1)) { # 三国志設定
 		# バックアップ作成
@@ -581,6 +582,7 @@ sub player_migrate {
 			++$i;
 		}
 		close $fh;
+		&cs_data_repair;
 	}
 #	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) { # 混乱設定
 	elsif ($type == &festival_type('konran', 1)) { # 混乱設定
@@ -654,12 +656,14 @@ sub player_migrate {
 			}
 		}
 		closedir $dh;
+		&cs_data_repair;
 	}
 	elsif ($type == &festival_type('sessoku', 1)) { # 拙速開始
-		&write_cs;
+#		&write_cs;
 	}
 	elsif ($type == &festival_type('sessoku', 0)) { # 拙速終了
-		&write_cs;
+		&cs_data_repair;
+#		&write_cs;
 	}
 	elsif ($type == &festival_type('dokuritu', 1)) { # 独立設定
 		for my $i (0 .. $w{country}) {
@@ -725,7 +729,6 @@ sub player_migrate {
 		
 		&cs_data_repair;# ???
 	}
-	&cs_data_repair;
 }
 
 sub wt_c_reset {
