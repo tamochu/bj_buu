@@ -689,6 +689,25 @@ sub add_festival_country {
 	}
 }
 
+sub wt_c_reset {
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $pid = readdir $dh) {
+		next if $pid =~ /\./;
+		next if $pid =~ /backup/;
+		my %you_datas = &get_you_datas($pid, 1);
+
+		if ($you_datas{name} eq $m{name}){
+			$m{wt_c_latest} = $m{wt_c};
+			$m{wt_c} = 0;
+			&write_user;
+		} else {
+			&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
+			&regist_you_data($you_datas{name}, "wt_c", 0);
+		}
+	}
+	closedir $dh;
+}
+
 =pod
 # 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
 use constant FESTIVAL_TYPE => {
@@ -794,25 +813,6 @@ sub player_migrate {
 		
 		&cs_data_repair;# ???
 	}
-}
-
-sub wt_c_reset {
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		my %you_datas = &get_you_datas($pid, 1);
-
-		if ($you_datas{name} eq $m{name}){
-			$m{wt_c_latest} = $m{wt_c};
-			$m{wt_c} = 0;
-			&write_user;
-		} else {
-			&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-			&regist_you_data($you_datas{name}, "wt_c", 0);
-		}
-	}
-	closedir $dh;
 }
 =cut
 1;
