@@ -700,8 +700,8 @@ sub add_my_status_line {
 
 sub remove_my_status_line {
 	my $to_id = shift;
-	my $rm_name = shift;
 	my $type = shift;
+	my $rm_name = shift;
 	
 	unless (-f "$userdir/$to_id/espoir.cgi") {
 		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
