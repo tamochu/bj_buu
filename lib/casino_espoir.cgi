@@ -720,6 +720,7 @@ sub lose {
 		&regist_you_data($name, 'money', 0);
 		&regist_you_data($name, 'shogo', $shogos[1][0]);
 	}
+	&system_comment("$name’n‰º¶ŠˆŒˆ’è");
 	&end_player($name);
 }
 
@@ -865,6 +866,11 @@ sub change_my_status {
 	open my $fhw, "> $userdir/$change_id/espoir.cgi" or &error('ŽQ‰ÁŽÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	print $fhw @lines;
 	close $fhw;
+	
+	if ($star <= 0) {
+		my $lose_name = pack 'H*', $change_id;
+		&lose($lose_name)
+	}
 	
 	return $ret;
 }
