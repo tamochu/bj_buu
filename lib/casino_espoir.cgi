@@ -634,6 +634,7 @@ sub goal {
 			$recv -= $bonus_coin;
 			&bonus($m{name}, '', '');
 		}
+		&end_player($m{name});
 		return '';
 	}
 	return '終了条件を満たしていません。';
@@ -641,7 +642,28 @@ sub goal {
 
 sub lose {
 	my $name = shift;
+	&end_player($name);
+}
+
+sub end_player {
+	my $name = shift;
+
+	open my $fh, "< $all_member_file" or &error('参加者ﾌｧｲﾙが開けません'); 
+	while (my $line = <$fh>) {
+		chomp $line;
+		if ($line) {
+			if ($line ne $name) {
+				push @all_players, $line;
+			}
+		}
+	}
+	close $fh;
 	
+	open my $wfh, "> $all_member_file" or &error('参加者ﾌｧｲﾙが開けません'); 
+	for my $line (@all_players) {
+		print $wfh "$line\n";
+	}
+	close $wfh;
 }
 
 sub add_my_status_line {
