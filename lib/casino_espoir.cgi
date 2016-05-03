@@ -412,7 +412,7 @@ sub send_star {
 		return;
 	}
 	my $to_id = unpack 'H*', $to;
-	&change_my_status($id, 'add_star', -1);
+	&change_my_status($id, 'star_add', -1);
 	&add_my_status_line($id, -1, $to);
 	&add_my_status_line($to_id, 1, $m{name});
 }
@@ -423,7 +423,7 @@ sub send_a {
 		return;
 	}
 	my $to_id = unpack 'H*', $to;
-	&change_my_status($id, 'add_a', -1);
+	&change_my_status($id, 'a_add', -1);
 	&add_my_status_line($id, -2, $to);
 	&add_my_status_line($to_id, 2, $m{name});
 }
@@ -434,7 +434,7 @@ sub send_b {
 		return;
 	}
 	my $to_id = unpack 'H*', $to;
-	&change_my_status($id, 'add_b', -1);
+	&change_my_status($id, 'b_add', -1);
 	&add_my_status_line($id, -3, $to);
 	&add_my_status_line($to_id, 3, $m{name});
 }
@@ -445,7 +445,7 @@ sub send_c {
 		return;
 	}
 	my $to_id = unpack 'H*', $to;
-	&change_my_status($id, 'add_c', -1);
+	&change_my_status($id, 'c_add', -1);
 	&add_my_status_line($id, -4, $to);
 	&add_my_status_line($to_id, 4, $m{name});
 }
@@ -491,7 +491,7 @@ sub check_a {
 		&change_my_status($id, 'set', 1);
 		&add_my_status_line($id, -5, $to);
 		&add_my_status_line($to_id, 5, $m{name});
-		&change_my_status($id, 'add_a', -1);
+		&change_my_status($id, 'a_add', -1);
 	}
 	return 'チェック';
 }
@@ -507,7 +507,7 @@ sub check_b {
 		&change_my_status($id, 'set', 2);
 		&add_my_status_line($id, -5, $to);
 		&add_my_status_line($to_id, 5, $m{name});
-		&change_my_status($id, 'add_b', -1);
+		&change_my_status($id, 'b_add', -1);
 	}
 	return 'チェック';
 }
@@ -523,7 +523,7 @@ sub check_c {
 		&change_my_status($id, 'set', 3);
 		&add_my_status_line($id, -5, $to);
 		&add_my_status_line($to_id, 5, $m{name});
-		&change_my_status($id, 'add_c', -1);
+		&change_my_status($id, 'c_add', -1);
 	}
 	return 'チェック';
 }
@@ -545,7 +545,7 @@ sub recheck {
 		my $win = 0;
 		my $omes = "オープン<br>$m{name}:";
 		if ($hand == 1) {
-			&change_my_status($id, 'add_a', -1);
+			&change_my_status($id, 'a_add', -1);
 			$omes .= 'グー vs ';
 			if ($y_hand == 1) {
 				$omes .= "$name:グー<br>あいこ";
@@ -557,7 +557,7 @@ sub recheck {
 				$win = -1;
 			}
 		} elsif ($hand == 2) {
-			&change_my_status($id, 'add_b', -1);
+			&change_my_status($id, 'b_add', -1);
 			$omes .= 'チョキ vs ';
 			if ($y_hand == 1) {
 				$omes .= "$name:グー<br>$name勝利";
@@ -569,7 +569,7 @@ sub recheck {
 				$win = 1;
 			}
 		} else {
-			&change_my_status($id, 'add_c', -1);
+			&change_my_status($id, 'c_add', -1);
 			$omes .= 'パー vs ';
 			if ($y_hand == 1) {
 				$omes .= "$name:グー<br>$m{name}勝利";
@@ -585,8 +585,8 @@ sub recheck {
 		&decrease_all($y_hand);
 		&system_comment($omes);
 		if ($win != 0) {
-			&change_my_status($id, 'add_star', $win);
-			&change_my_status($from_id, 'add_star', -1 * $win);
+			&change_my_status($id, 'star_add', $win);
+			&change_my_status($from_id, 'star_add', -1 * $win);
 		}
 	}
 }
