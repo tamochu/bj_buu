@@ -86,7 +86,7 @@ sub run {
 		print qq|全体残り グー:$all_rest_a チョキ:$all_rest_b パー:$all_rest_c<br>|;
 		if ($participate) {
 			my ($rest_a, $rest_b, $rest_c, $star, $count, $year, $check_h, %stack) = &get_my_state;
-			print qq|残り グー:$my_rest_a チョキ:$my_rest_b パー:$my_rest_c|;
+			print qq|残り グー:$rest_a チョキ:$rest_b パー:$rest_c|;
 			my $no_stack = 1;
 			if (@{$stack{star}}) {
 				print qq|<form method="$method" action="$this_script" name="form">|;
