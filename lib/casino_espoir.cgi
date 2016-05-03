@@ -671,7 +671,7 @@ sub add_my_status_line {
 	my $type = shift;
 	my $name = shift;
 	
-	unless (-f "$userdir/$change_id/espoir.cgi") {
+	unless (-f "$userdir/$to_id/espoir.cgi") {
 		open my $fh, "> $userdir/$change_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
@@ -698,7 +698,7 @@ sub remove_my_status_line {
 	my $rm_name = shift;
 	my $type = shift;
 	
-	unless (-f "$userdir/$change_id/espoir.cgi") {
+	unless (-f "$userdir/$to_id/espoir.cgi") {
 		open my $fh, "> $userdir/$change_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
