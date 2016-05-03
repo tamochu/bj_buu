@@ -677,7 +677,7 @@ sub add_my_status_line {
 	my $name = shift;
 	
 	unless (-f "$userdir/$to_id/espoir.cgi") {
-		open my $fh, "> $userdir/$change_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
 	}
@@ -695,7 +695,7 @@ sub add_my_status_line {
 	
 	open my $fhw, "> $userdir/$to_id/espoir.cgi" or &error('Q‰ÁÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	print $fhw @lines;
-	close $fhm;
+	close $fhw;
 }
 
 sub remove_my_status_line {
@@ -704,7 +704,7 @@ sub remove_my_status_line {
 	my $type = shift;
 	
 	unless (-f "$userdir/$to_id/espoir.cgi") {
-		open my $fh, "> $userdir/$change_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
 	}
@@ -728,7 +728,7 @@ sub remove_my_status_line {
 	
 	open my $fhw, "> $userdir/$to_id/espoir.cgi" or &error('Q‰ÁÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	print $fhw @lines;
-	close $fhm;
+	close $fhw;
 	
 	return ($find, $rm_name);
 }
@@ -781,7 +781,7 @@ sub change_my_status {
 	
 	open my $fhw, "> $userdir/$change_id/espoir.cgi" or &error('Q‰ÁÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	print $fhw @lines;
-	close $fhm;
+	close $fhw;
 	
 	return $ret;
 }
@@ -802,7 +802,7 @@ sub clear_stack {
 	
 	open my $fhw, "> $userdir/$clear_id/espoir.cgi" or &error('Q‰ÁÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	print $fhw @lines;
-	close $fhm;
+	close $fhw;
 }
 
 sub decrease_all {
