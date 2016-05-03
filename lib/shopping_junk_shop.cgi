@@ -70,7 +70,6 @@ sub tp_1 {
 	}
 	elsif ($cmd eq '3') {
 		$mes .= '運だましのｶﾞﾁｬｶﾞﾁｬﾀﾏｺﾞ。値段色々。何が出るかはお楽しめ<br>';
-		$mes .= 'いだまけ投票権つく<br>';
 		my @menus = ('やめる');
 		for my $i (0..$#gacha_eggs) {
 			push @menus, "$gacha_eggs[$i][0] G";
@@ -79,7 +78,6 @@ sub tp_1 {
 	}
 	elsif ($cmd eq '4') {
 		$mes .= 'ちょっとﾘｯﾁなｶﾞﾁｬｶﾞﾁｬﾀﾏｺﾞ。何が出るかはお楽しめ<br>';
-		$mes .= 'いだまけ投票権つく<br>';
 		my @menus = ('やめる');
 		for my $i (0..$#gacha_eggs2) {
 			push @menus, "$gacha_eggs2[$i][0] G";
@@ -196,10 +194,11 @@ sub tp_200 {
 			
 			$mes .= "お前いい人、仲良し。良いもの持てる $sall_money Gやる<br>";
 			$m{money} += $sall_price;
-			
-			open my $fh, ">> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
-			print $fh $line;
-			close $fh;
+			if (rand(2) < 1) {
+				open my $fh, ">> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
+				print $fh $line;
+				close $fh;
+			}
 			open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
 			print $fh3 "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
 			close $fh3;
