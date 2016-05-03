@@ -26,9 +26,6 @@ unless (-f $all_member_file) {
 }
 
 sub run {
-	my ($game_year, $all_rest_a, $all_rest_b, $all_rest_c, $participate, @all_member) = &get_state;
-	
-	
 	if ($in{mode} eq "participate") {
 		$in{comment} = &participate;
 		&write_comment if $in{comment};
@@ -78,6 +75,8 @@ sub run {
 	}
 	my ($member_c, $member) = &get_member;
 
+	my ($game_year, $all_rest_a, $all_rest_b, $all_rest_c, $participate, @all_member) = &get_state;
+	
 	print qq|<form method="$method" action="$script">|;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 	print qq|<input type="submit" value="戻る" class="button1"></form>|;
@@ -195,7 +194,7 @@ sub run {
 						print qq|<option value="send_star">星を渡す</option>|;
 					}
 					print qq|</select>|;
-					print qq|相手：<input type="hidden" name="to" value="">|;
+					print qq|相手：<input type="text" name="to" value="">|;
 					print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 					print qq|<input type="submit" value="送信" class="button_s"><br>|;
 					print qq|</form>|;
@@ -245,6 +244,7 @@ sub run {
 	print qq|</td>|;
 	print qq|</tr></table>|;
 }
+
 sub get_member {
 	my $is_find = 0;
 	my $member  = '';
@@ -369,9 +369,9 @@ sub participate {
 		
 		if (@all_players >= $min_espoir) {
 			if ($play_year != $w{year} + 1) {
+				$play_year = $w{year} + 1;
 				&system_comment("$play_yearにエスポワール<希望>は出港いたします。");
 			}
-			$play_year = $w{year} + 1;
 			for my $en (@all_players) {
 				my $en_id = unpack 'H*', $en;
 				&change_my_status($en_id, 'year', $play_year);
@@ -636,6 +636,11 @@ sub goal {
 		return '';
 	}
 	return '終了条件を満たしていません。';
+}
+
+sub lose {
+	my $name = shift;
+	
 }
 
 sub add_my_status_line {
