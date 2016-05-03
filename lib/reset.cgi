@@ -47,7 +47,7 @@ sub reset {
 	$this_file = "$logdir/chat_casino_toto";
 	require './lib/casino_toto.cgi';
 	&pay_back($w{year});
-	$this_file = "$logdir/chat_casino_espoir";
+	$this_file = "$logdir/chat_casino_e";
 	require './lib/casino_espoir.cgi';
 	&game_end_espoir($w{year});
 
