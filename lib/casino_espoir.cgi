@@ -194,7 +194,8 @@ sub run {
 						print qq|<option value="send_star">星を渡す</option>|;
 					}
 					print qq|</select>|;
-					print qq|相手：<input type="text" name="to" value="">|;
+					print qq|相手：|;
+					&print_player_select('to');
 					print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 					print qq|<input type="submit" value="送信" class="button_s"><br>|;
 					print qq|</form>|;
@@ -801,6 +802,28 @@ sub decrease_all {
 	open my $fhw, "> $all_member_file" or &error('参加者ﾌｧｲﾙが開けません'); 
 	print $fhw @all_players;
 	close $fhw;
+}
+
+sub print_player_select {
+	my $name = shift;
+
+	my @all_players = ();
+	open my $fh, "< $all_member_file" or &error('参加者ﾌｧｲﾙが開けません'); 
+	my $headline = <$fh>;
+	my($play_year, $rest_a, $rest_b, $rest_c) = split /<>/, $headline;
+	while (my $line = <$fh>) {
+		push @all_players, $line;
+	}
+	close $fh;
+
+	print qq|<select name="$name">|;
+	for my $pl (@all_players) {
+		chomp $pl;
+		if ($pl) {
+			print qq|<option value="$pl">$pl</option>|;
+		}
+	}
+	print qq|</select>|;
 }
 
 sub item_or_coin {
