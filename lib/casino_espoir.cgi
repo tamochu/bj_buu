@@ -213,13 +213,13 @@ sub run {
 	} else {
 		print qq|乗船者募集中|;
 		if ($participate) {
+			print qq|あなたは乗船予\定です。|;
+		} else {
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="participate">|;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 			print qq|<input type="submit" value="乗船" class="button_s"><br>|;
 			print qq|</form>|;
-		} else {
-			print qq|あなたは乗船予定です。|;
 		}
 	}
 	print qq|<form method="$method" action="$this_script" name="form">|;
