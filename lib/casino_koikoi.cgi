@@ -1,7 +1,7 @@
 #================================================
 # ‚±‚¢‚±‚¢
 #================================================
-@rates = (100, 1000, 10000);
+@rates = (100, 1000, 3000, 10000, 30000);
 require './lib/_casino_funcs.cgi';
 
 sub run {
@@ -554,6 +554,7 @@ sub print_field {
 	my $num_deck = @decks;
 	
 	print qq|ŽRŽD $num_deck –‡<br>|;
+	print qq|‚±‚¢‚±‚¢ $koikoi ‰ñ<br>|;
 	for my $card (@field_cards){
 		my $gif_str = &num_to_gif($card);
 		print qq|$gif_str|;
@@ -640,7 +641,7 @@ sub start_game{
 	my $e_card = '';
 	while (1) {
 		my @decks = &shuffled_deck;
-		my @fmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
+		my @mmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
 		$field_card = shift @decks;
 		$mmonth[int($field_card / 10) - 1]++;
 		for(2..8){

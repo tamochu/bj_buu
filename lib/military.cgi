@@ -90,9 +90,7 @@ sub tp_600 {
 		print $fh "$time<>$m{name}<>\n";
 		close $fh;
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("mil", $GWT);
-
+		&write_yran("contr_mil_$GWT", 1, 1);
 		&wait;
 	}
 	elsif ($cmd eq '2') {
@@ -102,8 +100,7 @@ sub tp_600 {
 		$m{value} = 'ambush';
 		$m{tp} += 10;
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("mil", $GWT);
+		&write_yran("contr_mil_$GWT", 1, 1);
 
 		&wait;
 	}
@@ -235,8 +232,7 @@ sub exe1 {
 			$m{renzoku_c} = 1;
 		}
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("mil", $GWT);
+		&write_yran("contr_mil_$GWT", 1, 1);
 
 		&wait;
 	}

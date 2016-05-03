@@ -183,10 +183,10 @@ sub update_sales_ranking  {
 	open my $fh9, "> $flag_file";
 	close $fh9;
 	
-	if (${type} eq '') {
-		my @plist = get_player_name_list;
+	if ($files[$in{no}][1] eq '') {
+		my @plist = &get_player_name_list;
 		for my $name (@plist) {
-			if (&you_exist($name)) {
+			if (&you_exists($name)) {
 				&regist_you_data($name, 'exchange_count', '');
 			}
 		}

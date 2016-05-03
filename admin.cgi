@@ -328,6 +328,12 @@ sub top {
 	print qq|<p><input type="submit" value="臨時処理" class="button_s"></p></form></div>|;
 	
 	print qq|<br><br><br>|;
+	print qq|<div class="mes">ﾍﾟｯﾄ流通状況調査<ul>|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_all_pet_check">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="調査" class="button_s"></p></form></div>|;
+	
+	print qq|<br><br><br>|;
 	my @files = glob "$logdir/monster/*.cgi";
 	for my $p_name (@files){
 		if ($p_name =~ /boss/ || $p_name =~ /beginner/) {
@@ -590,10 +596,11 @@ sub junk_sub {
 	my @lines = <$fh3>;
 	my @sell = ();
 	my @buy = ();
-	$mes .= qq|<table class="table1"><tr><th>アイテム</th><th>名前</th><th>売り/買い</th><th>時間</th></tr>|;
+	$mes .= qq|<table><tr>|;
 	@lines = map { $_->[0] }
 				sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
 					map { [$_, split /<>/ ] } @lines;
+	$mes .= qq|<td>アイテムソ\ート<table class="table1"><tr><th>アイテム</th><th>名前</th><th>売り/買い</th><th>時間</th></tr>|;
 	for my $line (@lines){
 		my($kind, $item_no, $item_c, $name, $jtime, $type) = split /<>/, $line;
 		$mes .= "<td>";
@@ -604,7 +611,23 @@ sub junk_sub {
 		$mes .= $type ? "<td>買い</td>" : "<td>売り</td>";
 		$mes .= "<td>$jtime<br></td></tr>";
 	}
-	$mes .= "</table>";
+	$mes .= qq|</table></td>|;
+	@lines = map { $_->[0] }
+				sort { $a->[5] <=> $b->[5] }
+					map { [$_, split /<>/ ] } @lines;
+	$mes .= qq|<td>時間ソ\ート<table class="table1"><tr><th>アイテム</th><th>名前</th><th>売り/買い</th><th>時間</th></tr>|;
+	for my $line (@lines){
+		my($kind, $item_no, $item_c, $name, $jtime, $type) = split /<>/, $line;
+		$mes .= "<td>";
+		$mes .= $kind eq '1' ? $weas[$item_no][1]
+			: $kind eq '2' ? $eggs[$item_no][1]
+			:				$pets[$item_no][1];
+		$mes .= "</td><td>$name</td>";
+		$mes .= $type ? "<td>買い</td>" : "<td>売り</td>";
+		$mes .= "<td>$jtime<br></td></tr>";
+	}
+	$mes .= qq|</table></td>|;
+	$mes .= qq|<tr></table>|;
 	
 	if($del){
 		seek  $fh3, 0, 0;
@@ -986,13 +1009,13 @@ sub admin_all_pet_check {
 		my $depot_file = "$userdir/$pid/depot.cgi";
 		my %pm = &get_you_datas($pid, 1);
 
-		if ($pm{pet} && $pm{pet_c} >= 15) {
+		if ($pm{pet} && $pm{pet_c} >= 10) {
 			push @lines, "$pm{name}<>3<>$pm{pet}<>$pm{pet_c}<>0<>\n";
 		}
 		open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 		while (my $line = <$fh>) {
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			if ($kind eq '3' && $item_c >= 15) {
+			if ($kind eq '3' && $item_c >= 10) {
 				push @lines, "$pm{name}<>$line";
 			}
 		}
@@ -1013,7 +1036,12 @@ sub admin_all_pet_check {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
-
+	my @plist = &get_player_name_list;
+	for my $name (@plist) {
+		if (&you_exists($name)) {
+			&regist_you_data($name, 'exchange_count', '');
+		}
+	}
 }
 
 #=================================================

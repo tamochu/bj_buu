@@ -193,8 +193,7 @@ sub tp_100 {
 			$m{renzoku_c} = 1;
 		}
 
-		require "./lib/hardworker_country.cgi";
-		&write_action_log("war", $GWT);
+		&write_yran("contr_war_$GWT", 1, 1);
 
 		&wait;
 		&write_cs;

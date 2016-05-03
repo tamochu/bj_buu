@@ -870,6 +870,12 @@ sub summary_contribute {
 	print $fh @lines;
 	close $fh;
 
+	unless (-e "$logdir/action_log_country_$m{country}.cgi") {
+		open my $fht, "> $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		print $fht "\n";
+		close $fht;
+	}
+	
 	open $fh1, "< $logdir/action_log_country_$m{country}.cgi" or &error("action_log_country.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	$line = <$fh1>;
 	$line =~ tr/\x0D\x0A//d;

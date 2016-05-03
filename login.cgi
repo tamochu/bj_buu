@@ -25,8 +25,7 @@ if ($time > $w{limit_time}) {
 	&time_limit;
 }
 
-require "./lib/hardworker_country.cgi";
-&add_action_log_country;
+&summary_contribute;
 
 # htmlÌ§²Ùì¬ & ŠúŒÀØ‚êÌßÚ²Ô°íœ
 for my $i (0 .. $w{country}) {
