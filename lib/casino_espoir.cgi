@@ -362,7 +362,7 @@ sub participate {
 	}
 	close $fh;
 	
-	if (!$find && $m{coin} < $rate) {
+	if (!$find && $m{coin} >= $rate) {
 		&coin_move(-1 * $rate, $m{name}, 1);
 		
 		push @all_players, $m{name};
