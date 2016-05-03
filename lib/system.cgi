@@ -326,11 +326,11 @@ sub access_check {
 		$deny =~ s/\*/\.\*/g;
 		
 		if ($is_mobile) {
-			&error($deny_message) if $agent =~ /$deny/;
+			&error($deny_message . $agent) if $agent =~ /$deny/;
 		}
 		else {
-			&error($deny_message) if $addr =~ /^$deny$/i;
-			&error($deny_message) if $host =~ /^$deny$/i;
+			&error($deny_message . $addr) if $addr =~ /^$deny$/i;
+			&error($deny_message . $host) if $host =~ /^$deny$/i;
 		}
 	}
 	my $logging = 1;

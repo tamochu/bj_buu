@@ -631,6 +631,9 @@ sub goal {
 	if (@{$stack{send}}) {
 		return '送った相手が受け取っていないか拒否していません。';
 	}
+	if ($check_h) {
+		return '勝負の最中です。';
+	}
 	
 	if ($rest_a <= 0 && $rest_b <= 0 && $rest_c <= 0 && $star >= $need_star && !$check_h) {
 		my $else_star = $star - $need_star;
@@ -639,6 +642,7 @@ sub goal {
 			$recv -= $bonus_coin;
 			&bonus($m{name}, '', '');
 		}
+		&coin_move($recv, $m{name}, 1);
 		&end_player($m{name});
 		return '';
 	}
@@ -647,6 +651,75 @@ sub goal {
 
 sub lose {
 	my $name = shift;
+	my $lose_id = unpack 'H*', $name;
+
+	for my $type (1..5) {
+		my ($find, $r_name) = &remove_my_status_line($lose_id, $type, '');
+		while ($find) {
+			my $from_id = unpack 'H*', $r_name;
+			&remove_my_status_line($from_id, -1 * $type, $m{name});
+			if ($type == 5) {
+				my $y_hand = &change_my_status($lose_id, 'set', '');
+				my $sta = $y_hand == 1 ? 'a_add' :
+							$y_hand == 2 ? 'b_add' :
+							$y_hand == 3 ? 'c_add' :
+										'';
+				&change_my_status($lose_id, $sta, 1);
+			} else {
+				my $sta = $type == 1 ? 'star_add' :
+							$type == 2 ? 'a_add' :
+							$type == 3 ? 'b_add' :
+							$type == 4 ? 'c_add' :
+										'';
+				
+				&change_my_status($from_id, $sta, 1);
+			}
+			($find, $r_name) = &remove_my_status_line($lose_id, $type, '');
+		}
+
+		($find, $r_name) = &remove_my_status_line($lose_id, -1 * $type, '');
+		while ($find) {
+			my $from_id = unpack 'H*', $r_name;
+			&remove_my_status_line($from_id, $type, $m{name});
+			if ($type == 5) {
+				my $y_hand = &change_my_status($from_id, 'set', '');
+				my $sta = $y_hand == 1 ? 'a_add' :
+							$y_hand == 2 ? 'b_add' :
+							$y_hand == 3 ? 'c_add' :
+										'';
+				&change_my_status($from_id, $sta, 1);
+			} else {
+				my $sta = $type == 1 ? 'star_add' :
+							$type == 2 ? 'a_add' :
+							$type == 3 ? 'b_add' :
+							$type == 4 ? 'c_add' :
+										'';
+				&change_my_status($lose_id, $sta, 1);
+			}
+			($find, $r_name) = &remove_my_status_line($lose_id, -1 * $type, '');
+		}
+	}
+	&clear_stack($lose_id);
+	
+	open my $fhm, "< $userdir/$lose_id/espoir.cgi" or &error('参加者ﾌｧｲﾙが開けません'); 
+	my $headline = <$fhm>;
+	my ($star, $rest_a, $rest_b, $rest_c, $count, $year, $check_h) = split /<>/, $headline;
+	close $fhm;
+	
+	if ($star > 0) {
+		return;
+	}
+	
+	if ($name eq $m{name}) {
+		$m{coin} = 0;
+		$m{money} = 0;
+		$m{shogo} = $shogos[1][0];
+		&write_user;
+	} else {
+		&regist_you_data($name, 'coin', 0);
+		&regist_you_data($name, 'money', 0);
+		&regist_you_data($name, 'shogo', $shogos[1][0]);
+	}
 	&end_player($name);
 }
 
@@ -669,6 +742,16 @@ sub end_player {
 		print $wfh "$line\n";
 	}
 	close $wfh;
+}
+
+sub game_end {
+	my $year = shift;
+	my ($game_year, $all_rest_a, $all_rest_b, $all_rest_c, $participate, @all_member) = &get_state;
+	if ($game_year == $year) {
+		for my $name (@all_member) {
+			&lose($name);
+		}
+	}
 }
 
 sub add_my_status_line {
@@ -846,21 +929,11 @@ sub print_player_select {
 	print qq|<select name="$name">|;
 	for my $pl (@all_players) {
 		chomp $pl;
-		if ($pl) {
+		if ($pl && $pl ne $m{name}) {
 			print qq|<option value="$pl">$pl</option>|;
 		}
 	}
 	print qq|</select>|;
-}
-
-sub item_or_coin {
-	my ($m_coin, $name) = @_;
-	
-	while ($m_coin > 2500000) {
-		$m_coin -= 1000000;
-		&bonus($name, '', 'ﾄﾄの景品を貰いました');
-	}
-	&coin_move($m_coin, $name, 1);
 }
 
 1;
