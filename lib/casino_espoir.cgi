@@ -70,9 +70,6 @@ sub run {
 	elsif ($in{mode} eq "goal") {
 		&goal;
 	}
-	elsif ($in{mode} eq "end_espoir") {
-		&game_end_espoir;
-	}
 	elsif($in{mode} eq "write" &&$in{comment}){
 		&write_comment;
 	}
@@ -86,11 +83,6 @@ sub run {
 	print qq|<h2>$this_title</h2>|;
 	
 	if ($game_year eq $w{year}) {
-		print qq|<form method="$method" action="$this_script" name="form">|;
-		print qq|<input type="hidden" name="mode" value="end_espoir">|;
-		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-		print qq|<input type="submit" value="強制終了" class="button_s"><br>|;
-		print qq|</form>|;
 		print qq|全体残り グー:$all_rest_a チョキ:$all_rest_b パー:$all_rest_c<br>|;
 		if ($participate) {
 			my ($rest_a, $rest_b, $rest_c, $star, $count, $year, $check_h, %stack) = &get_my_state;
@@ -659,6 +651,7 @@ sub goal {
 
 sub lose {
 	my $name = shift;
+	my $force = shift;
 	my $lose_id = unpack 'H*', $name;
 
 	for my $type (1..5) {
@@ -714,7 +707,7 @@ sub lose {
 	my ($star, $rest_a, $rest_b, $rest_c, $count, $year, $check_h) = split /<>/, $headline;
 	close $fhm;
 	
-	if ($star > 0) {
+	if ($star > 0 && !$force) {
 		return;
 	}
 	
@@ -760,7 +753,7 @@ sub game_end_espoir {
 		for my $name (@all_member) {
 			chomp $name;
 			if ($name) {
-				&lose($name);
+				&lose($name, 1);
 			}
 		}
 	}
@@ -880,7 +873,7 @@ sub change_my_status {
 	
 	if ($star <= 0) {
 		my $lose_name = pack 'H*', $change_id;
-		&lose($lose_name)
+		&lose($lose_name, 0)
 	}
 	
 	return $ret;
