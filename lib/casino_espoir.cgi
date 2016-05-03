@@ -680,7 +680,7 @@ sub add_my_status_line {
 	my @lines = ();
 	open my $fhm, "< $userdir/$to_id/espoir.cgi" or &error('参加者ﾌｧｲﾙが開けません'); 
 	my $headline = <$fhm>;
-	push @lines, $head_line;
+	push @lines, $headline;
 	while (my $line = <$fh>) {
 		push @lines, $line;
 	}
@@ -707,7 +707,7 @@ sub remove_my_status_line {
 	my @lines = ();
 	open my $fhm, "< $userdir/$to_id/espoir.cgi" or &error('参加者ﾌｧｲﾙが開けません'); 
 	my $headline = <$fhm>;
-	push @lines, $head_line;
+	push @lines, $headline;
 	
 	my $find = 0;
 	while (my $line = <$fh>) {
