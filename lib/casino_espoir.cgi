@@ -686,7 +686,7 @@ sub add_my_status_line {
 	open my $fhm, "< $userdir/$to_id/espoir.cgi" or &error('Q‰ÁÒÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	my $headline = <$fhm>;
 	push @lines, $headline;
-	while (my $line = <$fh>) {
+	while (my $line = <$fhm>) {
 		push @lines, $line;
 	}
 	close $fhm;
@@ -715,7 +715,7 @@ sub remove_my_status_line {
 	push @lines, $headline;
 	
 	my $find = 0;
-	while (my $line = <$fh>) {
+	while (my $line = <$fhm>) {
 		my ($t, $n) = split /<>/, $line;
 		if (!$find && $t eq $type && (!$rm_name || $n eq $rm_name)) {
 			$find = 1;
