@@ -2,9 +2,6 @@ use File::Copy::Recursive qw(rcopy);
 use File::Path;
 #================================================
 # 祭り情勢の開始・終了で使われるモジュール
-#================================================
-
-#================================================
 # 主な呼び出し元
 # ./lib/reset.cgi
 #================================================
@@ -55,10 +52,10 @@ sub begin_festival_world {
 #================================================
 sub end_festival_world {
 	if ($w{year} % 40 == 0){ # 不倶戴天
-		$w{country} -= 2;
+		$w{country} -= FESTIVAL_COUNTRY_PROPERTY->{kouhaku}[0];
 		&run_kouhaku(0);
 	} elsif ($w{year} % 40 == 20) { # 三国志
-		$w{country} -= 3;
+		$w{country} -= FESTIVAL_COUNTRY_PROPERTY->{sangokusi}[0];
 		&run_sangokusi(0);
 	} elsif ($w{year} % 40 == 10) { # 拙速
 		&run_sessoku(0);
@@ -75,16 +72,6 @@ sub run_kouhaku {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 紅白開始時の処理	
-		# バックアップ作成
-		for my $i (0 .. $w{country} - 2) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
-		
 		@sedais=([0, 0],[0, 0],[0, 0],[0, 0]);
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 	
@@ -183,48 +170,8 @@ sub run_kouhaku {
 			}
 		}
 		closedir $dh;
-		
-		# 国フォルダ削除
-		for my $i ($w{country}+2, $w{country}+1) {
-			my $from = "$logdir/$i";
-			my $num = rmtree($from);
-			
-			my @lines = ();
-			open my $fh, "+< $logdir/countries_mes.cgi";
-			eval { flock $fh, 2; };
-			while (my $line = <$fh>) {
-				push @lines, $line;
-			}
-			pop @lines while @lines > $w{country} + 1;
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh @lines;
-			close $fh;
-		}
-		
-		$w{country} -= 2;
-		
-		# 国データ復旧
-		for my $i (0 .. $w{country}) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			my $num = rmtree($from);
-			rcopy($backup, $from);
-		}
-		
-		my $i = 1;
-		open my $fh, "< $logdir/countries_backup.cgi" or &error("国ﾃﾞｰﾀが読み込めません");
-		my $world_line = <$fh>;
-		while (my $line = <$fh>) {
-			for my $hash (split /<>/, $line) {
-				my($k, $v) = split /;/, $hash;
-				if ($k eq 'name' || $k eq 'color' || $k eq 'win_c' || $k eq 'old_ceo' || $k eq 'ceo_continue') {
-					$cs{$k}[$i] = $v;
-				}
-			}
-			++$i;
-		}
-		close $fh;
+
+		&remove_festival_country('kouhaku');
 		&cs_data_repair;
 	} # 紅白終了時の処理
 }
@@ -237,16 +184,6 @@ sub run_sangokusi {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 三国志開始時の処理
-		# バックアップ作成
-		for my $i (0 .. $w{country} - 3) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
-		
 		@sedais=([0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 0, 0]);
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -344,48 +281,8 @@ sub run_sangokusi {
 			}
 		}
 		closedir $dh;
-		
-		# 国フォルダ削除
-		for my $i ($w{country}+3, $w{country}+2, $w{country}+1) {
-			my $from = "$logdir/$i";
-			my $num = rmtree($from);
-			
-			my @lines = ();
-			open my $fh, "+< $logdir/countries_mes.cgi";
-			eval { flock $fh, 2; };
-			while (my $line = <$fh>) {
-				push @lines, $line;
-			}
-			pop @lines if @lines > $w{country} + 1;
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh @lines;
-			close $fh;
-		}
-		
-		$w{country} -= 3;
-		
-		# 国データ復旧
-		for my $i (0 .. $w{country}) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			my $num = rmtree($from);
-			rcopy($backup, $from);
-		}
-		
-		my $i = 1;
-		open my $fh, "< $logdir/countries_backup.cgi" or &error("国ﾃﾞｰﾀが読み込めません");
-		my $world_line = <$fh>;
-		while (my $line = <$fh>) {
-			for my $hash (split /<>/, $line) {
-				my($k, $v) = split /;/, $hash;
-				if ($k eq 'name' || $k eq 'color' || $k eq 'win_c' || $k eq 'old_ceo' || $k eq 'ceo_continue') {
-					$cs{$k}[$i] = $v;
-				}
-			}
-			++$i;
-		}
-		close $fh;
+
+		&remove_festival_country('sangokusi');
 		&cs_data_repair;
 	} # 三国志終了時の処理
 }
@@ -460,7 +357,6 @@ sub run_konran {
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 混乱開始時の処理
 		# 一旦ネバラン送り
-		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
@@ -539,6 +435,154 @@ sub run_konran {
 }
 
 #================================================
+# 指定された祭り情勢用の国を追加し、それ以外の国をﾊﾞｯｸｱｯﾌﾟ
+# 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
+#================================================
+sub add_festival_country {
+	my $festival_name = shift;
+	my $country_num = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[0];
+	$w{country} += $country_num;
+	my $max_c = int($w{player} / $country_num) + 3;
+	for my $i ($w{country}-($country_num-1)..$w{country}){
+		mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
+		for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
+			my $output_file = "$logdir/$i/$file_name.cgi";
+			next if -f $output_file;
+			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+			close $fh;
+			chmod $chmod, $output_file;
+		}
+		for my $file_name (qw/leader member/) {
+			my $output_file = "$logdir/$i/$file_name.cgi";
+			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+			close $fh;
+			chmod $chmod, $output_file;
+		}
+		&add_npc_data($i);
+		# create union file
+		for my $j (1 .. $i-1) {
+			my $file_name = "$logdir/union/${j}_${i}";
+			$w{ "f_${j}_${i}" } = -99;
+			$w{ "p_${j}_${i}" } = 2;
+			next if -f "$file_name.cgi";
+			open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
+			close $fh;
+			chmod $chmod, "$file_name.cgi";
+			open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
+			close $fh2;
+			chmod $chmod, "${file_name}_log.cgi";
+			open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
+			close $fh3;
+			chmod $chmod, "${file_name}_member.cgi";
+		}
+		unless (-f "$htmldir/$i.html") {
+			open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html ﾌｧｲﾙが作れません");
+			close $fh_h;
+		}
+
+		my $num = $i-($w{country}+1-$country_num);
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$num];
+		$cs{member}[$i]   = 0;
+		$cs{win_c}[$i]    = 999;
+		$cs{tax}[$i]      = 99;
+		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1];
+		$cs{food}[$i]     = $config_test ? 999999 : 0;
+		$cs{money}[$i]    = $config_test ? 999999 : 0;
+		$cs{soldier}[$i]  = $config_test ? 999999 : 0;
+		$cs{state}[$i]    = 0;
+		$cs{capacity}[$i] = $max_c;
+		$cs{is_die}[$i]   = 0;
+		my @lines = &get_countries_mes();
+		if ($w{country} > @lines - $country_num) {
+			open my $fh9, ">> $logdir/countries_mes.cgi";
+			print $fh9 "<>$default_icon<>\n";
+			close $fh9;
+		}
+	}
+
+	for my $i (1 .. $w{country}-$country_num) {
+		$cs{strong}[$i]   = 0;
+		$cs{food}[$i]     = 0;
+		$cs{money}[$i]    = 0;
+		$cs{soldier}[$i]  = 0;
+		$cs{state}[$i]    = 0;
+		$cs{capacity}[$i] = 0;
+		$cs{is_die}[$i]   = 1;
+
+		for my $j ($i+1 .. $w{country}-$country_num) {
+			$w{ "f_${i}_${j}" } = -99;
+			$w{ "p_${i}_${j}" } = 2;
+		}
+
+		$cs{old_ceo}[$i] = $cs{ceo}[$i];
+		$cs{ceo}[$i] = '';
+
+		open my $fh, "> $logdir/$i/leader.cgi";
+		close $fh;
+	}
+
+	# バックアップ作成
+	for my $i (0 .. $w{country} - $country_num) {
+		my $from = "$logdir/$i";
+		my $backup = $from . "_backup";
+		rcopy($from, $backup);
+	}
+	my $from = "$logdir/countries.cgi";
+	my $backup = "$logdir/countries_backup.cgi";
+	rcopy($from, $backup);
+}
+
+#================================================
+# 指定された祭り情勢用の国を削除し、それ以外の国をﾘｽﾄｱ
+# 削除される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
+#================================================
+sub remove_festival_country {
+	my $festival_name = shift;
+	my $country_num = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[0];
+	# 国フォルダ削除
+	for (my $i = $w{country}+$country_num; $i > $w{country}; $i--) {
+		my $from = "$logdir/$i";
+		my $num = rmtree($from);
+		
+		my @lines = ();
+		open my $fh, "+< $logdir/countries_mes.cgi";
+		eval { flock $fh, 2; };
+		while (my $line = <$fh>) {
+			push @lines, $line;
+		}
+		pop @lines while @lines > $w{country} + 1;
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh @lines;
+		close $fh;
+	}
+	$w{country} -= $country_num;
+
+	# 国データ復旧
+	for my $i (0 .. $w{country}) {
+		my $from = "$logdir/$i";
+		my $backup = $from . "_backup";
+		my $num = rmtree($from);
+		rcopy($backup, $from);
+	}
+	
+	my $i = 1;
+	open my $fh, "< $logdir/countries_backup.cgi" or &error("国ﾃﾞｰﾀが読み込めません");
+	my $world_line = <$fh>;
+	while (my $line = <$fh>) {
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			if ($k eq 'name' || $k eq 'color' || $k eq 'win_c' || $k eq 'old_ceo' || $k eq 'ceo_continue') {
+				$cs{$k}[$i] = $v;
+			}
+		}
+		++$i;
+	}
+	close $fh;
+}
+
+#================================================
 # 1位 (int(国数/2)+1)位 国数位 の国力順位を配列で返す
 # 拙速用だけどなんか使い道あるかも？
 #================================================
@@ -599,96 +643,9 @@ sub get_strong_ranking {
 }
 
 #================================================
-# 指定された祭り情勢用の国を追加する
-# 追加される国の情報は FESTIVAL_COUNTRY_PROPERTY で定義しておく
+# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
+# 全プレイヤー走査をしない拙速で使う
 #================================================
-sub add_festival_country {
-	my $festival_name = shift;
-
-	my $country_num = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[0];
-	$w{country} += $country_num;
-	my $max_c = int($w{player} / $country_num) + 3;
-	for my $i ($w{country}-($country_num-1)..$w{country}){
-		mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
-		for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
-			my $output_file = "$logdir/$i/$file_name.cgi";
-			next if -f $output_file;
-			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-			close $fh;
-			chmod $chmod, $output_file;
-		}
-		for my $file_name (qw/leader member/) {
-			my $output_file = "$logdir/$i/$file_name.cgi";
-			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
-			close $fh;
-			chmod $chmod, $output_file;
-		}
-		&add_npc_data($i);
-		# create union file
-		for my $j (1 .. $i-1) {
-			my $file_name = "$logdir/union/${j}_${i}";
-			$w{ "f_${j}_${i}" } = -99;
-			$w{ "p_${j}_${i}" } = 2;
-			next if -f "$file_name.cgi";
-			open my $fh, "> $file_name.cgi" or &error("$file_name.cgi ﾌｧｲﾙが作れません");
-			close $fh;
-			chmod $chmod, "$file_name.cgi";
-			open my $fh2, "> ${file_name}_log.cgi" or &error("${file_name}_log.cgi ﾌｧｲﾙが作れません");
-			close $fh2;
-			chmod $chmod, "${file_name}_log.cgi";
-			open my $fh3, "> ${file_name}_member.cgi" or &error("${file_name}_member.cgi ﾌｧｲﾙが作れません");
-			close $fh3;
-			chmod $chmod, "${file_name}_member.cgi";
-		}
-		unless (-f "$htmldir/$i.html") {
-			open my $fh_h, "> $htmldir/$i.html" or &error("$htmldir/$i.html ﾌｧｲﾙが作れません");
-			close $fh_h;
-		}
-
-		my $num = $i-($w{country}+1-$country_num);
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$num];
-		$cs{member}[$i]   = 0;
-		$cs{win_c}[$i]    = 999;
-		$cs{tax}[$i]      = 99;
-		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1];
-		$cs{food}[$i]     = $config_test ? 999999 : 0;
-		$cs{money}[$i]    = $config_test ? 999999 : 0;
-		$cs{soldier}[$i]  = $config_test ? 999999 : 0;
-		$cs{state}[$i]    = 0;
-		$cs{capacity}[$i] = $max_c;
-		$cs{is_die}[$i]   = 0;
-		my @lines = &get_countries_mes();
-		if ($w{country} > @lines - $country_num) {
-			open my $fh9, ">> $logdir/countries_mes.cgi";
-			print $fh9 "<>$default_icon<>\n";
-			print $fh9 "<>$default_icon<>\n";
-			close $fh9;
-		}
-	}
-
-	for my $i (1 .. $w{country}-$country_num) {
-		$cs{strong}[$i]   = 0;
-		$cs{food}[$i]     = 0;
-		$cs{money}[$i]    = 0;
-		$cs{soldier}[$i]  = 0;
-		$cs{state}[$i]    = 0;
-		$cs{capacity}[$i] = 0;
-		$cs{is_die}[$i]   = 1;
-
-		for my $j ($i+1 .. $w{country}-$country_num) {
-			$w{ "f_${i}_${j}" } = -99;
-			$w{ "p_${i}_${j}" } = 2;
-		}
-
-		$cs{old_ceo}[$i] = $cs{ceo}[$i];
-		$cs{ceo}[$i] = '';
-
-		open my $fh, "> $logdir/$i/leader.cgi";
-		close $fh;
-	}
-}
-
 sub wt_c_reset {
 	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 	while (my $pid = readdir $dh) {
