@@ -44,8 +44,10 @@ sub time_limit {
 # reset ‘OŒã‚É $w{world} ‚ğ•Ï‚¦‚éˆ—‚ª‚ ‚é‚Ì‚Åî¨‚ğŒˆ‚ß‚éŠÖ”‚Æ‚µ‚Äg‚¤‚à‚Ì‚Å‚Í‚È‚¢‚Æv‚í‚ê‚é
 #================================================
 sub reset {
+	$this_file = "$logdir/chat_casino_toto";
 	require './lib/casino_toto.cgi';
 	&pay_back($w{year});
+	$this_file = "$logdir/chat_casino_espoir";
 	require './lib/casino_espoir.cgi';
 	&game_end_espoir($w{year});
 
