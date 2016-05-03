@@ -280,18 +280,33 @@ sub update_main_player  {
 			}
 			elsif (($p{mil5} > $p{dom3} * 2) && ($p{mil5} > $p{win_c} *2)) { # 軍事が内政戦争の倍なら特化と判定
 				$p{type} = "軍事屋";
-				if ( ($p{mil5}/5) < $p{gik_c} ) {
+				# 諜報数が4軍事合計よりも高いなら諜報特化
+				if ( ($p{mil5}-$p{cho_c}) < $p{cho_c} ) {
+				}
+				# 偽計数が4軍事合計よりも高いなら偽計特化
+				elsif ( ($p{mil5}-$p{gik_c}) < $p{gik_c} ) {
 					$p{type} .= "（ナナコ）";
 				}
-				elsif ( ($p{mil5}/5) < $p{gik_c} ) {
-					$p{type} .= "（アクロマ）";
+				# 偵察数が4軍事合計よりも高いなら偵察特化
+				elsif ( ($p{mil5}-$p{tei_c}) < $p{tei_c} ) {
+					if (($p{mil5}-$p{tei_c}) < $in{mil5_1}) { # 4軍事合計が5軍事合格ラインを切る超特化
+						$p{type} .= "（アクロマ）";
+					}
+					else {
+						$p{type} .= "（覗き屋）";
+					}
 				}
 			}
 			elsif (($p{win_c} > $p{dom3} * 2) && ($p{win_c} > $p{mil5} *2)) { # 戦争が内政軍事の倍なら特化と判定
 				$p{type} = "戦争屋";
 			}
 			else {
-				$p{type} = "器用貧乏";
+				if ($p{gai_c} >= $in{gai_c}) {
+					$p{type} = "外交好き";
+				}
+				else {
+					$p{type} = "器用貧乏";
+				}
 			}
 
 			# 内政しないで戦争ばっかアーサー
