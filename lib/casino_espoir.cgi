@@ -89,58 +89,63 @@ sub run {
 			print qq|残り グー:$rest_a チョキ:$rest_b パー:$rest_c|;
 			my $no_stack = 1;
 			if (@{$stack{star}}) {
+				my $yname = ${stack{star}}[0];
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="receive"><input type="hidden" name="type" value="1">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{star}}[0]からの星を受け取る" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからの星を受け取る" class="button_s"><br>|;
 				print qq|</form>|;
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="refuse"><input type="hidden" name="type" value="1">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{star}}[0]からの星を受け取らない" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからの星を受け取らない" class="button_s"><br>|;
 				print qq|</form>|;
 				$no_stack = 0;
 			}
 			if (@{$stack{a}}) {
+				my $yname = ${stack{a}}[0];
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="receive"><input type="hidden" name="type" value="2">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{a}}[0]からのグーを受け取る" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからのグーを受け取る" class="button_s"><br>|;
 				print qq|</form>|;
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="refuse"><input type="hidden" name="type" value="2">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{a}}[0]からのグーを受け取らない" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからのグーを受け取らない" class="button_s"><br>|;
 				print qq|</form>|;
 				$no_stack = 0;
 			}
 			if (@{$stack{b}}) {
+				my $yname = ${stack{b}}[0];
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="receive"><input type="hidden" name="type" value="3">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{b}}[0]からのチョキを受け取る" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからのチョキを受け取る" class="button_s"><br>|;
 				print qq|</form>|;
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="refuse"><input type="hidden" name="type" value="3">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{b}}[0]からのチョキを受け取らない" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからのチョキを受け取らない" class="button_s"><br>|;
 				print qq|</form>|;
 				$no_stack = 0;
 			}
 			if (@{$stack{c}}) {
+				my $yname = ${stack{c}}[0];
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="receive"><input type="hidden" name="type" value="4">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{c}}[0]からのパーを受け取る" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからのパーを受け取る" class="button_s"><br>|;
 				print qq|</form>|;
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="refuse"><input type="hidden" name="type" value="4">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{c}}[0]からのパーを受け取らない" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameからのパーを受け取らない" class="button_s"><br>|;
 				print qq|</form>|;
 				$no_stack = 0;
 			}
 			if (@{$stack{check}}) {
+				my $yname = ${stack{check}}[0];
 				if ($rest_a + $rest_b + $rest_c > 0) {
 					print qq|<form method="$method" action="$this_script" name="form">|;
 					print qq|<input type="hidden" name="mode" value="recheck">|;
@@ -155,13 +160,13 @@ sub run {
 								$i == 2 ? 'チョキ' :
 										'パー';
 					}
-					print qq|<input type="submit" value="${stack{check}}[0]と勝負" class="button_s"><br>|;
+					print qq|<input type="submit" value="$ynameと勝負" class="button_s"><br>|;
 					print qq|</form>|;
 				}
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="uncheck">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="${stack{check}}[0]と勝負しない" class="button_s"><br>|;
+				print qq|<input type="submit" value="$ynameと勝負しない" class="button_s"><br>|;
 				print qq|</form>|;
 				$no_stack = 0;
 			}
@@ -318,7 +323,7 @@ sub get_my_state {
 	open my $fhm, "< $my_espoir_file" or &error('参加者ﾌｧｲﾙが開けません'); 
 	my $headline = <$fhm>;
 	my ($star, $rest_a, $rest_b, $rest_c, $count, $year, $check_h) = split /<>/, $headline;
-	while (my $line = <$fh>) {
+	while (my $line = <$fhm>) {
 		my ($type, $name) = split /<>/, $line;
 		if ($type eq '1') {
 			push @star, $name;
