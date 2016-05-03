@@ -745,12 +745,15 @@ sub end_player {
 	close $wfh;
 }
 
-sub game_end {
+sub game_end_espoir {
 	my $year = shift;
 	my ($game_year, $all_rest_a, $all_rest_b, $all_rest_c, $participate, @all_member) = &get_state;
 	if ($game_year == $year) {
 		for my $name (@all_member) {
-			&lose($name);
+			chomp $name;
+			if ($name) {
+				&lose($name);
+			}
 		}
 	}
 }

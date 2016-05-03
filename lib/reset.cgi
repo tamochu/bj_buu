@@ -47,7 +47,7 @@ sub reset {
 	require './lib/casino_toto.cgi';
 	&pay_back($w{year});
 	require './lib/casino_espoir.cgi';
-	&game_end($w{year});
+	&game_end_espoir($w{year});
 
 	# “Áêî¨I—¹ˆ—
 	if (&is_special_world) { # “Áêî¨I—¹
