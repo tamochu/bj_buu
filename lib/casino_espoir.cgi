@@ -404,7 +404,7 @@ sub participate {
 		&clear_stack($id);
 		return "$m{name}‚ªæ‘D‚µ‚Ü‚µ‚½B";
 	}
-	return "";
+	return "‚·‚Å‚Éæ‘D—\’èÏ‚İ‚©º²İ $rate ‚ª‘«‚è‚Ü‚¹‚ñ";
 }
 
 sub send_star {
