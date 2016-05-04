@@ -56,6 +56,7 @@ form { margin: 0; padding: 7px; }
 	</td>
 	<td valign="top" align="center">
 		<div class="login_box">
+			<p>Chromeのデータセーバーを無効にしないとアクセスできません</p>
 			$login_box_html
 		</div>
 		<div align="left" style="padding: 0.2em 2em;">
