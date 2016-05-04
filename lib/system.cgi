@@ -656,6 +656,7 @@ sub debug_log {
 	use Data::Dumper;
 	my $dmes = Dumper $message;
 	$dmes =~ s/\n/<br>/g;
+	$dmes =~ s/\s/&nbsp;/g;
 
 	my $tag = unpack 'H*', $tag_disp;
 	open my $fh, ">> $logdir/debug_log.cgi";
