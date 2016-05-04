@@ -645,6 +645,17 @@ sub _get_war_you_data {
 					$y_mes = $you_datas{mes};
 					return 0;
 				}
+			} elsif ($cs{disaster}[$y{country}] eq 'mismatch' && $cs{disaster_limit}[$y{country}] >= $time) {
+				# wŠöŒn“¬—
+				if ( $you_datas{rank} <= $m{rank}) {
+					# set %y
+					while (my($k,$v) = each %you_datas) {
+						next if $k =~ /^y_/;
+						$y{$k} = $v;
+					}
+					$y_mes = $you_datas{mes};
+					return 0;
+				}
 			} else {
 				# ‘Ò‚¿•š‚¹‚µ‚Ä‚¢‚él‚ª‚¢‚½‚ç
 				if ( $you_datas{value} eq 'ambush' && $max_ambush_hour * 3600 + $you_datas{ltime} > $time) {

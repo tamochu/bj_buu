@@ -239,6 +239,9 @@ sub war_win {
 	else {
 		$cs{soldier}[$m{country}] += $m{sol};
 	}
+	if ($cs{disaster}[$y{country}] eq 'paper' && $cs{disaster_limit}[$y{country}] >= $time) {
+		$v *= 2;
+	}
 	# ‘—Íƒf[ƒ^}
 	$cs{strong}[$m{country}] += ($w{world} eq '13' || $w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3) ? int($v * 0.75):$v;
 	$cs{strong}[$y{country}] -= $v unless ($w{world} eq $#world_states - 5);
