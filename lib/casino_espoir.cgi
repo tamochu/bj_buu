@@ -17,7 +17,7 @@ my $overflow = 2500000;
 my $bonus_coin = 2500000;
 
 # 出港に必要な最低プレイヤー数
-my $min_espoir = 10;
+my $min_espoir = 6;
 
 unless (-f $all_member_file) {
 	open my $fh, "> $all_member_file" or &error('賭けﾌｧｲﾙの書き込みに失敗しました');
