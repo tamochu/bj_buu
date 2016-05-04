@@ -545,6 +545,7 @@ sub player_shuffle {
 	while (my $pid = readdir $dh) {
 		next if $pid =~ /\./;
 		next if $pid =~ /backup/;
+		next unless &you_exists($pid, 1);
 		my %you_datas = &get_you_datas($pid, 1);
 		if ($you_datas{shuffle}) {
 			my $c_find = 0;
