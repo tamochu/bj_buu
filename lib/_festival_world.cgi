@@ -5,6 +5,10 @@ use File::Path;
 # 主な呼び出し元
 # ./lib/reset.cgi
 #================================================
+# 紅白 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
+# 三国志 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
+# 拙速 ﾉｰｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
+# 混乱 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 
 #================================================
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
@@ -18,16 +22,13 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
-	#&wt_c_reset; # 稼働率の更新とﾘｾｯﾄ
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
-		&add_festival_country('kouhaku');
 		&run_kouhaku(1);
 	} elsif ($w{year} % 40 == 20) { # 三国志
 		$w{world} = $#world_states-3;
 		$w{game_lv} = 99;
-		&add_festival_country('sangokusi');
 		&run_sangokusi(1);
 	} elsif ($w{year} % 40 == 10) { # 拙速
 		$w{world} = $#world_states-5;
@@ -71,6 +72,7 @@ sub run_kouhaku {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 紅白開始時の処理	
+		&add_festival_country('kouhaku');
 		&player_shuffle($w{country}-1..$w{country});
 	} # 紅白開始時の処理
 	else { # 紅白終了時の処理
@@ -104,6 +106,8 @@ sub run_kouhaku {
 			if ($you_datas{name} eq $m{name}){
 				$m{country} = 0;
 				$y{country} = 0;
+
+				# 熟練度のﾘｽﾄｱ
 				for my $k (qw/war dom pro mil/) {
 					$m{$k."_c"} = $m{$k."_c_t"};
 					$m{$k."_c_t"} = 0;
@@ -112,6 +116,8 @@ sub run_kouhaku {
 			} else {
 				&regist_you_data($you_datas{name}, 'country', 0);
 				&regist_you_data($you_datas{name}, 'y_country', 0);
+
+				# 熟練度のﾘｽﾄｱ
 				for my $k (qw/war dom pro mil/) {
 					&regist_you_data($you_datas{name}, $k."_c", $you_datas{$k."_c_t"});
 					&regist_you_data($you_datas{name}, $k."_c_t", 0);
@@ -133,6 +139,7 @@ sub run_sangokusi {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 三国志開始時の処理
+		&add_festival_country('sangokusi');
 		&player_shuffle($w{country}-2..$w{country});
 	} # 三国志開始時の処理
 	else { # 三国志終了時の処理
@@ -167,6 +174,8 @@ sub run_sangokusi {
 			if ($you_datas{name} eq $m{name}){
 				$m{country} = 0;
 				$y{country} = 0;
+
+				# 熟練度のﾘｽﾄｱ
 				for my $k (qw/war dom pro mil/) {
 					$m{$k."_c"} = $m{$k."_c_t"};
 					$m{$k."_c_t"} = 0;
@@ -175,6 +184,8 @@ sub run_sangokusi {
 			} else {
 				&regist_you_data($you_datas{name}, 'country', 0);
 				&regist_you_data($you_datas{name}, 'y_country', 0);
+
+				# 熟練度のﾘｽﾄｱ
 				for my $k (qw/war dom pro mil/) {
 					&regist_you_data($you_datas{name}, $k."_c", $you_datas{$k."_c_t"});
 					&regist_you_data($you_datas{name}, $k."_c_t", 0);
@@ -209,6 +220,7 @@ sub run_sessoku {
 		closedir $dh;
 	} # 拙速開始時の処理
 	else { # 拙速終了時の処理
+		require './lib/shopping_offertory_box.cgi';
 		require "./lib/move_player.cgi";
 		# 1位国には統一ボーナスと祭り報酬
 		# (int(国数/2)+1)位には統一ボーナス
@@ -223,7 +235,6 @@ sub run_sessoku {
 		$cs{strong}[$strong_rank[2]] = 0;
 		$cs{is_die}[$strong_rank[2]] = 3;
 
-		require "./lib/move_player.cgi";
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
@@ -232,30 +243,47 @@ sub run_sessoku {
 			my %p = &get_you_datas($pid, 1);
 
 			# 祭り報酬
-			if ($strong_rank[0] eq $p{country}) {
-				require './lib/shopping_offertory_box.cgi';
-				for my $k (qw/war dom pro mil ceo/) {
-					if ($cs{$k}[$p{country}] eq $p{name}) {
-						&send_god_item(5, $cs{$k}[$p{country}]);
+			if ($strong_rank[0] eq $p{country} || $strong_rank[1] eq $p{country}) {
+				if ($$strong_rank[0] eq $p{country}) {
+					for my $k (qw/war dom pro mil ceo/) {
+						if ($cs{$k}[$p{country}] eq $p{name}) {
+							&send_god_item(5, $cs{$k}[$p{country}]);
+						}
 					}
+					&send_item($p{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
 				}
-				&send_item($p{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
+				open my $fh, ">> $userdir/$pid/ex_c.cgi";
+				print $fh "fes_c<>1<>\n";
+				close $fh;
 			}
-			# ビリの国にいるプレイヤーは適当仕官
-			elsif ($strong_rank[2] eq $p{country}) {
-				my $to_country = 0;
-				do {
-					$to_country = int(rand($w{country}) + 1);
-				} while ($cs{is_die}[$to_country] > 1);
 
-				&move_player($p{name}, $p{country}, $to_country);
-				if ($p{name} eq $m{name}){
-					$m{country} = $to_country;
-					&write_user;
-				} else {
-					&regist_you_data($p{name}, 'country', $to_country);
-				}
+			# ネバラン送り
+			&move_player($p{name}, $p{country}, 0);
+			if ($p{name} eq $m{name}){
+				$m{country} = 0;
+				$y{country} = 0;
+				&write_user;
+			} else {
+				&regist_you_data($p{name}, 'country', 0);
+				&regist_you_data($p{name}, 'y_country', 0);
 			}
+
+			# 封鎖で使うので残しておいてくだちい
+			# ビリの国にいるプレイヤーは適当仕官
+#			elsif ($strong_rank[2] eq $p{country}) {
+#				my $to_country = 0;
+#				do {
+#					$to_country = int(rand($w{country}) + 1);
+#				} while ($cs{is_die}[$to_country] > 1);
+#
+#				&move_player($p{name}, $p{country}, $to_country);
+#				if ($p{name} eq $m{name}){
+#					$m{country} = $to_country;
+#					&write_user;
+#				} else {
+#					&regist_you_data($p{name}, 'country', $to_country);
+#				}
+#			}
 
 		}
 	} # 拙速終了時の処理
@@ -281,10 +309,21 @@ sub run_konran {
 			if($you_datas{name} eq $m{name}){
 				&move_player($m{name}, $m{country}, 0);
 				$m{country} = 0;
+
+				# 熟練度のﾘｽﾄｱ
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c"} = $m{$k."_c_t"};
+					$m{$k."_c_t"} = 0;
+				}
 				&write_user;
 			}
 			&move_player($you_datas{name}, $you_datas{country}, 0);
 			&regist_you_data($you_datas{name}, 'country', 0);
+			# 熟練度のﾘｽﾄｱ
+			for my $k (qw/war dom pro mil/) {
+				&regist_you_data($you_datas{name}, $k."_c", $you_datas{$k."_c_t"});
+				&regist_you_data($you_datas{name}, $k."_c_t", 0);
+			}
 
 			my($c1, $c2) = split /,/, $w{win_countries};
 			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
@@ -508,36 +547,19 @@ sub get_strong_ranking {
 }
 
 #================================================
-# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-# 全プレイヤー走査をしない拙速で使う
+# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ（祭り突入時の10年毎）
 #================================================
 sub wt_c_reset {
 	my ($m, $you_datas) = @_;
-#	$$m{name} = "nanamie";
-#	$$you_datas{name} = "name";
-#f0(\@arr1,\@arr2);
-
-#	my $name = shift;
-#	my %you_datas = @_;
-#	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-#	while (my $pid = readdir $dh) {
-#		next if $pid =~ /\./;
-#		next if $pid =~ /backup/;
-#		next unless &you_exists($pid, 1);
-#		my %you_datas = &get_you_datas($pid, 1);
-
-		if ($you_datas{name} eq $m{name}){
-			$$m{wt_c_latest} = $m{wt_c};
-			$$m{wt_c} = 0;
-			&write_user;
-		} else {
-			&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-			&regist_you_data($you_datas{name}, "wt_c", 0);
-		}
-#	}
-#	closedir $dh;
+	if ($you_datas{name} eq $m{name}){
+		$$m{wt_c_latest} = $m{wt_c};
+		$$m{wt_c} = 0;
+		&write_user;
+	} else {
+		&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
+		&regist_you_data($you_datas{name}, "wt_c", 0);
+	}
 }
-
 
 #================================================
 # プレーヤーシャッフル
