@@ -246,7 +246,12 @@ sub tp_200 {
 	close $fh;
 	$mes .= qq|</table>| unless $is_mobile;
 
-	&menu('Ç‚ÇﬂÇÈ','ìoò^Ç∑ÇÈ');
+	
+	$mes .= qq|<form method="$method" action="$script">|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<textarea name="comment" cols="50" rows="$rows" class="textarea1"></textarea><br>|;
+	$mes .= qq|<input type="submit" value="ëóêM" class="button1">|;
+	$mes .= qq|Å@ <input type="checkbox" name="cmd" value="1" checked>ìoò^Ç∑ÇÈ</form>|;
 	$m{tp} += 10;
 }
 sub tp_210 {
@@ -277,7 +282,8 @@ sub tp_210 {
 	else {
 		my($last_no) = (split /<>/, $lines[0])[0];
 		++$last_no;
-		unshift @lines, "$last_no<>$date<>$m{name}<>$m{country}<>$m{lv}<>$m{rank}<>$m{shogo}<>$m{mes}<>$m{icon}<>\n";
+		my $comment = $in{comment} . $m{mes};
+		unshift @lines, "$last_no<>$date<>$m{name}<>$m{country}<>$m{lv}<>$m{rank}<>$m{shogo}<>$comment<>$m{icon}<>\n";
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
 		print $fh @lines;
