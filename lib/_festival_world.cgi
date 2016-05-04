@@ -598,7 +598,7 @@ sub player_shuffle {
 	
 	# U‚è•ª‚¯
 	for my $nl (@new_line) {
-		my($nname, $nc) = split /<>/, $pl;
+		my($nname, $nc) = split /<>/, $nl;
 		my %you_datas = &get_you_datas($nname);
 		
 		&move_player($you_datas{name}, $you_datas{country}, $nc);
