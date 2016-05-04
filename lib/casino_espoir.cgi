@@ -11,7 +11,7 @@ my $all_member_file = "$logdir/espoir_member.cgi";
 my $my_espoir_file = "$userdir/$id/espoir.cgi";
 
 # 基準額
-my $rate = 10;
+my $rate = 1000000;
 
 my $overflow = 2500000;
 my $bonus_coin = 2500000;
@@ -83,6 +83,7 @@ sub run {
 	print qq|<h2>$this_title</h2>|;
 	
 	if ($game_year eq $w{year}) {
+		print "ﾌﾟﾚｰﾔｰ：" . join ',', @all_member;
 		print qq|全体残り グー:$all_rest_a チョキ:$all_rest_b パー:$all_rest_c<br>|;
 		if ($participate) {
 			my ($rest_a, $rest_b, $rest_c, $star, $count, $year, $check_h, %stack) = &get_my_state;
