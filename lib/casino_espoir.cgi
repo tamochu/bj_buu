@@ -404,7 +404,7 @@ sub participate {
 		&clear_stack($id);
 		return "$m{name}が乗船しました。";
 	}
-	return "すでに乗船予定済みかｺｲﾝ $rate が足りません";
+	return "すでに乗船予\定済みかｺｲﾝ $rate が足りません";
 }
 
 sub send_star {

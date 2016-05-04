@@ -64,7 +64,11 @@ sub main_system {
 				if ($tmon + 1 == $2 && $tmday == $3) {
 					$mes .= "íaê∂ì˙Ç®ÇﬂÇ≈Ç∆Ç§";
 					require './lib/shopping_offertory_box.cgi';
-					&get_god_item($m{sedai});
+					my $gvar = $m{sedai};
+					if ($m{start_time} + 30 * 24 * 60 * 60 < $time) {
+						$gvar += 7;
+					}
+					&get_god_item($gvar);
 				}
 			}
 		}

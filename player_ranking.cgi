@@ -135,6 +135,9 @@ sub update_player_ranking  {
 			}
 			my %p = &get_you_datas($player_id, 1);
 			$p{str} = int($p{max_hp} + $p{max_mp} + $p{at} + $p{df} + $p{mat} + $p{mdf} + $p{ag} + $p{cha} * 0.5);
+			if (&get_rank_name($p{rank}, $p{name}) eq 'c’é') {
+				$p{rank}++;
+			}
 			$p{rank} += $p{super_rank};
 
 			my $count = 0;
