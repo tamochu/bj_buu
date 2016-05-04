@@ -196,7 +196,7 @@ sub run_sessoku {
 	$is_start = shift;
 
 	if ($is_start) { # 拙速開始時の処理
-		&player_shuffle(1..$w{country});
+#		&player_shuffle(1..$w{country});
 	} # 拙速開始時の処理
 	else { # 拙速終了時の処理
 		require "./lib/move_player.cgi";
