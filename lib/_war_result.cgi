@@ -497,7 +497,7 @@ sub _rescue {
 #=================================================
 sub _touitu {
 	&c_up('hero_c');
-	%debug_log(\%w, 'touitsu_w');
+	&debug_log(\%w, 'touitsu_w');
 	if ($union) {
 		$w{win_countries} = "$m{country},$union";
 		++$cs{win_c}[$union];
