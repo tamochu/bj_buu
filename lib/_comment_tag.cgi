@@ -16,6 +16,7 @@ sub comment_change {
 	$bcomment =~ s|&amp;homashinchiw\(\)|<img src="$icondir/homashinchiw.jpg" style="vertical-align:middle;" $pic_size>|g;
 	$bcomment =~ s|&amp;kappa\(\)|<img src="$icondir/kappa.png" style="vertical-align:middle;" $pic_size>|g;
 	$bcomment =~ s|&amp;homo\(\)|„¡(„¡^o^)„¢ƒzƒ‚ƒH|g;
+	$bcomment =~ s|&amp;img\((.*?)\)|<a href="./../upbbs/img-box/\1"><img src="./../upbbs/img-box/\1" style="vertical-align:middle;" $pic_size></a>|g;
 	$bcomment =~ s|&amp;italic\((.*?)\)|<i>\1</i>|g;
 	$bcomment =~ s|&amp;bold\((.*?)\)|<b>\1</b>|g;
 	$bcomment =~ s|&amp;underline\((.*?)\)|<u>\1</u>|g;

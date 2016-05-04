@@ -191,8 +191,6 @@ sub run_sangokusi {
 					&regist_you_data($you_datas{name}, $k."_c_t", 0);
 				}
 			}
-
-#			&wt_c_reset($m, %you_datas); # 稼働率の更新とﾘｾｯﾄ
 		}
 		closedir $dh;
 
@@ -270,21 +268,20 @@ sub run_sessoku {
 
 			# 封鎖で使うので残しておいてくだちい
 			# ビリの国にいるプレイヤーは適当仕官
-#			elsif ($strong_rank[2] eq $p{country}) {
-#				my $to_country = 0;
-#				do {
-#					$to_country = int(rand($w{country}) + 1);
-#				} while ($cs{is_die}[$to_country] > 1);
-#
-#				&move_player($p{name}, $p{country}, $to_country);
-#				if ($p{name} eq $m{name}){
-#					$m{country} = $to_country;
-#					&write_user;
-#				} else {
-#					&regist_you_data($p{name}, 'country', $to_country);
-#				}
-#			}
+			#elsif ($strong_rank[2] eq $p{country}) {
+				#my $to_country = 0;
+				#do {
+					#$to_country = int(rand($w{country}) + 1);
+				#} while ($cs{is_die}[$to_country] > 1);
 
+				#&move_player($p{name}, $p{country}, $to_country);
+				#if ($p{name} eq $m{name}){
+					#$m{country} = $to_country;
+					#&write_user;
+				#} else {
+					#&regist_you_data($p{name}, 'country', $to_country);
+				#}
+			#}
 		}
 	} # 拙速終了時の処理
 }
