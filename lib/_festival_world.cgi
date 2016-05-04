@@ -596,6 +596,7 @@ sub player_shuffle {
 		}
 	}
 	
+	require "./lib/move_player.cgi";
 	# U‚è•ª‚¯
 	for my $nl (@new_line) {
 		my($nname, $nc) = split /<>/, $nl;
