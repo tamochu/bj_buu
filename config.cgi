@@ -141,7 +141,7 @@ $deny_message = '‚ ‚È‚½‚ÌIP±ÄŞÚ½‚Í±¸¾½§ŒÀ‚ª‚©‚©‚Á‚Ä‚¢‚Ü‚·';
 @deny_lists = (
 	'*.anonymizer.com',
 	'p*-ipngn100105matuyama.ehime.ocn.ne.jp',
-	'*proxy*',
+	'*proxy[^-]+',
 	'*tor*',
 );
 
