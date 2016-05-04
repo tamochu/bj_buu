@@ -1100,6 +1100,7 @@ sub alltime_event {
 			&super_attack('random');
 		}
 	}
+	&debug_log("$m{lib}:$m{tp}", 'play_log');
 }
 
 sub before_bj {

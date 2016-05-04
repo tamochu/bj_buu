@@ -643,4 +643,19 @@ sub send_twitter {
 	exit;
 }
 
+#================================================
+# デバッグログ
+#================================================
+sub debug_log {
+	my $message = shift;
+	my $tag_disp = shift;
+	if (!$config_test) {
+		return;
+	}
+
+	my $tag = unpack 'H*', $tag_disp;
+	open my $fh, ">> $logdir/debug_log.cgi";
+	print $fh "$m{name}<>$time<>$message<>$tag<>\n";
+	close $fh;
+}
 1; # 削除不可
