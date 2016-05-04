@@ -18,6 +18,7 @@ sub index {
 
 	print <<"EOM";
 <h1>$title</h1>
+<p>Chromeのデータセーバーを無効にしないとアクセスできません</p>
 <form method="$method" action="login.cgi">
 <div>ﾌﾟﾚｲﾔｰ名:<input type="text" name="login_name" value="$cook_name"></div>
 <div>ﾊﾟｽﾜｰﾄﾞ:<input type="password" name="pass" value="$cook_pass"></div>
