@@ -17,7 +17,7 @@ my $overflow = 2500000;
 my $bonus_coin = 2500000;
 
 # 出港に必要な最低プレイヤー数
-my $min_espoir = 3;
+my $min_espoir = 10;
 
 unless (-f $all_member_file) {
 	open my $fh, "> $all_member_file" or &error('賭けﾌｧｲﾙの書き込みに失敗しました');
@@ -83,7 +83,7 @@ sub run {
 	print qq|<h2>$this_title</h2>|;
 	
 	if ($game_year eq $w{year}) {
-		print "ﾌﾟﾚｰﾔｰ：" . join ',', @all_member;
+		print "ﾌﾟﾚｰﾔｰ：" . (join ',', @all_member) . "<br>";
 		print qq|全体残り グー:$all_rest_a チョキ:$all_rest_b パー:$all_rest_c<br>|;
 		if ($participate) {
 			my ($rest_a, $rest_b, $rest_c, $star, $count, $year, $check_h, %stack) = &get_my_state;
