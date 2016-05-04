@@ -256,10 +256,14 @@ sub battle_html {
 	my $m_icon = $m{icon} ? qq|<img src="$icondir/$m{icon}" $mobile_icon_size>| : '';
 	my $y_icon = $y{icon} ? qq|<img src="$icondir/$y{icon}" $mobile_icon_size>| : '';
 
-	my $m_hp_par = $m{max_hp} <= 0 ? 0 : int($m{hp} / $m{max_hp} * 100);
-	my $y_hp_par = $y{max_hp} <= 0 ? 0 : int($y{hp} / $y{max_hp} * 100);
-	my $m_mp_par = $m{max_mp} <= 0 ? 0 : int($m{mp} / $m{max_mp} * 100);
-	my $y_mp_par = $y{max_mp} <= 0 ? 0 : int($y{mp} / $y{max_mp} * 100);
+	my $m_hp_par = $m{max_hp} <= 0 ? 0 :
+				$m{hp} > $m{max_hp} ? 100 : int($m{hp} / $m{max_hp} * 100);
+	my $y_hp_par = $y{max_hp} <= 0 ? 0 :
+				$y{hp} > $y{max_hp} ? 100 :int($y{hp} / $y{max_hp} * 100);
+	my $m_mp_par = $m{max_mp} <= 0 ? 0 :
+				$m{mp} > $m{max_mp} ? 100 : int($m{mp} / $m{max_mp} * 100);
+	my $y_mp_par = $y{max_mp} <= 0 ? 0 :
+				$y{mp} > $y{max_mp} ? 100 : int($y{mp} / $y{max_mp} * 100);
 	my $fuka = !$m{egg} ? 0 :
 				int($m{egg_c} / $eggs[$m{egg}][2] * 100) > 100 ? 100 : int($m{egg_c} / $eggs[$m{egg}][2] * 100);
 	my $exp = $m{exp} > 100 ? 100 : $m{exp};
