@@ -10,8 +10,6 @@ use File::Path;
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 #================================================
 use constant FESTIVAL_COUNTRY_PROPERTY => {
-#	'kouhaku' => [2, 5, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
-#	'sangokusi' => [3, 5, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 	'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
 	'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 };
@@ -20,7 +18,7 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
-	&wt_c_reset; # 稼働率の更新とﾘｾｯﾄ
+	#&wt_c_reset; # 稼働率の更新とﾘｾｯﾄ
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
@@ -181,6 +179,8 @@ sub run_sangokusi {
 					&regist_you_data($you_datas{name}, $k."_c_t", 0);
 				}
 			}
+
+#			&wt_c_reset($m, %you_datas); # 稼働率の更新とﾘｾｯﾄ
 		}
 		closedir $dh;
 
@@ -196,7 +196,16 @@ sub run_sessoku {
 	$is_start = shift;
 
 	if ($is_start) { # 拙速開始時の処理
-#		&player_shuffle(1..$w{country});
+		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+		while (my $pid = readdir $dh) {
+			next if $pid =~ /\./;
+			next if $pid =~ /backup/;
+			next unless &you_exists($pid, 1);
+			my %you_datas = &get_you_datas($pid, 1);
+
+			&wt_c_reset(\%m, \%you_datas); # 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ	
+		}
+		closedir $dh;
 	} # 拙速開始時の処理
 	else { # 拙速終了時の処理
 		require "./lib/move_player.cgi";
@@ -501,23 +510,30 @@ sub get_strong_ranking {
 # 全プレイヤー走査をしない拙速で使う
 #================================================
 sub wt_c_reset {
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		next unless &you_exists($pid, 1);
-		my %you_datas = &get_you_datas($pid, 1);
+	my ($m, $you_datas) = @_;
+#	$$m{name} = "nanamie";
+#	$$you_datas{name} = "name";
+#f0(\@arr1,\@arr2);
+
+#	my $name = shift;
+#	my %you_datas = @_;
+#	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+#	while (my $pid = readdir $dh) {
+#		next if $pid =~ /\./;
+#		next if $pid =~ /backup/;
+#		next unless &you_exists($pid, 1);
+#		my %you_datas = &get_you_datas($pid, 1);
 
 		if ($you_datas{name} eq $m{name}){
-			$m{wt_c_latest} = $m{wt_c};
-			$m{wt_c} = 0;
+			$$m{wt_c_latest} = $m{wt_c};
+			$$m{wt_c} = 0;
 			&write_user;
 		} else {
 			&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
 			&regist_you_data($you_datas{name}, "wt_c", 0);
 		}
-	}
-	closedir $dh;
+#	}
+#	closedir $dh;
 }
 
 
@@ -548,6 +564,9 @@ sub player_shuffle {
 		next if $pid =~ /backup/;
 		next unless &you_exists($pid, 1);
 		my %you_datas = &get_you_datas($pid, 1);
+
+		&wt_c_reset(\%m, \%you_datas); # 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
+
 		if ($you_datas{shuffle}) {
 			my $c_find = 0;
 			if ($you_datas{country}) {
