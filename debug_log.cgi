@@ -31,7 +31,7 @@ exit;
 sub top {
 	print qq|<form action="$script_index"><input type="submit" value="‚s‚n‚o" class="button1"></form>|;
 	
-	print qq|<table border="0"><tr>|;
+	print qq|<table class="table1"><tr>|;
 	while (my($k,$v) = each %e2j_sorts) {
 		print qq|<td><form method="$method" action="$this_script">\n|;
 		print qq|<input type="hidden" name="sort" value="$k"><input type="submit" value="$v" class="button_s"></form></td>\n|;
@@ -56,6 +56,7 @@ sub top {
 		print qq|<td>$ptime</td>|;
 		print qq|<td>$message</td>|;
 		print qq|<td><input type="button" class="button_s" value="$tag_disp" onClick="location.href='?tag=$tag';"></td>|;
+		print qq|</tr>|;
 	}
 	print qq|</table>|;
 }
