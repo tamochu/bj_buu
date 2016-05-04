@@ -665,10 +665,10 @@ sub disaster {
 			$cs{ $disasters[$v][1] }[$i] = int($cs{ $disasters[$v][1] }[$i] * 0.5);
 		}
 		&write_world_news("<b>¢ŠE’†‚É $disasters[$v][0] ‚ª‹N‚±‚è‚Ü‚µ‚½</b>");
-	} elsif ($disasters[$v][1] eq 'strong') {
+	} elsif ($disasters[$v][1] eq 'strong' && $m{country}) {
 		$cs{ $disasters[$v][1] }[$m{country}] = int($cs{ $disasters[$v][1] }[$m{country}] * 0.5);
 		&write_world_news("<b>$cs{name}[$m{country}]‚É $disasters[$v][0] ‚ª‹N‚±‚è‚Ü‚µ‚½</b>");
-	} elsif ($disasters[$v][1] eq 'paper' || $disasters[$v][1] eq 'mismatch') {
+	} elsif (($disasters[$v][1] eq 'paper' || $disasters[$v][1] eq 'mismatch') && $m{country}) {
 		$cs{disaster}[$m{country}] = $disasters[$v][1];
 		$cs{disaster_limit}[$m{country}] = $time + 1 * 60 * 60;
 		&write_world_news("<b>$cs{name}[$m{country}]‚Å $disasters[$v][0] ‚µ‚Ü‚µ‚½</b>");
