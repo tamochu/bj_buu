@@ -3,6 +3,7 @@ require './lib/summer_system.cgi';
 use Time::Local;
 &get_date; # 時間と日付は常時必要なので常に取得
 use LWP::UserAgent;
+use Data::Dumper::AutoEncode;
 
 #================================================
 # ﾒｲﾝでよく使う処理 Created by Merino
@@ -652,10 +653,13 @@ sub debug_log {
 	if (!$config_test) {
 		return;
 	}
+	
+	my $dmes = eDumper $message;
+	$dmes =~ s/\n/<br>/g;
 
 	my $tag = unpack 'H*', $tag_disp;
 	open my $fh, ">> $logdir/debug_log.cgi";
-	print $fh "$m{name}<>$time<>$message<>$tag<>\n";
+	print $fh "$m{name}<>$time<>$dmes<>$tag<>\n";
 	close $fh;
 }
 1; # 削除不可

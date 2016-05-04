@@ -21,6 +21,11 @@ $in{sort} ||= 'time';
 #=================================================
 &header;
 &decode;
+
+if ($in{mode} eq 'delete_log') {
+	&delete_log;
+}
+
 &top;
 &footer;
 exit;
@@ -30,6 +35,7 @@ exit;
 #=================================================
 sub top {
 	print qq|<form action="$script_index"><input type="submit" value="‚s‚n‚o" class="button1"></form>|;
+	print qq|<form action="$this_script"><input type="hidden" name="mode" value="delete_log"><input type="submit" value="ƒƒOíœ" class="button1"></form>|;
 	
 	print qq|<table border="0"><tr>|;
 	while (my($k,$v) = each %e2j_sorts) {
@@ -82,4 +88,12 @@ sub get_all_messages {
 	elsif ($in{sort} eq 'time')    { @lines = map { $_->[0] } sort { $a->[2] cmp $b->[2] } map { [$_, split /<>/] } @lines; }
 	
 	return @lines;
+}
+
+#=================================================
+# ƒƒOíœ
+#=================================================
+sub delete_log {
+	open my $fh, "> $logdir/debug_log.cgi";
+	close $fh;
 }

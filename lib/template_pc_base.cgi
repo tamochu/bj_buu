@@ -248,6 +248,8 @@ sub status_html {
 	$main_screen .= qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;">| if $m{icon};
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 	my $pet_c = $m{pet} ? "★$m{pet_c}":'';
+	my $act_d = $m{act} > 100 ? 100 : $m{act}; 
+	my $exp_d = $m{exp} > 100 ? 100 : $m{exp}; 
 	$main_screen .=<<"EOM";
 
 		$name<br>
@@ -272,10 +274,10 @@ sub status_html {
 		<font color="#CC99CC">$e2j{mp} [ <b>$m{mp}</b>/<b>$m{max_mp}</b> ]</font><br>
 		<hr size="1">
 		疲労度 <b>$m{act}</b>%<br>
-		<div class="bar3" width="140px"><img src="$htmldir/space.gif" style="width: $m{act}%"></div>
+		<div class="bar3" width="140px"><img src="$htmldir/space.gif" style="width: $act_d%"></div>
 		<hr size="1">
 		$e2j{exp} <b>$m{exp}</b>Exp<br>
-		<div class="bar4"><img src="$htmldir/space.gif" style="width: $m{exp}%"></div>
+		<div class="bar4"><img src="$htmldir/space.gif" style="width: $exp_d%"></div>
 
 		<hr size="1">
 		資金 <b>$m{money}</b>G<br>
@@ -318,9 +320,11 @@ sub battle_html {
 	$main_screen .= qq|<tr><td colspan="3">$m_tokkou武器：[$weas[$m{wea}][2]] $wname★$m{wea_lv} ($m{wea_c})<br></td></tr>| if $m{wea};
 	$main_screen .= qq|<tr><td colspan="3">防具：[$guas[$m{gua}][2]] $guas[$m{gua}][1]<br></td></tr>| if $m{gua};
 	$main_screen .= qq|<tr><td colspan="3">ﾍﾟｯﾄ：$pets[$m{pet}][1]★$m{pet_c}<br></td></tr>| if $pets[$m{pet}][2] eq 'battle';
-	$main_screen .= qq|<tr><td>$e2j{exp}：</td><td><div class="bar4"><img src="$htmldir/space.gif" style="width: $m{exp}%"></div></td><td> (<b>$m{exp}</b>/<b>100</b>)<br></td></tr>|;
+	my $act_d = $m{act} > 100 ? 100 : $m{act}; 
+	my $exp_d = $m{exp} > 100 ? 100 : $m{exp}; 
+	$main_screen .= qq|<tr><td>$e2j{exp}：</td><td><div class="bar4"><img src="$htmldir/space.gif" style="width: $exp_d%"></div></td><td> (<b>$m{exp}</b>/<b>100</b>)<br></td></tr>|;
 	$main_screen .= qq|<tr><td>$eggs[$m{egg}][1]：</td><td><div class="bar5"><img src="$htmldir/space.gif" style="width: $fuka%"></div></td><td> (<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)<br></td></tr>|;
-	$main_screen .= qq|<tr><td>疲労度：</td><td><div class="bar3" width="140px"><img src="$htmldir/space.gif" style="width: $m{act}%"></div></td><td> (<b>$m{act}</b>/<b>100</b>)<br></td></tr>|;
+	$main_screen .= qq|<tr><td>疲労度：</td><td><div class="bar3" width="140px"><img src="$htmldir/space.gif" style="width: $act_d%"></div></td><td> (<b>$m{act}</b>/<b>100</b>)<br></td></tr>|;
 
 	$main_screen .= qq|</table>　 VS<br>|;
 	
