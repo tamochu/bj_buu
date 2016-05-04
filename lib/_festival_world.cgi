@@ -20,6 +20,7 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
+	&wt_c_reset; # 稼働率の更新とﾘｾｯﾄ
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
@@ -72,57 +73,7 @@ sub run_kouhaku {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 紅白開始時の処理	
-		@sedais=([0, 0],[0, 0],[0, 0],[0, 0]);
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-	
-			my $j = int(rand(2));
-			my $s;
-			# これ $m{sedai} だと全員一緒じゃね？
-			if($m{sedai} <= 5){
-				$s = 0;
-			}elsif($m{sedai} <= 10){
-				$s = 1;
-			}elsif($m{sedai} <= 15){
-				$s = 2;
-			}else{
-				$s = 3;
-			}
-			for my $cj (0..1) {
-				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
-					$j = $cj;
-				}
-			}
-			++$sedais[$s][$j];
-			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $w{country} - $j;
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
-	
-				# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-				$m{wt_c_latest} = $m{wt_c};
-				$m{wt_c} = 0;
-				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
-				for my $k (qw/war dom pro mil/) {
-					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-					&regist_you_data($you_datas{name}, $k."_c", 0);
-				}
-	
-				# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-				&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-				&regist_you_data($you_datas{name}, "wt_c", 0);
-			}
-		}
-		closedir $dh;
+		&player_shuffle($w{country}-1..$w{country});
 	} # 紅白開始時の処理
 	else { # 紅白終了時の処理
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -184,56 +135,7 @@ sub run_sangokusi {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 三国志開始時の処理
-		@sedais=([0, 0, 0],[0, 0, 0],[0, 0, 0],[0, 0, 0]);
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			my $j = int(rand(3));
-			my $s;
-			if($m{sedai} <= 5){
-				$s = 0;
-			}elsif($m{sedai} <= 10){
-				$s = 1;
-			}elsif($m{sedai} <= 15){
-				$s = 2;
-			}else{
-				$s = 3;
-			}
-			for my $cj (0..2) {
-				if ($sedais[$s][$j] > $sedais[$s][$cj] + 2) {
-					$j = $cj;
-				}
-			}
-			++$sedais[$s][$j];
-			&move_player($you_datas{name}, $you_datas{country}, $w{country} - $j);
-
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $w{country} - $j;
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
-
-				# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-				$m{wt_c_latest} = $m{wt_c};
-				$m{wt_c} = 0;
-				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $w{country} - $j);
-				for my $k (qw/war dom pro mil/) {
-					&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-					&regist_you_data($you_datas{name}, $k."_c", 0);
-				}
-
-				# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-				&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-				&regist_you_data($you_datas{name}, "wt_c", 0);
-			}
-		}
-		closedir $dh;
+		&player_shuffle($w{country}-2..$w{country});
 	} # 三国志開始時の処理
 	else { # 三国志終了時の処理
 		require "./lib/shopping_offertory_box.cgi";
@@ -294,7 +196,7 @@ sub run_sessoku {
 	$is_start = shift;
 
 	if ($is_start) { # 拙速開始時の処理
-		&wt_c_reset; # 稼働率の更新とﾘｾｯﾄ
+		&player_shuffle(1..$w{country});
 	} # 拙速開始時の処理
 	else { # 拙速終了時の処理
 		require "./lib/move_player.cgi";
@@ -356,55 +258,7 @@ sub run_konran {
 
 	require "./lib/move_player.cgi";
 	if ($is_start) { # 混乱開始時の処理
-		# 一旦ネバラン送り
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			next if $you_datas{shuffle};
-			
-			if($you_datas{name} eq $m{name}){
-				&move_player($m{name}, $m{country}, 0);
-				$m{country} = 0;
-				&write_user;
-			}
-			&move_player($you_datas{name}, $you_datas{country}, 0);
-			&regist_you_data($you_datas{name}, 'country', 0);
-		}
-		closedir $dh;
-		
-		# 振り分け
-		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-		while (my $pid = readdir $dh) {
-			next if $pid =~ /\./;
-			next if $pid =~ /backup/;
-			my %you_datas = &get_you_datas($pid, 1);
-			
-			my $j = int(rand($w{country}) + 1);
-			for my $cj (1..$w{country}) {
-				if ($cs{member}[$j] > $cs{member}[$cj] + 2) {
-					$j = $cj;
-				}
-			}
-
-			&move_player($you_datas{name}, $you_datas{country}, $j);
-			if ($you_datas{name} eq $m{name}){
-				$m{country} = $j;
-
-				# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-				$m{wt_c_latest} = $m{wt_c};
-				$m{wt_c} = 0;
-				&write_user;
-			} else {
-				&regist_you_data($you_datas{name}, 'country', $j);
-
-				# 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
-				&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-				&regist_you_data($you_datas{name}, "wt_c", 0);
-			}
-		}
-		closedir $dh;
+		&player_shuffle(1..$w{country});
 	} # 混乱開始時の処理
 	else { # 混乱終了時の処理
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
@@ -663,6 +517,96 @@ sub wt_c_reset {
 		}
 	}
 	closedir $dh;
+}
+
+
+#================================================
+# プレーヤーシャッフル
+# 稼働率をもとに振り分ける。
+#================================================
+sub player_shuffle {
+	my @countries = @_;
+	
+	for my $i (0..$#countries){
+		my $j = int(rand(@countries));
+		my $temp = $countries[$i];
+ 		$countries[$i] = $countries[$j];
+ 		$countries[$j] = $temp;
+	}
+	
+	my %country_num = ();
+	for my $c ($countries) {
+		$country_num{$c} = 0;
+	}
+	
+	# ユーザー一覧取得
+	my @player_line = ();
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $pid = readdir $dh) {
+		next if $pid =~ /\./;
+		next if $pid =~ /backup/;
+		my %you_datas = &get_you_datas($pid, 1);
+		if ($you_datas{shuffle}) {
+			my $c_find = 0;
+			if ($you_datas{country}) {
+				for my $c (@countries) {
+					if ($c eq $you_datas{country}) {
+						$country_num{$c}++;
+						$c_find = 1;
+					}
+				}
+			}
+			if ($c_find) {
+				next;
+			}
+		}
+		
+		push @player_line, "$you_datas{name}<>$you_datas{wt_c_latest}<>\n";
+	}
+	closedir $dh;
+	
+	@player_line = map { $_->[0] } sort { $a->[2] <=> $b->[2] } map { [$_, split /<>/ ] } @player_line;
+	
+	my $updown = 1;
+	my $index = 0;
+	my $round = 0;
+	my @new_line = ();
+	my $mc = @countries;
+	for my $pl (@player_line) {
+		my $c = $countries[$index];
+		my($pname, $pw) = split /<>/, $pl;
+		push @new_line, "$pname<>$c<>\n";
+		$country_num{$c}++;
+		while (1) {
+			$index += $updown;
+			if ($index < 0) {
+				$index = 0;
+				$updown = 1;
+				$round++;
+			} elsif ($index >= $mc) {
+				$index = $mc - 1;
+				$updown = -1;
+				$round++;
+			}
+			if ($country_num{$countries[$index]} <= $round) {
+				last;
+			}
+		}
+	}
+	
+	# 振り分け
+	for my $nl (@new_line) {
+		my($nname, $nc) = split /<>/, $pl;
+		my %you_datas = &get_you_datas($nname);
+		
+		&move_player($you_datas{name}, $you_datas{country}, $nc);
+		if ($you_datas{name} eq $m{name}){
+			$m{country} = $nc;
+			&write_user;
+		} else {
+			&regist_you_data($you_datas{name}, 'country', $nc);
+		}
+	}
 }
 
 =pod
