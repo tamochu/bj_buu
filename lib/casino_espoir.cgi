@@ -360,7 +360,7 @@ sub participate {
 	my $find = 0;
 	while (my $line = <$fh>) {
 		chomp $line;
-		if ($line) {
+		if ($line && &you_exists($line)) {
 			push @all_players, $line;
 			if ($line eq $m{name}) {
 				$find = 1;
