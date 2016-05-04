@@ -141,6 +141,7 @@ sub run_sangokusi {
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
 			next if $pid =~ /backup/;
+			next unless &you_exists($pid, 1);
 			my %you_datas = &get_you_datas($pid, 1);
 			
 			my($c1, $c2) = split /,/, $w{win_countries};
@@ -227,6 +228,7 @@ sub run_sessoku {
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
 			next if $pid =~ /backup/;
+			next unless &you_exists($pid, 1);
 			my %p = &get_you_datas($pid, 1);
 
 			# Õ‚è•ñV
@@ -624,9 +626,21 @@ sub player_shuffle {
 		&move_player($you_datas{name}, $you_datas{country}, $nc);
 		if ($you_datas{name} eq $m{name}){
 			$m{country} = $nc;
+
+			# ‘ã•\n—û‚ÌÊŞ¯¸±¯Ìß
+			for my $k (qw/war dom pro mil/) {
+				$m{$k."_c_t"} = $m{$k."_c"};
+				$m{$k."_c"} = 0;
+			}
 			&write_user;
 		} else {
 			&regist_you_data($you_datas{name}, 'country', $nc);
+
+			# ‘ã•\n—û‚ÌÊŞ¯¸±¯Ìß
+			for my $k (qw/war dom pro mil/) {
+				&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+				&regist_you_data($you_datas{name}, $k."_c", 0);
+			}
 		}
 	}
 }
