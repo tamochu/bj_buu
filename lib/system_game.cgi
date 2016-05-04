@@ -17,13 +17,13 @@ sub write_cs {
 		name strong tax food money soldier state is_die member capacity color
 		win_c old_ceo ceo war dom mil pro war_c dom_c mil_c pro_c ceo_continue
 		modify_war modify_dom modify_mil modify_pro
-		extra extra_limit
+		extra extra_limit disaster disaster_limit
 		new_commer
 	/);
 	# 国名　総国力　税率　総兵糧　国家予算　総兵士数　状態　滅亡ﾌﾗｸﾞ　所属人数　定員　国色
 	# 統一数　旧代表者　代表者　参謀　内政官　策士　外交官　参謀ﾎﾟｲﾝﾄ　内政官ﾎﾟｲﾝﾄ　策士ﾎﾟｲﾝﾄ　外交官ﾎﾟｲﾝﾄ　代表年期
 	# 各国設定戦争　内政　軍事　外交
-	# 追加効果　追加効果期限
+	# 追加効果　追加効果期限　国別災害　国別災害有効期間
 	# 新規数
 	
 	# -------------------
@@ -644,13 +644,52 @@ sub m_st { int($m{max_hp} + $m{max_mp} + $m{at} + $m{df} + $m{mat} + $m{mdf} + $
 # 災害 滅亡時低確率、ﾛﾌﾟﾄ使用時
 #================================================
 sub disaster {
-	my @disasters = (['自然災害','food'],['経済破綻','money'],['大地震','soldier']);
-	my $v = int(rand(@disasters));
-	for my $i (1 .. $w{country}) {
-		next if $cs{ is_die }[$i];
-		$cs{ $disasters[$v][1] }[$i] = int($cs{ $disasters[$v][1] }[$i] * 0.5);
+	my @disasters = (
+		['自然災害','food'],
+		['経済破綻','money'],
+		['大地震','soldier'],
+		['魔人復活','strong'],
+		['一定時間国防が脆弱化','paper'],
+		['一定時間指揮系統が混乱','mismatch'],
+		['大泥棒が出現','concentrate'],
+	);
+	if ($w{world} eq '12') {
+		push @disasters, ['大飢饉', 'big_food'];
+		push @disasters, ['大恐慌', 'big_money'];
+		push @disasters, ['大津波', 'big_soldier'];
 	}
-	&write_world_news("<b>世界中に $disasters[$v][0] が起こりました</b>");
+	my $v = int(rand(@disasters));
+	if ($disasters[$v][1] eq 'food' || $disasters[$v][1] eq 'money' || $disasters[$v][1] eq 'soldier') {
+		for my $i (1 .. $w{country}) {
+			next if $cs{ is_die }[$i];
+			$cs{ $disasters[$v][1] }[$i] = int($cs{ $disasters[$v][1] }[$i] * 0.5);
+		}
+		&write_world_news("<b>世界中に $disasters[$v][0] が起こりました</b>");
+	} elsif ($disasters[$v][1] eq 'strong') {
+		$cs{ $disasters[$v][1] }[$m{country}] = int($cs{ $disasters[$v][1] }[$m{country}] * 0.5);
+		&write_world_news("<b>$cs{name}[$m{country}]に $disasters[$v][0] が起こりました</b>");
+	} elsif ($disasters[$v][1] eq 'paper' || $disasters[$v][1] eq 'mismatch') {
+		$cs{disaster}[$m{country}] = $disasters[$v][1];
+		$cs{disaster_limit}[$m{country}] = $time + 1 * 60 * 60;
+		&write_world_news("<b>$cs{name}[$m{country}]で $disasters[$v][0] しました</b>");
+	} elsif ($disasters[$v][1] eq 'concentrate') {
+		my @rlist = ('food', 'money', 'soldier');
+		my $r = $rlist[int(rand(@rlist))];
+		for my $i (1 .. $w{country}) {
+			next if $cs{is_die}[$i];
+			next if $i eq $m{country};
+			$cs{$r}[$i] = int($cs{$r}[$i] * 0.5);
+			$cs{$r}[$m{country}] += $cs{$r}[$i];
+		}
+		&write_world_news("<b>世界中に $disasters[$v][0] しました</b>");
+	} elsif ($disasters[$v][1] =~ 'big_(.*)') {
+		$r = $1;
+		for my $i (1 .. $w{country}) {
+			next if $cs{is_die}[$i];
+			$cs{$r}[$i] = int($cs{$r}[$i] * 0.1);
+		}
+		&write_world_news("<b>世界中に $disasters[$v][0] が起こりました</b>");
+	}
 }
 #================================================
 # 相手ﾃﾞｰﾀがあるかチェック
@@ -1047,6 +1086,12 @@ sub alltime_event {
 				&write_cs;
 				&write_world_news("<b>花火大会開始のお知らせ</b>");
 			}
+		}
+	}
+	if ($w{world} eq '12') {
+		if (rand(1000) < 1) {
+			&disaster;
+			&write_cs;
 		}
 	}
 	if ($w{world} eq $#world_states-4) {
