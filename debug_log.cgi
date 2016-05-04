@@ -57,7 +57,7 @@ sub top {
 		print qq|<td>$message</td>|;
 		print qq|<td><input type="button" class="button_s" value="$tag_disp" onClick="location.href='?tag=$tag';"></td>|;
 	}
-	print qq|</table>
+	print qq|</table>|;
 }
 
 #=================================================
