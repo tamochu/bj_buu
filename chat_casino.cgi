@@ -60,6 +60,7 @@ sub header2 {
 		print <<"EOM";
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <link rel="stylesheet" type="text/css" href="$htmldir/bj.css?$jstime">
+<link rel="stylesheet" type="text/css" href="$htmldir/themes/green/style.css">
 
 <script language="JavaScript">
 <!--

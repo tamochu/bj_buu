@@ -41,12 +41,21 @@ sub run {
 	    $in{comment} = &reset_game($m{name});
 	    &write_comment if $in{comment};
 	}
+	elsif ($in{mode} eq "result_table") {
+		&result_table;
+		return;
+	}
 	&write_comment if ($in{mode} eq "write") && $in{comment};
 	my($member_c, $member, $leader, $rate, $waiting, $state, $wmember) = &get_member;
 	if($m{c_turn} eq '0' || $m{c_turn} eq ''){
 		print qq|<form method="$method" action="$script">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 		print qq|<input type="submit" value="戻る" class="button1"></form>|;
+		
+		print qq|<form method="$method" action="$this_script" name="form">|;
+		print qq|<input type="hidden" name="mode" value="result_table">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="結果一覧" class="button_s"></form><br>|;
 	}elsif($m{name} ne $leader) {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print qq|<input type="hidden" name="mode" value="exit">|;
@@ -130,6 +139,36 @@ sub run {
 		print qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
 	}
 	close $fh;
+}
+
+sub result_table {
+	print qq|<form method="$method" action="$script">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+	print qq|<input type="submit" value="戻る" class="button1"></form>|;
+	
+	print qq|<script type="text/javascript" src="$htmldir/jquery.tablesorter.js?$jstime"></script>\n|;
+	print <<'EOM';
+<script type="text/javascript">
+	$(function() {
+		$("#result").tablesorter();
+	});
+</script>
+EOM
+	print qq|<table class="tablesorter" id="result">|;
+	print qq|<thead><tr><th>親</th><th>勝</th><th>負</th><th>手役</th><th>文数</th><th>こいこい</th><th>レート</th><th>ｺｲﾝ</th><th>日付</th></tr></thead>|;
+	print qq|<tbody>|;
+	open my $fhr, "< $logdir/koikoi_result.cgi" or &error('結果ﾌｧｲﾙが開けません'); 
+	while (my $line = <$fhr>) {
+		my($leader, $win, $lose, $yaku, $hand_value, $koikoi, $rate, $mcoin, $rtime) = split /<>/, $line;
+		my ($rsec, $rmin, $rhour, $rmday, $rmon, $ryear, $rwday, $ryday, $risdst) = localtime($rtime);
+		$ryear += 1900;
+		$rmon++;
+		my $rdate = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$ryear,$rmon,$rmday,$rhour,$rmin,$rsec);
+		print qq|<tr><td>$leader</td><td>$win</td><td>$lose</td><td>$yaku</td><td>$hand_value</td><td>$koikoi</td><td>$rate</td><td>$mcoin</td><td>$rdate</td></tr>|;
+	}
+	close $fhr;
+	print qq|</tbody>|;
+	print qq|</table>|;
 }
 
 sub get_member {
@@ -337,6 +376,7 @@ sub play_card {
 		&write_user;
 		($hand_value, $yaku) = &h_value($m{c_value});
 		unless($e_hand || $m{c_stock}){
+			&no_game;
 #			&leader_win unless ($koikoi);
 			$reset_flag = 1;
 		}
@@ -438,6 +478,9 @@ sub win_game {
 			$mcoin *= 2;
 		}
 	}
+	open my $fhr, ">> $logdir/koikoi_result.cgi" or &error('結果ﾌｧｲﾙが開けません'); 
+	print $fhr "$leader<>$m{name}<>$e_name<>$yaku<>$hand_value<>$koikoi<>$rate<>$mcoin<>$time<>\n";
+	close $fhr;
 	my $cv = &coin_move(-1*$mcoin, $e_name);
 	&coin_move(-1*$cv, $m{name});
 	$state = '';
@@ -450,6 +493,25 @@ sub win_game {
 	&reset_game;
 	
 	return ($ret_mes);
+}
+
+sub no_game {
+	my $hand_value;
+	my $yaku;
+	my $e_name;
+	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	my $head_line = <$fh>;
+	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
+	while (my $line = <$fh>) {
+		my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($mturn > 0 && $mname ne $m{name}){
+			$e_name = $mname;
+		}
+	}
+	close $fh;
+	open my $fhr, ">> $logdir/koikoi_result.cgi" or &error('結果ﾌｧｲﾙが開けません'); 
+	print $fhr "$leader<>$m{name}<>$e_name<>つかず<>0<>$koikoi<>$rate<>0<>$time<>\n";
+	close $fhr;
 }
 
 sub leader_win {

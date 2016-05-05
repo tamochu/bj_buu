@@ -508,7 +508,7 @@ require './lib/system_game.cgi';
  	[68,	'ﾉｱ',		'myself',	sub{ return if ($w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 5); return unless $m{country}; $cs{is_die}[$m{country}] = 1;     &write_cs; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い$c_mに守りのご加護がつきました</b>");			}],
  	[69,	'ﾒｼｱ',		'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; $cs{state}[$m{country}]  = 1;     &write_cs; &mes_and_world_news("$pets[$m{pet}][1]★$m{pet_c}を使い$c_mが$country_states[1]になりました");			},'我はメシア、明日この世界を粛清する。(54687)'],
  	[70,	'ｼｸﾞﾏ',		'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; $cs{state}[$m{country}]  = 2;     &write_cs; &mes_and_world_news("$pets[$m{pet}][1]★$m{pet_c}を使い$c_mが$country_states[2]になりました");			}],
- 	[71,	'ﾛﾌﾟﾄ',		'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使いました</b>"); &disaster; &write_cs;	}],
+ 	[71,	'ﾛﾌﾟﾄ',		'myself',	sub{ return if ($w{world} eq $#world_states-5); return unless $m{country}; &mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使いました</b>"); my $tc = $m{country}; $m{country} = int(rand($w{country}-1))+1; &disaster; $m{country} = $tc; &write_cs;	}],
  
  #	# 武器.ﾀﾏｺﾞに変化(「..」の意味は「～」)
  	[72,	'ｳｪﾎﾟﾝLv1',	'myself',	sub{ &_pet_weapon(2..4, 7..9,  12..14, 17..19, 22..24, 27..29)	}, '', 1], # 武器に変化武器のNo
