@@ -61,6 +61,8 @@ sub move_player {
 
 	if ($to_country eq 'del') {
 		&delete_user($p_id, %datas) if -d "$userdir/$p_id";
+	
+		&write_entry_news("$name‚Æ‚¢‚¤Ò‚ª‹‚è‚Ü‚µ‚½");
 	}
 	else {
 		open my $fh9, ">> $logdir/$to_country/member.cgi" or &error("$logdir/$to_country/member.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
@@ -129,8 +131,6 @@ sub delete_user {
 	
 	# ©ì±²ºİíœ
 	unlink "$icondir/$datas{icon}" if $datas{icon} ne $default_icon && -f "$icondir/$datas{icon}";
-	
-	&write_entry_news("$m{name}‚Æ‚¢‚¤Ò‚ª‹‚è‚Ü‚µ‚½");
 }
 
 

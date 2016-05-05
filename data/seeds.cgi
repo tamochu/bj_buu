@@ -44,8 +44,9 @@
 	[3, 'elf',
 		['´ÙÌ',
 			{
-				'default' => sub {
+				'sedai_lv' => sub {
 					$v = shift;
+					$v += 10;
 					return $v;
 				}
 			},

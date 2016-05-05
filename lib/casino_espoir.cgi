@@ -206,7 +206,7 @@ sub run {
 					print qq|<input type="submit" value="送信" class="button_s"><br>|;
 					print qq|</form>|;
 				} else {
-					if (($count > 1 && $star >= 4) ||$star >= 3) {
+					if (!$check_h && ($count > 1 && $star >= 4) || $star >= 3) {
 						print qq|<form method="$method" action="$this_script" name="form">|;
 						print qq|<input type="hidden" name="mode" value="goal">|;
 						print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
@@ -321,6 +321,7 @@ sub get_my_state {
 	my @c = ();
 	my @check = ();
 	my @send = ();
+	my $check_find = 0;
 	open my $fhm, "< $my_espoir_file" or &error('参加者ﾌｧｲﾙが開けません'); 
 	my $headline = <$fhm>;
 	my ($star, $rest_a, $rest_b, $rest_c, $count, $year, $check_h) = split /<>/, $headline;
@@ -711,6 +712,15 @@ sub lose {
 	if ($star > 0 && !$force) {
 		return;
 	}
+	if ($rest_a) {
+		&decrease_all(1) for (1..$rest_a);
+	}
+	if ($rest_b) {
+		&decrease_all(2) for (1..$rest_b);
+	}
+	if ($rest_c) {
+		&decrease_all(3) for (1..$rest_c);
+	}
 	
 	if ($name eq $m{name}) {
 		$m{coin} = 0;
@@ -771,18 +781,27 @@ sub add_my_status_line {
 		close $fh;
 	}
 	
+	my $check_find = 0;
 	my @lines = ();
 	open my $fhm, "< $userdir/$to_id/espoir.cgi" or &error('参加者ﾌｧｲﾙが開けません'); 
 	my $headline = <$fhm>;
-	push @lines, $headline;
+	my ($star, $rest_a, $rest_b, $rest_c, $count, $year, $check_h) = split /<>/, $headline;
 	while (my $line = <$fhm>) {
+		my($type, $name) = split /<>/, $line;
+		if ($type == -5) {
+			$check_find = 1;
+		}
 		push @lines, $line;
 	}
 	close $fhm;
+	if (!$check_find) {
+		$check_h = '';
+	}
+	unshift @lines, "$star<>$rest_a<>$rest_b<>$rest_c<>$count<>$year<>$check_h<>\n";
 	
 	push @lines, "$type<>$name<>\n";
 	
-	open my $fhw, "> $userdir/$to_id/espoir.cgi" or &error('参加者ﾌｧｲﾙが開けません'); 
+	open my $fhw, "> $userdir/$to_id/espoir.cgi" or &error('参加者ﾌｧｲﾙが開けません');
 	print $fhw @lines;
 	close $fhw;
 }
@@ -863,7 +882,7 @@ sub change_my_status {
 		$check_h = $value;
 	}
 	push @lines, "$star<>$rest_a<>$rest_b<>$rest_c<>$count<>$year<>$check_h<>\n";
-	while (my $line = <$fh>) {
+	while (my $line = <$fhm>) {
 		push @lines, $line;
 	}
 	close $fhm;
