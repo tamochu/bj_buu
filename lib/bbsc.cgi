@@ -19,9 +19,14 @@ $limit_member_time = 60 * 4;
 # 最大過去ﾛｸﾞ保存件数
 $max_bbs_past_log = 50;
 
-
 #================================================
 sub run {
+
+	if ($in{mode} eq "img") {
+		&get_img_list;
+		return;
+	}
+
 	if ($in{mode} eq "write" && $in{comment}) {
 		&write_comment;
 		
@@ -43,7 +48,9 @@ sub run {
 	
 	my($member_c, $member) = &get_member;
 
-	print qq|<form method="$method" action="$script">|;
+	$in{text} =~ s/&lt;_&gt;/\r\n/g;
+
+	print qq|<form method="$metod" action="$script">|;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 	print qq|<input type="submit" value="戻る" class="button1"></form>|;
 	print qq|<h2>$this_title <font size="2" style="font-weight:normal;">$this_sub_title</font></h2>|;
@@ -74,10 +81,10 @@ sub run {
 	print qq|</tr></table>|;
 	
 	my $rows = $is_mobile ? 2 : 5;
-	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="write">|;
+	print qq|<form method="get" action="$this_script"><input type="hidden" name="mode" value="write">|;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-	print qq|<textarea name="comment" cols="60" rows="$rows" wrap="soft" class="textarea1"></textarea><br>|;
-	print qq|<input type="submit" value="書き込む" class="button_s">|;
+	print qq|<textarea name="comment" cols="60" rows="$rows" wrap="soft" class="textarea1">$in{text}$in{file_name}</textarea><br>|;
+	print qq|<input type="submit" value="書き込む" class="button_s"><button type="submit" name="mode" value="img" class="button_s">画像を選ぶ</button>|;
 	print qq|　 <input type="checkbox" name="is_save_log" value="1">ﾛｸﾞ保存</form><br>|;
 	print qq|<font size="2">$member_c人:$member</font><hr>|;
 
@@ -98,5 +105,47 @@ sub run {
 	close $fh;
 }
 
+sub get_img_list {
+
+#	my ($mday, $mon, $year) = (localtime(time()))[3..5];
+#	my $match_cmp = sprintf("%02d%02d",$year + 1900, $mon + 1);
+	$in{comment} =~ s/<br>/<_>/g;
+
+	print qq|<form method="$method" action="$this_script">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+	print qq|<input type="hidden" name="text" value="$in{comment}">|;
+	print qq|<input type="submit" value="決定" class="button_s"><hr>|;
+	print qq|<input type="radio" name="file_name" value="" checked="checked">やめる<hr>|;
+
+	my $i = 0;
+	my $filedat = "./../upbbs/file.dat";
+	open $fh, "< $filedat" or &error("画像のﾃﾞｰﾀﾌｧｲﾙが開けません");
+	while (my $line = <$fh>) {
+		next if $line !~ /.*?$m{name}.*?(jpg|png).*?/;
+
+		my @data = split(/\t/, $line);
+
+		my $file_name = substr($data[5], 10);
+		my $title = "";
+		my $img_data = "";
+		if ($data[6] =~ /^\.\/img.*?(jpg|png)$/) {
+			$title = substr($data[6], 10);
+		}
+		else {
+			$title = $data[6];
+			$img_data = $data[6];
+		}
+		$title =~ s|(.*?)<.*|\1|g;
+		$img_data =~ s|.*<!--(dsize=.*)-->.*|\1|g;
+
+		print qq|<input type="radio" name="file_name" value="&amp;img($file_name)"><a href="./../upbbs/img-box/$file_name" target="_blank"><img src="./../upbbs/img-box/$file_name" style="vertical-align:middle;" $mobile_icon_size></a><br>$img_data<hr>|;
+		$i++;
+		last if $i >= 5;
+	}
+	close $fh;
+	print qq|<input type="radio" name="file_name" value="">やめる<hr>|;
+	print qq|<input type="submit" value="決定" class="button_s">|;
+	print qq|</form>|;
+}
 
 1; # 削除不可
