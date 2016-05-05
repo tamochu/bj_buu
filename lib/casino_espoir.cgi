@@ -376,9 +376,9 @@ sub participate {
 		push @all_players, $m{name};
 		
 		&change_my_status($id, 'star', 3);
-		&change_my_status($id, 'a', 3);
-		&change_my_status($id, 'b', 3);
-		&change_my_status($id, 'c', 3);
+		&change_my_status($id, 'a', 4);
+		&change_my_status($id, 'b', 4);
+		&change_my_status($id, 'c', 4);
 		&change_my_status($id, 'count_add', 1);
 		&change_my_status($id, 'set', '');
 		&clear_stack($id);
