@@ -16,7 +16,6 @@ sub comment_change {
 	$bcomment =~ s|&amp;homashinchiw\(\)|<img src="$icondir/homashinchiw.jpg" style="vertical-align:middle;" $pic_size>|g;
 	$bcomment =~ s|&amp;kappa\(\)|<img src="$icondir/kappa.png" style="vertical-align:middle;" $pic_size>|g;
 	$bcomment =~ s|&amp;homo\(\)|┌(┌^o^)┐ホモォ|g;
-	$bcomment =~ s|&amp;img\((.*?)\)|<a href="./../upbbs/img-box/\1"><img src="./../upbbs/img-box/\1" style="vertical-align:middle;" $pic_size></a>|g;
 	$bcomment =~ s|&amp;italic\((.*?)\)|<i>\1</i>|g;
 	$bcomment =~ s|&amp;bold\((.*?)\)|<b>\1</b>|g;
 	$bcomment =~ s|&amp;underline\((.*?)\)|<u>\1</u>|g;
@@ -24,6 +23,10 @@ sub comment_change {
 		$bcomment =~ s|&amp;mahjong\(([mspz][1-9])(.*?)\)|<img src="$icondir/mahjongpai/\1.gif" style="vertical-align:middle;" $pai_size>&amp;mahjong(\2)|g;
 	}
 	$bcomment =~ s|&amp;mahjong\((.*?)\)|\1|g;
+
+	# 正規表現とかない言語ずっと使っててよく分からんし力技
+	$bcomment =~ s!&amp;img\(([^&]*?)(jpg|png)\)!<a href="./../upbbs/img-box/\1\2"><img src="./../upbbs/img-box/\1\2" style="vertical-align:middle;" $pic_size></a>!g;
+	$bcomment =~ s|&amp;img\((.*?)\)|<a href="./../upbbs/img-box/\1\2">\1\2</a>|g;
 	
 	return $bcomment;
 }
