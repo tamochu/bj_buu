@@ -5,7 +5,7 @@ use File::Path;
 #================================================
 
 # 統一難易度：[難しい 60 ～ 40 簡単]
-my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
+my $game_lv = $config_test ? int(rand(11) + 40) : int( rand(11) + 40 );
 
 # 統一期限(日)
 my $limit_touitu_day = int( rand(6)+5 );
@@ -77,7 +77,7 @@ sub reset {
 	my $sleep_num = 0;
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
-		$sleep_num++ if $cs{is_die}[$i] > 1;
+		$sleep_num++ if $cs{is_die}[$i] > 2;
 	}
 
 	# 仕官できる人数
@@ -99,7 +99,7 @@ sub reset {
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
 		$cs{modify_pro}[$i]   = 0;
-		if ($cs{is_die}[$i] > 1) {
+		if ($cs{is_die}[$i] > 2) {
 			$cs{strong}[$i]   = 0;
 			$cs{capacity}[$i] = 0;
 		}
@@ -168,6 +168,9 @@ sub reset {
 			&begin_festival_world;
 		}
 	}
+	else {
+		&begin_common_world;
+	}
 
 	# 1000年デフォルト
 	# ｽﾊﾟﾝ長すぎて形骸化してる上に祭り情勢の開始ﾊﾞｯｸｱｯﾌﾟと終了ﾘｽﾄｱに挟まってるから無効化されそう？
@@ -204,6 +207,7 @@ sub is_festival_world {
 # 戻り値は (world, world_sub)
 #================================================
 sub choice_unique_world {
+	my @new_worlds = @_;
 	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
 	my $line = <$fh>;
 	close $fh;
@@ -261,7 +265,7 @@ sub begin_common_world {
 	elsif ($w{world} eq '6') { # 結束
 		my @win_cs = ();
 		for my $i (1 .. $w{country}) {
-			next if $cs{is_die}[$i] > 1;
+			next if $cs{is_die}[$i] > 2;
 			push @win_cs, [$i, $cs{win_c}[$i]];
 		}
 		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;

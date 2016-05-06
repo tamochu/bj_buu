@@ -83,9 +83,10 @@ sub tp_100 {
 		my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
 		next if $name eq $m{name};
 		my $rank_name = &get_rank_name($rank, $name);
-		$name .= "[$shogo]" if $shogo;
-		$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank\name/$message<br>|
-			: qq|<tr><td><input type="radio" name="cmd" value="$no">$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
+		my $bname = &name_link($name);
+		$bname .= "[$shogo]" if $shogo;
+		$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$bname/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank\name/$message<br>|
+			: qq|<tr><td><input type="radio" name="cmd" value="$no">$bname</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 	}
 	close $fh;
 	$mes .= qq|</table>| unless $is_mobile;
