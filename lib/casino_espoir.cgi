@@ -20,7 +20,7 @@ my $bonus_coin = 2500000;
 my $min_espoir = 6;
 
 unless (-f $all_member_file) {
-	open my $fh, "> $all_member_file" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+	open my $fh, "> $all_member_file" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½ init');
 	print $fh "<>0<>0<>0<>\n";
 	close $fh;
 }
@@ -763,7 +763,7 @@ sub game_end_espoir {
 	if ($game_year == $year) {
 		for my $name (@all_member) {
 			chomp $name;
-			if ($name) {
+			if ($name && &you_exists($name)) {
 				&lose($name, 1);
 			}
 		}
@@ -776,7 +776,7 @@ sub add_my_status_line {
 	my $name = shift;
 	
 	unless (-f "$userdir/$to_id/espoir.cgi") {
-		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½ add_my_status_line');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
 	}
@@ -812,7 +812,7 @@ sub remove_my_status_line {
 	my $rm_name = shift;
 	
 	unless (-f "$userdir/$to_id/espoir.cgi") {
-		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+		open my $fh, "> $userdir/$to_id/espoir.cgi" or &error("“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½ $to_id remove_my_status_line");
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
 	}
@@ -848,7 +848,7 @@ sub change_my_status {
 	my $ret = '';
 	
 	unless (-f "$userdir/$change_id/espoir.cgi") {
-		open my $fh, "> $userdir/$change_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+		open my $fh, "> $userdir/$change_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½ change_my_status');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
 	}
@@ -902,7 +902,7 @@ sub clear_stack {
 	my $clear_id = shift;
 	
 	unless (-f "$userdir/$clear_id/espoir.cgi") {
-		open my $fh, "> $userdir/$clear_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½');
+		open my $fh, "> $userdir/$clear_id/espoir.cgi" or &error('“q‚¯Ì§²Ù‚Ì‘‚«‚İ‚É¸”s‚µ‚Ü‚µ‚½ clear_stack');
 		print $fh "<>0<>0<>0<>0<><><>\n";
 		close $fh;
 	}
