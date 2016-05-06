@@ -63,6 +63,7 @@ elsif ($in{mode} eq 'add_country')     { &admin_add_country;     }
 elsif ($in{mode} eq 'delete_country')  { &admin_delete_country;  }
 elsif ($in{mode} eq 'restore_country') { &restore_country; }
 elsif ($in{mode} eq 'modify_country') { &modify_country; }
+elsif ($in{mode} eq 'change_year')     { &admin_change_year;     }
 elsif ($in{step}) { &{ 'step_' . $in{step} }; }
 else { &step_1; }
 &footer;
@@ -145,6 +146,17 @@ EOM
 	if (-s "$logdir/countries.cgi") {
 		print <<"EOM";
 	<br><br><hr>
+	<br>
+	<div class="mes">
+	年を変更する<br>
+	<form method="$method" action="$this_script">
+		<input type="hidden" name="mode" value="change_year">
+		<input type="hidden" name="pass" value="$in{pass}">
+		<input type="text" name="year" value="1" class="text_box_s" style="text-align: right">年<br>
+		<p><input type="submit" value="変更" class="button1"></p>
+	</form>
+	</div>
+	<br>
 	<div class="mes">
 	国を追加する<br>
 	<form method="$method" action="$this_script">
@@ -372,6 +384,21 @@ sub create_countries_mes {
 		print $fh "<><>\n";
 	}
 	close $fh;
+}
+
+#=================================================
+# 年を変更
+#=================================================
+sub admin_change_year {
+	&read_cs;
+	$w{year} = $in{year}-1;
+	&write_cs;
+
+	require "./lib/reset.cgi";
+	&reset;
+
+	print qq|<p>以下のような国データで年を$w{year}にしました!</p>|;
+	&countries_html;
 }
 
 #=================================================
