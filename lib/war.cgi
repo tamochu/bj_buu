@@ -39,7 +39,13 @@ if (!$m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
 # 利用条件
 #================================================
 sub is_satisfy {
-	if ($time < $w{reset_time}) {
+	if ($cs{is_die}[$m{country}] > 1) { # 鎖国・崩壊国は行えない
+		$mes .= '他国に影響を与えることはできません<br>';
+		&refresh;
+		&n_menu;
+		return 0;
+	}
+	elsif ($time < $w{reset_time}) {
 		$mes .= '終戦期間なので戦争を中止します<br>';
 		&refresh;
 		&n_menu;
