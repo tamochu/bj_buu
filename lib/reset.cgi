@@ -168,6 +168,9 @@ sub reset {
 			&begin_festival_world;
 		}
 	}
+	else {
+		&begin_common_world;
+	}
 
 	# 1000年デフォルト
 	# ｽﾊﾟﾝ長すぎて形骸化してる上に祭り情勢の開始ﾊﾞｯｸｱｯﾌﾟと終了ﾘｽﾄｱに挟まってるから無効化されそう？
@@ -262,7 +265,7 @@ sub begin_common_world {
 	elsif ($w{world} eq '6') { # 結束
 		my @win_cs = ();
 		for my $i (1 .. $w{country}) {
-			next if $cs{is_die}[$i] > 1;
+			next if $cs{is_die}[$i] > 2;
 			push @win_cs, [$i, $cs{win_c}[$i]];
 		}
 		@win_cs = sort { $b->[1] <=> $a->[1] } @win_cs;
