@@ -587,7 +587,7 @@ sub print_hand {
 }
 
 sub print_my_hand {
-	print qq|Žc‚è<span id="nokori_time">$limit_member_time•b</span><br>|;
+	print qq|<br>Žc‚è<span id="nokori_time">$limit_member_time•b</span><br>|;
 	print qq|<script type="text/javascript"><!--\n nokori_time($limit_member_time, 0, 0, 0, 0);\n// --></script>\n|;
 
 	open my $fh, "< ${this_file}_member.cgi" or &error('ÒÝÊÞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
