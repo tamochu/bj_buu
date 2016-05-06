@@ -1036,12 +1036,13 @@ sub admin_all_pet_check {
 # —Õˆ—(‚¨‚»‚ç‚­ˆê“x‚¾‚¯‚Ìˆ—‚Ìê‡‚»‚Ì“s“x‚±‚±‚Åˆ—)
 #=================================================
 sub admin_expendable {
-	my @plist = &get_player_name_list;
-	for my $name (@plist) {
-		if (&you_exists($name)) {
-			&regist_you_data($name, 'exchange_count', '');
-		}
-	}
+	require "./lib/casino_espoir.cgi";
+	&change_my_status('818e', 'a', 1);
+	&change_my_status('818e', 'b', 1);
+	&change_my_status('818e', 'c', 1);
+	&change_my_status('82a082ab', 'a', 1);
+	&change_my_status('82a082ab', 'b', 1);
+	&change_my_status('82a082ab', 'c', 1);
 }
 
 #=================================================
