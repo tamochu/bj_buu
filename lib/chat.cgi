@@ -20,7 +20,6 @@ $limit_member_time = 60 * 3;
 # Ž©“®ØÛ°ÄÞŽžŠÔ
 @reload_times = (0, 30, 60, 90, 120);
 
-
 #================================================
 sub run {
 	if ($in{comment} && $m{silent_time} > $time) {

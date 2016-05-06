@@ -239,9 +239,10 @@ sub tp_200 {
 	while (my $line = <$fh>) {
 		my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
 		my $rank_name = &get_rank_name($rank, $name);
-		$name .= "[$shogo]" if $shogo;
-		$mes .= $is_mobile ? qq|<hr>$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
-			 : qq|<tr><td>$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
+		my $bname = &name_link($name);
+		$bname .= "[$shogo]" if $shogo;
+		$mes .= $is_mobile ? qq|<hr>$bname/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
+			 : qq|<tr><td>$bname</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 	}
 	close $fh;
 	$mes .= qq|</table>| unless $is_mobile;
@@ -313,9 +314,10 @@ sub tp_300 {
 		while (my $line = <$fh>) {
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
 			my $rank_name = &get_rank_name($rank, $name);
-			$name .= "[$shogo]" if $shogo;
-			$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
-				: qq|<tr><td><input type="radio" name="cmd" value="$no">$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
+			my $bname = &name_link($name);
+			$bname .= "[$shogo]" if $shogo;
+			$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$bname/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
+				: qq|<tr><td><input type="radio" name="cmd" value="$no">$bname</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 		}
 		close $fh;
 		$mes .= qq|</table>| unless $is_mobile;
@@ -335,8 +337,9 @@ sub tp_300 {
 		while (my $line = <$fh>) {
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
 			my $rank_name = &get_rank_name($rank, $name);
-			$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$name/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
-				: qq|<tr><td><input type="radio" name="cmd" value="$no">$name</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
+			my $bname = &name_link($name);
+			$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$bname/<font color="$cs{color}[$country]">$cs{name}[$country]</font>/“o˜^“ú$mdate/Lv$lv/ŠK‹‰$rank_name/$message<br>|
+				: qq|<tr><td><input type="radio" name="cmd" value="$no">$bname</td><td><font color="$cs{color}[$country]">$cs{name}[$country]</font></td><td>$mdate</td><td align="right">$lv</td><td>$rank_name</td><td>$message<br></td></tr>|;
 		}
 		close $fh;
 		$mes .= qq|</table>| unless $is_mobile;
