@@ -5,7 +5,7 @@ use File::Path;
 #================================================
 
 # 統一難易度：[難しい 60 ～ 40 簡単]
-my $game_lv = $config_test ? int(rand(6) + 5) : int( rand(11) + 40 );
+my $game_lv = $config_test ? int(rand(11) + 40) : int( rand(11) + 40 );
 
 # 統一期限(日)
 my $limit_touitu_day = int( rand(6)+5 );
@@ -77,7 +77,7 @@ sub reset {
 	my $sleep_num = 0;
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
-		$sleep_num++ if $cs{is_die}[$i] > 1;
+		$sleep_num++ if $cs{is_die}[$i] > 2;
 	}
 
 	# 仕官できる人数
@@ -99,7 +99,7 @@ sub reset {
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
 		$cs{modify_pro}[$i]   = 0;
-		if ($cs{is_die}[$i] > 1) {
+		if ($cs{is_die}[$i] > 2) {
 			$cs{strong}[$i]   = 0;
 			$cs{capacity}[$i] = 0;
 		}
@@ -204,6 +204,7 @@ sub is_festival_world {
 # 戻り値は (world, world_sub)
 #================================================
 sub choice_unique_world {
+	my @new_worlds = @_;
 	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
 	my $line = <$fh>;
 	close $fh;
