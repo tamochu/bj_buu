@@ -9,6 +9,11 @@ require "$datadir/slots.cgi";
 # ŒšÝ”ï—p
 my $build_money = 100000;
 
+
+if ($m{coin} > 2500000) {
+	$m{coin} = 2500000;
+}
+
 #================================================
 sub begin {
 	if ($m{tp} > 1) {

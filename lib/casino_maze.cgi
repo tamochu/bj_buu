@@ -218,7 +218,7 @@ sub make_leader {
 		$leader = $m{name};
 		if($in{comment} > 0 && $in{comment} !~ /[^0-9]/){
 			$v = $in{comment};
-			$v = $m{coin} if $v > $m{coin};
+			$v = int($m{coin} / 4) if $v > $m{coin} / 4;
 			$maze_bet = $v;
 		}else{
 			$maze_bet = 100;
@@ -622,7 +622,6 @@ sub entry{
 	my $is_find = 0;
 	my @lines = ();
 	my %sames = ();
-	&system_comment("debug");
 	open my $fhm, "+< $maze_file" or &error('迷宮ﾌｧｲﾙが開けません');
 	eval { flock $fhm, 2; };
 	my $maze = <$fhm>;
@@ -723,9 +722,9 @@ sub reset_maze{
 	my @members = ();
 
 	my $prize = int($maze_bet*$leverage*$count);
-	&coin_move(-1*$prize*$count, $lname, 1);
+	my $total = int(-1 * &coin_move(-1*$prize*$count, $lname, 1) / $count);
 	for my $name (@players){
-		&coin_move($prize, $name, 1);
+		&coin_move($total, $name, 1);
 	}
 	return "リセットしました";
 }

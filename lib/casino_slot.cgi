@@ -97,8 +97,22 @@ sub get_member {
 
 sub play {
 	if ($m{coin} < 1000){
-		$m{coin} = 0;
-		&write_user;
+		my $pool_find = 0;
+		if (-f "$userdir/$id/casino_pool.cgi") {
+			open my $fh, "< $this_pool_file" or &error("$this_pool_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			while (my $line = <$fh>){
+				my($pool, $this_term_gain, $slot_runs) = split /<>/, $line;
+				if ($pool > 0) {
+					$pool_find = 1;
+				}
+				last;
+			}
+			close $fh;
+		}
+		unless ($pool_find) {
+			$m{coin} = 0;
+			&write_user;
+		}
 		return ('º²Ý‚ª‚ ‚è‚Ü‚¹‚ñ');
 	}
 	$m{c_value} = $in{bet_value};

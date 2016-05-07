@@ -262,6 +262,7 @@ sub leader_dice{
 	my %sames = ();
 	my $mes = "";
 	my $total = 0;
+	my %p_players = ();
 	
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	eval { flock $fh, 2; };
@@ -291,8 +292,10 @@ sub leader_dice{
 				$m{c_value} > 10 ? 3:
 				$m{c_value} == 7 ? 2:1;
 			}
-			$total -= &coin_move($v, $mname, 1);
-			$m{coin} -= $v;
+			$v = &coin_move($v, $mname, 1);
+			&coin_move(-1 * $v, $mname, 1);
+			$total -= $v;
+			$p_players{$mname} = $v;
 			&you_c_reset($mname);
 			if($v > 0){
 				$mes .= "<br>$mname は $v ｺｲﾝ 勝ちました";
@@ -312,6 +315,15 @@ sub leader_dice{
 	print $fh @members;
 	close $fh;
 
+	my $p_rate = 1.0;
+	if ($m{coin} < -1 * $total) {
+		$p_rate = $m{coin} / (-1 * $total);
+	}
+	for my $mn (keys(%p_players)) {
+		my $v = int($p_players{$mn} * $p_rate);
+		&coin_move($v, $mn, 1);
+		$total
+	}
 
 	&coin_move($total, $m{name}, 1);
 	if($total > 0){
@@ -390,6 +402,7 @@ sub leader_penalty{
 	my %sames = ();
 	my $mes = "";
 	my $sum_penalty = 0;
+	my %p_players = ();
 	
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	eval { flock $fh, 2; };
@@ -409,10 +422,9 @@ sub leader_penalty{
 			my $v = 0;
 			my %datas = &get_you_datas($mname);
 			$v = $datas{c_stock};
+			$p_players{$mname} = $datas{c_stock};
 			$sum_penalty += $v;
-			&coin_move($v, $mname, 1);
 			&you_c_reset($mname);
-			$mes .= "<br>親が無断退席したため $mname は $v ｺｲﾝ 貰いました";
 		}
 
 		push @members, $line;
@@ -422,6 +434,16 @@ sub leader_penalty{
 	print $fh @members;
 	close $fh;
 
+	my $prate = 1.0;
+	my %ldatas = &get_you_datas($lname);
+	if ($ldatas{coin} < $sum_penalty) {
+		$p_rate = $ldatas{coin} / $sum_penalty;
+	}
+	for my $mn (keys(%p_players)) {
+		my $v = int($p_players{$mn} * $p_rate);
+		&coin_move($v, $mn, 1);
+		$mes .= "<br>親が無断退席したため $mname は $v ｺｲﾝ 貰いました";
+	}
 	&coin_move(-1 * $sum_penalty, $lname, 1);
 	&you_c_reset($lname);
 	return $mes;

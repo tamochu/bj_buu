@@ -62,7 +62,7 @@ sub run {
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 		print qq|<input type="submit" value="‚â‚ß‚é" class="button_s"></form><br>|;
 	}
-	if ($leader && &is_player) {
+	if ($leader && (&is_player || &is_sabakan)) {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print qq|<input type="hidden" name="mode" value="reset">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;

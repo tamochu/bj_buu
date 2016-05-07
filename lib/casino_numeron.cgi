@@ -215,8 +215,8 @@ sub play_number {
 		$ret_mes = "$in{comment}:$hit イート $blow バイト";
 		if($hit == 3){
 			$ret_mes .= "勝利";
-			&coin_move($max_bet, $m{name});
-			&coin_move(-1*$max_bet, $e_name);
+			my $cv = -1 * &coin_move(-1 * $max_bet, $e_name);
+			&coin_move($cv, $m{name});
 			$state = '';
 			$leader = '';
 			$max_bet = 0;
