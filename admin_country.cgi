@@ -306,6 +306,7 @@ print "$w{country}<br>" if $config_test;
 	
 	require './lib/reset.cgi';
 	&reset;
+	&begin_common_world;
 
 	&write_cs;
 	&create_countries_mes;

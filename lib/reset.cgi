@@ -27,6 +27,17 @@ sub time_limit {
 	}
 
 	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
+
+	if ($w{world} eq '0') { # •½˜a
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
+	}
+	elsif ($w{world} eq '18') { # E”°
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
+	}
+	else {
+		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+	}
+
 	&add_world_log($w{world});
 	&begin_common_world;
 
@@ -168,9 +179,6 @@ sub reset {
 			&begin_festival_world;
 		}
 	}
-	else {
-		&begin_common_world;
-	}
 
 	# 1000”NƒfƒtƒHƒ‹ƒg
 	# ½Êßİ’·‚·‚¬‚ÄŒ`Š[‰»‚µ‚Ä‚éã‚ÉÕ‚èî¨‚ÌŠJnÊŞ¯¸±¯Ìß‚ÆI—¹Ø½Ä±‚É‹²‚Ü‚Á‚Ä‚é‚©‚ç–³Œø‰»‚³‚ê‚»‚¤H
@@ -258,9 +266,11 @@ sub add_world_log {
 # ’Êíî¨‚Ìİ’è‚ğ‚·‚é
 #================================================
 sub begin_common_world {
+	my $old_world = $w{world};
+
 	if ($w{world} eq '0') { # •½˜a
 		$w{reset_time} += $config_test ? 0 : 3600 * 12;
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
 	}
 	elsif ($w{world} eq '6') { # Œ‹‘©
 		my @win_cs = ();
@@ -278,7 +288,7 @@ sub begin_common_world {
 			my $c_c = &union($win_cs[$i][0],$win_cs[$#win_cs-$i][0]);
 			$w{'p_'.$c_c} = 1;
 		}
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
 	elsif ($w{world} eq '18') { # E”°
 		$w{reset_time} = $time;
@@ -287,10 +297,10 @@ sub begin_common_world {
 			$cs{money}[$i]    = int(rand(300)) * 1000;
 			$cs{soldier}[$i]  = int(rand(300)) * 1000;
 		}
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
 	}
 	else {
-		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+#		&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
 	}
 	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
 }

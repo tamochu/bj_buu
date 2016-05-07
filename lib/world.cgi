@@ -71,9 +71,18 @@ sub tp_110 {
 			$w{world} = int(rand(10)) if $w{world} >= $#world_states-5;
 			&write_world_news("<i>¢ŠE‚Í $world_states[$old_world] ‚Æ‚È‚è‚Üc‚¹‚ñ $world_states[$w{world}]‚Æ‚È‚è‚Ü‚µ‚½</i>");
 		}
-		&begin_common_world;
+		elsif ($w{world} eq '0') { # •½˜a
+			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚É‚È‚è‚Ü‚µ‚½</i>");
+		}
+		elsif ($w{world} eq '18') { # E”°
+			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚µ‚½‚Ó‚¢‚ñ‚«(©‚È‚º‚©•ÏŠ·‚Å‚«‚È‚¢)‚É‚È‚è‚Ü‚µ‚½</i>");
+		}
+		else {
+			&write_world_news("<i>¢ŠE‚Í $world_states[$w{world}] ‚Æ‚È‚è‚Ü‚µ‚½</i>");
+		}
 	}# else { # “Áêî¨ˆÈŠO‚ÌŠJn
 	&add_world_log($w{world});
+	&begin_common_world;
 
 	&refresh;
 	&n_menu;
