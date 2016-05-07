@@ -42,6 +42,30 @@ sub coin_move{
 		}
 	}
 	
+	if ($m_coin < $ret_v) {
+		my $diff = ($ret_v - $m_coin) * 10;
+			
+		my $shop_id = unpack 'H*', $name;
+		my $this_pool_file = "$userdir/$shop_id/casino_pool.cgi";
+		my @lines = ();
+		if (-f $this_pool_file) {
+			open my $fh, "+< $this_pool_file" or &error("$this_pool_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			eval { flock $fh, 2; };
+			
+			while (my $line = <$fh>){
+				my($pool, $this_term_gain, $slot_runs) = split /<>/, $line;
+				$pool -= $diff;
+				push @lines, "$pool<>$this_term_gain<>$slot_runs<>\n";
+				last;
+			}
+			
+			seek  $fh, 0, 0;
+			truncate $fh, 0;
+			print $fh @lines;
+			close $fh;
+		}
+	}
+	
 	return $ret_v;
 }
 
@@ -96,6 +120,20 @@ sub system_comment{
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
+}
+
+sub you_c_reset {
+	my $name = shift;
+	if ($name eq $m{name}) {
+		$m{c_turn} = 0;
+		$m{c_value} = 0;
+		$m{c_stock} = 0;
+		&write_user;
+	}else {
+		&regist_you_data($name,'c_turn',0);
+		&regist_you_data($name,'c_value',0);
+		&regist_you_data($name,'c_stock',0);
+	}
 }
 
 1;#íœ•s‰Â

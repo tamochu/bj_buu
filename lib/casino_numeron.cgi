@@ -1,6 +1,7 @@
 #================================================
 # ﾁﾝﾁﾛﾘﾝ
 #================================================
+require './lib/_casino_funcs.cgi';
 
 sub run {
 	if ($in{mode} eq "play") {
@@ -145,9 +146,7 @@ sub get_member {
 		if ($time - $limit_member_time > $mtime) {
 			if($mturn > 0){
 				$leave_name = $mname if $state ne 'waiting';
-				&regist_you_data($mname,'c_turn',0);
-				&regist_you_data($mname,'c_value',0);
-				&regist_you_data($mname,'c_stock',0);
+				&you_c_reset($mname);
 			}else {
 				next;
 			}
@@ -275,8 +274,8 @@ sub use_item {
 			$ret_mes .= "$in{comment}:$hit イート $blow バイト";
 			if($hit == 3){
 				$ret_mes .= "勝利";
-				&coin_move($max_bet, $m{name});
-				&coin_move(-1*$max_bet, $e_name);
+				my $cv = -1 * &coin_move(-1*$max_bet, $e_name);
+				&coin_move($cv, $m{name});
 				$state = '';
 				$leader = '';
 				$max_bet = 0;
@@ -512,22 +511,26 @@ sub reset_game{
 	my($leader, $max_bet, $state) = split /<>/, $head_line;
 	$m{c_turn} = 0;
 	&write_user;
+	my $eplayer = '';
+	my $ev = 0;
 	while (my $line = <$fh>) {
 		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
 		if($leave_name ne '' && $mturn){
 			if($mname eq $leave_name){
-				&coin_move(-1*$max_bet, $mname);
+				$ev = -1 * &coin_move(-1*$max_bet, $mname);
 			}else{
-				&coin_move($max_bet, $mname);
+				$eplayer = $mname;
 			}
 		}
 		if($mturn){
-			&regist_you_data($mname,'c_turn',0);
-			&regist_you_data($mname,'c_value',0);
-			&regist_you_data($mname,'c_stock',0);
+			&you_c_reset($mname);
 		}
 		push @members, "$mtime<>$mname<>$maddr<>0<>0<>\n";
 	}
+	if ($eplayer ne '') {
+		&coin_move($ev, $eplayer);
+	}
+	
 	$state = '';
 	$leader = '';
 	$max_bet = 0;
@@ -642,47 +645,4 @@ sub hb_count {
 	return ($hit, $blow);
 }
 
-sub coin_move{
-	my ($m_coin, $name) = @_;
-	
-	if($m_coin > 0){
-		&system_comment("$name は $m_coin ｺｲﾝ得ました");
-	}else{
-		my $temp = -1 * $m_coin;
-		&system_comment("$name は $temp ｺｲﾝ払いました");
-	}
-	if($name eq $m{name}){
-		my $temp = $m{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		$m{coin} = $temp;
-		&write_user;
-	}else{
-		my %datas1 = &get_you_datas($name);
-		my $temp = $datas1{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		&regist_you_data($name,'coin',$temp);
-	}
-}
-
-sub system_comment{
-	my $s_mes = shift;
-
-	my @lines = ();
-	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
-	eval { flock $fh, 2; };
-	
-	# ｵｰﾄﾘﾝｸ
-	$in{comment} =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\=\@\;\#\:\%]+)/$1<a href=\"link.cgi?$2\" target=\"_blank\">$2<\/a>/g;#"
-	my $head_line = <$fh>;
-	push @lines, $head_line;
-	while (my $line = <$fh>) {
-		push @lines, $line;
-		last if @lines >= $max_log-1;
-	}
-	unshift @lines, "$time<>$date<>システムメッセージ<>0<><>$addr<>$s_mes<>$default_icon<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @lines;
-	close $fh;
-}
 1;#削除不可

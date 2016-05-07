@@ -1,6 +1,8 @@
 #================================================
 # 迷路
 #================================================
+require './lib/_casino_funcs.cgi';
+
 my $maze_file = "$logdir/maze.cgi";
 
 $leverage = 3;
@@ -721,9 +723,9 @@ sub reset_maze{
 	my @members = ();
 
 	my $prize = int($maze_bet*$leverage*$count);
-	&coin_move(-1*$prize*$count, $lname, 0);
+	&coin_move(-1*$prize*$count, $lname, 1);
 	for my $name (@players){
-		&coin_move($prize, $name, 0);
+		&coin_move($prize, $name, 1);
 	}
 	return "リセットしました";
 }
@@ -958,60 +960,8 @@ sub treasure_setted{
 sub coin_move_atob{
 	my ($from, $to, $coin, $display) = @_;
 	
-	my %datas = &get_you_datas($from);
-	if($datas{coin} < $coin){
-		$coin = $datas{coin};
-	}
-	if($coin < 0){
-		$coin = 0;
-	}
-	&coin_move(-1*$coin, $from, $display);
-	&coin_move($coin, $to, $display);
+	my $v = -1 * &coin_move(-1*$coin, $from, !$display);
+	&coin_move($v, $to, !$display);
 }
 
-sub coin_move{
-	my ($m_coin, $name, $display) = @_;
-	
-	if($display){
-		if($m_coin > 0){
-			&system_comment("$name は $m_coin ｺｲﾝ得ました");
-		}else{
-			my $temp = -1 * $m_coin;
-			&system_comment("$name は $temp ｺｲﾝ払いました");
-		}
-	}
-	if($name eq $m{name}){
-		my $temp = $m{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		$m{coin} = $temp;
-		&write_user;
-	}else{
-		my %datas1 = &get_you_datas($name);
-		my $temp = $datas1{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		&regist_you_data($name,'coin',$temp);
-	}
-}
-
-sub system_comment{
-	my $s_mes = shift;
-
-	my @lines = ();
-	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
-	eval { flock $fh, 2; };
-	
-	# ｵｰﾄﾘﾝｸ
-	$in{comment} =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\=\@\;\#\:\%]+)/$1<a href=\"link.cgi?$2\" target=\"_blank\">$2<\/a>/g;#"
-	my $head_line = <$fh>;
-	push @lines, $head_line;
-	while (my $line = <$fh>) {
-		push @lines, $line;
-		last if @lines >= $max_log-1;
-	}
-	unshift @lines, "$time<>$date<>システムメッセージ<>0<><>$addr<>$s_mes<>$default_icon<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @lines;
-	close $fh;
-}
 1;#削除不可

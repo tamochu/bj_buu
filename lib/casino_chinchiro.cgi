@@ -1,6 +1,7 @@
 #================================================
 # ÁİÁÛØİ
 #================================================
+require './lib/_casino_funcs.cgi';
 
 sub run {
 	if ($in{mode} eq "role") {
@@ -290,11 +291,9 @@ sub leader_dice{
 				$m{c_value} > 10 ? 3:
 				$m{c_value} == 7 ? 2:1;
 			}
-			$total -= $v;
+			$total -= &coin_move($v, $mname, 1);
 			$m{coin} -= $v;
-			&regist_you_data($mname,'coin',$datas{coin} + $v);
-			&regist_you_data($mname,'c_turn',0);
-			&regist_you_data($mname,'c_value',0);
+			&you_c_reset($mname);
 			if($v > 0){
 				$mes .= "<br>$mname ‚Í $v º²İ Ÿ‚¿‚Ü‚µ‚½";
 			}elsif($v < 0){
@@ -314,6 +313,7 @@ sub leader_dice{
 	close $fh;
 
 
+	&coin_move($total, $m{name}, 1);
 	if($total > 0){
 		$mes .= "<br>$m{name} ‚Í $total º²İ ‚Ì•‚‚«‚Å‚·";
 	}elsif($total < 0){
@@ -410,9 +410,8 @@ sub leader_penalty{
 			my %datas = &get_you_datas($mname);
 			$v = $datas{c_stock};
 			$sum_penalty += $v;
-			&regist_you_data($mname,'coin',$datas{coin} + $v);
-			&regist_you_data($mname,'c_turn',0);
-			&regist_you_data($mname,'c_value',0);
+			&coin_move($v, $mname, 1);
+			&you_c_reset($mname);
 			$mes .= "<br>e‚ª–³’f‘ŞÈ‚µ‚½‚½‚ß $mname ‚Í $v º²İ –á‚¢‚Ü‚µ‚½";
 		}
 
@@ -423,10 +422,8 @@ sub leader_penalty{
 	print $fh @members;
 	close $fh;
 
-	my %datas = &get_you_datas($lname);
-	&regist_you_data($lname,'coin',$datas{coin} - $sum_penalty);
-	&regist_you_data($lname,'c_turn',0);
-	&regist_you_data($lname,'c_value',0);
+	&coin_move(-1 * $sum_penalty, $lname, 1);
+	&you_c_reset($lname);
 	return $mes;
 }
 

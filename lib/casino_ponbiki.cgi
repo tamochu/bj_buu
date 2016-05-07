@@ -1,6 +1,7 @@
 #================================================
 # è–{ˆø‚«
 #================================================
+require './lib/_casino_funcs.cgi';
 
 sub run {
 	if ($in{mode} eq "p_set") {
@@ -203,7 +204,7 @@ sub make_leader {
 			$v = $in{comment};
 			$v = $m{coin} if $v > $m{coin};
 			if($v > 0){
-				$m{coin} -= $v;
+				&coin_move(-1 * $v, $m{name}, 1);
 				$m{c_turn} = 5;
 				&write_user;
 			}
@@ -237,7 +238,7 @@ sub set_card{
 	$state = 'playing';
 	if($cmd == 0){
 		$p_mes = "ô‚¢‚Ü‚µ‚½B$max_bet ‚Ìó‚©‚è";
-		$m{coin} += $max_bet;
+		&coin_move($max_bet, $m{name}, 1);
 		$leader = '';
 		$max_bet = 0;
 		$state = '';
@@ -391,8 +392,7 @@ sub open_card{
 	for my $k (@names){
 		my $kid = unpack 'H*', $k;
 		if (-f "$userdir/$kid/user.cgi") {
-			my %datas = &get_you_datas($k);
-			&regist_you_data($k,'coin',$datas{coin} + int($vs{$k} * $rate));
+			&coin_move(int($vs{$k} * $rate), $k, 1);
 			&regist_you_data($k,'c_turn',0);
 			if($vs{$k} > 0){
 				$lmes .= "<br>$k ‚Í $vs{$k} º²İ Ÿ‚¿‚Ü‚µ‚½";
@@ -457,7 +457,7 @@ sub leader_penalty{
 			my %datas = &get_you_datas($mname);
 			$v = $datas{c_stock};
 			$sum_penalty -= $v;
-			&regist_you_data($mname,'coin',$datas{coin} + $v);
+			&coin_move($v, $mname, 1);
 			&regist_you_data($mname,'c_turn',0);
 			$mes .= "<br>e‚ª–³’f‘ŞÈ‚µ‚½‚½‚ß $mname ‚Í $v º²İ –á‚¢‚Ü‚µ‚½";
 		}
@@ -470,7 +470,7 @@ sub leader_penalty{
 	close $fh;
 
 	my %datas = &get_you_datas($lname);
-	&regist_you_data($lname,'coin',$datas{coin} + $sum_penalty);
+	&coin_move($sum_penalty, $lname, 1);
 	&regist_you_data($lname,'c_turn',0);
 	return $mes;
 }

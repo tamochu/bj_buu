@@ -1,6 +1,7 @@
 #================================================
 # テキサスホールデムポーカー
 #================================================
+require './lib/_casino_funcs.cgi';
 my @rates = (100, 1000, 10000);
 
 sub run {
@@ -1291,28 +1292,6 @@ sub exit_game{
 	return("$m{name} は やめました");
 }
 
-sub system_comment{
-	my $s_mes = shift;
-
-	my @lines = ();
-	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
-	eval { flock $fh, 2; };
-	
-	# ｵｰﾄﾘﾝｸ
-	$in{comment} =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\=\@\;\#\:\%]+)/$1<a href=\"link.cgi?$2\" target=\"_blank\">$2<\/a>/g;#"
-	my $head_line = <$fh>;
-	push @lines, $head_line;
-	while (my $line = <$fh>) {
-		push @lines, $line;
-		last if @lines >= $max_log-1;
-	}
-	unshift @lines, "$time<>$date<>システムメッセージ<>0<><>$addr<>$s_mes<>$default_icon<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @lines;
-	close $fh;
-}
-
 sub shuffled_deck{
 	my @deck;
 	for my $i (0..51){
@@ -1361,30 +1340,5 @@ sub v_to_hj {
 	return @h;
 }
 
-sub coin_move{
-	my ($m_coin, $s_name) = @_;
-	
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	my($turn, $rate, $e_player, $s_player, $w_player, $n_player, $trash_e, $trash_s, $trash_w, $trash_n, $hands_e, $hands_s, $hands_w, $hands_n, $bonus, $rest) = split /<>/, $head_line;
-	close $fh;
-	
-	if($m_coin > 0){
-		&system_comment("$s_name は $m_coin ｺｲﾝ得ました");
-	}else{
-		my $temp = -1 * $m_coin;
-		&system_comment("$s_name は $temp ｺｲﾝ払いました");
-	}
-	if($s_name eq $m{name}){
-		my $temp = $m{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		$m{coin} = $temp;
-	}else{
-		my %datas1 = &get_you_datas($s_name);
-		my $temp = $datas1{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		&regist_you_data($s_name,'coin',$temp);
-	}
-}
 
 1;#削除不可

@@ -22,7 +22,7 @@ $max_bbs_past_log = 50;
 #================================================
 sub run {
 
-	if ($in{mode} eq "img") {
+	if ($in{img}) {
 		&get_img_list;
 		return;
 	}
@@ -84,7 +84,7 @@ sub run {
 	print qq|<form method="get" action="$this_script"><input type="hidden" name="mode" value="write">|;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 	print qq|<textarea name="comment" cols="60" rows="$rows" wrap="soft" class="textarea1">$in{text}$in{file_name}</textarea><br>|;
-	print qq|<input type="submit" value="書き込む" class="button_s"><button type="submit" name="mode" value="img" class="button_s">画像を選ぶ</button>|;
+	print qq|<input type="submit" value="書き込む" class="button_s"><input type="checkbox" name="img" value="1"/>画像を選ぶ|;
 	print qq|　 <input type="checkbox" name="is_save_log" value="1">ﾛｸﾞ保存</form><br>|;
 	print qq|<font size="2">$member_c人:$member</font><hr>|;
 

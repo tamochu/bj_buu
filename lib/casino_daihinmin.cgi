@@ -1,6 +1,8 @@
 #================================================
 # ‘å•n–¯
 #================================================
+require './lib/_casino_funcs.cgi';
+
 my $set_flag = 0;
 my @rates = (100, 1000, 10000);
 
@@ -450,8 +452,8 @@ sub deal_card {
 		@phand = sort { $a%13 <=> $b%13 || $a/13 <=> $b/13 } @phand;
 		$card_no += $plcards;
 		$m{c_value} = &h_to_vj(@phand);
-		$m{coin} -= $rate;
 		&write_user;
+		&coin_move(-1 * $rate, $m{name}, 1);
 	}
 	while (my $line = <$fh>) {
 		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
@@ -459,7 +461,7 @@ sub deal_card {
 		next if $sames{$mname}++; # “¯‚¶l‚È‚çŸ
 		if($mturn == 1){
 			if($mname eq $m{name}){
-				$m{coin} -= $rate;
+				&coin_move(-1 * $rate, $m{name}, 1);
 				push @members, "$mtime<>$mname<>$maddr<>$m{c_turn}<>$m{c_value}<>\n";
 			}else{
 				my @phand = ();
@@ -474,15 +476,11 @@ sub deal_card {
 				my $d_hand = &h_to_vj(@phand);
 				&regist_you_data($mname,'c_turn',2);
 				&regist_you_data($mname,'c_value',$d_hand);
-				my %datas = &get_you_datas($mname);
-				my $red_coin = $datas{coin} - $rate;
-				$red_coin = $red_coin < 0 ? 0:$red_coin;
-				&regist_you_data($mname,'coin',$red_coin);
+				&coin_move(-1 * $rate, $mname, 1);
 				push @members, "$mtime<>$mname<>$maddr<>2<>$d_hand<>\n";
 			}
 		}else {
-			&regist_you_data($mname,'c_turn',0);
-			&regist_you_data($mname,'c_value',0);
+			&you_c_reset($mname);
 			push @members, "$mtime<>$mname<>$maddr<>0<>0<>\n";
 		}
 	}
@@ -1170,33 +1168,6 @@ sub v_to_hj {
 	  $i++;
     }
     return @h;
-}
-
-sub coin_move{
-	my ($m_coin, $s_name) = @_;
-	
-	open my $fh, "< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $head_line = <$fh>;
-	my($turn, $rate, $e_player, $s_player, $w_player, $n_player, $trash_e, $trash_s, $trash_w, $trash_n, $hands_e, $hands_s, $hands_w, $hands_n, $bonus, $rest) = split /<>/, $head_line;
-	close $fh;
-	
-	if($m_coin > 0){
-		&system_comment("$s_name ‚Í $m_coin º²İ“¾‚Ü‚µ‚½");
-	}else{
-		my $temp = -1 * $m_coin;
-		&system_comment("$s_name ‚Í $temp º²İ•¥‚¢‚Ü‚µ‚½");
-	}
-	if($s_name eq $m{name}){
-		my $temp = $m{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		$m{coin} = $temp;
-		&write_user;
-	}else{
-		my %datas1 = &get_you_datas($s_name);
-		my $temp = $datas1{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		&regist_you_data($s_name,'coin',$temp);
-	}
 }
 
 1;#íœ•s‰Â

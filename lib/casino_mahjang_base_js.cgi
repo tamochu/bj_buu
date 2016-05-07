@@ -3,6 +3,7 @@
 #================================================
 require "$datadir/casino_bonus.cgi";
 require './lib/_comment_tag.cgi';
+require './lib/_casino_funcs.cgi';
 
 use lib './lib';
 use MahjongGame;
@@ -441,28 +442,6 @@ sub kill_game {
 	return 'ゲームを強制終了しました。（罰金-10000ｺｲﾝ）';
 }
 
-sub coin_move{
-	my ($m_coin, $name) = @_;
-	
-	if($m_coin > 0){
-		&system_comment("$name は $m_coin ｺｲﾝ得ました");
-	}else{
-		my $temp = -1 * $m_coin;
-		&system_comment("$name は $temp ｺｲﾝ払いました");
-	}
-	if($name eq $m{name}){
-		my $temp = $m{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		$m{coin} = $temp;
-		&write_user;
-	}else{
-		my %datas1 = &get_you_datas($name);
-		my $temp = $datas1{coin} + $m_coin;
-		$temp = 0 if $temp < 0;
-		&regist_you_data($name, 'coin', $temp);
-	}
-}
-
 sub yakuman_bonus{
 	my $name = shift;
 	require "$datadir/casino_bonus.cgi";
@@ -479,38 +458,6 @@ sub yakuman_bonus{
 	&system_comment("$name は役満祝儀として $prize を獲得しました");
 	&write_send_news(qq|<font color="#FF0000">$name が役満を上がりました</font>|);
 
-}
-
-sub system_comment{
-	my $s_mes = shift;
-	$s_mes =~ s/&/&amp/g;
-	$s_mes =~ s/;/&#59;/g;
-	$s_mes =~ s/&amp/&amp;/g;
-	$s_mes =~ s/,/&#44;/g;
-	$s_mes =~ s/</&lt;/g;
-	$s_mes =~ s/>/&gt;/g;
-	$s_mes =~ s/"/&quot;/g;#"
-	$s_mes =~ s/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]//g;
-	$s_mes =~ s/\.\.\///g;
-	$s_mes =~ s/【ダイス】/(ダイス)/g;
-	my $file_name = $this_file . '.cgi';
-
-	my @lines = ();
-	open my $fh, "+< $file_name" or &error("$file_name ﾌｧｲﾙが開けません");
-	eval { flock $fh, 2; };
-	
-	# ｵｰﾄﾘﾝｸ
-	my $head_line = <$fh>;
-	push @lines, $head_line;
-	while (my $line = <$fh>) {
-		push @lines, $line;
-		last if @lines >= $max_log-1;
-	}
-	unshift @lines, "$time<>$date<>system messge<>0<><>$addr<>$code $s_mes<>$default_icon<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @lines;
-	close $fh;
 }
 
 sub getMahjongData {
