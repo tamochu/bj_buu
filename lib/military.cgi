@@ -15,6 +15,12 @@ sub is_satisfy {
 	elsif (&is_act_satisfy) { # ”æ˜J‚µ‚Ä‚¢‚éê‡‚Ís‚¦‚È‚¢
 		return 0;
 	}
+	elsif ($cs{is_die}[$m{country}] > 1) { # ½‘E•ö‰ó‘‚Ís‚¦‚È‚¢
+		$mes .= '‘¼‘‚É‰e‹¿‚ğ—^‚¦‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>';
+		&refresh;
+		&n_menu;
+		return 0;
+	}
 	elsif ($time < $w{reset_time}) {
 		$mes .= 'IíŠúŠÔ’†‚Íí‘ˆ‚ÆŒR–‚Í‚Å‚«‚Ü‚¹‚ñ<br>';
 		if ($m{value} eq 'military_ambush'){
