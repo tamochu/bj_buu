@@ -648,11 +648,13 @@ sub disaster {
 		['©‘RĞŠQ','food'],
 		['ŒoÏ”j’]','money'],
 		['‘å’nk','soldier'],
-		['–‚l•œŠˆ','strong'],
 		['ˆê’èŠÔ‘–h‚ªÆã‰»','paper'],
 		['ˆê’èŠÔwŠöŒn“‚ª¬—','mismatch'],
 		['‘å“D–_‚ªoŒ»','concentrate'],
 	);
+	unless ($w{world} eq $#world_states || $w{world} eq $#world_states-1 || $w{world} eq $#world_states-2 || $w{world} eq $#world_states-3 || $w{world} eq $#world_states-4 || $w{world} eq $#world_states-5) {
+		push @disasters, ['–‚l•œŠˆ','strong'];
+	}
 	if ($w{world} eq '12') {
 		push @disasters, ['‘å‹Qé[', 'big_food'];
 		push @disasters, ['‘å‹°Q', 'big_money'];
@@ -666,12 +668,14 @@ sub disaster {
 		}
 		&write_world_news("<b>¢ŠE’†‚É $disasters[$v][0] ‚ª‹N‚±‚è‚Ü‚µ‚½</b>");
 	} elsif ($disasters[$v][1] eq 'strong' && $m{country}) {
-		$cs{ $disasters[$v][1] }[$m{country}] = int($cs{ $disasters[$v][1] }[$m{country}] * 0.5);
-		&write_world_news("<b>$cs{name}[$m{country}]‚É $disasters[$v][0] ‚ª‹N‚±‚è‚Ü‚µ‚½</b>");
+		my $target = &get_most_strong_country(1);
+		$cs{ $disasters[$v][1] }[$target] -= int(rand(10)+5) * 100;
+		&write_world_news("<b>$cs{name}[$target]‚É $disasters[$v][0] ‚ª‹N‚±‚è‚Ü‚µ‚½</b>");
 	} elsif (($disasters[$v][1] eq 'paper' || $disasters[$v][1] eq 'mismatch') && $m{country}) {
-		$cs{disaster}[$m{country}] = $disasters[$v][1];
-		$cs{disaster_limit}[$m{country}] = $time + 1 * 60 * 60;
-		&write_world_news("<b>$cs{name}[$m{country}]‚Å $disasters[$v][0] ‚µ‚Ü‚µ‚½</b>");
+		my $target = &get_most_strong_country(1);
+		$cs{disaster}[$target] = $disasters[$v][1];
+		$cs{disaster_limit}[$target] = $time + 1 * 60 * 60;
+		&write_world_news("<b>$cs{name}[$target]‚Å $disasters[$v][0] ‚µ‚Ü‚µ‚½</b>");
 	} elsif ($disasters[$v][1] eq 'concentrate') {
 		my @rlist = ('food', 'money', 'soldier');
 		my $r = $rlist[int(rand(@rlist))];
@@ -806,11 +810,14 @@ sub add_prisoner {
 # ‘—Í‚ªˆê”Ô‚‚¢‘
 #================================================
 sub get_most_strong_country {
+	my $skip_my_county = shift;
 	my $country = 0;
 	my $max_value = 0;
 	for my $i (1 .. $w{country}) {
-		next if $i eq $m{country};
-		next if $i eq $union;
+		if (!$skip_my_country) {
+			next if $i eq $m{country};
+			next if $i eq $union;
+		}
 		if ($cs{strong}[$i] > $max_value) {
 			$country = $i;
 			$max_value = $cs{strong}[$i];
