@@ -644,7 +644,7 @@ sub m_st { int($m{max_hp} + $m{max_mp} + $m{at} + $m{df} + $m{mat} + $m{mdf} + $
 # ĞŠQ –Å–S’áŠm—¦AÛÌßÄg—p
 #================================================
 sub disaster {
-	my $more = shfit;
+	my $more = shift;
 	my @disasters = (
 		['©‘RĞŠQ','food'],
 		['ŒoÏ”j’]','money'],
