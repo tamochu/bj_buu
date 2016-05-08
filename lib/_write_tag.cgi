@@ -89,6 +89,13 @@ sub write_change {
 		}
 		$bcomment = "$1$change_mes$4";
 	}
+	if($bcomment =~ /&amp;img/){
+		$bcomment =~ s|&amp;img|<amp_img>|;
+		if($bcomment =~ /&amp;img/){
+			&error('imgƒ^ƒO‚Íˆê‚Â‚Ì“Še‚É‚Â‚«ˆê‚Â‚Ü‚Å‚Å‚·');
+		}
+		$bcomment =~ s|<amp_img>|&amp;img|;
+	}
 
 	return ($bname, $bcomment);
 }

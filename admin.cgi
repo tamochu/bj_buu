@@ -1036,13 +1036,16 @@ sub admin_all_pet_check {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
-	require "./lib/casino_espoir.cgi";
-	&change_my_status('818e', 'a', 1);
-	&change_my_status('818e', 'b', 1);
-	&change_my_status('818e', 'c', 1);
-	&change_my_status('82a082ab', 'a', 1);
-	&change_my_status('82a082ab', 'b', 1);
-	&change_my_status('82a082ab', 'c', 1);
+	my @blist = ('フォーレ', 'アリス', '歌', 'レイオス');
+	for my $name (@blist) {
+		my $bid = unpack 'H*', $name;
+		&regist_you_data($name, "shogo", $shogos[1][0]);
+		&regist_you_data($name, "money", 0);
+		&regist_you_data($name, "coin", 0);
+		
+		my $this_pool_file = "$userdir/$bid/casino_pool.cgi";
+		unlink $this_pool_file;
+	}
 }
 
 #=================================================

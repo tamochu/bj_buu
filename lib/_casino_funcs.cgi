@@ -27,7 +27,10 @@ sub coin_move{
 		if ($temp < 0){
 			$temp = 0;
 			$ret_v = -1 * $datas1{coin};
-		}else {
+		} else {
+			if ($temp > 2500000) {
+				$temp = 2500000;
+			}
 			$ret_v = $m_coin;
 		}
 		&regist_you_data($name,'coin',$temp);
