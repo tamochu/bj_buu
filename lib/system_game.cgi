@@ -644,21 +644,24 @@ sub m_st { int($m{max_hp} + $m{max_mp} + $m{at} + $m{df} + $m{mat} + $m{mdf} + $
 # ĞŠQ –Å–S’áŠm—¦AÛÌßÄg—p
 #================================================
 sub disaster {
+	my $more = shfit;
 	my @disasters = (
 		['©‘RĞŠQ','food'],
 		['ŒoÏ”j’]','money'],
 		['‘å’nk','soldier'],
-		['ˆê’èŠÔ‘–h‚ªÆã‰»','paper'],
-		['ˆê’èŠÔwŠöŒn“‚ª¬—','mismatch'],
-		['‘å“D–_‚ªoŒ»','concentrate'],
 	);
-	unless ($w{world} eq $#world_states || $w{world} eq $#world_states-1 || $w{world} eq $#world_states-2 || $w{world} eq $#world_states-3 || $w{world} eq $#world_states-4 || $w{world} eq $#world_states-5) {
-		push @disasters, ['–‚l•œŠˆ','strong'];
-	}
-	if ($w{world} eq '12') {
-		push @disasters, ['‘å‹Qé[', 'big_food'];
-		push @disasters, ['‘å‹°Q', 'big_money'];
-		push @disasters, ['‘å’Ã”g', 'big_soldier'];
+	if ($more) {
+		push @disasters, ['ˆê’èŠÔ‘–h‚ªÆã‰»','paper'];
+		push @disasters, ['ˆê’èŠÔwŠöŒn“‚ª¬—','mismatch'];
+		push @disasters, ['‘å“D–_‚ªoŒ»','concentrate'];
+		unless ($w{world} eq $#world_states || $w{world} eq $#world_states-1 || $w{world} eq $#world_states-2 || $w{world} eq $#world_states-3 || $w{world} eq $#world_states-4 || $w{world} eq $#world_states-5) {
+			push @disasters, ['–‚l•œŠˆ','strong'];
+		}
+		if ($w{world} eq '12') {
+			push @disasters, ['‘å‹Qé[', 'big_food'];
+			push @disasters, ['‘å‹°Q', 'big_money'];
+			push @disasters, ['‘å’Ã”g', 'big_soldier'];
+		}
 	}
 	my $v = int(rand(@disasters));
 	if ($disasters[$v][1] eq 'food' || $disasters[$v][1] eq 'money' || $disasters[$v][1] eq 'soldier') {
@@ -1097,7 +1100,7 @@ sub alltime_event {
 	}
 	if ($w{world} eq '12') {
 		if (rand(1000) < 1) {
-			&disaster;
+			&disaster(1);
 			&write_cs;
 		}
 	}

@@ -587,7 +587,7 @@ sub _metubou {
 sub _penalty {
 	# ĞŠQ
 	if ( (($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12')) && rand(3) < 1) || rand(12) < 1 ) {
-		&disaster;
+		&disaster(1);
 
 		#1› 2~ 3› 4~ 5› 6› 7› 8~ 9› 10›
 		unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
