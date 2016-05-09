@@ -6,7 +6,8 @@
 # Ò²Ý
 #================================================
 print qq|Ž‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/;
-print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+#print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+print qq|<a name="menu">$menu_cmd</a>$mes|;
 
 if ($is_battle eq '1') {
 	&battle_html;

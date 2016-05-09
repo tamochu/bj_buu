@@ -17,8 +17,7 @@ if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
 	print qq|<hr>|;
 }
 #print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
-print qq|<a name="menu">$menu_cmd</a>|;
-print qq|$mes| if $mes;
+print qq|<a name="menu">$menu_cmd</a>$mes|;
 
 if ($is_battle eq '1') {
 	&battle_html;
