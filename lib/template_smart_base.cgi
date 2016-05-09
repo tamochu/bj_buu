@@ -7,12 +7,13 @@
 #================================================
 print qq|資金 $m{money} G<br>| if $m{lib} =~ /^shopping/;
 if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
+#if (!$mes && ($is_battle ne 1 && $is_battle ne 2) ) {
 	# 最新情報
 	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiﾌｧｲﾙが読み込めません");
 	my $line = <$fh>;
 	close $fh;
 	print qq|<hr>|;
-	print qq|<td bgcolor="#000000" align="left" valign="top">◎最新情報◎<br>$line|;
+	print qq|◎最新情報◎<br>$line|;
 	print qq|<hr>|;
 }
 print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
@@ -161,8 +162,10 @@ sub top_menu_html {
 #================================================
 sub status_html {
 	print qq|<hr><img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
-	print qq|$m{name}<br>|;
-	print qq|称号 $m{shogo}<br>| if $m{shogo};
+#	print qq|$m{name}<br>|;
+#	print qq|称号 $m{shogo}<br>| if $m{shogo};
+	print $m{name}, "[$m{shogo}]<br>";
+
 	if ($m{marriage}) {
 		my $yid = unpack 'H*', $m{marriage};
 		print qq|結婚相手 <a href="profile.cgi?id=$yid">$m{marriage}</a><br>|;
@@ -214,8 +217,11 @@ sub status_html {
 		print qq|<script type="text/javascript"><!--\n nokori_time($nokori_time, $reset_rest, $gacha_time, $gacha_time2, $offertory_time);\n// --></script>\n|;
 		print qq|<br>|;
 	}
+	print qq|<b>$m{sedai}</b>世代目 $sexes[$m{sex}]<br>|;
+	print qq|Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>|;
 	print qq|疲労度 <b>$m{act}</b>%<br>|;
-	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
+	print qq|経験値 [$m{exp}/100]<br>|;
+#	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
 	print qq|資金 <b>$m{money}</b> G<br>|;
 	print qq|勲章<b>$m{medal}</b>個<br>|;
 	print qq|ｺｲﾝ <b>$m{coin}</b>枚<br>|;
@@ -473,6 +479,13 @@ sub all_member_n {
 		$ret_str .= "<br>" if $i % 4 == 3;
 	}
 	return $ret_str;
+}
+
+sub show_world_news {
+	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiﾌｧｲﾙが読み込めません");
+	my $line = <$fh>;
+	close $fh;
+	print "<hr>$line";
 }
 
 1; # 削除不可

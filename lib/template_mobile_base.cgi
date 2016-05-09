@@ -14,8 +14,9 @@ if ($is_battle eq '1') {
 elsif ($is_battle eq '2') {
 	&war_html;
 }
-elsif ($m{lib} eq '') {
+elsif ($m{lib} eq '' || $m{lib} eq 'prison') {
 	&check_flag;
+	&show_world_news;
 	&status_html;
 	&my_country_info if $m{country};
 	&top_menu_html;
@@ -23,11 +24,11 @@ elsif ($m{lib} eq '') {
 }
 elsif ($m{wt} > 0) {
 	&check_flag;
+	&show_world_news;
 	&my_country_info if $m{country};
 	&top_menu_html;
 	&countries_info;
 }
-
 
 #================================================
 # ﾄｯﾌﾟﾒﾆｭｰ
@@ -60,8 +61,9 @@ sub top_menu_html {
 #================================================
 sub status_html {
 	print qq|<hr><img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
-	print qq|$m{name}<br>|;
-	print qq|称号 $m{shogo}<br>| if $m{shogo};
+	print $m{name}, "[$m{shogo}]<br>";
+#	print qq|称号 $m{shogo}<br>| if $m{shogo};
+
 	if ($m{marriage}) {
 		my $yid = unpack 'H*', $m{marriage};
 		print qq|結婚相手 <a href="profile.cgi?id=$yid">$m{marriage}</a><br>|;
@@ -78,8 +80,11 @@ sub status_html {
 			}
 		}
 	}
+	print qq|<b>$m{sedai}</b>世代目 $sexes[$m{sex}]<br>|;
+#	print qq|Lv.<b>$m{lv}</b><br>|;
+	print qq|Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>|;
 	print qq|疲労度 <b>$m{act}</b>%<br>|;
-	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
+	print qq|経験値 [$m{exp}/100]<br>|;
 	print qq|資金 <b>$m{money}</b> G<br>|;
 	print qq|<font color="#CC9999">$e2j{hp} [<b>$m{hp}</b>/<b>$m{max_hp}</b>]</font><br>|;
 	print qq|<font color="#CC99CC">$e2j{mp} [<b>$m{mp}</b>/<b>$m{max_mp}</b>]</font><br>|;
@@ -289,6 +294,13 @@ sub all_member_n {
 		$ret_str .= "<br>" if $i % 4 == 3;
 	}
 	return $ret_str;
+}
+
+sub show_world_news {
+	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiﾌｧｲﾙが読み込めません");
+	my $line = <$fh>;
+	close $fh;
+	print "<hr>$line";
 }
 
 1; # 削除不可
