@@ -79,7 +79,7 @@ sub status_mobile {
 	my $m_st = &m_st;
 	print <<"EOM";
 		<b>$m{sedai}</b>¢‘ã–Ú<br>
-		$sexes[ $m{sex} ] [$jobs[$m{job}][1]]<br>
+		$sexes[ $m{sex} ] [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>
 		ŒMÍ <b>$m{medal}</b>ŒÂ<br>
 		¶¼ŞÉº²İ <b>$m{coin}</b>–‡<br>
 		<hr>
