@@ -188,13 +188,15 @@ sub my_country_info {
 	my $offertory_time = $m{offertory_time} - $time;
 	$offertory_time = 0 if $offertory_time < 0;
 
+	print qq|<hr>|;
+	print qq|$units[$m{unit}][1] <b>$rank_sols[$m{rank}]</b>•º<br>|;
 	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};
 		$rank_name .= $m{rank_name};
 	}
-	print qq|<hr>$rank_name $e2j{rank_exp} [<b>$m{rank_exp}/$next_rank</b>]<br>|;
+	print qq|$rank_name $e2j{rank_exp} [<b>$m{rank_exp}/$next_rank</b>]<br>|;
 	print qq|“G‘<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font>˜A‘±<b>$m{renzoku_c}</b>‰ñ<br>| if $m{renzoku_c};
 	printf ("Ÿ‚Ì‹‹—^<b>%d</b><b>%02d</b>•ª<b>%02d</b>•bŒã<br>", $nokori_time / 3600, $nokori_time % 3600 / 60, $nokori_time % 60);
 	if ($m{disp_gacha_time}) {

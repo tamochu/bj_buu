@@ -16,7 +16,9 @@ if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
 	print qq|ÅVî•ñ<br>$line|;
 	print qq|<hr>|;
 }
-print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+#print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+print qq|<a name="menu">$menu_cmd</a>|;
+print qq|$mes| if $mes;
 
 if ($is_battle eq '1') {
 	&battle_html;
@@ -203,13 +205,19 @@ sub status_html {
 		$offertory_time = 0 if $offertory_time < 0;
 		my $offertory_time_mes = sprintf("<b>%d</b><b>%02d</b>•ª<b>%02d</b>•bŒã", $offertory_time / 3600, $offertory_time % 3600 / 60, $ofertory_time % 60);
 
-		print qq|<hr size="1">|;
+#		print qq|<hr size="1">|;
 		print qq|$units[$m{unit}][1] <b>$rank_sols[$m{rank}]</b>•º<br>|;
-		print qq|$e2j{rank_exp} [ <b>$m{rank_exp}</b> / <b>$next_rank</b> ]<br>|;
+		my $rank_name = &get_rank_name($m{rank}, $m{name});
+		if ($m{super_rank}){
+			$rank_name = '';
+			$rank_name .= 'š' for 1 .. $m{super_rank};
+			$rank_name .= $m{rank_name};
+		}
+		print qq|$rank_name $e2j{rank_exp} [ <b>$m{rank_exp}</b> / <b>$next_rank</b> ]<br>|;
 		print qq|“G‘[‘O‰ñF<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font> ˜A‘±<b>$m{renzoku_c}</b>‰ñ]<br>| if $m{renzoku_c};
 		print qq|<hr size="1">|;
 		if ($m{disp_gacha_time}) {
-			print qq|c‚èŠÔ<br>\n|;
+#			print qq|c‚èŠÔ<br>\n|;
 			print qq|<table class="table1s">|;
 			print qq|<tr><th>‹‹—^</th><th>æÎ‘K</th></tr>\n|;
 			print qq|<tr><td><span id="nokori_time">$nokori_time_mes</span></td><td><span id="offertory_time">$offertory_time_mes</span></td></tr>\n|;
@@ -334,13 +342,27 @@ sub war_html {
 # ©‘/“¯–¿‘‚Ìî•ñ
 #================================================
 sub my_country_info {
-	my $rank_name = &get_rank_name($m{rank}, $m{name});
-	if ($m{super_rank}){
-		$rank_name = '';
-		$rank_name .= 'š' for 1 .. $m{super_rank};
-		$rank_name .= $m{rank_name};
-	}
+	print qq|<hr><table class="table1s">|;
+	print qq|<tr><th colspan="3" style="color: #333; background-color: $cs{color}[$m{country}]; text-align: center;">$c_m</th></tr>\n|;
+	print qq|<tr><th>$e2j{strong}</th><th>$e2j{tax}</th><th>$e2j{state}</th></tr>\n|;
+	print qq|<tr><td align="right">$cs{strong}[$m{country}]</td><td align="right">$cs{tax}[$m{country}]%</td><td align="center">$country_states[ $cs{state}[$m{country}] ]</td></tr>\n|;
+	print qq|<tr><th>$e2j{food}</th><th>$e2j{money}</th><th>$e2j{soldier}</th></tr>\n|;
+	print qq|<tr><td align="right">$cs{food}[$m{country}]</td><td align="right">$cs{money}[$m{country}]</td><td align="right">$cs{soldier}[$m{country}]</td></tr>\n|;
+	print qq|</table>|;
 
+	if (!$union) {
+		print qq|<br>|;
+		print qq|<table class="table1s">|;
+		print qq|<tr><th colspan="3" style="color: #333; background-color: $cs{color}[$union]; text-align: center;">$cs{name}[$union]</th></tr>\n|;
+		print qq|<tr><th>$e2j{strong}</th><th>$e2j{tax}</th><th>$e2j{state}</th></tr>\n|;
+		print qq|<tr><td align="right">$cs{strong}[$union]</td><td align="right">$cs{tax}[$union]%</td><td align="center">$country_states[ $cs{state}[$union] ]</td></tr>\n|;
+		print qq|<tr><th>$e2j{food}</th><th>$e2j{money}</th><th>$e2j{soldier}</th></tr>\n|;
+		print qq|<tr><td align="right">$cs{food}[$union]</td><td align="right">$cs{money}[$union]</td><td align="right">$cs{soldier}[$union]</td></tr>\n|;
+		print qq|</table>|;
+	}
+	print qq|<br>|;
+
+=pod
 	print qq|<hr><font color="$cs{color}[$m{country}]">$c_m</font><br>|;
 	print qq|$e2j{strong}:$cs{strong}[$m{country}]<br>|;
 	print qq|$e2j{tax}:$cs{tax}[$m{country}]%<br>|;
@@ -358,6 +380,7 @@ sub my_country_info {
 		print qq|$e2j{money}:$cs{money}[$union]<br>|;
 		print qq|$e2j{soldier}:$cs{soldier}[$union]<br>|;
 	}
+=cut
 }
 
 #================================================
@@ -402,16 +425,15 @@ sub countries_info {
 
 	print qq|</table><br>|;
 
-
 	my($c1, $c2) = split /,/, $w{win_countries};
 	my $limit_hour = int( ($w{limit_time} - $time) / 3600 );
 	my $limit_day  = $limit_hour <= 24 ? $limit_hour . 'ŠÔ' : int($limit_hour / 24) . '“ú';
 	my $reset_rest = int($w{reset_time} - $time);
 	my $reset_time_mes = sprintf("<b>%d</b>ŠÔ<b>%02d</b>•ª<b>%02d</b>•bŒã", $reset_rest / 3600, $reset_rest % 3600 / 60, $reset_rest % 60);
 
-	print $w{playing} >= $max_playing ? qq|<hr><font color="#FF0000">œ</font>| : qq|<hr><font color="#00FF00">œ</font>|;
-	print qq|ÌßÚ²’† $w{playing}/$max_playingl|;
-	print qq|<hr>“ˆêŠúŒÀ c‚è$limit_day<br>|;
+	print $w{playing} >= $max_playing ? qq|<hr><font color="#FF0000">œ</font>| : qq|<font color="#00FF00">œ</font>|;
+	print qq|ÌßÚ²’† $w{playing}/$max_playingl<br>|;
+	print qq|“ˆêŠúŒÀ c‚è$limit_day<br>|;
 	if ($reset_rest > 0){
 		print qq|IíŠúŠÔyc‚è$reset_time_mesz<br>|;
 	}
@@ -455,7 +477,7 @@ sub promise_table_html {
 		}
 		print qq|</tr>|;
 	}
-	print qq|</table><br>|;
+	print qq|</table>|;
 }
 
 #================================================
