@@ -350,7 +350,7 @@ sub my_country_info {
 	print qq|<tr><td align="right">$cs{food}[$m{country}]</td><td align="right">$cs{money}[$m{country}]</td><td align="right">$cs{soldier}[$m{country}]</td></tr>\n|;
 	print qq|</table>|;
 
-	if (!$union) {
+	if ($union) {
 		print qq|<br>|;
 		print qq|<table class="table1s">|;
 		print qq|<tr><th colspan="3" style="color: #333; background-color: $cs{color}[$union]; text-align: center;">$cs{name}[$union]</th></tr>\n|;
