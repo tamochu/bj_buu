@@ -39,7 +39,10 @@ elsif ($m{wt} > 0) {
 	&countries_info;
 	&promise_table_html;
 }
-
+else {
+	print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>| if $m{pet};
+	print qq|<font color="#99CC99">ÀÏºŞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
+}
 #================================================
 # Ä¯ÌßÒÆ­°
 #================================================
