@@ -62,7 +62,8 @@ sub reset {
 	# 特殊情勢終了処理
 	if (&is_special_world) { # 特殊情勢終了
 		if ($w{year} =~ /6$/) { # 暗黒・英雄終了
-			if ($w{year} =~ /16$/ || $w{year} =~ /36$/ || $w{year} =~ /56$/ || $w{year} =~ /76$/ || $w{year} =~ /96$/) { # 暗黒終了
+#			if ($w{year} =~ /16$/ || $w{year} =~ /36$/ || $w{year} =~ /56$/ || $w{year} =~ /76$/ || $w{year} =~ /96$/) { # 暗黒終了
+			if ($w{year} % 20 > 9) { # 暗黒終了
 				require './lib/vs_npc.cgi';
 				&delete_npc_country;
 			}
@@ -162,7 +163,8 @@ sub reset {
 	# 特殊情勢開始処理
 	if (&is_special_world) { # 特殊情勢開始
 		if ($w{year} =~ /6$/) { # 暗黒・英雄開始
-			if ($w{year} =~ /16$/ || $w{year} =~ /36$/ || $w{year} =~ /56$/ || $w{year} =~ /76$/ || $w{year} =~ /96$/) { # 暗黒開始
+#			if ($w{year} =~ /16$/ || $w{year} =~ /36$/ || $w{year} =~ /56$/ || $w{year} =~ /76$/ || $w{year} =~ /96$/) { # 暗黒開始
+			if ($w{year} % 20 > 9) { # 暗黒開始
 				require './lib/vs_npc.cgi';
 				&add_npc_country;
 			}
