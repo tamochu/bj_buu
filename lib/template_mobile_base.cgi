@@ -61,7 +61,10 @@ sub top_menu_html {
 #================================================
 sub status_html {
 	print qq|<hr><img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
-	print $m{name}, "[$m{shogo}]<br>";
+	print qq|$m{name}|;
+	print qq|[$m{shogo}]| if $m{shogo};
+	print qq|<br>|;
+#	print $m{name}, "[$m{shogo}]<br>";
 #	print qq|èÃçÜ $m{shogo}<br>| if $m{shogo};
 
 	if ($m{marriage}) {
