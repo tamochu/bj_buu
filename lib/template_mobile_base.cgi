@@ -84,7 +84,7 @@ sub status_html {
 #	print qq|Lv.<b>$m{lv}</b><br>|;
 	print qq|Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>|;
 	print qq|疲労度 <b>$m{act}</b>%<br>|;
-	print qq|経験値 [$m{exp}/100]<br>|;
+	print qq|経験値 [<b>$m{exp}</b>/<b>100</b>]<br>|;
 	print qq|資金 <b>$m{money}</b> G<br>|;
 	print qq|<font color="#CC9999">$e2j{hp} [<b>$m{hp}</b>/<b>$m{max_hp}</b>]</font><br>|;
 	print qq|<font color="#CC99CC">$e2j{mp} [<b>$m{mp}</b>/<b>$m{max_mp}</b>]</font><br>|;

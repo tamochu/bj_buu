@@ -220,7 +220,7 @@ sub status_html {
 	print qq|<b>$m{sedai}</b>世代目 $sexes[$m{sex}]<br>|;
 	print qq|Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>|;
 	print qq|疲労度 <b>$m{act}</b>%<br>|;
-	print qq|経験値 [$m{exp}/100]<br>|;
+	print qq|経験値 [<b>$m{exp}</b>/<b>100</b>]<br>|;
 #	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
 	print qq|資金 <b>$m{money}</b> G<br>|;
 	print qq|勲章<b>$m{medal}</b>個<br>|;
