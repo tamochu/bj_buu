@@ -341,6 +341,50 @@ sub war_html {
 # é©çë/ìØñøçëÇÃèÓïÒ
 #================================================
 sub my_country_info {
+	print qq|<hr>|;
+#	print qq|<div class="c_info">|;
+	print qq|<span style="color: $cs{color}[$m{country}];">$c_m</span>|;
+	print qq|<div class="c_info1p">|;
+	print qq|<div class="c_info1c">$e2j{strong}:$cs{strong}[$m{country}]</div>|;
+	print qq|<div class="c_info1c">$e2j{tax}:$cs{tax}[$m{country}]%</div>|;
+	print qq|<div class="c_info1c">$e2j{state}:$country_states[ $cs{state}[$m{country}] ]</div>|;
+	print qq|</div>|;
+	print qq|<div class="c_info2p">|;
+	print qq|<div class="c_info2c">$e2j{food}:$cs{food}[$m{country}]</div>|;
+	print qq|<div class="c_info2c">$e2j{money}:$cs{money}[$m{country}]</div>|;
+	print qq|<div class="c_info2c">$e2j{soldier}:$cs{soldier}[$m{country}]</div>|;
+	print qq|</div>|;
+#	print qq|</div>|;
+
+	if ($union) {
+		print qq|<br>|;
+#		print qq|<div class="c_info">|;
+		print qq|<span style="color: $cs{color}[$union];">$cs{name}[$union]</span>|;
+		print qq|<div class="c_info1p">|;
+		print qq|<div class="c_info1c">$e2j{strong}:$cs{strong}[$union]</div>|;
+		print qq|<div class="c_info1c">$e2j{tax}:$cs{tax}[$union]%</div>|;
+		print qq|<div class="c_info1c">$e2j{state}:$country_states[ $cs{state}[$union] ]</div>|;
+		print qq|</div>|;
+		print qq|<div class="c_info2p">|;
+		print qq|<div class="c_info2c">$e2j{food}:$cs{food}[$union]</div>|;
+		print qq|<div class="c_info2c">$e2j{money}:$cs{money}[$union]</div>|;
+		print qq|<div class="c_info2c">$e2j{soldier}:$cs{soldier}[$union]</div>|;
+		print qq|</div>|;
+#		print qq|</div>|;
+	}
+	print qq|<br>|;
+
+=pod
+	print qq|<hr>|;
+	print qq|<dl>$c_m|;
+	print qq|<dt>$e2j{strong}</dt><dd>$cs{strong}[$m{country}]</dd>|;
+	print qq|<dt>$e2j{tax}</dt><dd>$cs{tax}[$m{country}]%</dd>|;
+	print qq|<dt>$e2j{state}</dt><dd>$country_states[ $cs{state}[$m{country}] ]</dd>|;
+	print qq|<dt>$e2j{food}</dt><dd>$cs{food}[$m{country}]</dd>|;
+	print qq|<dt>$e2j{money}</dt><dd>$cs{money}[$m{country}]</dd>|;
+	print qq|<dt>$e2j{soldier}</dt><dd>$cs{soldier}[$m{country}]</dd>|;
+	print qq|</dl>|;
+
 	print qq|<hr><table class="table1s">|;
 	print qq|<tr><th colspan="3" style="color: #333; background-color: $cs{color}[$m{country}]; text-align: center;">$c_m</th></tr>\n|;
 	print qq|<tr><th>$e2j{strong}</th><th>$e2j{tax}</th><th>$e2j{state}</th></tr>\n|;
@@ -360,7 +404,7 @@ sub my_country_info {
 		print qq|</table>|;
 	}
 	print qq|<br>|;
-
+=cut
 =pod
 	print qq|<hr><font color="$cs{color}[$m{country}]">$c_m</font><br>|;
 	print qq|$e2j{strong}:$cs{strong}[$m{country}]<br>|;
