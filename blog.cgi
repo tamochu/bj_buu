@@ -106,7 +106,8 @@ sub myself_blog {
 			print qq|<hr><br>|;
 		}
 		else {
-			print qq|<table class="table1" cellpadding="5" width="440">|;
+#			print qq|<table class="table1" cellpadding="5" width="440">|;
+			print qq|<table class="table1" cellpadding="5">|;
 			print qq|<tr><th align="left"><input type="checkbox" name="delete" value="$btime"> $baddr <font size="1">($bdate)</font> $secret_mark<br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td>ºÒİÄ<br>@bcomments</td></tr>| if $is_comment && @bcomments;
@@ -167,7 +168,8 @@ sub view_blog {
 		}
 		else {
 			$bcomment =~ s|ƒnƒ@ƒg|<font color="#FFB6C1">&hearts;</font>|g;
-			print qq|<table class="table1" cellpadding="5" width="440">|;
+#			print qq|<table class="table1" cellpadding="5" width="440">|;
+			print qq|<table class="table1" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ºÒİÄ‚ğ‘‚­</a><br>@bcomments</td></tr>| if $is_comment;
@@ -211,7 +213,8 @@ sub comment_form {
 			print qq|<hr><br>|;
 		}
 		else {
-			print qq|<table class="table1" cellpadding="5" width="440">|;
+#			print qq|<table class="table1" cellpadding="5" width="440">|;
+			print qq|<table class="table1" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td>ºÒİÄ<br>@bcomments</td></tr>| if @bcomments;

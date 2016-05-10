@@ -1,4 +1,44 @@
-.c_info {
+.button2s {
+	display:inline;
+	color: #FFF;
+	font-size: 6px;
+	font-weight: bold;
+	background: #333366;
+	width: 24%;
+	height: 65px;
+	margin-right:1%;
+	-webkit-border-radius: 10px;
+	-webkit-appearance: none;
+	word-break: break-all;
+	white-space:nowrap;
+}
+
+.text_box_b {
+	width: 80%;
+}
+
+.textarea1 {
+	width:100%;
+}
+
+.table1 {
+	width:100%;
+}
+
+.table1 td {
+	white-space: normal;
+}
+
+.cmd_form {
+	display:inline;
+}
+
+.smart_br {
+	display:block !important;
+}
+
+.tablet_br {
+	display:none!important;
 }
 
 .c_info1p {

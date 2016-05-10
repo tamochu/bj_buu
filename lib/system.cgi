@@ -414,12 +414,14 @@ sub header {
 		print qq|<script type="text/javascript" src="$htmldir/nokori_time.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
-		if ($is_smart) {
-			print qq|<meta name="viewport" content="width=device-width, maximum-scale=1.5, minimum-scale=0.5,user-scalable=yes,initial-scale=1.0" />|;
-			print qq|<link rel="stylesheet" media="screen and (max-width: 480px)" href="$htmldir/smart.css?$jstime" />|;
+		&load_RWD;
+#		if ($is_smart) {
+#			print qq|<meta name="viewport" content="width=device-width">|;
+#			print qq|<meta name="viewport" content="width=device-width, maximum-scale=1.5, minimum-scale=0.5,user-scalable=yes,initial-scale=0.9" />|;
+#			print qq|<link rel="stylesheet" media="screen and (max-width: 480px)" href="$htmldir/smart.css" />|;
+#			print qq|<link rel="stylesheet" media="screen and (min-width: 481px)" href="$htmldir/tablet.css" />|;
 #			print qq|<link rel="stylesheet" media="screen and (min-width: 481px) and (max-width: 720px)" href="$htmldir/tablet.css?$jstime" />|;
-			print qq|<link rel="stylesheet" media="screen and (min-width: 481px)" href="$htmldir/tablet.css?$jstime" />|;
-		}
+#		}
 	} else {
 		# ガラケーで外部CSSの読み込みはNG
 		# HTMLファイルを読み込んだ後にCSSファイルを読み込むため、
@@ -669,4 +671,18 @@ sub debug_log {
 	print $fh "$m{name}<>$time<>$dmes<>$tag<>\n";
 	close $fh;
 }
+
+#================================================
+# スマートフォン or タブレット端末向けのCSS読み込み
+#================================================
+sub load_RWD {
+	if ($is_smart) {
+			print qq|<meta name="viewport" content="width=device-width">|;
+			print qq|<link rel="stylesheet" media="screen and (max-width: 480px)" href="$htmldir/smart.css" />|;
+			print qq|<link rel="stylesheet" media="screen and (min-width: 481px)" href="$htmldir/tablet.css" />|;
+#			print qq|<meta name="viewport" content="width=device-width, maximum-scale=1.5, minimum-scale=0.5,user-scalable=yes,initial-scale=0.9" />|;
+#			print qq|<link rel="stylesheet" media="screen and (min-width: 481px) and (max-width: 720px)" href="$htmldir/tablet.css?$jstime" />|;
+	}
+}
+
 1; # 削除不可

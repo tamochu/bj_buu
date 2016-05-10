@@ -145,7 +145,8 @@ sub status_pc {
 		$rank_name .= $m{rank_name};
 	}
 	
-	print qq|<table width="440" border="0" cellpadding="3" bgcolor="#CCCCCC"><tr><td bgcolor="#000000" align="left" valign="top">|;
+#	print qq|<table width="440" border="0" cellpadding="3" bgcolor="#CCCCCC"><tr><td bgcolor="#000000" align="left" valign="top">|;
+	print qq|<table border="0" cellpadding="3" bgcolor="#CCCCCC"><tr><td bgcolor="#000000" align="left" valign="top">|;
 	print qq|<table width="100%" border="0"><tr><td width="60%" valign="top" align="left"><tt>|;
 	print qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;">| if $m{icon};
 	print qq|$m{name}<br>|;
@@ -314,7 +315,8 @@ sub profile {
 		$datas{$k} = $v;
 	}
 	
-	print qq|<table class="table1" cellpadding="3" width="440">| unless $is_mobile;
+#	print qq|<table class="table1" cellpadding="3" width="440">| unless $is_mobile;
+	print qq|<table class="table1" cellpadding="3">| unless $is_mobile;
 	for my $profile (@profiles) {
 		next if $datas{$profile->[0]} eq '';
 		

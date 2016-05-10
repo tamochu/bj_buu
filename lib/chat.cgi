@@ -95,7 +95,8 @@ sub header {
 	print qq|Content-type: text/html; charset=shift_jis\n\n|;
 	print qq|<html><head>|;
 	print qq|<meta http-equiv="Cache-Control" content="no-cache">|;
-	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
+	&load_RWD;
+#	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	print qq|<title>$title</title>|;
 }
 
@@ -104,11 +105,15 @@ sub header2 {
 		print qq|</head><body $body><a name="top"></a>|;
 	}
 	else {
+		my $rwd = "";
+		if ($is_smart) {
+			$rwd = qq|<meta name="viewport" content="width=device-width">\n<link rel="stylesheet" media="screen and (max-width: 480px)" href="$htmldir/smart.css" />\n<link rel="stylesheet" media="screen and (min-width: 481px)" href="$htmldir/tablet.css" />|;
+		}
 		$auto_loader_head = &auto_loader($this_file);
 		print <<"EOM";
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <link rel="stylesheet" type="text/css" href="$htmldir/bj.css">
-
+$rwd
 <script language="JavaScript">
 <!--
 function textset(text){
