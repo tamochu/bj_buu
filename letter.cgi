@@ -6,6 +6,7 @@ require "$datadir/header_myroom.cgi";
 #================================================
 &get_data;
 &header_myroom;
+my $table_class = $is_smart ? "table2" : "table1" ;
 &delete_kiji if $in{mode} eq 'delete_kiji';
 if ($in{type} eq 'send') { &letter_box_send; }
 else { &letter_box_get; }
@@ -65,7 +66,7 @@ sub letter_box_get {
 			}
 			else {
 #				print qq|<table class="table1" cellpadding="5" width="440"><tr><th align="left">|;
-				print qq|<table class="table1" cellpadding="5"><tr><th align="left">|;
+				print qq|<table class="$table_class" cellpadding="5"><tr><th align="left">|;
 				print qq|From $from_name</th></tr>|;
 				print qq|<tr><td>|;
 				if ($number % 3 == 0) {
@@ -117,7 +118,7 @@ sub letter_box_get {
 		else {
 			$bshogo = "" if $is_smart;
 #			print qq|<table class="table1" cellpadding="5" width="440"><tr><th align="left">|;
-			print qq|<table class="table1" cellpadding="5"><tr><th align="left">|;
+			print qq|<table class="$table_class" cellpadding="5"><tr><th align="left">|;
 			if($in{mode} eq 'delete_all'){
 				print qq|<input type="checkbox" name="delete" value="$btime" checked>|;
 			}else{
@@ -172,7 +173,7 @@ sub letter_box_send {
 		}
 		else {
 #			print qq|<table class="table1" cellpadding="5" width="440"><tr><th align="left">|;
-			print qq|<table class="table1" cellpadding="5"><tr><th align="left">|;
+			print qq|<table class="$table_class" cellpadding="5"><tr><th align="left">|;
 			if($in{mode} eq 'delete_all'){
 				print qq|<input type="checkbox" name="delete" value="$btime" checked>|;
 			}else{

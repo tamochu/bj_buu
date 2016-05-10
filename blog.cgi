@@ -19,6 +19,8 @@ $max_comment = 3000;
 # 他人の日記にｺﾒﾝﾄつけられる機能(0:使わない,1:使う)
 $is_comment = 1;
 
+my $table_class = $is_smart ? "table2" : "table1" ;
+
 # ｺﾒﾝﾄﾛｸﾞファイルは各プレイヤー参入時に空のを用意するように変更しファイル非存在の処理を削る
 #================================================
 
@@ -107,7 +109,7 @@ sub myself_blog {
 		}
 		else {
 #			print qq|<table class="table1" cellpadding="5" width="440">|;
-			print qq|<table class="table1" cellpadding="5">|;
+			print qq|<table class="$table_class" cellpadding="5">|;
 			print qq|<tr><th align="left"><input type="checkbox" name="delete" value="$btime"> $baddr <font size="1">($bdate)</font> $secret_mark<br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td>ｺﾒﾝﾄ<br>@bcomments</td></tr>| if $is_comment && @bcomments;
@@ -169,7 +171,7 @@ sub view_blog {
 		else {
 			$bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
 #			print qq|<table class="table1" cellpadding="5" width="440">|;
-			print qq|<table class="table1" cellpadding="5">|;
+			print qq|<table class="$table_class" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments</td></tr>| if $is_comment;
@@ -214,7 +216,7 @@ sub comment_form {
 		}
 		else {
 #			print qq|<table class="table1" cellpadding="5" width="440">|;
-			print qq|<table class="table1" cellpadding="5">|;
+			print qq|<table class="$table_class" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td>ｺﾒﾝﾄ<br>@bcomments</td></tr>| if @bcomments;
@@ -224,7 +226,7 @@ sub comment_form {
 		print qq|<form method="$method" action="blog.cgi">|;
 		print qq|<input type="hidden" name="mode" value="comment_exe"><input type="hidden" name="id" value="$in{id}">|;
 		print qq|<input type="hidden" name="country" value="$in{country}"><input type="hidden" name="kiji" value="$in{kiji}">|;
-		print qq|<table class="table1"><tr><th><tt>ﾌﾟﾚｲﾔｰ名:</tt></th><td><input type="text" name="name" value="$cook_name" class="text_box1"><br></td></tr>|;
+		print qq|<table class="$table_class"><tr><th><tt>ﾌﾟﾚｲﾔｰ名:</tt></th><td><input type="text" name="name" value="$cook_name" class="text_box1"><br></td></tr>|;
 		print qq|<tr><th><tt>ﾊﾟｽﾜｰﾄﾞ:</tt></th><td><input type="password" name="pass" value="$cook_pass" class="text_box1"><br></td></tr></table>|;
 		print qq|全角300(半角600)文字まで：<br><textarea name="comment" cols="60" rows="4" class="textarea1"></textarea><br>|;
 		print qq|<input type="submit" value="書き込む" class="button_s"></form>|;

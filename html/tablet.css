@@ -1,7 +1,7 @@
 .button2s {
 	display:inline;
 	color: #FFF;
-	font-size: 6px;
+	font-size: 8px;
 	font-weight: bold;
 	background: #333366;
 	width: 13%;
@@ -21,11 +21,15 @@
 	width:100%;
 }
 
-.table1 {
+.table2 {
 	width:100%;
 }
-
-.table1 td {
+.table2 th {
+	border: 2px solid #999;
+	background: #336;
+	white-space: nowrap;
+}
+.table2 td {
 	white-space: normal;
 }
 
@@ -34,11 +38,13 @@
 }
 
 .smart_br {
-	display:none !important;
+	display:none;
 }
 
 .tablet_br {
-	display:block !important;
+	display:block;
+	margin-bottom: 1%;
+	content: "";
 }
 
 .c_info1c {
@@ -51,5 +57,5 @@
 
 .c_info2c {
 	display:inline;
-	margin-right:12px;
+	margin-right:10px;
 }
