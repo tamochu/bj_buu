@@ -644,6 +644,30 @@ sub send_twitter {
 }
 
 #================================================
+# flockの代替関数
+#================================================
+sub dirflock {
+	my $file_name = shift;
+	my $lock_dir_name = "$file_name.lock";
+	my $lock_file = "$lock_dir_name/lock.cgi";
+	if (!(-f $lock_file) || (stat $lock_file)[10] < $time - 10) {
+		rmdir $lock_dir_name;
+	}
+	if (!mkdir($lock_dir_name, 0755)) {
+		&error("$file_nameをロックできませんでした。");
+	}
+	open $fh, "> $lock_file";
+	close $fh;
+}
+
+sub release_dirflock {
+	my $file_name = shift;
+	my $lock_dir_name = "$file_name.lock";
+	rmdir $lock_dir_name;
+}
+
+
+#================================================
 # デバッグログ
 #================================================
 sub debug_log {

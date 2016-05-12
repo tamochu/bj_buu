@@ -760,8 +760,8 @@ sub reset_monster {
 		}
 		$mes .= "$p_name<br>";
 		my @lines = ();
-		open my $fh, "+<$p_name" or &error("$p_nameﾌｧｲﾙが開けません");
-		eval { flock $fh, 2; };
+		open my $fh, "+< $p_name" or &error("$p_nameﾌｧｲﾙが開けません");
+		&dirflock($pname);
 		while (my $line = <$fh>) {
 			# 魔物画像を返す処理
 			next unless $default_icon;
@@ -787,6 +787,7 @@ sub reset_monster {
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
 		close $fh;
+		&release_dirflock($pname);
 	}
 	$mes .= "<hr>魔物をリセットしました<br>";
 }
@@ -1036,16 +1037,9 @@ sub admin_all_pet_check {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
-	my @blist = ('フォーレ', 'アリス', '歌', 'レイオス');
-	for my $name (@blist) {
-		my $bid = unpack 'H*', $name;
-		&regist_you_data($name, "shogo", $shogos[1][0]);
-		&regist_you_data($name, "money", 0);
-		&regist_you_data($name, "coin", 0);
-		
-		my $this_pool_file = "$userdir/$bid/casino_pool.cgi";
-		unlink $this_pool_file;
-	}
+	my $fname = "$logdir/lock_test.cgi";
+	&dirflock($fname);
+	&release_dirflock($fname);
 }
 
 #=================================================
