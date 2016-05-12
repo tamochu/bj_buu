@@ -685,4 +685,28 @@ sub load_RWD {
 	}
 }
 
+#================================================
+# flock代替関数
+#================================================
+sub dirflock {
+	my $fname = shift;
+	my $ldir = "$fname.lock";
+	my $lname = "$ldir/lock.cgi";
+	if (!(-f $lname) || (stat $lname)[10] < $time - 60) {
+		rmdir($ldir);
+	}
+	if (!mkdir($ldir, 0755)) {
+		&error("$fnameをロックできませんでした。");
+	}
+	open $fh, "> $lname";
+	close $fh;
+}
+
+sub release_dirflock {
+	my $fname = shift;
+	my $ldir = "$fname.lock";
+
+	rmdir($ldir);
+}
+
 1; # 削除不可
