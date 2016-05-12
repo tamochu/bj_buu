@@ -590,7 +590,7 @@ sub _penalty {
 		&disaster( ($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') )); # –ï”N or “ä(–ï”N)‚Ì‚İ’Ç‰ÁÍßÅÙÃ¨
 
 		#1› 2~ 3› 4~ 5› 6› 7› 8~ 9› 10›
-		unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) { # “Áêî¨‚Å‚È‚¯‚ê‚Î½‘”­“®
+		if ($w{year} !~ /6$/ && $w{year} !~ /0$/ && $cs{strong}[$y{country}] < 5000) { # “Áêî¨‚Å‚È‚­‚©‚Â‘—Í5000–¢–iÉ±ÊŞØ±‚Ì½‘‰ñ”ğj‚Ì‚İ½‘”­“®
 			# ½‘ó‘Ôæ“¾
 			my $sleep_num = 0;
 			for my $i (1 .. $w{country}) {
