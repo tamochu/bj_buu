@@ -6,7 +6,8 @@
 # Ò²İ
 #================================================
 print qq|‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/;
-print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+#print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+print qq|<a name="menu">$menu_cmd</a>$mes|;
 
 if ($is_battle eq '1') {
 	&battle_html;
@@ -14,8 +15,9 @@ if ($is_battle eq '1') {
 elsif ($is_battle eq '2') {
 	&war_html;
 }
-elsif ($m{lib} eq '') {
+elsif ($m{lib} eq '' || $m{lib} eq 'prison') {
 	&check_flag;
+	&show_world_news;
 	&status_html;
 	&my_country_info if $m{country};
 	&top_menu_html;
@@ -23,11 +25,15 @@ elsif ($m{lib} eq '') {
 }
 elsif ($m{wt} > 0) {
 	&check_flag;
+	&show_world_news;
 	&my_country_info if $m{country};
 	&top_menu_html;
 	&countries_info;
 }
-
+elsif ($m{lib} =~ /(domestic|hunting|military|promise|training|war_form)/  ) {
+	print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>| if $m{pet};
+	print qq|<font color="#99CC99">ÀÏºŞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
+}
 
 #================================================
 # Ä¯ÌßÒÆ­°
@@ -60,8 +66,12 @@ sub top_menu_html {
 #================================================
 sub status_html {
 	print qq|<hr><img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
-	print qq|$m{name}<br>|;
-	print qq|Ì† $m{shogo}<br>| if $m{shogo};
+	print qq|$m{name}|;
+	print qq|[$m{shogo}]| if $m{shogo};
+	print qq|<br>|;
+#	print $m{name}, "[$m{shogo}]<br>";
+#	print qq|Ì† $m{shogo}<br>| if $m{shogo};
+
 	if ($m{marriage}) {
 		my $yid = unpack 'H*', $m{marriage};
 		print qq|Œ‹¥‘Šè <a href="profile.cgi?id=$yid">$m{marriage}</a><br>|;
@@ -78,8 +88,11 @@ sub status_html {
 			}
 		}
 	}
+	print qq|<b>$m{sedai}</b>¢‘ã–Ú $sexes[$m{sex}]<br>|;
+#	print qq|Lv.<b>$m{lv}</b><br>|;
+	print qq|Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>|;
 	print qq|”æ˜J“x <b>$m{act}</b>%<br>|;
-	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
+	print qq|ŒoŒ±’l [<b>$m{exp}</b>/<b>100</b>]<br>|;
 	print qq|‘‹à <b>$m{money}</b> G<br>|;
 	print qq|<font color="#CC9999">$e2j{hp} [<b>$m{hp}</b>/<b>$m{max_hp}</b>]</font><br>|;
 	print qq|<font color="#CC99CC">$e2j{mp} [<b>$m{mp}</b>/<b>$m{max_mp}</b>]</font><br>|;
@@ -176,13 +189,15 @@ sub my_country_info {
 	my $offertory_time = $m{offertory_time} - $time;
 	$offertory_time = 0 if $offertory_time < 0;
 
+	print qq|<hr>|;
+	print qq|$units[$m{unit}][1] <b>$rank_sols[$m{rank}]</b>•º<br>|;
 	my $rank_name = &get_rank_name($m{rank}, $m{name});
 	if ($m{super_rank}){
 		$rank_name = '';
 		$rank_name .= 'š' for 1 .. $m{super_rank};
 		$rank_name .= $m{rank_name};
 	}
-	print qq|<hr>$rank_name $e2j{rank_exp} [<b>$m{rank_exp}/$next_rank</b>]<br>|;
+	print qq|$rank_name $e2j{rank_exp} [<b>$m{rank_exp}/$next_rank</b>]<br>|;
 	print qq|“G‘<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font>˜A‘±<b>$m{renzoku_c}</b>‰ñ<br>| if $m{renzoku_c};
 	printf ("Ÿ‚Ì‹‹—^<b>%d</b><b>%02d</b>•ª<b>%02d</b>•bŒã<br>", $nokori_time / 3600, $nokori_time % 3600 / 60, $nokori_time % 60);
 	if ($m{disp_gacha_time}) {
@@ -289,6 +304,13 @@ sub all_member_n {
 		$ret_str .= "<br>" if $i % 4 == 3;
 	}
 	return $ret_str;
+}
+
+sub show_world_news {
+	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
+	my $line = <$fh>;
+	close $fh;
+	print "<hr>$line";
 }
 
 1; # íœ•s‰Â

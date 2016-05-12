@@ -29,6 +29,7 @@ $in{step} = $cgi->param("step");
 $in{title} = $cgi->param("title");
 $in{count} = $cgi->param("count");
 $in{items} = $cgi->param("items");
+$in{open} = $cgi->param("open");
 $in{amida} = $cgi->param("amida");
 $in{no} = $cgi->param("no");
 $in{cmp} = $cgi->param("cmp");
@@ -64,6 +65,10 @@ sub run {
 	elsif ($in{step} == 3) {
 		&write_amida;
 	}
+	# あみだからキック
+	elsif ($in{step} == 4) {
+		&kick_amida;
+	}
 }
 
 sub show_head {
@@ -88,6 +93,7 @@ sub create_amida_form {
 	print qq|<tr><td><label for="title">くじのタイトル：</label></td><td><input type="text" name="title" id="title" min="1" max="30" required="required" value="$in{title}"></td></tr>|;
 	print qq|<tr><td><label for="count">くじの本数：</label></td><td><input type="number" name="count" id="count" min="2" max="30" required="required" value="$in{count}"></td></tr>|;
 	print qq|<tr><td><label for="items">当たり賞品：<br>（1行1賞品）</label></td><td><textarea name="items" rows="8" cols="10" word="soft" id="items" required="required">$in{items}</textarea></td></tr>|;
+	print qq|<tr><td><label for="open">埋まったら公開：</label></td><td><input type="checkbox" name="open" value="1"/></td></tr>|;
 	print qq|<tr><td colspan="2" style="text-align:center;"><input type="submit" value="あみだ作成" class="button1"></td></tr>|;
 	print qq|</table><input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}"><input type="hidden" name="step" value="2"></form>|;
 }
@@ -101,7 +107,7 @@ sub rewrite_amida_form {
 	print qq|<input type="submit" value="一覧に戻る" class="button1"></form>|;
 
 	print qq|<form method="$method" action="$this_script">|;
-	print qq|<input type="hidden" name="id" value="$data[0]"><input type="hidden" name="pass" value="$data[1]"><input type="hidden" name="title" value="$data[2]"><input type="hidden" name="count" value="$data[3]"><input type="hidden" name="items" value="$data[4]"><input type="hidden" name="step" value="1">|;
+	print qq|<input type="hidden" name="id" value="$data[0]"><input type="hidden" name="pass" value="$data[1]"><input type="hidden" name="title" value="$data[2]"><input type="hidden" name="count" value="$data[3]"><input type="hidden" name="items" value="$data[4]"><input type="hidden" name="open" value="$data[5]"><input type="hidden" name="step" value="1">|;
 	print qq|<input type="submit" value="あみだを作り直す" class="button1"></form>|;
 	&error($err);
 }
@@ -112,7 +118,7 @@ sub view_amida {
 	if ($in{amida}) {
 		while (my $line = <$fh>) {
 			$line =~ tr/\x0D\x0A//d;
-			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $bopen, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 			next	if $btime != $in{amida};
 
 			my @user_list = split /,/, $busers;
@@ -124,12 +130,20 @@ sub view_amida {
 			print qq|<p>このあみだくじは終了しています</p>|	if $bcmp;
 			print qq|<span>くじの本数：$bcount</span><br>|;
 			print qq|<span>賞品リスト：$bitems</span><br>|;
-			print qq|<span>参加者数：$bscount人</span><br><br>|;
+			print qq|<span>参加者数：$bscount人</span><br>|;
+			my $open = $bopen ? "ON" : "OFF" ;
+			print qq|<span>自動公開：$open</span><br><br>|;
 
 			print "<table>";
 			for (my $i = 0; $i < $bcount; $i++) {
 				print "<tr><td>".($i+1).".";
-				print qq|$user_list[$i]| if $user_list[$i];
+				if ($in{login_name} eq $bmaker && !$bcmp) {
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=4&amida=$btime&no=$i">$user_list[$i]さんをキックする</a>|	if $user_list[$i];
+				}
+				else {
+					print qq|$user_list[$i]|	if $user_list[$i];
+				}
+#				print qq|$user_list[$i]| if $user_list[$i];
 				print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">このくじにする</a>|	unless $user_list[$i] || $bcmp;
 				print "</td><td>－あみだ線は省略－</td>";
 				print "<td>$suser_list[$i]</td>"	if $bcmp;
@@ -144,7 +158,7 @@ sub view_amida {
 		print "<ul>";
 		while (my $line = <$fh>) {
 			$line =~ tr/\x0D\x0A//d;
-			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $bopen, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 
 			if ($bcmp) { print "<li>[公開済]"; } else { print "<li>[募集中]"; } 
 			print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=0&amida=$btime">$btitle</a> $bmaker作 $bdate|;
@@ -160,11 +174,11 @@ sub view_amida {
 
 # あみだを新規作成、できなければ再設定を促す
 sub create_amida {
-	&rewrite_amida_form('タイトルがありません', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	unless $in{title};
-	&rewrite_amida_form('タイトルに不正な文字( ,;\"\'&<>\\\/ )が含まれています', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	if $in{title} =~ /[,;\"\'&<>\\\/]/;#"
-	&rewrite_amida_form('本数に入力できるのは 2 以上の数値だけです', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	unless $in{count}  =~ /^[0-9]+$/;#"
-	&rewrite_amida_form('賞品リストに不正な文字( ,;\"\'&<>\\\/ )が含まれています', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	if $in{items} =~ /[,;\"\'&<>\\\/]/;#"
-	&rewrite_amida_form('賞品リストに何も入力されていません', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	unless $in{items};
+	&rewrite_amida_form('タイトルがありません', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	unless $in{title};
+	&rewrite_amida_form('タイトルに不正な文字( ,;\"\'&<>\\\/ )が含まれています', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	if $in{title} =~ /[,;\"\'&<>\\\/]/;#"
+	&rewrite_amida_form('本数に入力できるのは 2 以上の数値だけです', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	unless $in{count}  =~ /^[0-9]+$/;#"
+	&rewrite_amida_form('賞品リストに不正な文字( ,;\"\'&<>\\\/ )が含まれています', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	if $in{items} =~ /[,;\"\'&<>\\\/]/;#"
+	&rewrite_amida_form('賞品リストに何も入力されていません', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	unless $in{items};
 
 	$in{items} =~ s/^\s+//gm;
 	$in{items} =~ s/\s+$//gm;
@@ -173,8 +187,8 @@ sub create_amida {
 	$in{items} =~ s/\n/,/g;
 	my @item_list = split /,/, $in{items};
 
-	&rewrite_amida_form('賞品リストに何も入力されていません', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	unless @item_list;
-	&rewrite_amida_form('賞品数がくじの本数を超えています', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}))	if @item_list > $in{count};
+	&rewrite_amida_form('賞品リストに何も入力されていません', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	unless @item_list;
+	&rewrite_amida_form('賞品数がくじの本数を超えています', ($in{id}, $in{pass}, $in{title}, $in{count}, $in{items}, $in{open}))	if @item_list > $in{count};
 
 	my $users = "," x ($in{count}-1);
 	my $sitems = "," x ($in{count}-1);
@@ -186,12 +200,12 @@ sub create_amida {
 	print qq| <a href="$this_script?id=$in{id}&pass=$in{pass}&amida=$time&step=3&cmp=1">公開する</a></li>|;
 
 	my @lines = ();
-	push @lines, "$time<>$date<>$in{login_name}<>$in{title}<>$in{count}<>$in{items}<>$users<>0<>0<>$users<>$sitems<>\n";
+	push @lines, "$time<>$date<>$in{login_name}<>$in{title}<>$in{count}<>$in{items}<>$in{open}<>$users<>0<>0<>$users<>$sitems<>\n";
 	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが開けません");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		$line =~ tr/\x0D\x0A//d;
-		my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
+		my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $bopen, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 
 		if ($bcmp) { print "<li>[公開済]"; } else { print "<li>[募集中]"; } 
 		print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&amida=$btime">$btitle</a> $bmaker作 $bdate|;
@@ -218,7 +232,7 @@ sub write_amida {
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			$line =~ tr/\x0D\x0A//d;
-			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $bopen, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
 			if ($btime ne $in{amida}) {
 				push @lines, "$line\n";
 				next;
@@ -246,16 +260,18 @@ sub write_amida {
 				print "<p>".($in{no}+1)."番目のくじにｴﾝﾄﾘｰしました</p>";
 				$user_list[$in{no}] = $in{login_name};
 				$bscount++;
-				print qq|<p>すべてのくじが埋まったため結果を公開します</p>|	if ($bcount <= $bscount);
+				print qq|<p>すべてのくじが埋まったため結果を公開します</p>|	if ($bcount <= $bscount) && $bopen;
 				$busers = join(',', @user_list);
 			}
 
 			print qq|<span>くじの本数：$bcount</span><br>|;
 			print qq|<span>賞品リスト：$bitems</span><br>|;
-			print qq|<span>参加者数：$bscount人</span><br><br>|;
+			print qq|<span>参加者数：$bscount人</span><br>|;
+			my $open = $bopen ? "ON" : "OFF" ;
+			print qq|<span>自動公開：$open</span><br><br>|;
 
 			my @suser_list = ();
-			if ( !$bcmp && ($bcount <= $bscount)  || ($in{login_name} eq $bmaker && $in{cmp}) ) {
+			if ( !$bcmp && ($bcount <= $bscount) && $bopen  || ($in{login_name} eq $bmaker && $in{cmp}) ) {
 				# 参加者が埋まったか公開されたイコールくじ公開
 				@suser_list = List::Util::shuffle(@user_list);
 				$bsusers = join(',', @suser_list);
@@ -267,7 +283,12 @@ sub write_amida {
 			print "<table>";
 			for (my $i = 0; $i < $bcount; $i++) {
 				print "<tr><td>".($i+1).".";
-				print qq|$user_list[$i]|	if $user_list[$i];
+				if ($in{login_name} eq $bmaker && !$bcmp) {
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=4&amida=$btime&no=$i">$user_list[$i]さんをキックする</a>|	if $user_list[$i];
+				}
+				else {
+					print qq|$user_list[$i]|	if $user_list[$i];
+				}
 				print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">このくじにする</a>|	unless $user_list[$i] || $bcmp;
 				print "</td><td>－あみだ線は省略－</td>";
 				print "<td>$suser_list[$i]</td>"	if $bcmp;
@@ -275,7 +296,7 @@ sub write_amida {
 				print "</tr>";
 			}
 			print "</table>";
-			$line = "$btime<>$bdate<>$bmaker<>$btitle<>$bcount<>$bitems<>$busers<>$bcmp<>$bscount<>$bsusers<>$bsitems<>";
+			$line = "$btime<>$bdate<>$bmaker<>$btitle<>$bcount<>$bitems<>$bopen<>$busers<>$bcmp<>$bscount<>$bsusers<>$bsitems<>";
 
 			push @lines, "$line\n";
 		}
@@ -288,7 +309,76 @@ sub write_amida {
 		&show_head;
 		print "<p>そのあみだくじは存在しません</p>";
 	}
+}
 
+# あみだに参加したり公開する
+sub kick_amida {
+	if ($in{amida}) {
+		my @lines = ();
+		open my $fh, "+< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが開けません");
+		eval { flock $fh, 2; };
+		while (my $line = <$fh>) {
+			$line =~ tr/\x0D\x0A//d;
+			my ($btime, $bdate, $bmaker, $btitle, $bcount, $bitems, $bopen, $busers, $bcmp, $bscount, $bsusers, $bsitems) = split /<>/, $line;
+			if ($btime ne $in{amida}) {
+				push @lines, "$line\n";
+				next;
+			}
+
+			my @user_list = split /,/, $busers;
+			@user_list = realloc_array($bcount, @user_list);
+			my @item_list = split /,/, $bitems;
+			@item_list = realloc_array($bcount, @item_list);
+
+			&show_head("$btitle 作：$bmaker $bdate");
+#			print qq|<p>$btitle 作：$bmaker $bdate</p>|;
+
+#			if (($bcmp && $bopen) || ($in{login_name} eq $bmaker && $in{cmp}) ) {
+#				print qq|<p>このあみだくじは終了しています</p>| if $bcmp;
+#				print qq|<p>あみだくじを公開しました</p>| unless $bcmp;
+#			}
+			if (!$bcmp && $in{login_name} eq $bmaker) {
+				print "<p>$user_list[$in{no}]さんをキックしました</p>";
+				$user_list[$in{no}] = "";
+				$bscount--;
+				$busers = join(',', @user_list);
+			}
+
+			print qq|<span>くじの本数：$bcount</span><br>|;
+			print qq|<span>賞品リスト：$bitems</span><br>|;
+			print qq|<span>参加者数：$bscount人</span><br>|;
+			my $open = $bopen ? "ON" : "OFF" ;
+			print qq|<span>自動公開：$open</span><br><br>|;
+
+			print "<table>";
+			for (my $i = 0; $i < $bcount; $i++) {
+				print "<tr><td>".($i+1).".";
+				if ($in{login_name} eq $bmaker && !$bcmp) {
+					print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=4&amida=$btime&no=$i">$user_list[$i]さんをキックする</a>|	if $user_list[$i];
+				}
+				else {
+					print qq|$user_list[$i]|	if $user_list[$i];
+				}
+				print qq|<a href="$this_script?id=$in{id}&pass=$in{pass}&step=3&amida=$btime&no=$i">このくじにする</a>|	unless $user_list[$i] || $bcmp;
+				print "</td><td>－あみだ線は省略－</td>";
+				print "<td>$suser_list[$i]</td>"	if $bcmp;
+				print "<td>$item_list[$i]</td>"	if $bcmp;
+				print "</tr>";
+			}
+			print "</table>";
+			$line = "$btime<>$bdate<>$bmaker<>$btitle<>$bcount<>$bitems<>$bopen<>$busers<>$bcmp<>$bscount<>$bsusers<>$bsitems<>";
+
+			push @lines, "$line\n";
+		}
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh @lines;
+		close $fh;
+	}
+	else {
+		&show_head;
+		print "<p>そのあみだくじは存在しません</p>";
+	}
 }
 
 sub realloc_array {

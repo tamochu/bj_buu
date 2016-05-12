@@ -200,7 +200,7 @@ sub status_html {
 		$country_info .= qq|$e2j{rank_exp} [ <b>$m{rank_exp}</b> / <b>$next_rank</b> ]<br>|;
 		$country_info .= qq|敵国[前回：<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font> 連続<b>$m{renzoku_c}</b>回]<br>| if $m{renzoku_c};
 		$country_info .= qq|<hr size="1">|;
-		$country_info .= qq|残り時間<br>\n|;
+#		$country_info .= qq|残り時間<br>\n|;
 		$country_info .= qq|<table class="table1">|;
 		if ($m{disp_gacha_time}) {
 			$country_info .= qq|<tr><th>給与</th><th>賽銭</th></tr>\n|;
@@ -213,7 +213,7 @@ sub status_html {
 		}
 		$country_info .= qq|<script type="text/javascript"><!--\n nokori_time($nokori_time, $reset_rest, $gacha_time, $gacha_time2, $offertory_time);\n// --></script>\n|;
 		$country_info .= qq|</table>|;
-		$country_info .= qq|<br>|;
+#		$country_info .= qq|<br>|;
 	}
 	
 	my $name = $m{name};

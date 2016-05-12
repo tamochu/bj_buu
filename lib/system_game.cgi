@@ -240,6 +240,45 @@ sub b_menu {
 sub menu {
 	my @menus = @_;
 	if($is_smart){
+		$menu_cmd .= qq|<div>|;
+#		$menu_cmd .= qq|<div style="float:right;">|;
+		for my $i (0 .. $#menus) {
+			next if $menus[$i] eq '';
+			my $mline = '';
+			my $mpos = 0;
+			while (1) {
+				my $char_num = 10;
+				if ($mpos + $char_num >= length($menus[$i])) {
+					$mline .= substr($menus[$i], $mpos);
+					last;
+				}
+				my $last_char = substr($menus[$i], $mpos + $char_num - 1, 2);
+				$last_char =~ s/([^0-9A-Za-z_ ])/'%'.unpack('H2', $1)/ge;
+				my $first1 = substr($last_char, 0, 1);
+				my $first2 = substr($last_char, 3, 1);
+				if ($first1 eq '%' && $first2 ne '%') {
+					$char_num--;
+				}
+				$mline .= substr($menus[$i], $mpos, $char_num) . "&#13;&#10;";
+				$mpos += $char_num;
+			}
+
+			$menu_cmd .= qq|<form method="$method" action="$script" class="cmd_form">|;
+			$menu_cmd .= qq|<input type="submit" value="$mline" class="button2s"><input type="hidden" name="cmd" value="$i">|;
+			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			$menu_cmd .= qq|</form>|;
+#			print "$i ", ($i+1) % 4, " " , ($i+1) % 6, "<br>";
+
+#			$menu_cmd .= qq|</div>| if (($i+1) % 4 == 0) || (($i+1) % 7 == 0);
+			$menu_cmd .= qq|<br class="smart_br" />| if ($i+1) % 4 == 0;
+#			$menu_cmd .= qq|<hr class="smart_hr" />| if ($i+1) % 4 == 0;
+			$menu_cmd .= qq|<br class="tablet_br" />| if ($i+1) % 7 == 0;
+#			$menu_cmd .= qq|<hr class="tablet_hr" />| if ($i+1) % 7 == 0;
+#			$menu_cmd .= qq|<hr class="smart_hr">| if (($i+1) % 4 == 0) || (($i+1) % 7 == 0);
+		}
+		$menu_cmd .= qq|</div>|;
+#		$menu_cmd .= qq|<br style="display:none;">|;
+=pod
 		$menu_cmd .= qq|<table boder=0 cols=4 width=110 height=110>|;
 		for my $i (0 .. $#menus) {
 			if($i % 4 == 0){
@@ -277,6 +316,7 @@ sub menu {
 			$menu_cmd .= qq|</tr>|;
 		}
 		$menu_cmd .= qq|</table>|;
+=cut
 	}else{
 		$menu_cmd  = qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
 		for my $i (0 .. $#menus) {

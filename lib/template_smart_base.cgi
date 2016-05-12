@@ -7,15 +7,18 @@
 #================================================
 print qq|資金 $m{money} G<br>| if $m{lib} =~ /^shopping/;
 if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
+#if (!$mes && ($is_battle ne 1 && $is_battle ne 2) ) {
 	# 最新情報
 	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiﾌｧｲﾙが読み込めません");
 	my $line = <$fh>;
 	close $fh;
 	print qq|<hr>|;
-	print qq|<td bgcolor="#000000" align="left" valign="top">◎最新情報◎<br>$line|;
+	print qq|◎最新情報◎<br>$line|;
 	print qq|<hr>|;
 }
-print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+#print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
+print qq|$menu_cmd|;
+print qq|<br>$mes| if $mes;
 
 if ($is_battle eq '1') {
 	&battle_html;
@@ -38,7 +41,10 @@ elsif ($m{wt} > 0) {
 	&countries_info;
 	&promise_table_html;
 }
-
+elsif ($m{lib} =~ /(domestic|hunting|military|promise|training|war_form)/  ) {
+	print qq|<font color="#99CCCC">ﾍﾟｯﾄ:$pets[$m{pet}][1]★$m{pet_c}</font><br>| if $m{pet};
+	print qq|<font color="#99CC99">ﾀﾏｺﾞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
+}
 #================================================
 # ﾄｯﾌﾟﾒﾆｭｰ
 #================================================
@@ -161,8 +167,12 @@ sub top_menu_html {
 #================================================
 sub status_html {
 	print qq|<hr><img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
-	print qq|$m{name}<br>|;
-	print qq|称号 $m{shogo}<br>| if $m{shogo};
+	print qq|$m{name}|;
+	print qq|[$m{shogo}]| if $m{shogo};
+	print qq|<br>|;
+#	print qq|称号 $m{shogo}<br>| if $m{shogo};
+#	print $m{name}, "[$m{shogo}]<br>";
+
 	if ($m{marriage}) {
 		my $yid = unpack 'H*', $m{marriage};
 		print qq|結婚相手 <a href="profile.cgi?id=$yid">$m{marriage}</a><br>|;
@@ -195,13 +205,19 @@ sub status_html {
 		$offertory_time = 0 if $offertory_time < 0;
 		my $offertory_time_mes = sprintf("<b>%d</b>時<b>%02d</b>分<b>%02d</b>秒後", $offertory_time / 3600, $offertory_time % 3600 / 60, $ofertory_time % 60);
 
-		print qq|<hr size="1">|;
+#		print qq|<hr size="1">|;
 		print qq|$units[$m{unit}][1] <b>$rank_sols[$m{rank}]</b>兵<br>|;
-		print qq|$e2j{rank_exp} [ <b>$m{rank_exp}</b> / <b>$next_rank</b> ]<br>|;
+		my $rank_name = &get_rank_name($m{rank}, $m{name});
+		if ($m{super_rank}){
+			$rank_name = '';
+			$rank_name .= '★' for 1 .. $m{super_rank};
+			$rank_name .= $m{rank_name};
+		}
+		print qq|$rank_name $e2j{rank_exp} [ <b>$m{rank_exp}</b> / <b>$next_rank</b> ]<br>|;
 		print qq|敵国[前回：<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font> 連続<b>$m{renzoku_c}</b>回]<br>| if $m{renzoku_c};
 		print qq|<hr size="1">|;
 		if ($m{disp_gacha_time}) {
-			print qq|残り時間<br>\n|;
+#			print qq|残り時間<br>\n|;
 			print qq|<table class="table1s">|;
 			print qq|<tr><th>給与</th><th>賽銭</th></tr>\n|;
 			print qq|<tr><td><span id="nokori_time">$nokori_time_mes</span></td><td><span id="offertory_time">$offertory_time_mes</span></td></tr>\n|;
@@ -214,8 +230,11 @@ sub status_html {
 		print qq|<script type="text/javascript"><!--\n nokori_time($nokori_time, $reset_rest, $gacha_time, $gacha_time2, $offertory_time);\n// --></script>\n|;
 		print qq|<br>|;
 	}
+	print qq|<b>$m{sedai}</b>世代目 $sexes[$m{sex}]<br>|;
+	print qq|Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>|;
 	print qq|疲労度 <b>$m{act}</b>%<br>|;
-	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
+	print qq|経験値 [<b>$m{exp}</b>/<b>100</b>]<br>|;
+#	print qq|Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>|;
 	print qq|資金 <b>$m{money}</b> G<br>|;
 	print qq|勲章<b>$m{medal}</b>個<br>|;
 	print qq|ｺｲﾝ <b>$m{coin}</b>枚<br>|;
@@ -323,13 +342,71 @@ sub war_html {
 # 自国/同盟国の情報
 #================================================
 sub my_country_info {
-	my $rank_name = &get_rank_name($m{rank}, $m{name});
-	if ($m{super_rank}){
-		$rank_name = '';
-		$rank_name .= '★' for 1 .. $m{super_rank};
-		$rank_name .= $m{rank_name};
-	}
+	print qq|<hr>|;
+#	print qq|<div class="c_info">|;
+	print qq|<span style="color: $cs{color}[$m{country}];">$c_m</span>|;
+	print qq|<div class="c_info1p">|;
+	print qq|<div class="c_info1c">$e2j{strong}:$cs{strong}[$m{country}]</div>|;
+	print qq|<div class="c_info1c">$e2j{tax}:$cs{tax}[$m{country}]%</div>|;
+	print qq|<div class="c_info1c">$e2j{state}:$country_states[ $cs{state}[$m{country}] ]</div>|;
+	print qq|</div>|;
+	print qq|<div class="c_info2p">|;
+	print qq|<div class="c_info2c">$e2j{food}:$cs{food}[$m{country}]</div>|;
+	print qq|<div class="c_info2c">$e2j{money}:$cs{money}[$m{country}]</div>|;
+	print qq|<div class="c_info2c">$e2j{soldier}:$cs{soldier}[$m{country}]</div>|;
+	print qq|</div>|;
+#	print qq|</div>|;
 
+	if ($union) {
+		print qq|<br>|;
+#		print qq|<div class="c_info">|;
+		print qq|<span style="color: $cs{color}[$union];">$cs{name}[$union]</span>|;
+		print qq|<div class="c_info1p">|;
+		print qq|<div class="c_info1c">$e2j{strong}:$cs{strong}[$union]</div>|;
+		print qq|<div class="c_info1c">$e2j{tax}:$cs{tax}[$union]%</div>|;
+		print qq|<div class="c_info1c">$e2j{state}:$country_states[ $cs{state}[$union] ]</div>|;
+		print qq|</div>|;
+		print qq|<div class="c_info2p">|;
+		print qq|<div class="c_info2c">$e2j{food}:$cs{food}[$union]</div>|;
+		print qq|<div class="c_info2c">$e2j{money}:$cs{money}[$union]</div>|;
+		print qq|<div class="c_info2c">$e2j{soldier}:$cs{soldier}[$union]</div>|;
+		print qq|</div>|;
+#		print qq|</div>|;
+	}
+	print qq|<br>|;
+
+=pod
+	print qq|<hr>|;
+	print qq|<dl>$c_m|;
+	print qq|<dt>$e2j{strong}</dt><dd>$cs{strong}[$m{country}]</dd>|;
+	print qq|<dt>$e2j{tax}</dt><dd>$cs{tax}[$m{country}]%</dd>|;
+	print qq|<dt>$e2j{state}</dt><dd>$country_states[ $cs{state}[$m{country}] ]</dd>|;
+	print qq|<dt>$e2j{food}</dt><dd>$cs{food}[$m{country}]</dd>|;
+	print qq|<dt>$e2j{money}</dt><dd>$cs{money}[$m{country}]</dd>|;
+	print qq|<dt>$e2j{soldier}</dt><dd>$cs{soldier}[$m{country}]</dd>|;
+	print qq|</dl>|;
+
+	print qq|<hr><table class="table1s">|;
+	print qq|<tr><th colspan="3" style="color: #333; background-color: $cs{color}[$m{country}]; text-align: center;">$c_m</th></tr>\n|;
+	print qq|<tr><th>$e2j{strong}</th><th>$e2j{tax}</th><th>$e2j{state}</th></tr>\n|;
+	print qq|<tr><td align="right">$cs{strong}[$m{country}]</td><td align="right">$cs{tax}[$m{country}]%</td><td align="center">$country_states[ $cs{state}[$m{country}] ]</td></tr>\n|;
+	print qq|<tr><th>$e2j{food}</th><th>$e2j{money}</th><th>$e2j{soldier}</th></tr>\n|;
+	print qq|<tr><td align="right">$cs{food}[$m{country}]</td><td align="right">$cs{money}[$m{country}]</td><td align="right">$cs{soldier}[$m{country}]</td></tr>\n|;
+	print qq|</table>|;
+
+	if ($union) {
+		print qq|<br>|;
+		print qq|<table class="table1s">|;
+		print qq|<tr><th colspan="3" style="color: #333; background-color: $cs{color}[$union]; text-align: center;">$cs{name}[$union]</th></tr>\n|;
+		print qq|<tr><th>$e2j{strong}</th><th>$e2j{tax}</th><th>$e2j{state}</th></tr>\n|;
+		print qq|<tr><td align="right">$cs{strong}[$union]</td><td align="right">$cs{tax}[$union]%</td><td align="center">$country_states[ $cs{state}[$union] ]</td></tr>\n|;
+		print qq|<tr><th>$e2j{food}</th><th>$e2j{money}</th><th>$e2j{soldier}</th></tr>\n|;
+		print qq|<tr><td align="right">$cs{food}[$union]</td><td align="right">$cs{money}[$union]</td><td align="right">$cs{soldier}[$union]</td></tr>\n|;
+		print qq|</table>|;
+	}
+	print qq|<br>|;
+=cut
+=pod
 	print qq|<hr><font color="$cs{color}[$m{country}]">$c_m</font><br>|;
 	print qq|$e2j{strong}:$cs{strong}[$m{country}]<br>|;
 	print qq|$e2j{tax}:$cs{tax}[$m{country}]%<br>|;
@@ -347,6 +424,7 @@ sub my_country_info {
 		print qq|$e2j{money}:$cs{money}[$union]<br>|;
 		print qq|$e2j{soldier}:$cs{soldier}[$union]<br>|;
 	}
+=cut
 }
 
 #================================================
@@ -391,16 +469,15 @@ sub countries_info {
 
 	print qq|</table><br>|;
 
-
 	my($c1, $c2) = split /,/, $w{win_countries};
 	my $limit_hour = int( ($w{limit_time} - $time) / 3600 );
 	my $limit_day  = $limit_hour <= 24 ? $limit_hour . '時間' : int($limit_hour / 24) . '日';
 	my $reset_rest = int($w{reset_time} - $time);
 	my $reset_time_mes = sprintf("<b>%d</b>時間<b>%02d</b>分<b>%02d</b>秒後", $reset_rest / 3600, $reset_rest % 3600 / 60, $reset_rest % 60);
 
-	print $w{playing} >= $max_playing ? qq|<hr><font color="#FF0000">●</font>| : qq|<hr><font color="#00FF00">●</font>|;
-	print qq|ﾌﾟﾚｲ中 $w{playing}/$max_playing人|;
-	print qq|<hr>統一期限 残り$limit_day<br>|;
+	print $w{playing} >= $max_playing ? qq|<hr><font color="#FF0000">●</font>| : qq|<font color="#00FF00">●</font>|;
+	print qq|ﾌﾟﾚｲ中 $w{playing}/$max_playing人<br>|;
+	print qq|統一期限 残り$limit_day<br>|;
 	if ($reset_rest > 0){
 		print qq|終戦期間【残り$reset_time_mes】<br>|;
 	}
@@ -444,7 +521,7 @@ sub promise_table_html {
 		}
 		print qq|</tr>|;
 	}
-	print qq|</table><br>|;
+	print qq|</table>|;
 }
 
 #================================================
@@ -473,6 +550,13 @@ sub all_member_n {
 		$ret_str .= "<br>" if $i % 4 == 3;
 	}
 	return $ret_str;
+}
+
+sub show_world_news {
+	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiﾌｧｲﾙが読み込めません");
+	my $line = <$fh>;
+	close $fh;
+	print "<hr>$line";
 }
 
 1; # 削除不可

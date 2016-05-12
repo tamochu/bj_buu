@@ -12,6 +12,8 @@ require "$datadir/profile.cgi";
 &header_profile;
 &read_cs;
 
+my $table_class = $is_smart ? "table2" : "table1" ;
+
 if    ($in{mode} eq 'profile') { &profile; }
 elsif ($is_mobile) { &status_mobile if $in{mode} eq 'status'; }
 else { &status_pc; }
@@ -79,7 +81,7 @@ sub status_mobile {
 	my $m_st = &m_st;
 	print <<"EOM";
 		<b>$m{sedai}</b>¢‘ã–Ú<br>
-		$sexes[ $m{sex} ] [$jobs[$m{job}][1]]<br>
+		$sexes[ $m{sex} ] [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>
 		ŒMÍ <b>$m{medal}</b>ŒÂ<br>
 		¶¼ŞÉº²İ <b>$m{coin}</b>–‡<br>
 		<hr>
@@ -145,7 +147,8 @@ sub status_pc {
 		$rank_name .= $m{rank_name};
 	}
 	
-	print qq|<table width="440" border="0" cellpadding="3" bgcolor="#CCCCCC"><tr><td bgcolor="#000000" align="left" valign="top">|;
+#	print qq|<table width="440" border="0" cellpadding="3" bgcolor="#CCCCCC"><tr><td bgcolor="#000000" align="left" valign="top">|;
+	print qq|<table border="0" cellpadding="3" bgcolor="#CCCCCC"><tr><td bgcolor="#000000" align="left" valign="top">|;
 	print qq|<table width="100%" border="0"><tr><td width="60%" valign="top" align="left"><tt>|;
 	print qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;">| if $m{icon};
 	print qq|$m{name}<br>|;
@@ -192,7 +195,7 @@ sub status_pc {
 		<tt>
 
 		y½Ã°À½z‹­‚³F$m_st<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 		<tr>
 			<th>$e2j{max_hp}</th><td align="right">$m{max_hp}</td>
 			<th>$e2j{at}</th><td align="right">$m{at}</td>
@@ -209,14 +212,14 @@ sub status_pc {
 		</table>
 		<hr size="1">
 		yŠo‚¦‚Ä‚¢‚é‹Zz<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 		<tr><th>‘®«</th><th>‹Z@–¼</th></tr>
 		$skill_info
 		</table>
 
 		<hr size="1">
 		yn—û“xz<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 		<tr>
 			<th>”_‹Æ</th><td align="right">$m{nou_c}</td>
 			<th>¤‹Æ</th><td align="right">$m{sho_c}</td>
@@ -256,7 +259,7 @@ sub status_pc {
 		
 		<hr size="1">
 		y‘ã•\\ÒÎß²İÄz<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 		<tr>
 			<th>í‘ˆ</th><td align="right">$m{war_c}</td>
 			<th>“à­</th><td align="right">$m{dom_c}</td>
@@ -267,7 +270,7 @@ sub status_pc {
 		
 		<hr size="1">
 		yí—ğz<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 		<tr>
 			<th>í‰ñ</th><td align="right">$war_c</td>    
 			<th>Ÿ‚¿</th><td align="right">$m{win_c}</td> 
@@ -279,7 +282,7 @@ sub status_pc {
 		
 		<hr size="1">
 		yºİÌßØ°Ä—¦z<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 			<tr><th>Ì†</th><td align="right"><b>$shogo_par</b>%<br></td></tr>
 			<tr><th>½·Ù</th><td align="right"><b>$skill_par</b>%<br></td></tr>
 			<tr><th>•Ší</th><td align="right"><b>$collection_pars{1}</b>%<br></td></tr>
@@ -289,7 +292,7 @@ sub status_pc {
 		
 		<hr size="1">
 		yğ”N“xÀÑz<br>
-		<table class="table1" cellpadding="3">
+		<table class="$table_class" cellpadding="3">
 			<tr>
 				<th>’D‘—Í</th><td align="right"><b>$m_year{strong}</b></td>
 				<th>”_‹Æ</th><td align="right"><b>$m_year{nou}</b></td>
@@ -314,7 +317,8 @@ sub profile {
 		$datas{$k} = $v;
 	}
 	
-	print qq|<table class="table1" cellpadding="3" width="440">| unless $is_mobile;
+#	print qq|<table class="table1" cellpadding="3" width="440">| unless $is_mobile;
+	print qq|<table class="$table_class" cellpadding="3">| unless $is_mobile;
 	for my $profile (@profiles) {
 		next if $datas{$profile->[0]} eq '';
 		

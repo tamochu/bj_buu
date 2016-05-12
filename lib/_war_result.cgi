@@ -587,14 +587,14 @@ sub _metubou {
 sub _penalty {
 	# ĞŠQ
 	if ( (($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12')) && rand(3) < 1) || rand(12) < 1 ) {
-		&disaster(1);
+		&disaster( ($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') )); # –ï”N or “ä(–ï”N)‚Ì‚İ’Ç‰ÁÍßÅÙÃ¨
 
 		#1› 2~ 3› 4~ 5› 6› 7› 8~ 9› 10›
-		unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) {
+		unless ($w{year} =~ /6$/ || $w{year} =~ /0$/) { # “Áêî¨‚Å‚È‚¯‚ê‚Î½‘”­“®
 			# ½‘ó‘Ôæ“¾
 			my $sleep_num = 0;
 			for my $i (1 .. $w{country}) {
-				$sleep_num += $cs{die}[$i] == 2 ? 1 : 0;
+				$sleep_num++ if $cs{die}[$i] == 2;
 			}
 			unless ($sleep_num) { # ‚Ç‚±‚à½‘‚µ‚Ä‚È‚¢‚È‚ç½‘
 				$cs{is_die}[$y{country}] = 2;

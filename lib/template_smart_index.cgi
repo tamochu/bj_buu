@@ -56,7 +56,7 @@ sub index {
 <hr>
 定員 $w{player}/$max_entry人<br>
 ﾌﾟﾚｲﾔｰ保存期間 $auto_delete_day日<br>
-(1世代目1ﾚﾍﾞﾙは5日)<br>
+(1世代目1ﾚﾍﾞﾙは1日)<br>
 基本拘束時間 $GWT分<br>
 給与 $salary_hour時間毎<br>
 君主の任期 $reset_ceo_cycle_year年周期
