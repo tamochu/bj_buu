@@ -692,7 +692,10 @@ sub dirflock {
 	my $fname = shift;
 	my $ldir = "$fname.lock";
 	my $lname = "$ldir/lock.cgi";
-	if (!(-f $lname) || (stat $lname)[9] < $time - 60) {
+	if (!(-f $lname)) {
+		rmdir($ldir);
+	} elsif ((stat $lname)[9] < $time - 60) {
+		unlink($lname);
 		rmdir($ldir);
 	}
 	if (!mkdir($ldir, 0755)) {
@@ -705,7 +708,9 @@ sub dirflock {
 sub release_dirflock {
 	my $fname = shift;
 	my $ldir = "$fname.lock";
+	my $lname = "$ldir/lock.cgi";
 
+	unlink($lname);
 	rmdir($ldir);
 }
 
