@@ -12,9 +12,9 @@ sub begin {
 	$mes .= "Ç«ÇÃÇ®ìXÇ≈îÉï®ÇµÇ‹Ç∑Ç©?<br>";
 	
 	my $count = 0;
-	$mes .= qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>Ç‚ÇﬂÇÈ<br>|;
-	$mes .= qq|<input type="radio" name="cmd" value="total_list">è§ïiàÍóó<br>| unless $is_mobile;
-	$mes .= qq|<table class="table1"><tr><th>ìXñº</th><th>ìXí∑</th><th>è–âÓï∂<br></th></tr>| unless $is_mobile;
+	$mes .= qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">Ç‚ÇﬂÇÈ</label><br>|;
+	$mes .= qq|<input type="radio" id="total_list" name="cmd" value="total_list"><label for="total_list">è§ïiàÍóó</label><br>| unless $is_mobile;
+	$mes .= qq|<table class="table1"><tr><th>ìXñº</th><th>ìXí∑</th><th>è–âÓï∂</th></tr>| unless $is_mobile;
 	
 	open my $fh, "< $logdir/shop_list.cgi" or &error('ºÆØÃﬂÿΩƒÃß≤ŸÇ™ì«Ç›çûÇﬂÇ‹ÇπÇÒ');
 	while (my $line = <$fh>) {
@@ -26,7 +26,7 @@ sub begin {
 		
 		my $gc = "#ffffff";
 		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font><br>|
-			 : qq|<tr><td><input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font></td><td>$name</td><td>$message<br></td></tr>|;
+			 : qq|<tr><td><input type="radio" id="$name" name="cmd" value="$name"><font color="$gc"><label for="$name">$shop_name</label></font></td><td>$name</td><td>$message<br></td></tr>|;
 		$count++;
 	}
 	close $fh;
@@ -82,19 +82,21 @@ sub tp_1 {
 	}
 	elsif (-s "$userdir/$shop_id/shop.cgi") {
 		$mes .= qq|Åy$m{stock}Åz$y{name}Åu$shop_messageÅv<br>|;
-		$mes .= qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>Ç‚ÇﬂÇÈ<br>|;
+		$mes .= qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">Ç‚ÇﬂÇÈ</label><br>|;
 		$mes .= qq|<table class="table1"><tr><th>è§ïiñº</th><th>ílíi<br></th></tr>|;
 		
 		open my $fh, "< $userdir/$shop_id/shop.cgi" or &error("$y{name}Ç…ì¸ÇÍÇ‹ÇπÇÒ");
 		while (my $line = <$fh>) {
 			my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
 			next if ($price == 5000000);
-			$mes .= qq|<tr><td><input type="radio" name="cmd" value="$no">|;
+			$mes .= qq|<tr><td><input type="radio" id="$no" name="cmd" value="$no">|;
+			$mes .= qq|<label for="$no">| unless $is_mobile;
 			$mes .= $kind eq '1' ? "$weas[$item_no][1]Åö$item_lv($item_c/$weas[$item_no][4])"
 				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 				  : $kind eq '3' ? "$pets[$item_no][1]Åö$item_c"
 				  : 			   "$guas[$item_no][1]"
 				  ;
+			$mes .= qq|</label>| unless $is_mobile;
 			$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
 		}
 		close $fh;
@@ -251,13 +253,15 @@ sub tp_200 {
 			next;
 		}
 		my $gc = "#ffffff";
-		$mes .= qq|<tr><td><input type="radio" name="cmd" value="$name">|;
+		$mes .= qq|<tr><td><input type="radio" id="$name$item_no" name="cmd" value="$name">|;
+		$mes .= qq|<label for="$name$item_no">| unless $is_mobile;
 		$mes .= $kind eq '1' ? "$weas[$item_no][1]Åö$item_lv($item_c/$weas[$item_no][4])"
 			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 			  : $kind eq '3' ? "$pets[$item_no][1]Åö$item_c"
 			  : 			   "$guas[$item_no][1]"
 			  ;
 		$price = 'îÒï\é¶' if $price == 99999999;
+		$mes .= qq|</label>| unless $is_mobile;
 		$mes .= qq|</td><td><font color="$gc">$name</font></td><td>$price<br></td></tr>|;
 		$b_name = $name;
 		$b_kind = $kind;

@@ -33,7 +33,6 @@ my %taboo_items = (
 	gua => [], # 防具
 );
 
-
 #================================================
 sub begin {
 	if (-f "$userdir/$id/depot_flag.cgi") {
@@ -637,7 +636,7 @@ sub radio_my_depot {
 	my $count = 0;
 	my %lock = &get_lock_item;
 	my $sub_mes = qq|<form method="$method" action="$script">|;
-	$sub_mes .= qq|<input type="radio" name="cmd" value="0" checked>やめる<br>|;
+	$sub_mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">やめる</label><br>|;
 	open my $fh, "< $this_file" or &error("$this_file が読み込めません");
 	while (my $line = <$fh>) {
 		++$count;
@@ -646,13 +645,16 @@ sub radio_my_depot {
 		if ($lock{"$kind<>$item_no<>"}) {
 			$lock_mes = ' ロックされてます';
 		}
-		$sub_mes .= qq|<input type="radio" name="cmd" value="$count">|;
+		$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count">|;
+		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes<br>|
-				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes<br>|
-				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes<br>|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes<br>|
+		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes|
+				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes|
+				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes|
+				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes|
 				  ;
+		$sub_mes .= qq|</label>| unless $is_mobile;
+		$sub_mes .= qq|<br>|;
 	}
 	close $fh;
 	
@@ -686,13 +688,16 @@ sub checkbox_my_depot {
 		if ($lock{"$kind<>$item_no<>"}) {
 			$lock_mes = ' ロックされてます';
 		}
-		$sub_mes .= qq|<input type="checkbox" name="$count" value="1">|;
+		$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1">|;
+		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes<br>|
-				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes<br>|
-				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes<br>|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes<br>|
+		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes|
+				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes|
+				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes|
+				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes|
 				  ;
+		$sub_mes .= qq|</label>| unless $is_mobile;
+		$sub_mes .= qq|<br>|;
 	}
 	close $fh;
 	
@@ -722,20 +727,23 @@ sub checkbox_my_depot_lock_checked {
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		$sub_mes .= qq|<input type="checkbox" name="$count" value="1"|;
+		$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1"|;
 		my $lock_mes = '';
 		if ($lock{"$kind<>$item_no<>"}) {
 			$sub_mes .= qq| checked|;
 			$lock_mes = ' ロックされてます';
 		}
 		$sub_mes .= qq|>|;
+		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes<br>|
-				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes<br>|
-				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes<br>|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes<br>|
+		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes|
+				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes|
+				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes|
+				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes|
 				  ;
-	}
+		$sub_mes .= qq|</label>| unless $is_mobile;
+		$sub_mes .= qq|<br>|;
+}
 	close $fh;
 	
 	$m{is_full} = $count >= $max_depot ? 1 : 0;

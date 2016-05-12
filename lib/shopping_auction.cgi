@@ -5,7 +5,7 @@ my $this_file = "$logdir/auction.cgi";
 require "$datadir/buyable.cgi";
 
 # —DŠÔ(“ú)
-my $limit_day = 3;
+my $auction_limit_day = 3;
 
 # Å‘åo•i”
 my $max_auction = 30;
@@ -59,9 +59,9 @@ sub tp_1 {
 sub tp_100 {
 	$layout = 1;
 	
-	$mes .= qq|µ°¸¼®İ‚Ì—D“ú”‚ÍAo•i“ú‚©‚ç $limit_day“ú‘OŒã‚Å‚·<br>|;
+	$mes .= qq|µ°¸¼®İ‚Ì—D“ú”‚ÍAo•i“ú‚©‚ç $auction_limit_day“ú‘OŒã‚Å‚·<br>|;
 	$mes .= qq|<form method="$method" action="$script">|;
-	$mes .= qq|<input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+	$mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
  	$mes .= $is_mobile ? qq|<hr>—D•i/“üDŠz/‘¦ŒˆŠz/“üDÒ/o•iÒ<br>|
  		: qq|<table class="table1" cellpadding="3"><tr><th>—D•i</th><th>“üDŠz</th><th>‘¦ŒˆŠz</th><th>“üDÒ</th><th>o•iÒ</th><th>ó‘Ô</th><th>“üD‰Â”\\Šz<br></th>|;
 
@@ -75,13 +75,13 @@ sub tp_100 {
 					   : 				"[–h]$guas[$item_no][1]"
 					   ;
 		my $item_state = $time + 3600 * 24 > $bit_time ? "‚»‚ë‚»‚ë":
-						$time + ($limit_day - 1) * 3600 * 24 > $bit_time ? "‚Ü‚¾‚Ü‚¾":"new";
+						$time + ($auction_limit_day - 1) * 3600 * 24 > $bit_time ? "‚Ü‚¾‚Ü‚¾":"new";
 		unless($buyout_price){
 			$buyout_price = '‚È‚µ';
 		}
 		my $next_min_price = int($item_price * 1.2);
 		$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$item_title/$item_price G/‘¦$buyout_price G/$to_name/$from_name/$item_state<br>|
-			: qq|<tr><td><input type="radio" name="cmd" value="$no">$item_title</td><td align="right">$item_price G</td><td align="right">$buyout_price G</td><td>$to_name</td><td>$from_name</td><td>$item_state<br></td><td>$next_min_price</td></tr>|;
+			: qq|<tr><td><input type="radio" id="$no" name="cmd" value="$no"><label for="$no">$item_title</label></td><td align="right">$item_price G</td><td align="right">$buyout_price G</td><td>$to_name</td><td>$from_name</td><td>$item_state<br></td><td>$next_min_price</td></tr>|;
 		$m{total_auction} += $item_price if ($to_name eq $m{name} && $from_name ne $m{name});
 	}
 	close $fh;
@@ -188,15 +188,15 @@ sub tp_200 {
 	$mes .= '‚Ç‚ê‚ğo•i‚µ‚Ü‚·‚©?<br>';
 	
 	$mes .= qq|<form method="$method" action="$script">|;
-	$mes .= qq|<input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
-	$mes .= qq|<input type="radio" name="cmd" value="1">$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c})<br>| if $m{wea};
-	$mes .= qq|<input type="radio" name="cmd" value="2">$eggs[$m{egg}][1]($m{egg_c})<br>| if $m{egg};
-	$mes .= qq|<input type="radio" name="cmd" value="3">$pets[$m{pet}][1]š$m{pet_c}<br>| if $m{pet};
-	$mes .= qq|<input type="radio" name="cmd" value="4">$guas[$m{gua}][1]<br>| if $m{gua};
+	$mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
+	$mes .= qq|<input type="radio" id="no_1" name="cmd" value="1"><label for="no_1">$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c})</label><br>| if $m{wea};
+	$mes .= qq|<input type="radio" id="no_2" name="cmd" value="2"><label for="no_2">$eggs[$m{egg}][1]($m{egg_c})</label><br>| if $m{egg};
+	$mes .= qq|<input type="radio" id="no_3" name="cmd" value="3"><label for="no_3">$pets[$m{pet}][1]š$m{pet_c}</label><br>| if $m{pet};
+	$mes .= qq|<input type="radio" id="no_4" name="cmd" value="4"><label for="no_4">$guas[$m{gua}][1]</label><br>| if $m{gua};
 	$mes .= qq|“üDŠúŒÀ<br>|;
-	$mes .= qq|<input type="radio" name="tlimit" value="0" checked>•’Ê<br>|;
-	$mes .= qq|<input type="radio" name="tlimit" value="1">’·‚ß<br>|;
-	$mes .= qq|<input type="radio" name="tlimit" value="2">’Z‚ß<br>|;
+	$mes .= qq|<input type="radio" id="no_5" name="tlimit" value="0" checked><label for="no_5">•’Ê</label><br>|;
+	$mes .= qq|<input type="radio" id="no_6" name="tlimit" value="1"><label for="no_6">’·‚ß</label><br>|;
+	$mes .= qq|<input type="radio" id="no_7" name="tlimit" value="2"><label for="no_7">’Z‚ß</label><br>|;
 	$mes .= qq|<p>‰Šú‹àŠz<input type="text" name="price" value="0" class="text_box1" style="text-align:right">G</p>|;
 	$mes .= qq|<p>‘¦Œˆ‹àŠz<input type="text" name="buyout_price" value="0" class="text_box1" style="text-align:right">G</p>|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -277,7 +277,7 @@ sub tp_210 {
 				$m{gua} = 0;
 			}
 			
-			my $bit_time = $time + int( $limit_day * 3600 * 24 + rand(3600) ); # “üDŠÔ‚ğ‚PŠÔ’ö“x‚Î‚ç‚¯‚³‚·
+			my $bit_time = $time + int( $auction_limit_day * 3600 * 24 + rand(3600) ); # “üDŠÔ‚ğ‚PŠÔ’ö“x‚Î‚ç‚¯‚³‚·
 			$bit_time += int( 3600 * 24 + rand(3600) ) if $in{tlimit} eq '1'; 
 			$bit_time -= int( 3600 * 24 + rand(3600) ) if $in{tlimit} eq '2'; 
 			my($last_no) = (split /<>/, $lines[-1])[1];

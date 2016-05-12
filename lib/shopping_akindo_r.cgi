@@ -14,7 +14,7 @@ sub begin {
 	$mes .= "‚Ç‚Ì‚¨“X‚Å”ƒ•¨‚µ‚Ü‚·‚©?<br>";
 	
 	my $count = 0;
-	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="total_list" checked>¤•iˆê——<br>|;
+	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" id="no_0" name="cmd" value="total_list" checked><label for="no_0">¤•iˆê——</label><br>|;
 	$mes .= qq|<table class="table1"><tr><th>“X–¼</th><th>“X’·</th><th>Ğ‰î•¶<br></th></tr>| unless $is_mobile;
 
 	open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ');
@@ -27,7 +27,7 @@ sub begin {
 
 		my $gc = "#ffffff";
 		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font><br>|
-			 : qq|<tr><td><input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font></td><td>$name</td><td>$message<br></td></tr>|;
+			 : qq|<tr><td><input type="radio" id="$shop_id" name="cmd" value="$name"><font color="$gc"><label for="$shop_id">$shop_name</label></font></td><td>$name</td><td>$message<br></td></tr>|;
 		$count++;
 	}
 	close $fh;
@@ -116,19 +116,21 @@ sub tp_1 {
 	}
 	elsif (-s "$userdir/$shop_id/shop.cgi") {
 		$mes .= qq|y$m{stock}z$y{name}u$shop_messagev<br>|;
-		$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+		$mes .= qq|<form method="$method" action="$script_r"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 		$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>’l’i<br></th></tr>|;
 		
 		open my $fh, "< $userdir/$shop_id/shop.cgi" or &error("$y{name}‚É“ü‚ê‚Ü‚¹‚ñ");
 		while (my $line = <$fh>) {
 			my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
 			next if ($price == 5000000);
-			$mes .= qq|<tr><td><input type="radio" name="cmd" value="$no">|;
+			$mes .= qq|<tr><td><input type="radio" id="$no" name="cmd" value="$no">|;
+			$mes .= qq|<label for="$no">| unless $is_mobile;
 			$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
 				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 				  : $kind eq '3' ? "$pets[$item_no][1]š$item_c"
 				  : 			   "$guas[$item_no][1]"
 				  ;
+			$mes .= qq|</label>| unless $is_mobile;
 			$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
 		}
 		close $fh;
@@ -273,7 +275,7 @@ sub tp_200 {
 				sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
 					map { [$_, split /<>/ ] } @item_list;
 	
-	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 	$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>“Xå</th><th>‰¿Ši<br></th></tr>|;
 	my $b_name = -1;
 	my $b_kind = -1;
@@ -284,13 +286,15 @@ sub tp_200 {
 			next;
 		}
 		my $gc = "#ffffff";
-		$mes .= qq|<tr><td><input type="radio" name="cmd" value="$name">|;
+		$mes .= qq|<tr><td><input type="radio" id="$name$item_no" name="cmd" value="$name">|;
+		$mes .= qq|<label for="$name$item_no">| unless $is_mobile;
 		$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
 			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 			  : $kind eq '3' ? "$pets[$item_no][1]š$item_c"
 			  : 			   "$guas[$item_no][1]"
 			  ;
 		$price = '”ñ•\¦' if $price == 99999999;
+		$mes .= qq|</label>| unless $is_mobile;
 		$mes .= qq|</td><td><font color="$gc">$name</font></td><td>$price<br></td></tr>|;
 		$b_name = $name;
 		$b_kind = $kind;
@@ -389,18 +393,20 @@ sub tp_310 {
 #================================================
 
 sub tp_400 {
+	# —DŠÔ(“ú)
+	my $auction_limit_day = 3;
+
 	if ($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]) {
 		$mes .= "$shogos[1][0]‚Ì•û‚Í‚¨’f‚è‚µ‚Ä‚¢‚Ü‚·<br>";
 		&begin;
 		return;
 	}
 	
-	
 	$layout = 1;
 	
-	$mes .= qq|µ°¸¼®İ‚Ì—D“ú”‚ÍAo•i“ú‚©‚ç $limit_day“ú‘OŒã‚Å‚·<br>|;
+	$mes .= qq|µ°¸¼®İ‚Ì—D“ú”‚ÍAo•i“ú‚©‚ç $auction_limit_day“ú‘OŒã‚Å‚·<br>|;
 	$mes .= qq|<form method="$method" action="$script_r">|;
-	$mes .= qq|<input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+	$mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
  	$mes .= $is_mobile ? qq|<hr>—D•i/“üDŠz/“üDÒ/o•iÒ/Å’á“üDŠz<br>|
  		: qq|<table class="table1" cellpadding="3"><tr><th>—D•i</th><th>“üDŠz</th><th>‘¦ŒˆŠz</th><th>“üDÒ</th><th>o•iÒ</th><th>ó‘Ô</th><th>Å’á“üDŠz<br></th>|;
 
@@ -414,13 +420,13 @@ sub tp_400 {
 					   : 				"[ƒy]$guas[$item_no][1]"
 					   ;
 		my $item_state = $time + 3600 * 24 > $bit_time ? "‚»‚ë‚»‚ë":
-						$time + ($limit_day - 1) * 3600 * 24 > $bit_time ? "‚Ü‚¾‚Ü‚¾":"new";
+						$time + ($auction_limit_day - 1) * 3600 * 24 > $bit_time ? "‚Ü‚¾‚Ü‚¾":"new";
 		unless($buyout_price){
 			$buyout_price = '‚È‚µ';
 		}
 		my $next_min_price = int($item_price * 1.2);
 		$mes .= $is_mobile ? qq|<hr><input type="radio" name="cmd" value="$no">$item_title/$item_price G/‘¦$buyout_price G/$to_name/$from_name/$item_state/$next_min_price<br>|
-			: qq|<tr><td><input type="radio" name="cmd" value="$no">$item_title</td><td align="right">$item_price G</td><td align="right">$buyout_price G</td><td>$to_name</td><td>$from_name</td><td>$item_state</td><td>$next_min_price<br></td></tr>|;
+			: qq|<tr><td><input type="radio" id="$no" name="cmd" value="$no"><label for="$no">$item_title</label></td><td align="right">$item_price G</td><td align="right">$buyout_price G</td><td>$to_name</td><td>$from_name</td><td>$item_state</td><td>$next_min_price<br></td></tr>|;
 		$m{total_auction} += $item_price if($to_name eq $m{name} && $from_name ne $m{name});
 	}
 	close $fh;

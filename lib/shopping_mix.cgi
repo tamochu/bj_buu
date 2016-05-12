@@ -38,7 +38,7 @@ sub tp_1 {
 	$layout = 2;
 	if($cmd eq '1'){
 		$mes .= "どれと合成しますか?<br>";
-		$mes .= qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>やめる<br>|;
+		$mes .= qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">やめる</label><br>|;
 	
 		open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 		my $count = 0;
@@ -46,7 +46,7 @@ sub tp_1 {
 			++$count;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 			if($kind eq '3' ){
-				$mes .= qq|<input type="radio" name="cmd" value="$count">[ぺ]$pets[$item_no][1]★$item_c<br>|;
+				$mes .= qq|<input type="radio" id="$count" name="cmd" value="$count"><label for="$count">[ぺ]$pets[$item_no][1]★$item_c</label><br>|;
 			}
 		}
 		close $fh;
@@ -83,7 +83,7 @@ sub tp_1 {
 				if ($cmd eq '3' && $item_no == 126) {
 					$checked = ' checked';
 				}
-				$mes .= qq|<input type="checkbox" name="pet_$count" value="1"$checked>[ぺ]$pets[$item_no][1]★$item_c<br>|;
+				$mes .= qq|<input type="checkbox" id="$count" name="pet_$count" value="1"$checked><label for="$count">[ぺ]$pets[$item_no][1]★$item_c</label><br>|;
 			}
 		}
 		close $fh;
@@ -152,16 +152,23 @@ sub tp_200 {
 		&begin;
 		return;
 	}
+	unless ($pets[$m{pet}][5]) {
+		$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
+		&begin;
+		return;
+	}
 	
 	open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 	my $count = 0;
 	my $rest = 0;
 	while (my $line = <$fh>) {
 		++$count;
-		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		unless($in{"pet_$count"}){
-			$rest++;
-		}
+		 $rest++ unless $in{"pet_$count"};
+		# ここから消しても良さそう
+#		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+#		unless($in{"pet_$count"}){
+#			$rest++;
+#		}
 	}
 	close $fh;
 	if($rest > $max_depot){
@@ -169,11 +176,12 @@ sub tp_200 {
 		&begin;
 		return;
 	}
-	unless ($pets[$m{pet}][5]) {
-		$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
-		&begin;
-		return;
-	}
+# ファイル開く前に確認すればスマート
+#	unless ($pets[$m{pet}][5]) {
+#		$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
+#		&begin;
+#		return;
+#	}
 	
 	$count = 0;
 	my @lines = ();
