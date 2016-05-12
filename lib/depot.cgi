@@ -52,7 +52,7 @@ sub begin {
 		$mes .= "どうしますか?<br>";
 	}
 	&depot_common;
-	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '一括廃棄', 'ロックをかける');
+	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '----', 'ロックをかける'); # 一括破棄
 }
 sub tp_1 {
 	return if &is_ng_cmd(1..7);
@@ -490,11 +490,13 @@ sub tp_510 {
 					  ;
 				
 				$m{money} += $sall_price;
-				if (rand(2) < 1) {
+# ｼﾞｬﾝｸｼｮｯﾌﾟに行くことよりも延々掘れることの方が問題としては大きい
+# 間違って売ってしまった時に回収できないのもちょっと可哀想
+#				if (rand(2) < 1) {
 					open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiﾌｧｲﾙが開けません");
 					print $fh2 "$kind<>$item_no<>$item_c<>\n";
 					close $fh2;
-				}
+#				}
 				open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
 				print $fh3 "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
 				close $fh3;
@@ -519,6 +521,9 @@ sub tp_510 {
 # 一括廃棄
 #=================================================
 sub tp_600 {
+	&begin;
+	return;
+
 	$layout = 2;
 	my($count, $sub_mes) = &checkbox_my_depot;
 
