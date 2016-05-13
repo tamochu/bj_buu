@@ -589,6 +589,7 @@ sub _penalty {
 	if ( (($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12')) && rand(3) < 1) || rand(12) < 1 ) {
 		&disaster( ($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') )); # –ï”N or “ä(–ï”N)‚Ì‚Ý’Ç‰ÁÍßÅÙÃ¨
 
+=pod
 		#1› 2~ 3› 4~ 5› 6› 7› 8~ 9› 10›
 		if ($w{year} !~ /6$/ && $w{year} !~ /0$/ && $cs{strong}[$y{country}] < 5000) { # “ÁŽêî¨‚Å‚È‚­‚©‚Â‘—Í5000–¢–žiÉ±ÊÞØ±‚Ì½‘‰ñ”ðj‚Ì‚Ý½‘”­“®
 			# ½‘ó‘ÔŽæ“¾
@@ -607,6 +608,7 @@ sub _penalty {
 				}
 			}
 		}
+=cut
 	}
 }
 
