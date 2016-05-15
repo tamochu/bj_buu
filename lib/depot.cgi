@@ -52,7 +52,7 @@ sub begin {
 		$mes .= "どうしますか?<br>";
 	}
 	&depot_common;
-	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '----', 'ロックをかける'); # 一括破棄
+	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '捨てる', 'ロックをかける');
 }
 sub tp_1 {
 	return if &is_ng_cmd(1..7);
@@ -490,13 +490,9 @@ sub tp_510 {
 					  ;
 				
 				$m{money} += $sall_price;
-# ｼﾞｬﾝｸｼｮｯﾌﾟに行くことよりも延々掘れることの方が問題としては大きい
-# 間違って売ってしまった時に回収できないのもちょっと可哀想
-#				if (rand(2) < 1) {
-					open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiﾌｧｲﾙが開けません");
-					print $fh2 "$kind<>$item_no<>$item_c<>\n";
-					close $fh2;
-#				}
+				open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiﾌｧｲﾙが開けません");
+				print $fh2 "$kind<>$item_no<>$item_c<>\n";
+				close $fh2;
 				open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
 				print $fh3 "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
 				close $fh3;
@@ -518,14 +514,11 @@ sub tp_510 {
 }
 
 #=================================================
-# 一括廃棄
+# 捨てる
 #=================================================
 sub tp_600 {
-	&begin;
-	return;
-
 	$layout = 2;
-	my($count, $sub_mes) = &checkbox_my_depot;
+	my($count, $sub_mes) = &radio_my_depot;
 
 	$mes .= "どれを捨てますか?[ $count / $max_depot ]<br>";
 	$mes .= $sub_mes;
@@ -535,12 +528,7 @@ sub tp_600 {
 	$m{tp} += 10;
 }
 sub tp_610 {
-	if ($in{uncheck_flag}) {
-		$m{tp} -= 10;
-		&{ 'tp_'. $m{tp} };
-		return;
-	}
-	my($maxcount, $sub_mes) = &checkbox_my_depot;
+	my($maxcount, $sub_mes) = &radio_my_depot;
 	my $count = 0;
 	my $is_rewrite = 0;
 	my %lock = &get_lock_item;
@@ -548,7 +536,7 @@ sub tp_610 {
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		++$count;
-		if ($in{$count} eq '1') {
+		if ($cmd eq $count) {
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 			if ($lock{"$kind<>$item_no<>"}) {
 				push @lines, $line;
