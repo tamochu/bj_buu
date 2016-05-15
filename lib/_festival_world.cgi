@@ -346,13 +346,20 @@ sub add_festival_country {
 	my $max_c = int($w{player} / $country_num) + 3;
 	for my $i ($w{country}-($country_num-1)..$w{country}){
 		mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
-		for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
+		for my $file_name (qw/bbs bbs_log bbs_member depot_log patrol prison prison_member prisoner violator old_member/) {
 			my $output_file = "$logdir/$i/$file_name.cgi";
 			next if -f $output_file;
 			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
 			close $fh;
 			chmod $chmod, $output_file;
 		}
+		# 国庫は1行目が設定なので予め書き込んでおかないと国庫にぶち込んだ1個目のアイテムが消失してしまう
+		my $output_file = "$logdir/$i/depot.cgi";
+		open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+		print $fh "1<>1<>1世代Lv1以上が利用できます<>\n";
+		close $fh;
+		chmod $chmod, $output_file;
+
 		for my $file_name (qw/leader member/) {
 			my $output_file = "$logdir/$i/$file_name.cgi";
 			open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");

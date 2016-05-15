@@ -205,4 +205,5 @@ sub disp_now {
 	}
 	return "$state<br>\n";
 }
+
 1; # íœ•s‰Â login.cgi‚Å bj.cgi‚ğrequire‚µ‚Ä‚¢‚é
