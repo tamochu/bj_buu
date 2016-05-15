@@ -5,7 +5,7 @@ use File::Path;
 #================================================
 
 # 統一難易度：[難しい 60 ～ 40 簡単]
-my $game_lv = $config_test ? int(rand(11) + 40) : int( rand(11) + 40 );
+my $game_lv = $config_test ? int(rand(11) + 40) : int( rand(6) + 50 );
 
 # 統一期限(日)
 my $limit_touitu_day = int( rand(6)+5 );
@@ -75,23 +75,6 @@ sub reset {
 		}
 		$w{world} = int(rand($#world_states-5));
 	}
-
-	require "./lib/move_player.cgi";
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		my %you_datas = &get_you_datas($pid, 1);
-		if($you_datas{name} eq $m{name}){
-			&move_player($m{name}, $m{country}, 0);
-			$m{country} = 0;
-
-			&write_user;
-		}
-		&move_player($you_datas{name}, $you_datas{country}, 0);
-		&regist_you_data($you_datas{name}, 'country', 0);
-	}
-	closedir $dh;
 
 	# ここまでが一年の最後の最後
 	# ここからは一年の最初の最初

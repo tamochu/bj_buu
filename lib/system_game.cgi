@@ -240,6 +240,7 @@ sub b_menu {
 sub menu {
 	my @menus = @_;
 	if($is_smart){
+=pod
 		$menu_cmd .= qq|<div>|;
 #		$menu_cmd .= qq|<div style="float:right;">|;
 		for my $i (0 .. $#menus) {
@@ -262,9 +263,9 @@ sub menu {
 				$mline .= substr($menus[$i], $mpos, $char_num) . "&#13;&#10;";
 				$mpos += $char_num;
 			}
-
 			$menu_cmd .= qq|<form method="$method" action="$script" class="cmd_form">|;
 			$menu_cmd .= qq|<input type="submit" value="$mline" class="button2s"><input type="hidden" name="cmd" value="$i">|;
+#			$menu_cmd .= qq|<input type="submit" value="$menus[$i]" class="button2s"><input type="hidden" name="cmd" value="$i">|;
 			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 			$menu_cmd .= qq|</form>|;
 #			print "$i ", ($i+1) % 4, " " , ($i+1) % 6, "<br>";
@@ -278,7 +279,8 @@ sub menu {
 		}
 		$menu_cmd .= qq|</div>|;
 #		$menu_cmd .= qq|<br style="display:none;">|;
-=pod
+=cut
+
 		$menu_cmd .= qq|<table boder=0 cols=4 width=110 height=110>|;
 		for my $i (0 .. $#menus) {
 			if($i % 4 == 0){
@@ -316,7 +318,7 @@ sub menu {
 			$menu_cmd .= qq|</tr>|;
 		}
 		$menu_cmd .= qq|</table>|;
-=cut
+
 	}else{
 		$menu_cmd  = qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
 		for my $i (0 .. $#menus) {
@@ -1153,7 +1155,39 @@ sub alltime_event {
 	&debug_log("$m{lib}:$m{tp}", 'play_log');
 }
 
+#================================================
+# login.cgi→bj.cgi
+# ログインしユーザーデータの取得後、真っ先に呼び出される
+#================================================
 sub before_bj {
+	my($lmin,$lhour,$lmday,$lmon,$lyear) = (localtime($m{ltime}))[1..5];
+	my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
+
+	# その日最初のアクセスなら
+	if ($lmday ne $tmday || $lmon ne $tmon || $lyear ne $tyear || $lmin ne $tmin) {
+		# 誕生日プレゼント
+		my %datas = ();
+		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
+		my $line = <$fh>;
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$datas{$k} = $v;
+		}
+		close $fh;
+
+		if ($datas{birthday} && $datas{birthday} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
+			if ($tmon + 1 == $2 && $tmday == $3) {
+				$mes .= "Happy Birthday $m{name}!!<br>誕生日おめでとう!!<br>";
+				require './lib/shopping_offertory_box.cgi';
+				my $gvar = $m{sedai};
+				if ($m{start_time} + 30 * 24 * 60 * 60 < $time) {
+					$gvar += 7;
+				}
+				&get_god_item($gvar);
+			}
+		}
+	}
+
 	if (&on_summer) {
 		if (rand(100) < 1) {
 			$mes .= "おじさん「君、おじさんの投票権をあげよう」<br>";
@@ -1161,6 +1195,7 @@ sub before_bj {
 		}
 	}
 }
+
 #================================================
 # 各国設定値取得
 #================================================

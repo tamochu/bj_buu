@@ -6,7 +6,8 @@
 # Ò²İ
 #================================================
 print qq|‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/;
-if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
+#if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
+if ( ($mes && $m{wt} > 1) || (!$mes && $m{lib} eq '') ) {
 #if (!$mes && ($is_battle ne 1 && $is_battle ne 2) ) {
 	# ÅVî•ñ
 	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
@@ -49,6 +50,223 @@ elsif ($m{lib} =~ /(domestic|hunting|military|promise|training|war_form)/  ) {
 # Ä¯ÌßÒÆ­°
 #================================================
 sub top_menu_html {
+	print qq|<hr>|;
+if (&is_sabakan) {
+	my @country_menus = (
+		[$script_index, "‚s ‚n ‚o", "disp_top"] ,
+		["news.cgi", "‰ß‹‚Ì‰hŒõ", "disp_news"] ,
+		["bbs_public.cgi", "Œf¦”Â", ""] ,
+		["", "", ""] ,
+		["chat_public.cgi", "Œğ—¬Lê", "disp_chat"] ,
+		["chat_horyu.cgi", "‰ü‘¢ˆÄ“Š•[Š", ""] ,
+		["bbs_ad.cgi", "é“`Œ¾”Â", "disp_ad"] ,
+		["letter.cgi", "‚l‚™ ‚q‚‚‚", ""] ,
+		["chat_prison.cgi", "˜S–", ""] ,
+		["bbs_country.cgi", "ìí‰ï‹cº", ""] ,
+		["bbs_union.cgi", "“¯–¿‰ï‹cº", ""] ,
+		["bbs_vs_npc.cgi", "••ˆó‰ï‹cº", ""] ,
+		["bbs_daihyo.cgi", "‘ã•\\•]‹c‰ï", "disp_daihyo"] ,
+		["chat_casino.cgi", "‘Îl¶¼ŞÉ", ""] ,
+		["chat_admin.cgi", "‰^‰c“¢˜_ê", ""],
+		["", "", ""]
+	);
+
+	# 4x4 ‚ÌÄ¯ÌßÒÆ­°
+	print qq|<div class="menu_table">|;
+	for my $i (0 .. $#country_menus) {
+		print qq|<div class="menu_parent_table">| if ($i) % 4 == 0;
+
+		unless ( (($country_menus[$i][1] eq "“¯–¿‰ï‹cº") && !$union) ||
+			(($country_menus[$i][1] eq "••ˆó‰ï‹cº") && ($w{world} != $#world_states) || ($m{country} == $w{country})) ||
+			(($country_menus[$i][1] eq "‰^‰c“¢˜_ê") && !&is_sabakan) ) {
+
+			if ($country_menus[$i][0]) {
+				if ( !$country_menus[$i][2] || ($country_menus[$i][2] && $m{$country_menus[$i][2]}) ) {
+					print qq|<div class="menu_child_table">|;
+					print qq|<form method="$method" action="$country_menus[$i][0]" class="cmd_form">|;
+					print qq|<input type="submit" value="$country_menus[$i][1]" class="button2s">|;
+					print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">| if $i;
+					print qq|</form>|;
+#					$button_count++;
+					print "</div>";
+				}
+			}
+		}
+
+		print "</div>" if ($i+1) % 4 == 0;
+	}
+	print qq|</div>|;
+}
+
+=pod
+	my $button_count = 0;
+	print qq|<div>|;
+	for my $i (0 .. $#country_menus) {
+		# Ä¯ÌßÍß°¼Ş
+		if ($i == 0) {
+			if ($m{$country_menus[$i][2]}) {
+				print qq|<form method="$method"  action="$country_menus[$i][0]" class="cmd_form">|;
+				print qq|<input type="submit" value="$country_menus[$i][1]" class="button2s">|;
+				print qq|</form>|;
+				$button_count++;
+			}
+		}
+		elsif ($country_menus[$i][1] eq "“¯–¿‰ï‹cº") {
+			if ($union) {
+				print qq|<form method="$method" action="$country_menus[$i][0]" class="cmd_form">|;
+				print qq|<input type="submit" value="$country_menus[$i][1]" class="button2s">|;
+				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+				print qq|</form>|;
+				$button_count++;
+			}
+		}
+		elsif ($country_menus[$i][1] eq "••ˆó‰ï‹cº") {
+			if ( ($w{world} eq $#world_states) && ($m{country} ne $w{country}) ) {
+				print qq|<form method="$method" action="$country_menus[$i][0]" class="cmd_form">|;
+				print qq|<input type="submit" value="$country_menus[$i][1]" class="button2s">|;
+				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+				print qq|</form>|;
+				$button_count++;
+			}
+		}
+		elsif ($country_menus[$i][1] eq "‰^‰c“¢˜_ê") {
+			if (&is_sabakan) {
+				print qq|<form method="$method" action="$country_menus[$i][0]" class="cmd_form">|;
+				print qq|<input type="submit" value="$country_menus[$i][1]" class="button2s">|;
+				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+				print qq|</form>|;
+				$button_count++;
+			}
+		}
+		# ‹­§‚©ŒÂlİ’è‚Å•\¦‚Éİ’è‚µ‚Ä‚¢‚éê‡‚É‚¾‚¯•\¦
+		else {
+			if ( !$country_menus[$i][2] || ($country_menus[$i][2] && $m{$country_menus[$i][2]}) ) {
+				print qq|<form method="$method" action="$country_menus[$i][0]" class="cmd_form">|;
+				print qq|<input type="submit" value="$country_menus[$i][1]" class="button2s">|;
+				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+				print qq|</form>|;
+				$button_count++;
+			}
+		}
+		if ($i < $#country_menus) {
+			print qq|<br class="smart_br" />| if ($button_count) % 4 == 0;
+			print qq|<br class="tablet_br" />| if ($button_count) % 7 == 0;
+		}
+	}
+	# ‘Îl¶¼ŞÉ‚Ìl”
+	if ($m{disp_casino}) {
+		require "$datadir/casino.cgi";
+		my $a_line = &all_member_n;
+		print qq|<br>$a_line|;
+	}
+	print qq|</div>|;
+=cut
+=pod
+	print qq|<form action="$script_index" class="cmd_form">|;
+	print qq|<input type="submit" value="‚s ‚n ‚o" class="button2s">|;
+	print qq|</form>|;
+
+	unless ($m{disp_news} eq '0'){
+		print qq|<td>|;
+		print qq|<form method="$method" action="news.cgi">|;
+		print qq|<input type="submit" value="‰ß‹‚Ì‰hŒõ" class="button1s">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		print qq|</form>|;
+		print qq|</td>|;
+	}
+
+	print qq|<form method="$method" action="bbs_public.cgi">|;
+	print qq|<input type="submit" value="Œf ¦ ”Â" class="button1s">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	print qq|</form>|;
+
+	unless ($m{disp_chat} eq '0'){
+		print qq|<td>|;
+		print qq|<form method="$method" action="chat_public.cgi">|;
+		print qq|<input type="submit" value="Œğ—¬Lê" class="button1s">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		print qq|</form>|;
+		print qq|</td>|;
+	}
+
+	print qq|<form method="$method" action="chat_horyu.cgi">|;
+	print qq|<input type="submit" value="‰ü‘¢ˆÄ“Š•[Š" class="button1s">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	print qq|</form>|;
+
+	unless ($m{disp_ad} eq '0'){
+		print qq|<td>|;
+		print qq|<form method="$method" action="bbs_ad.cgi">|;
+		print qq|<input type="submit" value="é“`Œ¾”Â" class="button1s">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		print qq|</form>|;
+		print qq|</td>|;
+	}
+
+	$country_menu .= qq|<tr><td><form method="$method" action="chat_prison.cgi">|;
+	$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$country_menu .= qq|<input type="submit" value="˜S–" class="button1s"></form></td>|;
+
+	$country_menu .= qq|<td><form method="$method" action="bbs_country.cgi">|;
+	$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$country_menu .= qq|<input type="submit" value="ìí‰ï‹cº" class="button1s"></form></td>|;
+
+	if ($union) {
+		$country_menu .= qq|<td><form method="$method" action="bbs_union.cgi">|;
+		$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$country_menu .= qq|<input type="submit" value="“¯–¿‰ï‹cº" class="button1s"></form></td>|;
+	}
+
+	# ¢ŠEî¨ˆÃ•‚Ì‚İ
+	if (($w{world} eq $#world_states) && $m{country} ne $w{country}) {
+		$country_menu .= qq|<td><form method="$method" action="bbs_vs_npc.cgi">|;
+		$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$country_menu .= qq|<input type="submit" value="{ •• ˆó ‰ï ‹c {" class="button1s"></form></td>|;
+	}
+
+	$country_menu .= qq|<td><form method="$method" action="chat_casino.cgi">|;
+	$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$country_menu .= qq|<input type="submit" value="‘Îl¶¼ŞÉ" class="button1s"></form></td>|;
+	
+	unless ($m{disp_daihyo} eq '0'){
+		$country_menu .= qq|<td><form method="$method" action="bbs_daihyo.cgi">|;
+		$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$country_menu .= qq|<input type="submit" value="‘ã•\\•]‹c‰ï" class="button1s"></form></td>|;
+	}
+	if($m{disp_casino}){
+		require "$datadir/casino.cgi";
+		my $a_line = &all_member_n;
+		$country_menu .= qq|</tr><tr><td colspan=3>$a_line</td>|;
+	}
+
+	print qq|<form method="$method" action="letter.cgi">|;
+	print qq|<input type="submit" value="‚l‚™ ‚q‚‚‚" class="button1s">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	print qq|</form>|;
+
+	if (&is_sabakan){
+		$country_menu .= qq|<td>|;
+		$country_menu .= qq|<form method="$method" action="chat_admin.cgi">|;
+		$country_menu .= qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1s">|;
+		$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$country_menu .= qq|</form>|;
+		$country_menu .= qq|</td>|;
+	}
+
+
+			$menu_cmd .= qq|<form method="$method" action="$script" class="cmd_form">|;
+			$menu_cmd .= qq|<input type="submit" value="$mline" class="button2s"><input type="hidden" name="cmd" value="$i">|;
+#			$menu_cmd .= qq|<input type="submit" value="$menus[$i]" class="button2s"><input type="hidden" name="cmd" value="$i">|;
+			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			$menu_cmd .= qq|</form>|;
+#			print "$i ", ($i+1) % 4, " " , ($i+1) % 6, "<br>";
+
+#			$menu_cmd .= qq|</div>| if (($i+1) % 4 == 0) || (($i+1) % 7 == 0);
+			$menu_cmd .= qq|<br class="smart_br" />| if ($i+1) % 4 == 0;
+#			$menu_cmd .= qq|<hr class="smart_hr" />| if ($i+1) % 4 == 0;
+			$menu_cmd .= qq|<br class="tablet_br" />| if ($i+1) % 7 == 0;
+=cut
+
 	my $country_menu = '';
 	$country_menu .= qq|<tr><td><form method="$method" action="chat_prison.cgi">|;
 	$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -94,6 +312,15 @@ sub top_menu_html {
 		require "$datadir/casino.cgi";
 		my $a_line = &all_member_n;
 		$country_menu .= qq|</tr><tr><td colspan=3>$a_line</td>|;
+	}
+
+	if (&is_sabakan){
+		$country_menu .= qq|<td>|;
+		$country_menu .= qq|<form method="$method" action="chat_admin.cgi">|;
+		$country_menu .= qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1s">|;
+		$country_menu .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$country_menu .= qq|</form>|;
+		$country_menu .= qq|</td>|;
 	}
 	
 	$country_menu .= qq|</tr>|;
@@ -149,17 +376,11 @@ sub top_menu_html {
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	print qq|</form>|;
 	print qq|</td>|;
-	if (&is_sabakan){
-		print qq|<td>|;
-		print qq|<form method="$method" action="chat_admin.cgi">|;
-		print qq|<input type="submit" value="‰^‰c“¢˜_ê" class="button1s">|;
-		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		print qq|</form>|;
-		print qq|</td>|;
-	}
 	print qq|</tr>|;
 	print qq|$country_menu|;
 	print qq|</table>|;
+
+	print qq|<hr>|;
 }
 
 #================================================
@@ -247,6 +468,7 @@ sub status_html {
 	print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>| if $m{pet};
 	print qq|<font color="#99CC99">ÀÏºŞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
 	print qq|<font color="#CCCC99">’  :$m{insect_name}</font><br>| if $m{insect_name};
+#	print qq|<hr>|;
 }
 
 #================================================
@@ -342,8 +564,10 @@ sub war_html {
 # ©‘/“¯–¿‘‚Ìî•ñ
 #================================================
 sub my_country_info {
-	print qq|<hr>|;
-#	print qq|<div class="c_info">|;
+	print qq|<hr>| if $m{country};
+	print qq|<div class="c_infos">|;
+
+	print qq|<div class="c_info">|;
 	print qq|<span style="color: $cs{color}[$m{country}];">$c_m</span>|;
 	print qq|<div class="c_info1p">|;
 	print qq|<div class="c_info1c">$e2j{strong}:$cs{strong}[$m{country}]</div>|;
@@ -355,11 +579,11 @@ sub my_country_info {
 	print qq|<div class="c_info2c">$e2j{money}:$cs{money}[$m{country}]</div>|;
 	print qq|<div class="c_info2c">$e2j{soldier}:$cs{soldier}[$m{country}]</div>|;
 	print qq|</div>|;
-#	print qq|</div>|;
+	print qq|</div>|;
 
 	if ($union) {
-		print qq|<br>|;
-#		print qq|<div class="c_info">|;
+#		print qq|<br>|;
+		print qq|<div class="u_info">|;
 		print qq|<span style="color: $cs{color}[$union];">$cs{name}[$union]</span>|;
 		print qq|<div class="c_info1p">|;
 		print qq|<div class="c_info1c">$e2j{strong}:$cs{strong}[$union]</div>|;
@@ -371,9 +595,9 @@ sub my_country_info {
 		print qq|<div class="c_info2c">$e2j{money}:$cs{money}[$union]</div>|;
 		print qq|<div class="c_info2c">$e2j{soldier}:$cs{soldier}[$union]</div>|;
 		print qq|</div>|;
-#		print qq|</div>|;
+		print qq|</div>|;
 	}
-	print qq|<br>|;
+	print qq|</div>|;
 
 =pod
 	print qq|<hr>|;
@@ -432,13 +656,16 @@ sub my_country_info {
 #================================================
 sub countries_info {
 	my($c1, $c2) = split /,/, $w{win_countries};
-	print qq|<table style="border: 2px solid #999; border-collapse: collapse; border-spacing: 0; empty-cells: show; width:320;">|;
+#	print qq|<table style="border: 2px solid #999; border-collapse: collapse; border-spacing: 0; empty-cells: show; width:320;">|;
+	print qq|<table style="border: 2px solid #999; border-collapse: collapse; border-spacing: 0; empty-cells: show; width:100%;">|;
 	print qq|<tr><th style="border: 2px solid #999; background: #336; white-space: nowrap;">$e2j{name}</th>|;
+#	print qq|<tr><th style="border: 2px solid #999; background: #336;">$e2j{name}</th>|;
 	print qq|<td style="color: #333; background-color: $cs{color}[$_]">$cs{name}[$_]</td>| for (1 .. $w{country});
 	print qq|</tr>\n|;
 	
 	unless ($w{world} eq '10') {
 		print qq|<tr><th style="border: 2px solid #999; background: #336; white-space: nowrap;">$e2j{strong}</th>|;
+#		print qq|<tr><th style="border: 2px solid #999; background: #336;">$e2j{strong}</th>|;
 		for my $i (1 .. $w{country}) {
 			my $status = $cs{strong}[$i];
 			if ($cs{is_die}[$i] == 1) {
@@ -451,6 +678,7 @@ sub countries_info {
 				$status = "•ö ‰ó";
 			}
 			print qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">$status</td>|;
+#			print qq|<td align="center" style="border: 1px solid #999; background: #333;">$status</td>|;
 #			print $cs{is_die}[$i] ? qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">–Å –S</td>| : qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">$cs{strong}[$i]</td>|;
 		}
 		print qq|</tr>\n|;
@@ -459,7 +687,7 @@ sub countries_info {
 	for my $k (qw/ceo war dom pro mil/) {
 		print qq|<tr><th style="border: 2px solid #999; background: #336;">$e2j{$k}</th>|;
 		for my $i (1 .. $w{country}) {
-			print qq|<td align="center" style="border: 1px solid #999; background: #333;">$cs{$k}[$i]</td>|;
+			print qq|<td align="center" style="border: 1px solid #999; background: #333;word-break:break-all;">$cs{$k}[$i]</td>|;
 		}
 		print qq|</tr>\n|;
 	}
@@ -500,7 +728,8 @@ sub promise_table_html {
 		'<td align="center" style="background-color: #C00">Œğí’†</td>',
 	);
 	
-	print qq|<table style="border: 2px solid #999; border-collapse: collapse; border-spacing: 0; empty-cells: show; width:320;"><tr><td style="border: 1px solid #999; background: #333; white-space: nowrap;">ó‘Ô/—FD“x</td>|;
+#	print qq|<table style="border: 2px solid #999; border-collapse: collapse; border-spacing: 0; empty-cells: show; width:320;"><tr><td style="border: 1px solid #999; background: #333; white-space: nowrap;">ó‘Ô/—FD“x</td>|;
+	print qq|<table style="border: 2px solid #999; border-collapse: collapse; border-spacing: 0; empty-cells: show; width:100%;"><tr><td style="border: 1px solid #999; background: #333; white-space: nowrap;">ó‘Ô/—FD“x</td>|;
 	print qq|<td style="color: #333; background-color: $cs{color}[$_]">$cs{name}[$_]</td>| for 1 .. $w{country};
 	print qq|</tr>|;
 	
@@ -522,6 +751,9 @@ sub promise_table_html {
 		print qq|</tr>|;
 	}
 	print qq|</table>|;
+}
+
+sub countries_infos_table {
 }
 
 #================================================
@@ -547,8 +779,9 @@ sub all_member_n {
 		}
 		close $fh;
 		$ret_str .= substr($files[$i][0], 0, 2) . "/$member_c ";
-		$ret_str .= "<br>" if $i % 4 == 3;
+		$ret_str .= "<br>" if $i % 7 == 6;
 	}
+#	$ret_str .= "</p>";
 	return $ret_str;
 }
 

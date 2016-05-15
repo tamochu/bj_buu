@@ -45,34 +45,6 @@ sub tp_1 { $cmd ? &b_menu(@menus) : &begin; }
 # ﾒｲﾝｼｽﾃﾑ
 #================================================
 sub main_system {
-	# 誕生日プレゼント
-	# メインの elsif に組み込むと他が優先された場合にログイン時間が更新され二度とここを通らなくなる
-	# 毎日必ず通る処理だから読み込むユーザーデータに次の誕生日を持たせた方がファイルオープン減らせそう？
-	if (&last_login_check) {
-		my %datas = ();
-		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
-		my $line = <$fh>;
-		for my $hash (split /<>/, $line) {
-			my($k, $v) = split /;/, $hash;
-			$datas{$k} = $v;
-		}
-		close $fh;
-		
-		if ($datas{birthday}) {
-			if ($datas{birthday} =~ /(\d{4})\/(\d{2})\/(\d{2})/) {
-				my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
-				if ($tmon + 1 == $2 && $tmday == $3) {
-					$mes .= "誕生日おめでとう";
-					require './lib/shopping_offertory_box.cgi';
-					my $gvar = $m{sedai};
-					if ($m{start_time} + 30 * 24 * 60 * 60 < $time) {
-						$gvar += 7;
-					}
-					&get_god_item($gvar);
-				}
-			}
-		}
-	}
 	# Lv up
 	if ($m{exp} >= 100) {
 		if ($m{egg}) {
@@ -318,16 +290,21 @@ sub main_system {
 	}
 	
 	if ($m{name} eq "nanamie") {
-		if ($in{seed_change}) {
-			&seed_change('change');
-		} else {
+#		for my $i (1..$w{country}) {
+#			$cs{state}[$i] = 5;
+#		}
+#		&write_cs;
+#		&mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使い各国の$e2j{state}が $country_states[5] になりました</b>");
+#		if ($in{seed_change}) {
+#			&seed_change('change');
+#		} else {
 #			require './lib/shopping_offertory_box.cgi';
-#			&get_god_item(6);
+#			&get_god_item(7);
 #			$mes .= qq|<form method="$method" action="$script">|;
 #			$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 #			$mes .= qq|<input type="hidden" name="seed_change" value="1">|;
 #			$mes .= qq|<input type="submit" value="強制種族変更" class="button1"></form>|;
-		}
+#		}
 	}
 }
 
@@ -579,8 +556,6 @@ sub lv_up {
 	}
 }
 
-
-
 #================================================
 # 弟子卒業
 #================================================
@@ -597,18 +572,6 @@ sub graduate {
 	&regist_you_data($m{master}, 'master', '');
 	$m{master} = '';
 	$m{master_c} = '';
-}
-
-#================================================
-# その日最初のアクセスか
-#================================================
-sub last_login_check {
-	my($lmin,$lhour,$lmday,$lmon,$lyear) = (localtime($m{ltime}))[1..5];
-	my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
-	if ($lmday ne $tmday || $lmon ne $tmon || $lyear ne $tyear) {
-		return 1;
-	}
-	return 0;
 }
 
 1; # 削除不可
