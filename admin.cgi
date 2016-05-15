@@ -1037,9 +1037,6 @@ sub admin_all_pet_check {
 # —Õˆ—(‚¨‚»‚ç‚­ˆê“x‚¾‚¯‚Ìˆ—‚Ìê‡‚»‚Ì“s“x‚±‚±‚Åˆ—)
 #=================================================
 sub admin_expendable {
-	my $fname = "$logdir/lock_test.cgi";
-	&dirflock($fname);
-	&release_dirflock($fname);
 }
 
 #=================================================
