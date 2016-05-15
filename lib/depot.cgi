@@ -490,9 +490,12 @@ sub tp_510 {
 					  ;
 				
 				$m{money} += $sall_price;
-				open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-				print $fh2 "$kind<>$item_no<>$item_c<>\n";
-				close $fh2;
+
+				if (rand(3) < 2) {
+					open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+					print $fh2 "$kind<>$item_no<>$item_c<>\n";
+					close $fh2;
+				}
 				open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 				print $fh3 "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
 				close $fh3;
