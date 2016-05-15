@@ -814,7 +814,10 @@ sub is_patrol {
 }
 
 sub master_c_up {
-	if ($m{master_c} eq @_[0]) { &c_up(@_[0]) for 1 .. (int($m{turn} / 3)); }
+	if ($m{master_c} eq @_[0]) {
+		&c_up(@_[0]);
+		&c_up(@_[0]) for 1 .. (int($m{turn} / 4));
+	}
 }
 
 1; # íœ•s‰Â
