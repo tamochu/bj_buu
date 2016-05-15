@@ -3,6 +3,8 @@ require './lib/summer_system.cgi';
 use Time::Local;
 &get_date; # 時間と日付は常時必要なので常に取得
 use LWP::UserAgent;
+use lib q(./lib);
+use FlockWrapper(flock => 'mkdir', dir => './lock');
 
 #================================================
 # ﾒｲﾝでよく使う処理 Created by Merino
