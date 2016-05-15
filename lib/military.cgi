@@ -171,6 +171,7 @@ sub tp_610 {
 		$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $vm G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
 	}
 	&c_up('mat_c') for 1 .. $m{turn};
+	&master_c_up('mat_c');
 	&use_pet('mat') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '32');
 	&tp_1000;
 }
@@ -429,7 +430,6 @@ sub tp_730 { # ‹­’D¬Œ÷
 		$mes .= "$v‚ÌH—¿‹­’D‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
 	}
 	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ‹­’D $m{stock} ]<br>";
-
 }
 sub tp_830 { # ’³•ñ¬Œ÷
 	my $v = int( ($m{cho_c} + $m{mat}) * $m{turn} * rand(6) );
@@ -474,6 +474,7 @@ sub tp_930 { # ô”]¬Œ÷
 #=================================================
 sub tp_140 { # ‹­’D
 	&c_up('gou_c') for 1 .. $m{turn};
+	&master_c_up('gou_c');
 	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
 	$m{stock} = &seed_bonus('gou', $m{stock});
 	my $v = &exe3('food');
@@ -484,6 +485,7 @@ sub tp_140 { # ‹­’D
 }
 sub tp_240 { # ’³•ñ
 	&c_up('cho_c') for 1 .. $m{turn};
+	&master_c_up('cho_c');
 	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
 	$m{stock} = &seed_bonus('cho', $m{stock});
 	my $v = &exe3('money');
@@ -494,6 +496,7 @@ sub tp_240 { # ’³•ñ
 }
 sub tp_340 { # ô”]
 	&c_up('sen_c') for 1 .. $m{turn};
+	&master_c_up('sen_c');
 	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
 	$m{stock} = &seed_bonus('sen', $m{stock});
 	my $v = &exe3('soldier');
@@ -504,6 +507,7 @@ sub tp_340 { # ô”]
 }
 sub tp_740 { # ‹­’D
 	&c_up('gou_c') for 1 .. $m{turn};
+	&master_c_up('gou_c');
 	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
 	$m{stock} = &seed_bonus('gou', $m{stock});
 	my $v = &exe3('food');
@@ -514,6 +518,7 @@ sub tp_740 { # ‹­’D
 }
 sub tp_840 { # ’³•ñ
 	&c_up('cho_c') for 1 .. $m{turn};
+	&master_c_up('cho_c');
 	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
 	$m{stock} = &seed_bonus('cho', $m{stock});
 	my $v = &exe3('money');
@@ -524,6 +529,7 @@ sub tp_840 { # ’³•ñ
 }
 sub tp_940 { # ô”]
 	&c_up('sen_c') for 1 .. $m{turn};
+	&master_c_up('sen_c');
 	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
 	$m{stock} = &seed_bonus('sen', $m{stock});
 	my $v = &exe3('soldier');
@@ -534,7 +540,6 @@ sub tp_940 { # ô”]
 }
 sub exe3 {
 	my $k = shift;
-	
 	
 	# ôm‚Í’DŒR–—Í1.1”{
 	$m{stock} = int($m{stock} * 1.1) if  $cs{mil}[$m{country}] eq $m{name};
@@ -578,6 +583,7 @@ sub tp_440 { # ’ã@
 }	
 sub tp_450 {
 	&c_up('tei_c') for 1 .. $m{turn};
+	&master_c_up('tei_c');
 	&use_pet('tei') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '36');
 	
 	if($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1')){
@@ -660,6 +666,7 @@ sub tp_450 {
 # ----------------------------
 sub tp_540 { # ‹UŒv
 	&c_up('gik_c') for 1 .. $m{turn};
+	&master_c_up('gik_c');
 	&use_pet('gik') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '37');
 	my $v = $m{turn} <= 1 ? 1:
 	      	$m{gik_c} > 2000 ? int($m{turn} * 1.4):
@@ -806,5 +813,8 @@ sub is_patrol {
 	return 0;
 }
 
+sub master_c_up {
+	if ($m{master_c} eq @_[0]) { &c_up(@_[0]) for 1 .. (int($m{turn} / 3)); }
+}
 
 1; # íœ•s‰Â

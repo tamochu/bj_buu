@@ -401,6 +401,8 @@ sub c_up { # count up
 		$m{shogo} = $secret->[0];
 	}
 	
+	# ŒR–Œn‚Ìt Œø‰Ê‚Í ./lib/military.cgi ‚Å master_c_up
+	return if $c == 'gou_c' || $c == 'cho_c' || $c == 'sen_c' || $c == 'tei_c' || $c == 'gik_c' || $c == 'mat_c';
 	# ’íq‚Ìê‡2”{æ“¾
 	if ($m{master_c} eq $c) {
 		++$m{$c};
