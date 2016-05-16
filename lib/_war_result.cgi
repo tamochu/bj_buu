@@ -131,12 +131,14 @@ sub war_win {
 	my $v = ($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2')) ? (@ranks - $m{rank}) * 10 + 10 : $m{rank} * 8 + 10;
 
 	# ’èˆõ‚ª­‚È‚¢•ªÌß×½‘½‚¢•ªÏ²Å½
-	if ($m{country}) {
-		$mem = &modified_member($m{country});
-	} else {
-		$mem = 0;
-	}
-	$v += ($cs{capacity}[$m{country}] - $mem) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
+#	if ($m{country}) {
+#		$mem = &modified_member($m{country});
+#	} else {
+#		$mem = 0;
+#	}
+#	$v += ($cs{capacity}[$m{country}] - $mem) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
+	$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
+
 
 	# ‘î¨‚É‚æ‚è’D‘—Í‘‰Á
 	if (($w{world} eq '4' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '4' || $w{world_sub} eq '5')))) { # –\ŒNA¬“×
