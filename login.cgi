@@ -25,7 +25,7 @@ if ($time > $w{limit_time}) {
 	&time_limit;
 }
 
-&summary_contribute;
+#&summary_contribute;
 
 # htmlÌ§²Ùì¬ & ŠúŒÀØ‚êÌßÚ²Ô°íœ
 for my $i (0 .. $w{country}) {
