@@ -288,8 +288,6 @@ sub tp_300 {
 		}
 		# –³Š‘®¨‘
 		else {
-			&begin;
-			return;
 			# ˆÃ•
 			if ($w{world} eq $#world_states) {
 				if ($m{country} eq $w{country}) {
@@ -329,8 +327,6 @@ sub tp_300 {
 		} elsif($w{world} eq $#world_states-1) {
 			$cmd = int(rand($w{country}) + 1);
 		}
-
-		$cmd = int(rand($w{country}) + 1);
 
 		&move_player($m{name}, $m{country}, $cmd);
 		$m{next_salary} = $time + 3600 * $salary_hour;
