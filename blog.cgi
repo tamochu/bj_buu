@@ -171,11 +171,13 @@ sub view_blog {
 		else {
 			$bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
 #			print qq|<table class="table1" cellpadding="5" width="440">|;
+#			print qq|<div class="disp_scroll">| if $is_smart; # iPhoneはダメ
 			print qq|<table class="$table_class" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
 			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments</td></tr>| if $is_comment;
 			print qq|</table><br>|;
+#			print qq|</div>| if $is_smart; # iPhoneはダメ
 		}
 	}
 	close $fh;
