@@ -535,7 +535,7 @@ sub lv_up {
 		} else {
 			&seed_change('');
 		}
-		&refresh_new_commer;
+#		&refresh_new_commer;
 	}
 	# レベルアップ
 	else {

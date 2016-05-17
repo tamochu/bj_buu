@@ -45,7 +45,7 @@ if (-M "./html/all.html" >= $update_cycle_day) {
 	&backup_players;
 }
 &make_player_name_list;
-&refresh_new_commer;
+#&refresh_new_commer;
 
 exit;
 
