@@ -145,7 +145,7 @@ sub create_user {
 	$m{sedai} = 1;
 	$m{lv}    = 1;
 	$m{egg}   = 51;
-	$m{money} = 10000;
+	$m{money} = $config_test ? 4999999 : 10000;
 	$m{icon}  = $default_icon;
 	
 	$m{start_time} = $time;
@@ -170,6 +170,7 @@ sub create_user {
 	}
 	
 	$m{seed} = 'human';
+	$m{coin} = $config_test ? 2500000 : 0;
 
 	&write_user;
 	
