@@ -290,6 +290,7 @@ sub main_system {
 	}
 	
 	if ($m{name} eq "nanamie") {
+#		$m{seed} = ;
 #		for my $i (1..$w{country}) {
 #			$cs{state}[$i] = 5;
 #		}
@@ -305,6 +306,9 @@ sub main_system {
 #			$mes .= qq|<input type="hidden" name="seed_change" value="1">|;
 #			$mes .= qq|<input type="submit" value="強制種族変更" class="button1"></form>|;
 #		}
+#		my $sedai_max = &seed_bonus('sedai_lv', 100);
+#		$mes .= $sedai_max;
+#
 	}
 }
 
@@ -364,8 +368,9 @@ sub lv_up {
 	++$m{lv};
 	
 	# 世代交代
-	my $sedai_max = &seed_bonus('sedai_lv', 100);
-	if ($m{lv} >= 100) {
+	my $sedai_max = &seed_bonus('sedai_lv', 100); # そもそも自分がエルフの時でも返り値が 100
+#	if ($m{lv} >= 100) {
+	if ($m{lv} >= $sedai_max) {
 		$m{lv} = 1;
 		&c_up('sedai');
 		
