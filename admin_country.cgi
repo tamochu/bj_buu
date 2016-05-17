@@ -64,6 +64,7 @@ elsif ($in{mode} eq 'delete_country')  { &admin_delete_country;  }
 elsif ($in{mode} eq 'restore_country') { &restore_country; }
 elsif ($in{mode} eq 'modify_country') { &modify_country; }
 elsif ($in{mode} eq 'change_year')     { &admin_change_year;     }
+elsif ($in{mode} eq 'change_game_lv')     { &admin_change_game_lv;     }
 elsif ($in{step}) { &{ 'step_' . $in{step} }; }
 else { &step_1; }
 &footer;
@@ -153,6 +154,16 @@ EOM
 		<input type="hidden" name="mode" value="change_year">
 		<input type="hidden" name="pass" value="$in{pass}">
 		<input type="text" name="year" value="1" class="text_box_s" style="text-align: right">年<br>
+		<p><input type="submit" value="変更" class="button1"></p>
+	</form>
+	</div>
+	<br>
+	<div class="mes">
+	統一難易度を変更する<br>
+	<form method="$method" action="$this_script">
+		<input type="hidden" name="mode" value="change_game_lv">
+		<input type="hidden" name="pass" value="$in{pass}">
+		<input type="text" name="game_lv" value="1" class="text_box_s" style="text-align: right">Lv<br>
 		<p><input type="submit" value="変更" class="button1"></p>
 	</form>
 	</div>
@@ -406,6 +417,17 @@ sub admin_change_year {
 
 	print qq|<p>以下のような国データで年を$w{year}にしました!</p>|;
 	&countries_html;
+}
+
+#=================================================
+# 統一難易度を変更
+#=================================================
+sub admin_change_game_lv {
+	&read_cs;
+	$w{game_lv} = $in{game_lv};
+	&write_cs;
+
+	print qq|<p>統一難易度を$w{game_lv}にしました!</p>|;
 }
 
 #=================================================
