@@ -7,8 +7,7 @@ my $this_file = "$logdir/$m{country}/leader.cgi";
 my $need_ceo_point = int($cs{member}[$m{country}] * 0.1)+2;
 
 # 立候補に必要な費用
-my $need_money = 50000;
-
+my $need_money = $config_test ? 0 : 50000;
 
 #=================================================
 # 利用条件
