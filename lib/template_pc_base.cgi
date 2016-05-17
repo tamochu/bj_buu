@@ -420,9 +420,6 @@ sub countries_html {
 	print qq|<tr><th>l”</th>|;
 	print qq|<td align="center">$cs{member}[$_]/$cs{capacity}[$_]</td>| for (1 .. $w{country});
 	print qq|</tr>\n|;
-	print qq|<tr><th>V‹K</th>|;
-	print qq|<td align="center">$cs{new_commer}[$_]/$cs{capacity}[$_]</td>| for (1 .. $w{country});
-	print qq|</tr>\n|;
 
 	print qq|</table><br>|;
 }

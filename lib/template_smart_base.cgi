@@ -694,9 +694,6 @@ sub countries_info {
 	print qq|<tr><th style="border: 2px solid #999; background: #336; white-space: nowrap;">l”</th>|;
 	print qq|<td align="center" style="border: 1px solid #999; background: #333; white-space: nowrap;">$cs{member}[$_]/$cs{capacity}[$_]</td>| for (1 .. $w{country});
 	print qq|</tr>\n|;
-	print qq|<tr><th style="border: 2px solid #999; background: #336; white-space: nowrap;">V‹K</th>|;
-	print qq|<td align="center"  style="border: 1px solid #999; background: #333; white-space: nowrap;">$cs{new_commer}[$_]/$cs{capacity}[$_]</td>| for (1 .. $w{country});
-	print qq|</tr>\n|;
 
 	print qq|</table><br>|;
 
