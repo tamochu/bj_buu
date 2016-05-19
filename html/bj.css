@@ -316,14 +316,22 @@ a.clickable_name:focus {
 /*--------------------------------------
  ‰ß‹Ž‰hƒRƒ“ƒ{
 --------------------------------------*/
-div.no_combo {
+span.no_combo {
 
 }
-div.first_bullet {
-	background-color: #AAEEDD;
+span.first_bullet {
+	border: 1px dashed #F2D8DF;
 }
-
-div.max_combo {
-	background-color: #FFFF00;
+span.second_bullet {
+	border: 1px dotted #0C00CC;
+}
+span.last_bullet {
+	border: 1px solid #E54500;
+}
+span.alter_bullet {
+	border: 1px double #00FF41;
+}
+span.max_combo {
+	border: 1px outset #FFFF00;
 }
 
