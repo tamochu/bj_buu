@@ -5,7 +5,8 @@ use File::Path;
 #================================================
 
 # 統一難易度：[難しい 60 ～ 40 簡単]
-my $game_lv = $config_test ? int(rand(11) + 40) : int( rand(6) + 50 );
+#my $game_lv = $config_test ? int(rand(6) + 55) : int( rand(11) + 40 );
+my $game_lv = $config_test ? int(rand(11) + 45) : int( rand(11) + 45 );
 
 # 統一期限(日)
 my $limit_touitu_day = int( rand(6)+5 );
@@ -82,7 +83,7 @@ sub reset {
 	# set world
 	$w{year}++;
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 12;
-	$w{limit_time} = $config_test ? $time + 3600 * 0 : $time + 3600 * 24 * $limit_touitu_day;
+	$w{limit_time} = $config_test ? $time + 3600 * 36 : $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
 
 	# reset countries
@@ -97,16 +98,18 @@ sub reset {
 	$country -= $sleep_num if $sleep_num > 0;
 	my $ave_c = int($w{player} / $country);
 	$ave_c = $ave_c < 2 ? 2 : $ave_c;
+#	$ave_c = $config_test ? 11 : $ave_c;
 
 	# set countries
 	my($c1, $c2) = split /,/, $w{win_countries};
 	for my $i (1 .. $w{country}) {
 		# 統一国の場合はNPC弱体
-			$cs{strong}[$i] = $c1 eq $i || $c2 eq $i ? 8000 : int(rand(6) + 10) * 1000;
-			$cs{state}[$i]    = rand(2) > 1 ? 0 : int(rand(@country_states));
-		$cs{food}[$i]     = int(rand(30) + 5) * 1000;
-		$cs{money}[$i]    = int(rand(30) + 5) * 1000;
-		$cs{soldier}[$i]  = int(rand(30) + 5) * 1000;
+#		$cs{strong}[$i] = $c1 eq $i || $c2 eq $i ? 8000 : int(rand(6) + 10) * 1000;
+		$cs{strong}[$i] = $c1 eq $i || $c2 eq $i ? 8000 : int(rand(4) + 12) * 1000;
+		$cs{state}[$i]    = rand(2) > 1 ? 0 : int(rand(@country_states));
+		$cs{food}[$i]     = $config_test ? 999999 : int(rand(30) + 5) * 1000;
+		$cs{money}[$i]    = $config_test ? 999999 : int(rand(30) + 5) * 1000;
+		$cs{soldier}[$i]  = $config_test ? 999999 : int(rand(30) + 5) * 1000;
 		$cs{modify_war}[$i]   = 0;
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
@@ -177,6 +180,30 @@ sub reset {
 			}
 		}
 		else { # 祭り情勢開始
+			# 終了時よりも開始時の方が処理が軽く祭り情勢用の move_player を用意するつもりなので処理の流れ的にここが良い
+			# 拙速以外は終了時ﾈﾊﾞﾗﾝ送りなので国の君主情報をリセットしておかないと、
+			# ユーザーデータと国データで齟齬が生まれる可能性が高い（国の持つ情報通りに人が仕官してくるとは限らないため）
+			# ﾈﾊﾞﾗﾝから国に仕官するところでユーザーの持つ君主投票情報はリセットするようにしたが、
+			# 3年毎の君主任期とは別に拙速以外での祭り情勢で君主投票情報を初期化した場合、連続君主など他のところでバグ含みそうなので一旦保留
+			# country_leader.cgi を見る限り、国ログの leader.cgi を参照していないのでおそらくリセットしても大丈夫とは思うけど…
+			#if ($w{year} % 40 != 10) {
+				# ここから
+				#if ($cs{ceo}[$i]) {
+					#my $n_id = unpack 'H*', $cs{ceo}[$i];
+					#open my $fh, ">> $userdir/$n_id/ex_c.cgi";
+					#print $fh "ceo_c<>1<>\n";
+					#close $fh;
+				#}
+				# ここまでたぶん要らない 3年毎の君主熟練だけで十分というかないのが従来通りのはず
+
+				# 拙速以外の祭り情勢開始時の既存国すべての君主と君主投票情報をリセット
+				#for $i (1 .. $w{country}) {
+					#$cs{ceo}[$i] = '';
+					#open my $fh, "> $logdir/$i/leader.cgi";
+					#close $fh;
+				#}
+			#}
+
 			require './lib/_festival_world.cgi';
 			&begin_festival_world;
 		}
@@ -304,7 +331,7 @@ sub begin_common_world {
 	else {
 #		&write_world_news("<i>世界は $world_states[$w{world}] となりました</i>");
 	}
-	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.7):$w{game_lv};
+	$w{game_lv} = $w{world} eq '15' || $w{world} eq '17' ? int($w{game_lv} * 0.9):$w{game_lv};
 }
 
 1; # 削除不可
