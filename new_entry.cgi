@@ -31,6 +31,7 @@ sub new_form {
 		<li>半角記号(,;"'&<>)と空白は使えません。</li>
 		<li>人が不愉快と思う名前、放送禁止用語等を含む名前は登録しても削除されます。</li>
 		<li><b>多重登録は禁止です。見つけ次第削除します。</b></li>
+		<li>必読→<a href="readme.html" class="link1">readme</a></li>
 	</ul>
 </div>
 <br>
