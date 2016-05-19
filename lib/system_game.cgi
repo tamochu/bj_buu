@@ -584,11 +584,19 @@ sub _write_news {
 	my @lines = ();
 	open my $fh, "+< $logdir/$file_name.cgi" or &error("$file_name.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	push @lines, $head_line;
+	my $combo = 0;
+	if ($head_line =~ /<input type="hidden" name="combo" value="(\d+)_(\d+)">/) {
+		if ($1 eq $m{country}) {
+			$combo = $2 + 1;
+		}
+	}
 	while (my $line = <$fh>) {
 		push @lines, $line;
 		last if @lines >= $max_log-1;
 	}
-	unshift @lines, qq|$message <font size="1">($date)</font>\n|;
+	unshift @lines, qq|$message <font size="1">($date)</font><input type="hidden" name="combo" value="$m{country}_$combo">\n|;
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @lines;
