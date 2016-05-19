@@ -596,7 +596,10 @@ sub _write_news {
 		push @lines, $line;
 		last if @lines >= $max_log-1;
 	}
-	unshift @lines, qq|$message <font size="1">($date)</font><input type="hidden" name="combo" value="$m{country}_$combo">\n|;
+	my $combo_class = $combo < 5 ? 'no_combo' :
+						$combo < 10 ? 'first_bullet' :
+						'max_combo';
+	unshift @lines, qq|<div class="$combo_class">$message <font size="1">($date)</font><input type="hidden" name="combo" value="$m{country}_$combo"></div>\n|;
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @lines;

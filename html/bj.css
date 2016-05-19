@@ -312,3 +312,18 @@ a.clickable_name:hover {
 a.clickable_name:focus {
 	outline: none;
 }
+
+/*--------------------------------------
+ ‰ß‹Ž‰hƒRƒ“ƒ{
+--------------------------------------*/
+div.no_combo {
+
+}
+div.first_bullet {
+	background-color: #AAEEDD;
+}
+
+div.max_combo {
+	background-color: #FFFF00;
+}
+
