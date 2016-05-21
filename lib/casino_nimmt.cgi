@@ -262,7 +262,7 @@ sub exec_culc {
 		for my $p (@players) {
 			my($pname, $selected, $rest, $nimmt) = split /<>/, $p;
 			if ($selected || $rest) {
-				$is_end = 1;
+				$is_end = 0;
 			}
 		}
 		if ($is_end) {
@@ -367,11 +367,11 @@ sub print_gotten {
 	my @nimmts = split /,/, $nimmt;
 	for my $c (@nimmts) {
 		$nsum += $c == 55 ? 7 :
-				$c =~ /^[1-9]{2}$/ ? 5 :
+				$c =~ /^(\d)\1+$/ ? 5 :
 				$c =~ /0$/ ? 3 :
 				$c =~ /5$/ ? 2 :
 				1;
-		&print_card($r);
+		&print_card($c);
 		print qq|,|;
 	}
 	print qq|<br>Œv ‹$nsum“ª<br>|;
