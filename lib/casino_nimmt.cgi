@@ -572,7 +572,7 @@ sub set_state {
 }
 
 sub set_player_state {
-	my($pn, $sel, $rest, $nm) = @_;
+	my($pn, $sel, $res, $nm) = @_;
 	
 	my($rate, $line1, $line2, $line3, $line4, $suspend, @players) = &get_state;
 
@@ -581,7 +581,7 @@ sub set_player_state {
 	for my $p (@players) {
 		my($pname, $selected, $rest, $nimmt) = split /<>/, $p;
 		if ($pname eq $pn) {
-			print $fh "$pn<>$sel<>$rest<>$nm<>\n";
+			print $fh "$pn<>$sel<>$res<>$nm<>\n";
 		} else {
 			print $fh $p;
 		}
