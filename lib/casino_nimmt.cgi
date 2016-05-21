@@ -380,11 +380,11 @@ sub print_gotten {
 sub print_card {
 	$c = shift;
 	my $c_color = $c == 55 ? 'purple' :
-				$c =~ /^[1-9]{2}$/ ? 'red' :
+				$c =~ /^(\d)\1+$/ ? 'red' :
 				$c =~ /0$/ ? 'yellow' :
 				$c =~ /5$/ ? 'cyan' :
 				'white';
-	print qq|<span color="$c_color">$c</span>|;
+	print qq|<span style="color:$c_color;">$c</span>|;
 }
 
 sub start_game{
