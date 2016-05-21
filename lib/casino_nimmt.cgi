@@ -439,10 +439,10 @@ sub end_game {
 		$seat++;
 	}
 
-	@ranks = map { $_->[0] } sort { $b->[3] <=> $a->[3] || $a->[4] <=> $b->[4] } map { [$_, split /<>/ ] } @players;
+	@ranks = map { $_->[0] } sort { $a->[3] <=> $b->[3] || $a->[4] <=> $b->[4] } map { [$_, split /<>/ ] } @ranks;
 	my $rank_i = 1;
 	for my $r (@ranks) {
-		my($pname, $nimmt, $nsum, $seat) = split /<>/, $p;
+		my($pname, $nimmt, $nsum, $seat) = split /<>/, $r;
 		$rank .= "$rank_iˆÊ $pname ‹$nsum“ª $nimmt<br>";
 		$rank_i++;
 	}
