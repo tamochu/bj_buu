@@ -321,6 +321,7 @@ sub get_line {
 	&set_player_state($pname, $selected, $rest, $nimmt);
 
 	&exec_culc;
+	return "$line_no—ñ–Ú‚ğæ‚è‚Ü‚µ‚½B";
 }
 
 sub print_my_hand {
