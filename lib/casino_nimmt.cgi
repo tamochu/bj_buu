@@ -446,8 +446,10 @@ sub end_game {
 		$rank .= "$rank_iˆÊ $pname ‹$nsum“ª $nimmt<br>";
 		$rank_i++;
 	}
-
-	&set_state($rate, '', '', '', '', '');
+	
+	open my $fh, "> $game_file" or &error('ÃŞ°ÀÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
+	print $fh "$rate<><><><><><>\n";
+	close $fh;
 	&system_comment($rank);
 }
 
