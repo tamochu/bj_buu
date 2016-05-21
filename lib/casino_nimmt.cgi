@@ -449,12 +449,17 @@ sub print_gotten {
 
 sub print_card {
 	$c = shift;
+	$no_output = shift;
 	my $c_color = $c == 55 ? 'purple' :
 				$c =~ /^(\d)\1+$/ ? 'red' :
 				$c =~ /0$/ ? 'yellow' :
 				$c =~ /5$/ ? 'cyan' :
 				'white';
-	print qq|<span style="color:$c_color;">$c</span>|;
+	my $pr =  qq|<span style="color:$c_color;">$c</span>|;
+	unless ($no_output) {
+		print $pr;
+	}
+	return $pr;
 }
 
 sub start_game{
@@ -513,7 +518,13 @@ sub end_game {
 	my $rank_i = 1;
 	for my $r (@ranks) {
 		my($pname, $nimmt, $nsum, $seat) = split /<>/, $r;
-		$rank .= "$rank_iˆÊ $pname ‹$nsum“ª $nimmt<br>";
+		$nimmt_str = '';
+		my @nm = split /,/, $nimmt;
+		for my $n (@nm) {
+			$nimmt_str .= &print_card($n, 1);
+			$nimmt_str .= ',';
+		}
+		$rank .= "$rank_iˆÊ $pname ‹$nsum“ª $nimmt_str<br>";
 		$rank_i++;
 	}
 	
