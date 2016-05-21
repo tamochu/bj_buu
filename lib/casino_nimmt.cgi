@@ -529,6 +529,12 @@ sub is_selectable {
 	return 1;
 }
 
+sub is_put_minimum {
+	my($pname, $selected, $rest, $nimmt) = &get_my_state;
+	
+	return ($selected < 0);
+}
+
 sub get_state {
 	open my $fh, "< $game_file" or &error('ÃŞ°ÀÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	my $head_line = <$fh>;
