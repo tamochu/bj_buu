@@ -500,7 +500,7 @@ sub end_game {
 		my @nimmts = split /,/, $nimmt;
 		for my $c (@nimmts) {
 			$nsum += $c == 55 ? 7 :
-					$c =~ /^[1-9]{2}$/ ? 5 :
+					$c =~ /^(\d)\1+$/ ? 5 :
 					$c =~ /0$/ ? 3 :
 					$c =~ /5$/ ? 2 :
 					1;
