@@ -155,7 +155,26 @@ sub get_member {
 	print $fh @members;
 	close $fh;
 	
-	my $member_c = @members - 1;
+	my($rate, $line1, $line2, $line3, $line4, $suspend, @players) = &get_state;
+	for my $p (@players) {
+		my($pname, $selected, $rest, $nimmt) = split /<>/, $p;
+		my $pfind = 0;
+		for my $mm (@members) {
+			if ($pname eq $mm) {
+				$pfind = 1;
+				last;
+			}
+		}
+		unless ($pfind) {
+			if ($selected == 0) {
+				&auto_play($pname);
+			} elsif ($selected < 0) {
+				&auto_get_line($pname);
+			}
+		}
+	}
+	
+	my $member_c = @members;
 	return ($member_c, $member);
 }
 
@@ -172,6 +191,28 @@ sub play_card {
 					$selected = $c;
 				} else {
 					push @new_rests, $c;
+				}
+			}
+			$rest = join ',', @new_rests;
+			&set_player_state($pname, $selected, $rest, $nimmt);
+		}
+		&round_check;
+	}
+}
+
+sub auto_play {
+	my $name = shift;
+	
+	if (&is_playing && &is_player($name)) {
+		my($pname, $selected, $rest, $nimmt) = &get_my_state($name);
+		if ($selected == 0) {
+			my @rests = split /,/, $rest;
+			my @new_rests = ();
+			for my $c (@rests) {
+				if ($selected) {
+					push @new_rests, $c;
+				} else {
+					$selected = $c;
 				}
 			}
 			$rest = join ',', @new_rests;
@@ -322,6 +363,34 @@ sub get_line {
 
 	&exec_culc;
 	return "$line_no—ñ–Ú‚ðŽæ‚è‚Ü‚µ‚½B";
+}
+
+sub auto_get_line {
+	my $name = shift;
+	
+	my($rate, $line1, $line2, $line3, $line4, $suspend, @players) = &get_state;
+	my @suspends = split /,/, $suspend;
+	my $s = shift @suspends;
+	my($sname, $scard) = split /:/, $s;
+	if ($sname ne $name) {
+		return;
+	}
+	my @la = split /,/, $line1;
+	while (@la) {
+		my $get_card = shift @la;
+		&add_nimmt($sname, $get_card);
+	}
+	$line1 = $scard;
+	
+	$suspend = join ',', @suspends;
+	&set_state($rate, $line1, $line2, $line3, $line4, $suspend);
+
+	my($pname, $selected, $rest, $nimmt) = &get_my_state($sname);
+	$selected = 0;
+	&set_player_state($pname, $selected, $rest, $nimmt);
+
+	&exec_culc;
+	system_comment("$sname•sÝ‚Ì‚½‚ßŽ©“®‚Å1—ñ–Ú‚ðŽæ‚è‚Ü‚µ‚½B");
 }
 
 sub print_my_hand {
