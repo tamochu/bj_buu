@@ -342,7 +342,7 @@ sub print_my_hand {
 		print qq|</label>,|;
 	}
 	if ($selected == 0 && &is_selectable) {
-		print qq|<input type="submit" value="ŠJŽn‚·‚é" class="button_s"></form><br>|;
+		print qq|<input type="submit" value="‘I‘ð‚·‚é" class="button_s"></form><br>|;
 	}
 }
 
@@ -402,7 +402,7 @@ sub start_game{
 			my $c = shift @deck;
 			push @rests, $c;
 		}
-		$rest = join /,/, @rests;
+		$rest = join ',', @rests;
 		$nimmt = '';
 		&set_player_state($pname, $selected, $rest, $nimmt);
 	}
