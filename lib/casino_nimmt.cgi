@@ -160,7 +160,8 @@ sub get_member {
 		my($pname, $selected, $rest, $nimmt) = split /<>/, $p;
 		my $pfind = 0;
 		for my $mm (@members) {
-			if ($pname eq $mm) {
+			my($mtime, $mname, $maddr) = split /<>/, $mm;
+			if ($pname eq $mname) {
 				$pfind = 1;
 				last;
 			}
