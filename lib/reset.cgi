@@ -27,6 +27,7 @@ sub time_limit {
 		}
 	}
 
+
 	&reset; # ‚±‚±‚Ü‚Å¡ŠúŠúŒÀØ‚ê‚Ìˆ—
 
 	if ($w{world} eq '0') { # •½˜a
