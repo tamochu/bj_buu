@@ -1180,7 +1180,7 @@ sub before_bj {
 	my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..5];
 
 	# その日最初のアクセスなら
-	if ($lmday ne $tmday || $lmon ne $tmon || $lyear ne $tyear || $lmin ne $tmin) {
+	if ($lmday ne $tmday || $lmon ne $tmon || $lyear ne $tyear) {
 		# 誕生日プレゼント
 		my %datas = ();
 		open my $fh, "< $userdir/$id/profile.cgi" or &error("$userdir/$id/profile.cgiﾌｧｲﾙが開けません");
