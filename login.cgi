@@ -238,7 +238,7 @@ sub write_players_html {
 }
 
 sub write_all_players_html {
-	my @rows = (qw/名前 性別 階級 部隊 職業 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 開始日時/);
+	my @rows = (qw/名前 性別 階級 部隊 職業 種族 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 開始日時/);
 	
 	my $html = '';
 	$html .= qq|<table class="tablesorter"><thead><tr>|;
