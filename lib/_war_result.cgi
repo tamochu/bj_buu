@@ -137,7 +137,7 @@ sub war_win {
 #		$mem = 0;
 #	}
 #	$v += ($cs{capacity}[$m{country}] - $mem) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
-	$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
+	$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 5 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
 
 
 	# ‘î¨‚É‚æ‚è’D‘—Í‘‰Á
