@@ -535,7 +535,7 @@ sub _touitu {
 		if ($union) {
 			$mes .= "<em>$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>";
 			&write_world_news("<em>$c_m$cs{name}[$union]“¯–¿‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>",1);
-			&write_legend('touitu', "$c_m$cs{name}[$union]“¯–¿‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é")
+			&write_legend('touitu', "$c_m$cs{name}[$union]“¯–¿‚Ì$mname‚ª$world_name‘å—¤‚ğ“ˆê‚·‚é");
 		}
 		else {
 			&mes_and_world_news("<em>$world_name‘å—¤‚ğ“ˆê‚µ‚Ü‚µ‚½</em>",1);
@@ -548,7 +548,6 @@ sub _touitu {
 
 	$m{lib} = 'world';
 	$m{tp}  = 100;
-	
 }
 
 #=================================================
