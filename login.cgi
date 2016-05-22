@@ -30,6 +30,7 @@ if ($time > $w{limit_time}) {
 # htmlﾌｧｲﾙ作成 & 期限切れﾌﾟﾚｲﾔｰ削除
 for my $i (0 .. $w{country}) {
 	if (-M "./html/$i.html" >= $update_cycle_day) {
+#	if (-M "./html/$i.html" >= 0) {
 		&write_players_html($i);
 		last;
 	}
@@ -41,6 +42,7 @@ if($chart_time < $time - 3600){
 }
 
 if (-M "./html/all.html" >= $update_cycle_day) {
+#if (-M "./html/$i.html" >= 0) {
 	&write_all_players_html;
 	&backup_players;
 }
@@ -86,17 +88,18 @@ sub del_cookie {
 sub write_players_html {
 	my $country = shift;
 
-	my @rows = (qw/名前 性別 階級 部隊 職業 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 開始日時/);
-	
+	my @rows = (qw/名前 性別 階級 部隊 職業 種族 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 開始日時/);
+
 	my $html = '';
 	$html .= qq|<table class="tablesorter"><thead><tr>|;
 	$html .= qq|<th>$_</th>| for (@rows);
 	$html .= qq|</tr></thead><tbody>|;
-	
+
 	my %sames = ();
 	my %ranks = ();
 	my %weas  = ();
 	my %jobs  = ();
+	my %_seeds  = ();
 	my %sexes = ();
 	my %units = ();
 	my $count = 0;
@@ -156,6 +159,7 @@ sub write_players_html {
 		$html .= qq|<td>$rank_name</td>|;
 		$html .= qq|<td>$units[$p{unit}][1]</td>|;
 		$html .= qq|<td>$jobs[$p{job}][1]</td>|;
+		$html .= qq|<td>$seeds{$p{seed}}[0]</td>|;
 		$html .= qq|<td>$weas[$p{wea}][1]</td>|;
 		$html .= qq|<td>$eggs[$p{egg}][1]</td>|;
 		$html .= qq|<td>$pets[$p{pet}][1]</td>|;
@@ -169,6 +173,7 @@ sub write_players_html {
 		++$ranks{$p{rank}};
 		++$weas{$weas[$p{wea}][2]};
 		++$jobs{$p{job}};
+		++$_seeds{$p{seed}};
 		++$sexes{$p{sex}};
 		++$units{$p{unit}};
 		++$count;
@@ -209,6 +214,10 @@ sub write_players_html {
 	for my $k (sort { $a <=> $b } keys %jobs) {
 		$html_chart .= qq|$jobs[$k][1] $jobs{$k}/|;
 	}
+	$html_chart .= qq|<br></td></tr><tr><th>種族</th><td>|;
+	for my $k (sort { $a <=> $b } keys %_seeds) {
+		$html_chart .= qq|$seeds{$k}[0] $_seeds{$k}/|;
+	}
 	
 	$html_chart .= qq|<br></td></tr></table><br>|;
 	
@@ -240,6 +249,7 @@ sub write_all_players_html {
 	my %ranks = ();
 	my %weas  = ();
 	my %jobs  = ();
+	my %_seeds  = ();
 	my %sexes = ();
 	my %units = ();
 	my $count = 0;
@@ -269,6 +279,7 @@ sub write_all_players_html {
 			$html .= qq|<td>$rank_name</td>|;
 			$html .= qq|<td>$units[$p{unit}][1]</td>|;
 			$html .= qq|<td>$jobs[$p{job}][1]</td>|;
+			$html .= qq|<td>$seeds{$p{seed}}[0]</td>|;
 			$html .= qq|<td>$weas[$p{wea}][1]</td>|;
 			$html .= qq|<td>$eggs[$p{egg}][1]</td>|;
 			$html .= qq|<td>$pets[$p{pet}][1]</td>|;
@@ -282,6 +293,7 @@ sub write_all_players_html {
 			++$ranks{$p{rank}};
 			++$weas{$weas[$p{wea}][2]};
 			++$jobs{$p{job}};
+			++$_seeds{$p{seed}};
 			++$sexes{$p{sex}};
 			++$units{$p{unit}};
 			++$count;
@@ -313,6 +325,10 @@ sub write_all_players_html {
 	$html_chart .= qq|<br></td></tr><tr><th>職業</th><td>|;
 	for my $k (sort { $a <=> $b } keys %jobs) {
 		$html_chart .= qq|$jobs[$k][1] $jobs{$k}/|;
+	}
+	$html_chart .= qq|<br></td></tr><tr><th>種族</th><td>|;
+	for my $k (sort { $a <=> $b } keys %_seeds) {
+		$html_chart .= qq|$seeds{$k}[0] $_seeds{$k}/|;
 	}
 	
 	$html_chart .= qq|<br></td></tr></table><br>|;
