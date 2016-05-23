@@ -56,6 +56,22 @@
 		my $sp = int((10 * $all_self_burning / $all_skills) + rand(4) - 2) * 10;
 		return "アリア＜セルバ予\想ー☆ミ\n現在の$places[$place][2]は$sp％のセルバ確率です";
 	},
+	sub {
+		# 仕官人数bot
+		my $i = 0;
+		for my $j (1 .. $w{country}) {
+			$i += $cs{member}[$j];
+		}
+		return "現在の仕官数は$i人です";
+	},
+	sub {
+		# 説明書bot
+		@strs = (
+			"経営者の所持金がマイナス、総預金額が100万G未満、顧客の預けた回数が5回未満で銀行が潰れます",
+			"ﾎﾟｯﾎﾟを君主が持つと特殊効果を発動できるようになります",
+			);
+		return $strs[int(rand(@strs))];
+	},
 );
 
 1;
