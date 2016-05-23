@@ -532,7 +532,7 @@ sub send_money {
 sub mes_and_world_news {
 	my $w_name = &name_link($m{name});
 	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
-		$wname = '–¼–³‚µ';
+		$w_name = '–¼–³‚µ';
 	}
 	my $message = shift;
 	$mes .= "$message<br>";
@@ -545,7 +545,7 @@ sub mes_and_world_news {
 sub mes_and_send_news {
 	my $w_name = &name_link($m{name});
 	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
-		$wname = '–¼–³‚µ';
+		$w_name = '–¼–³‚µ';
 	}
 	my $message = shift;
 	$mes .= "$message<br>";
