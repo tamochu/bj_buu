@@ -260,6 +260,9 @@ sub war_win {
 	}
 	
 	my $mname = &name_link($m{name});
+	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+		$mname = '–¼–³‚µ';
+	}
 	if ($w{world} eq $#world_states - 5) {
 		&write_world_news(qq|$c_m‚Ì$mname‚ª<font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ“¾‚é–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
 	} else {
@@ -462,9 +465,13 @@ sub _rescue {
 	while (my $line = <$fh>) {
 		my($name,$country,$flag) = split /<>/, $line;
 		if ($flag == 0 && $count < $max_rescue && ($country eq $m{country} || $union eq $country) && $country ne '0' ) {
+			my $mname = $m{name};
+			if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+				$mname = '–¼–³‚µ';
+			}
 			$mes .= "$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚ğ‹~o‚µ‚Ü‚µ‚½<br>";
 			$is_rescue = 1;
-			&write_world_news("$c_m‚Ì$m{name}‚ª$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚Ì‹~o‚É¬Œ÷‚µ‚Ü‚µ‚½");
+			&write_world_news("$c_m‚Ì$mname‚ª$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚Ì‹~o‚É¬Œ÷‚µ‚Ü‚µ‚½");
 			&write_yran('res', 1, 1);
 			
 			# Ú½·­°Ì×¸Şì¬

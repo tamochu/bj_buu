@@ -611,6 +611,10 @@ sub tp_450 {
 
 	# BBS‚É’Ç‹L
 	if ($cmd eq '1') {
+		my $w_name = $m{name};
+		if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+			$w_name = '–¼–³‚µ';
+		}
 		my $comment = "y$c_yz";
 		$comment .= "$e2j{food}F$cs{food}[$y{country}]/"       if $m{turn} >= 1;
 		$comment .= "$e2j{money}F$cs{money}[$y{country}]/"     if $m{turn} >= 2;
@@ -627,7 +631,7 @@ sub tp_450 {
 		eval { flock $fh, 2; };
 		push @lines, $_ while <$fh>;
 		pop @lines;
-		unshift @lines, "$time<>$date<>$m{name}<>$m{country}<>$m{shogo}<>$addr<>$comment<>$m{icon}<>\n";
+		unshift @lines, "$time<>$date<>$w_name<>$m{country}<>$m{shogo}<>$addr<>$comment<>$m{icon}<>\n";
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
 		print $fh @lines;
@@ -646,7 +650,7 @@ sub tp_450 {
 			if(@lines2 > 50){
 				pop @lines2;
 			}
-			unshift @lines2, "$time<>$date<>$m{name}<>$m{country}<>$m{shogo}<>$addr<>$comment2<>$m{icon}<>\n";
+			unshift @lines2, "$time<>$date<>$w_name<>$m{country}<>$m{shogo}<>$addr<>$comment2<>$m{icon}<>\n";
 			seek  $fh2, 0, 0;
 			truncate $fh2, 0;
 			print $fh2 @lines2;
