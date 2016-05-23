@@ -161,6 +161,7 @@ sub tp_110 {
 		}
 		$m{act} += 10;
 		&write_colosseum_news(qq| <i>$menus[$m{stock}][0] VÁ¬İËßµİ <font color="$cs{color}[$m{country}]">$m{name}</font> ’a¶</i>|, 1);
+		&send_twitter("$menus[$m{stock}][0] VÁ¬İËßµİ $m{name} ’a¶");
 		
 		if ($w{world} eq $#world_states-4) {
 			require './lib/fate.cgi';
@@ -225,6 +226,7 @@ sub col_win {
 
 	$mes .= "$v‚Ì$e2j{exp}‚ğè‚É“ü‚ê‚Ü‚µ‚½<br>";
 	&write_colosseum_news(qq|$menus[$m{stock}][0]$round_titles[$m{value}] › ’§íÒ<font color="$cs{color}[$m{country}]">$m{name}</font> VS –h‰qÒ<font color="$cs{color}[$y{country}]">$y{name}</font> ~|);
+	&send_twitter("$menus[$m{stock}][0]$round_titles[$m{value}] › ’§íÒ$m{name} VS –h‰qÒ$y{name} ~");
 	
 	$m{tp} = 110;
 	++$m{value}; # ×³İÄŞ¶³İÄ±¯Ìß
@@ -253,12 +255,14 @@ sub _defence_c_up {
 			++$defence_c;
 			
 			&write_colosseum_news(qq|$menus[$m{stock}][0]$round_titles[$m{value}] ~ ’§íÒ<font color="$cs{color}[$m{country}]">$m{name}</font> VS –h‰qÒ<font color="$cs{color}[$y{country}]">$y{name}</font> › –h‰q$defence_c|);
+			&send_twitter("$menus[$m{stock}][0]$round_titles[$m{value}] ~ ’§íÒ$m{name} VS –h‰qÒ$y{name} › –h‰q$defence_c");
 
 			# ‹K’è”ˆÈã‚¾‚Æ©“®ˆø‘Ş•Î”è
 			if ($defence_c >= $limit_defence_c) {
 				&_send_money_and_col_c_up($name, $defence_c);
 				&write_colosseum_news(qq| <i><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</i>|);
 				&write_legend("champ_$m{stock}", "$cs{name}[$country]‚Ì$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚·", 1, $name);
+				&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
 			}
 			else {
 				push @lines, "$name<>$country<>$max_hp<>$max_mp<>$at<>$df<>$mat<>$mdf<>$ag<>$cha<>$wea<>$skills<>$mes_win<>$mes_lose<>$icon<>$defence_c<>$wea_name<>$gua<>\n";
@@ -299,9 +303,11 @@ sub _rewrite_champ {
 		if ($defence_c >= $legend_defence_c) {
 			&write_legend("champ_$m{stock}", "$cs{name}[$country]‚Ì$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚·", 1, $name);
 			&write_colosseum_news(qq| <i><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</i>|);
+			&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
 		}
 		else {
 			&write_colosseum_news(qq| <b><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</b>|, 1, $name);
+			&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
 		}
 		
 		&_send_money_and_col_c_up($name, $defence_c);

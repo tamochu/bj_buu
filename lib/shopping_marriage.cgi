@@ -438,6 +438,7 @@ sub tp_310 {
 					my $v = int( ($rank_sols[$you_datas{rank}] + $rank_sols[$m{rank}]) * 0.5);
 					if($m{sex} eq $you_datas{sex}) {
 						&write_world_news(qq|<font color="#8a2be2">ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
+						&send_twitter("ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
 						if(int(rand(5)) == 0){
 							$m{pet} = 0;
 						}elsif(int(rand(5)) == 0 && ($pets[$you_datas{pet}][2] eq 'marriage_y' || $pets[$you_datas{pet}][2] eq 'marriage_b')) {
@@ -446,6 +447,7 @@ sub tp_310 {
 						$v *= 3;
 					}else {
 						&write_world_news(qq|<font color="#FF99FF">ƒ™:ß*'Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
+						&send_twitter("ƒ™:ß*'Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
 					}
 					if($you_datas{job} eq '22' || $you_datas{job} eq '23' || $you_datas{job} eq '24'){
 						&regist_you_data($name, 'job', 0);
