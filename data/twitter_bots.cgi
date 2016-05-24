@@ -3,10 +3,10 @@
 		# もしもbot
 		return "よぉ、、、、";
 	},
-	sub {
+#	sub {
 		# 宣伝
-		return "にゃあ鯖Blind Justice\nhttp://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi";
-	},
+#		return "にゃあ鯖Blind Justice\nhttp://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi";
+#	},
 	sub {
 		# 宣伝2
 		my $job_name = $jobs[int(rand(@jobs))][1];
@@ -110,10 +110,10 @@
 		chomp($item_name);
 		$item_value = int($item_value / $item_count) if $item_count;
 		if ($item_value <= 500) {
-			return "$item_nameはタダ同然か計測不能です";
+			return "hinenoya＜価格調査の報告\n現在の$item_nameはタダ同然か計測不能です";
 		}
 		else {
-			return "$item_nameの平均相場は${item_value}Gです";
+			return "hinenoya＜価格調査の報告\n現在の$item_nameの平均相場は${item_value}Gです";
 		}
 	},
 );
