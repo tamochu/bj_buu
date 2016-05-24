@@ -22,6 +22,15 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
+	# 拙速以外の祭り情勢開始時の既存国すべての君主と君主ファイルを初期化
+	if ($w{year} % 40 != 10) {
+		for my $i (1 .. $w{country}) {
+			$cs{ceo}[$i] = '';
+			open my $fh, "> $logdir/$i/leader.cgi";
+			close $fh;
+		}
+	}
+
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
