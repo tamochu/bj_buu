@@ -92,49 +92,60 @@ sub begin {
 		$mes .= "おお!当選おめでと!賞品の $weas[$no1][1] は預かり所に送っておいたよ<br>";
 		&send_item($m{name}, 1, $no1, $weas[$no1][4], 10, 1);
 		&write_send_news(qq|$m{name}が武器賞に当選しました|);
+		&send_twitter("$m{name}が武器賞に当選しました");
 		$m{lot} = '';
 	} elsif ($atari1 == $mylot - 1 || $atari1 == $mylot + 1) {
 		$mes .= "惜しかったね!副賞の $weas[$no1_sub][1] は預かり所に送っておいたよ<br>";
 		&send_item($m{name}, 1, $no1_sub, $weas[$no1_sub][4], 10, 1);
+		&send_twitter("$m{name}が武器賞の副賞に当選しました");
+		$m{name}が武器賞に当選しました
 		$m{lot} = '';
 	}
 	if ($atari2 eq $mylot) {
 		$mes .= "おお!当選おめでと!賞品の $eggs[$no2][1] は預かり所に送っておいたよ<br>";
 		&send_item($m{name}, 2, $no2, 0, 0, 1);
 		&write_send_news(qq|$m{name}がﾀﾏｺﾞ賞に当選しました|);
+		&send_twitter("$m{name}がﾀﾏｺﾞ賞に当選しました");
 		$m{lot} = '';
 	} elsif ($atari2 == $mylot - 1 || $atari2 == $mylot + 1) {
 		$mes .= "惜しかったね!副賞の $eggs[$no2_sub][1] は預かり所に送っておいたよ<br>";
 		&send_item($m{name}, 2, $no2_sub, 0, 0, 1);
+		&send_twitter("$m{name}がﾀﾏｺﾞ賞の副賞に当選しました");
 		$m{lot} = '';
 	}
 	if ($atari3 eq $mylot) {
 		$mes .= "おお!当選おめでと!賞品の $no3 Gは送金しておいたよ<br>";
 		&send_money($m{name}, '宝くじ屋', $no3);
 		&write_send_news(qq|$m{name}が金貨賞に当選しました|);
+		&send_twitter("$m{name}が金貨賞に当選しました");
 		$m{lot} = '';
 	} elsif ($atari3 == $mylot - 1 || $atari3 == $mylot + 1) {
 		$mes .= "惜しかったね!副賞の $no3_sub Gは送金しておいたよ<br>";
 		&send_money($m{name}, '宝くじ屋', $no3_sub);
+		&send_twitter("$m{name}が金貨賞の副賞に当選しました");
 		$m{lot} = '';
 	}
 	if ($atari4 eq $mylot) {
 		$mes .= "おお!当選おめでと!賞品の $pets[$no4][1] は預かり所に送っておいたよ<br>";
 		&send_item($m{name}, 3, $no4, 0, 0, 1);
 		&write_send_news(qq|$m{name}がﾍﾟｯﾄ賞に当選しました|);
+		&send_twitter("$m{name}がﾍﾟｯﾄ賞に当選しました");
 		$m{lot} = '';
 	} elsif ($atari4 == $mylot - 1 || $atari4 == $mylot + 1) {
 		$mes .= "惜しかったね!副賞の $pets[$no4_sub][1] は預かり所に送っておいたよ<br>";
 		&send_item($m{name}, 3, $no4_sub, 0, 0, 1);
+		&send_twitter("$m{name}がﾍﾟｯﾄ賞の副賞に当選しました");
 		$m{lot} = '';
 	}
 	if ($atari5 eq $mylot) {
 		$mes .= "おお!当選おめでと!賞品の $no5 ｺｲﾝをあげるね<br>";
 		$m{coin} += $no5;
 		&write_send_news(qq|$m{name}がｺｲﾝ賞に当選しました|);
+		&send_twitter("$m{name}がｺｲﾝ賞に当選しました");
 		$m{lot} = '';
 	} elsif ($atari5 == $mylot - 1 || $atari5 == $mylot + 1) {
 		$mes .= "惜しかったね!副賞の $no5_sub ｺｲﾝをあげるね<br>";
+		&send_twitter("$m{name}がｺｲﾝ賞の副賞に当選しました");
 		$m{coin} += $no5_sub;
 		$m{lot} = '';
 	}
