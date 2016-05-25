@@ -475,6 +475,7 @@ sub tp_410 {
 						&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $in{money});
 						$mes .= "即決価格を提示しました<br>";
 						&write_send_news("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
+						&send_twitter("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
 						$is_sokketsu = 1;
 						$is_rewrite = 1;
 					}else{
@@ -504,6 +505,7 @@ sub tp_410 {
 				&send_money($to_name, 'ｵｰｸｼｮﾝ会場', "-$item_price");
 				&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $item_price);
 				&write_send_news("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
+				&send_twitter("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
 				$is_rewrite = 1;
 			}
 			else {
