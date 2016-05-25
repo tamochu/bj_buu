@@ -3,10 +3,10 @@
 		# もしもbot
 		return "よぉ、、、、";
 	},
-#	sub {
+	sub {
 		# 宣伝
-#		return "にゃあ鯖Blind Justice\nhttp://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi";
-#	},
+		return "にゃあ鯖Blind Justice\nhttp://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi";
+	},
 	sub {
 		# 宣伝2
 		my $job_name = $jobs[int(rand(@jobs))][1];
@@ -69,6 +69,9 @@
 		@strs = (
 			"経営者の所持金がマイナス、総預金額が100万G未満、顧客の預けた回数が5回未満で銀行が潰れます",
 			"ﾎﾟｯﾎﾟを君主が持つと特殊効果を発動できるようになります",
+			"ﾀﾞｰｸﾗﾋﾞｯﾄは★を上げると消滅する確率が下がります",
+			"一部のﾍﾟｯﾄは星降りのほこらで合成することによって強化できます",
+			"輸送が成功したときには同盟国との友好度が大幅に上昇します",
 			);
 		return $strs[int(rand(@strs))];
 	},
