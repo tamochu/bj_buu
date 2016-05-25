@@ -173,6 +173,7 @@ sub tp_500 {
 	}
 	elsif ($m{stock}) { # $m{stock} ‚ª‚ ‚éê‡‚ÍŸ‚¿->‚â‚ß‚é‚Ì‘I‘ð
 		$mes .= "º²Ý $m{stock} –‡‚ðŽè‚É“ü‚ê‚Ü‚µ‚½!<br>";
+		&send_twitter("$m{name}‚ªÊ²Û³‚Åº²Ý‚ð $m{stock} –‡“–‚Ä‚Ü‚µ‚½") if $m{stock} > 150000;
 		$m{coin} += $m{stock};
 		&casino_win_common;
 		&begin;
