@@ -283,6 +283,7 @@ sub tp_210 {
 				$twitter_mes = "$guas[$m{gua}][1]‚ğo•i‚µ‚Ü‚µ‚½";
 				$m{gua} = 0;
 			}
+
 			if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
 				$twitter_mes = "$c_m‚Ì–¼–³‚µ‚ª$twitter_mes";
 			}
