@@ -110,7 +110,7 @@
 		chomp($item_name);
 		$item_value = int($item_value / $item_count) if $item_count;
 		if ($item_value <= 500) {
-			return "hinenoya＜価格調査の報告\n現在の$item_nameはタダ同然か計測不能です";
+			return "hinenoya＜価格調査の報告\n現在の$item_nameはタダ同然か計測不能\です";
 		}
 		else {
 			return "hinenoya＜価格調査の報告\n現在の$item_nameの平均相場は${item_value}Gです";
