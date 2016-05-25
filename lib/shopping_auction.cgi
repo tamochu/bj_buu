@@ -130,6 +130,7 @@ sub tp_110 {
 						&sale_data_log($kind, $item_no, $item_c, $item_lv, $in{money}, 3);
 						$mes .= "即決価格を提示しました<br>";
 						&write_send_news("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
+						&send_twitter("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
 						$is_sokketsu = 1;
 						$is_rewrite = 1;
 					}else{
@@ -160,6 +161,7 @@ sub tp_110 {
 				&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $item_price);
 				&sale_data_log($kind, $item_no, $item_c, $item_lv, $item_price, 2);
 				&write_send_news("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
+				&send_twitter("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
 				$is_rewrite = 1;
 			}
 			else {
@@ -262,18 +264,22 @@ sub tp_210 {
 					$m{wea_name} = "";
 				}
 				&mes_and_send_news("$weas[$m{wea}][1]を出品しました");
+				&send_twitter("$weas[$m{wea}][1]を出品しました");
 				$m{wea} = $m{wea_c} = $m{wea_lv} = 0;
 			}
 			elsif ($cmd eq '2' && $m{egg}) {
 				&mes_and_send_news("$eggs[$m{egg}][1]を出品しました");
+				&send_twitter("$eggs[$m{egg}][1]を出品しました");
 				$m{egg} = $m{egg_c} = 0;
 			}
 			elsif ($cmd eq '3' && $m{pet}) {
 				&mes_and_send_news("$pets[$m{pet}][1]★$m{pet_c}を出品しました");
+				&send_twitter("$pets[$m{pet}][1]★$m{pet_c}を出品しました");
 				$m{pet} = 0;
 			}
 			elsif ($cmd eq '4' && $m{gua}) {
 				&mes_and_send_news("$guas[$m{gua}][1]を出品しました");
+				&send_twitter("$guas[$m{gua}][1]を出品しました");
 				$m{gua} = 0;
 			}
 			
