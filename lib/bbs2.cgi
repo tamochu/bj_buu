@@ -31,7 +31,7 @@ sub run {
 	if ($in{mode} eq "write_res") {
 		if($in{is_letter}){
 			$in{comment} .= "<hr>yé“`Œ¾”Â‚Ö‚ÌƒŒƒXz";
-			&send_letter($in{res_name});
+			&send_letter($in{res_name}, 1);
 		}else {
 			&write_res;
 		}
