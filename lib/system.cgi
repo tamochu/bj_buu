@@ -645,7 +645,7 @@ sub send_twitter {
 	close STDIN;
 	close STDERR;
 
-	$message = $w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16' ? "$c_m‚Ì–¼–³‚µ‚ª$message" : "$c_m‚Ì$m{name}‚ª$message" if $flag;
+	$message = $w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16') ? "$c_m‚Ì–¼–³‚µ‚ª$message" : "$c_m‚Ì$m{name}‚ª$message" if $flag;
 	my $ua = new LWP::UserAgent;
 	$ua->agent("AgentName/0.1 " . $ua->agent);
 	my %params = (
