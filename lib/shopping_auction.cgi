@@ -257,7 +257,6 @@ sub tp_210 {
 			my $item_no = $m{ $kinds[$cmd]       };
 			my $item_c  = $m{ $kinds[$cmd].'_c'  } || 0;
 			my $item_lv = $m{ $kinds[$cmd].'_lv' } || 0;
-			my $twitter_mes = "";
 			
 			if ($cmd eq '1' && $m{wea}) {
 				if($m{wea_name}){
@@ -265,32 +264,24 @@ sub tp_210 {
 					$m{wea_name} = "";
 				}
 				&mes_and_send_news("$weas[$m{wea}][1]を出品しました");
-				$twitter_mes = "$weas[$m{wea}][1]を出品しました";
+				&send_twitter("$weas[$m{wea}][1]を出品しました", 1);
 				$m{wea} = $m{wea_c} = $m{wea_lv} = 0;
 			}
 			elsif ($cmd eq '2' && $m{egg}) {
 				&mes_and_send_news("$eggs[$m{egg}][1]を出品しました");
-				$twitter_mes = "$eggs[$m{egg}][1]を出品しました";
+				&send_twitter("$eggs[$m{egg}][1]を出品しました", 1);
 				$m{egg} = $m{egg_c} = 0;
 			}
 			elsif ($cmd eq '3' && $m{pet}) {
 				&mes_and_send_news("$pets[$m{pet}][1]★$m{pet_c}を出品しました");
-				$twitter_mes = "$pets[$m{pet}][1]★$m{pet_c}を出品しました";
+				&send_twitter("$pets[$m{pet}][1]★$m{pet_c}を出品しました", 1);
 				$m{pet} = 0;
 			}
 			elsif ($cmd eq '4' && $m{gua}) {
 				&mes_and_send_news("$guas[$m{gua}][1]を出品しました");
-				$twitter_mes = "$guas[$m{gua}][1]を出品しました";
+				&send_twitter("$guas[$m{gua}][1]を出品しました", 1);
 				$m{gua} = 0;
 			}
-
-			if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
-				$twitter_mes = "$c_mの名無しが$twitter_mes";
-			}
-			else {
-				$twitter_mes = "$c_mの$m{name}が$twitter_mes";
-			}
-			&send_twitter("$twitter_mes");
 			
 			my $bit_time = $time + int( $auction_limit_day * 3600 * 24 + rand(3600) ); # 入札時間を１時間程度ばらけさす
 			$bit_time += int( 3600 * 24 + rand(3600) ) if $in{tlimit} eq '1'; 

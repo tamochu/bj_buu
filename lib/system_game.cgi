@@ -379,6 +379,7 @@ sub c_up { # count up
 	for my $cash_shogo (@cash_shogos) {
 		if ($cash_shogo->[1] eq $m{$c}) {
 			&mes_and_world_news("$cash_shogo->[0]‚ÌÌ†‚ð—^‚¦‚ç‚ê‚Ü‚µ‚½", 1);
+			&send_twitter("$cash_shogo->[0]‚ÌÌ†‚ð—^‚¦‚ç‚ê‚Ü‚µ‚½", 1);
 			$m{money} += $cash_shogo->[2];
 			$mes .= "$cash_shogo->[2]G‚Ì•ñ§‹à‚ðŽó‚¯Žæ‚è‚Ü‚µ‚½<br>";
 		}
@@ -396,6 +397,7 @@ sub c_up { # count up
 	
 	if ($secret->[0]) {
 		&mes_and_world_news("$secret->[0]‚ÌÌ†‚ð—^‚¦‚ç‚ê‚Ü‚µ‚½", 1);
+		&send_twitter("$secret->[0]‚ÌÌ†‚ð—^‚¦‚ç‚ê‚Ü‚µ‚½", 1);
 		$m{money} += $secret->[2];
 		$mes .= "$secret->[2]G‚Ì•ñ§‹à‚ðŽó‚¯Žæ‚è‚Ü‚µ‚½<br>";
 		$m{shogo} = $secret->[0];
@@ -419,6 +421,7 @@ sub c_up { # count up
 		for my $cash_shogo (@cash_shogos) {
 			if ($cash_shogo->[1] eq $m{$c}) {
 				&mes_and_world_news("$cash_shogo->[0]‚ÌÌ†‚ð—^‚¦‚ç‚ê‚Ü‚µ‚½", 1);
+				&send_twitter("$cash_shogo->[0]‚ÌÌ†‚ð—^‚¦‚ç‚ê‚Ü‚µ‚½", 1);
 				$m{money} += $cash_shogo->[2];
 				$mes .= "$cash_shogo->[2]G‚Ì•ñ§‹à‚ðŽó‚¯Žæ‚è‚Ü‚µ‚½<br>";
 			}
@@ -1680,7 +1683,8 @@ sub get_rank_name {
 #================================================
 sub twitter_bot {
 	require "$datadir/twitter_bots.cgi";
-	my $mes = &{$twitter_bots[$w{twitter_bot}]};
+#	my $mes = &{$twitter_bots[$w{twitter_bot}]};
+	my $mes = &{$twitter_bots[int(rand(@twitter_bots))]};
 	&send_twitter($mes);
 	$w{twitter_bot}++;
 	if ($w{twitter_bot} >= @twitter_bots) {
