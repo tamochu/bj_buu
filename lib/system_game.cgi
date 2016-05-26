@@ -1686,12 +1686,11 @@ sub twitter_bot {
 #	my $mes = &{$twitter_bots[$w{twitter_bot}]};
 	my $mes = &{$twitter_bots[int(rand(@twitter_bots))]};
 	&send_twitter($mes);
-	$w{twitter_bot}++;
-	if ($w{twitter_bot} >= @twitter_bots) {
-		$w{twitter_bot} = 0;
-	}
-	&write_cs;
+#	$w{twitter_bot}++;
+#	if ($w{twitter_bot} >= @twitter_bots) {
+#		$w{twitter_bot} = 0;
+#	}
+#	&write_cs;
 }
-
 
 1; # íœ•s‰Â
