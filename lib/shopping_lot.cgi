@@ -98,7 +98,6 @@ sub begin {
 		$mes .= "É‚µ‚©‚Á‚½‚Ë!•›Ü‚Ì $weas[$no1_sub][1] ‚Í—a‚©‚èŠ‚É‘—‚Á‚Ä‚¨‚¢‚½‚æ<br>";
 		&send_item($m{name}, 1, $no1_sub, $weas[$no1_sub][4], 10, 1);
 		&send_twitter("$m{name}‚ª•ŠíÜ‚Ì•›Ü‚É“–‘I‚µ‚Ü‚µ‚½");
-		$m{name}‚ª•ŠíÜ‚É“–‘I‚µ‚Ü‚µ‚½
 		$m{lot} = '';
 	}
 	if ($atari2 eq $mylot) {
