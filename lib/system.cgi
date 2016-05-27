@@ -607,6 +607,7 @@ sub make_player_name_list {
 	closedir $dh;
 	
 	open my $fh, "> $logdir/player_name_list.cgi";
+	eval { flock $fh, 2; };
 	print $fh @lines;
 	close $fh;
 }
@@ -688,6 +689,9 @@ sub load_RWD {
 #			print qq|<meta name="viewport" content="width=device-width, maximum-scale=1.5, minimum-scale=0.5,user-scalable=yes,initial-scale=0.9" />|;
 #			print qq|<link rel="stylesheet" media="screen and (min-width: 481px) and (max-width: 720px)" href="$htmldir/tablet.css?$jstime" />|;
 	}
+#	elsif (!$is_mobile) {
+#		print qq|<meta name="viewport" content="width=device-width">|;
+#	}
 }
 
 1; # íœ•s‰Â
