@@ -185,6 +185,8 @@ sub war_win {
 #	$v = int($v * 1.1) if $cs{war}[$m{country}] eq $m{name};    
 #	$v = int($v * 1.05) if $cs{ceo}[$m{country}] eq $m{name};
 
+	# èbâª
+	$v = &seed_bonus('red_moon', $v);
 	
 	$v = $v * $m{value} * (rand(0.4)+0.8);
 	$v = &seed_bonus('war_win', $v);

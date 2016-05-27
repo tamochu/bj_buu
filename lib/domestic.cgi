@@ -153,6 +153,8 @@ sub tp_110 {
 	$v = &use_pet('nou', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '28');
 	
 	$v = &seed_bonus('nou', $v);
+	# èbâª
+	$v = &seed_bonus('red_moon', $v);
 	
 	$v = int($v);
 	
@@ -192,6 +194,8 @@ sub tp_210 {
 	$v = &use_pet('sho', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '29');
 	
 	$v = &seed_bonus('sho', $v);
+	# èbâª
+	$v = &seed_bonus('red_moon', $v);
 	
 	$v = int($v);
 
@@ -230,6 +234,8 @@ sub tp_310 {
 	}
 	
 	$v = &seed_bonus('hei', $v);
+	# èbâª
+	$v = &seed_bonus('red_moon', $v);
 
 	$v = int($v);
 

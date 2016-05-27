@@ -554,6 +554,8 @@ sub exe3 {
 	
 	# Še‘İ’è
 	$m{stock} = int($m{stock} * &get_modify('mil'));
+	# b‰»
+	$m{stock} = &seed_bonus('red_moon', $m{stock});
 	
 	my $v = $m{stock} > $cs{$k}[$y{country}] ? int($cs{$k}[$y{country}]) : int($m{stock});
 	$cs{$k}[$y{country}] -= $v;
