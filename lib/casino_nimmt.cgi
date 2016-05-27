@@ -68,7 +68,9 @@ sub run {
 		&print_lines;
 		print qq|<br>|;
 		if (&is_player) {
+			print qq|残り手札:|;
 			&print_my_hand;
+			print qq|<br>取ってしまったカード:|;
 			&print_gotten;
 		}
 		if (&is_put_minimum) {
@@ -104,6 +106,7 @@ sub run {
 			print qq|<input type="submit" value="席に着く" class="button_s"></form><br>|;
 		}
 	}
+	print qq|<br>55:7頭<br>その他ぞろ目:5頭<br>下一桁0:3頭<br>下一桁5:2頭<br>その他:1頭<br>一番少ない人が勝ちです。|;
 	print qq|<hr>|;
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
 	while (my $line = <$fh>) {
@@ -126,14 +129,7 @@ sub get_member {
 	while (my $line = <$fh>) {
 		my($mtime, $mname, $maddr) = split /<>/, $line;
 		if ($time - $limit_member_time > $mtime) {
-			if($mturn > 0){
-				$leave_name = $mname if $state ne 'waiting';
-				&regist_you_data($mname,'c_turn',0);
-				&regist_you_data($mname,'c_value',0);
-				&regist_you_data($mname,'c_stock',0);
-			}else {
-				next;
-			}
+			next;
 		}
 		next if $sames{$mname}++; # 同じ人なら次
 		
@@ -478,6 +474,7 @@ sub start_game{
 			my $c = shift @deck;
 			push @rests, $c;
 		}
+		@rests = sort { $a <=> $b } @rests;
 		$rest = join ',', @rests;
 		$nimmt = '';
 		&set_player_state($pname, $selected, $rest, $nimmt);
@@ -511,11 +508,18 @@ sub end_game {
 					1;
 		}
 		push @ranks, "$pname<>$nimmt<>$nsum<>$seat<>";
+
+		&regist_you_data($pname,'c_turn',0);
+		&regist_you_data($pname,'c_value',0);
+		&regist_you_data($pname,'c_stock',0);
+
 		$seat++;
 	}
 
 	@ranks = map { $_->[0] } sort { $a->[3] <=> $b->[3] || $a->[4] <=> $b->[4] } map { [$_, split /<>/ ] } @ranks;
 	my $rank_i = 1;
+	my $top_name = '';
+	my $get_coin = 0;
 	for my $r (@ranks) {
 		my($pname, $nimmt, $nsum, $seat) = split /<>/, $r;
 		$nimmt_str = '';
@@ -525,9 +529,14 @@ sub end_game {
 			$nimmt_str .= ',';
 		}
 		$rank .= "$rank_i位 $pname 牛$nsum頭 $nimmt_str<br>";
+		if ($rank_i == 1) {
+			$top_name = $pname;
+		} else {
+			$get_coin += -1 * &coin_move(-1 * $rate, $pname);
+		}
 		$rank_i++;
 	}
-	
+	&coin_move($get_coin, $top_name);
 	open my $fh, "> $game_file" or &error('ﾃﾞｰﾀﾌｧｲﾙが開けません'); 
 	print $fh "$rate<><><><><><>\n";
 	close $fh;
