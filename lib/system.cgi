@@ -533,10 +533,16 @@ sub time_to_date {
 #================================================
 sub log_errors {
 	my $text = shift;
-	
+	return if $text =~ /‚»‚Ì‚æ‚¤‚È–¼‘O/;
+
 	my $url = "http://" . $ENV{'HTTP_HOST'} . $ENV{'REQUEST_URI'};
+	my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time());
+	$year += 1900;
+	$mon++;
+
+	my $time2 = sprintf("%04d-%02d-%02d %02d:%02d.%02d",$year,$mon,$mday,$hour,$min,$sec);;
 	open my $fh, ">> ./log/error.cgi";
-	print $fh "$text\n$url\n\n";
+	print $fh "$text $time2\n$url\n\n";
 	close $fh;
 }
 
