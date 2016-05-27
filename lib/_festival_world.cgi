@@ -22,6 +22,22 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
+	# 拙速以外の祭り情勢開始時の既存国すべての君主と君主ファイルを初期化
+	if ($w{year} % 40 != 10) {
+		for my $i (0 .. $w{country}) {
+			for my $key (qw/ceo war dom mil pro/) {
+				$cs{$key}[$i] = '';
+				$cs{$key.'_c'}[$i] = 0;
+			}
+			$cs{member}[$i] = 0;
+			open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiﾌｧｲﾙが開けません");
+			close $fh;
+			open my $fh2, "> $logdir/$i/leader.cgi" or &error("$logdir/$i/leader.cgiﾌｧｲﾙが開けません");
+			close $fh2;
+		}
+		&write_cs;
+	}
+
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
 		$w{game_lv} = 99;
@@ -60,6 +76,19 @@ sub end_festival_world {
 	} elsif ($w{year} % 40 == 10) { # 拙速
 		&run_sessoku(0);
 	} else { # 混乱
+		for my $i (0 .. $w{country}) {
+			for my $key (qw/ceo war dom mil pro/) {
+				$cs{$key}[$i] = '';
+				$cs{$key.'_c'}[$i] = 0;
+			}
+			$cs{member}[$i] = 0;
+			open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiﾌｧｲﾙが開けません");
+			close $fh;
+			open my $fh2, "> $logdir/$i/leader.cgi" or &error("$logdir/$i/leader.cgiﾌｧｲﾙが開けません");
+			close $fh2;
+		}
+		&write_cs;
+
 		&run_konran(0);
 	}
 }
@@ -302,24 +331,69 @@ sub run_konran {
 			next if $pid =~ /\./;
 			next if $pid =~ /backup/;
 			my %you_datas = &get_you_datas($pid, 1);
-			
-			if($you_datas{name} eq $m{name}){
-				&move_player($m{name}, $m{country}, 0);
-				$m{country} = 0;
 
+			&move_player2($you_datas{name}, $you_datas{country}, 0);
+			if ($you_datas{name} eq $m{name}){
+				$m{country} = 0;
+				$m{vote} = '';
+	
 				# 熟練度のﾘｽﾄｱ
 				for my $k (qw/war dom pro mil/) {
 					$m{$k."_c"} = $m{$k."_c_t"};
 					$m{$k."_c_t"} = 0;
 				}
 				&write_user;
-			}
-			&move_player($you_datas{name}, $you_datas{country}, 0);
-			&regist_you_data($you_datas{name}, 'country', 0);
-			# 熟練度のﾘｽﾄｱ
-			for my $k (qw/war dom pro mil/) {
-				&regist_you_data($you_datas{name}, $k."_c", $you_datas{$k."_c_t"});
-				&regist_you_data($you_datas{name}, $k."_c_t", 0);
+			} else {
+				my $y_id = unpack 'H*', $you_datas{name};
+				open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
+				eval { flock $fh, 2; };
+				my $line = <$fh>;
+				my $line_info = <$fh>;
+	
+				if(index($line, "<>country;") >= 0){
+					$line =~ s/<>(country;).*?<>/<>${1}0<>/;
+				}else{
+					$line = "$k;0<>" . $line;
+				}
+	
+				if(index($line, "<>vote;") >= 0){
+					$line =~ s/<>(vote;).*?<>/<>$1<>/;
+				}else{
+					$line = "$vote;<>" . $line;
+				}
+	
+				# 代表熟練のﾘｽﾄｱ
+				for my $k (qw/war dom pro mil/) {
+					my $k1 = "${k}_c";
+					my $k2 = "${k}_c_t";
+					if(index($line, "<>$k1;") >= 0){
+						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
+					}else{
+						$line = "$k1;$you_datas{$k2}<>" . $line;
+					}
+					if(index($line, "<>$k2;") >= 0){
+						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
+					}else{
+						$line = "$k2;0<>" . $line;
+					}
+				}
+	
+				seek  $fh, 0, 0;
+				truncate $fh, 0;
+				print $fh $line;
+				print $fh $line_info;
+	
+				close $fh;
+
+
+#				&regist_you_data($you_datas{name}, 'country', 0);
+#				&regist_you_data($you_datas{name}, 'vote', '');
+	
+				# 熟練度のﾘｽﾄｱ
+#				for my $k (qw/war dom pro mil/) {
+#					&regist_you_data($you_datas{name}, $k."_c", $you_datas{$k."_c_t"});
+#					&regist_you_data($you_datas{name}, $k."_c_t", 0);
+#				}
 			}
 
 			my($c1, $c2) = split /,/, $w{win_countries};
@@ -332,6 +406,7 @@ sub run_konran {
 			}
 		}
 		closedir $dh;
+		&write_cs;
 	} # 混乱終了時の処理
 }
 
@@ -643,15 +718,16 @@ sub player_shuffle {
 		}
 	}
 	
-	require "./lib/move_player.cgi";
+#	require "./lib/move_player.cgi";
 	# 振り分け
 	for my $nl (@new_line) {
 		my($nname, $nc) = split /<>/, $nl;
 		my %you_datas = &get_you_datas($nname);
 		
-		&move_player($you_datas{name}, $you_datas{country}, $nc);
+		&move_player2($you_datas{name}, $you_datas{country}, $nc);
 		if ($you_datas{name} eq $m{name}){
 			$m{country} = $nc;
+			$m{vote} = '';
 
 			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
 			for my $k (qw/war dom pro mil/) {
@@ -660,15 +736,72 @@ sub player_shuffle {
 			}
 			&write_user;
 		} else {
-			&regist_you_data($you_datas{name}, 'country', $nc);
+			# regist_you_data を使えばコードは綺麗になるが結果的に何千回とファイル操作するので、
+			# 一括してユーザーデータを書き換える（めちゃめちゃ高速になる）
+			#&regist_you_data($you_datas{name}, 'country', $nc);
+			#&regist_you_data($you_datas{name}, 'vote', '');
+
+			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
+			#for my $k (qw/war dom pro mil/) {
+				#&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+				#&regist_you_data($you_datas{name}, $k."_c", 0);
+			#}
+			my $y_id = unpack 'H*', $nname;
+			open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
+			eval { flock $fh, 2; };
+			my $line = <$fh>;
+			my $line_info = <$fh>;
+
+			if(index($line, "<>country;") >= 0){
+				$line =~ s/<>(country;).*?<>/<>$1$nc<>/;
+			}else{
+				$line = "$k;$nc<>" . $line;
+			}
+
+			if(index($line, "<>vote;") >= 0){
+				$line =~ s/<>(vote;).*?<>/<>$1<>/;
+			}else{
+				$line = "$vote;<>" . $line;
+			}
 
 			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
 			for my $k (qw/war dom pro mil/) {
-				&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-				&regist_you_data($you_datas{name}, $k."_c", 0);
+				my $k1 = "${k}_c_t";
+				my $k2 = "${k}_c";
+				if(index($line, "<>$k1;") >= 0){
+					$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
+				}else{
+					$line = "$k1;$you_datas{$k2}<>" . $line;
+				}
+				if(index($line, "<>$k2;") >= 0){
+					$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
+				}else{
+					$line = "$k2;0<>" . $line;
+				}
 			}
+
+			seek  $fh, 0, 0;
+			truncate $fh, 0;
+			print $fh $line;
+			print $fh $line_info;
+
+			close $fh;
 		}
 	}
+	&write_cs;
+}
+
+sub move_player2 {
+	my($name, $from_country, $to_country) = @_;
+
+	my $p_id = unpack 'H*', $name;
+	my %datas = ();
+	%datas = &get_you_datas($p_id, 1) if -f "$userdir/$p_id/user.cgi";
+
+	open my $fh9, ">> $logdir/$to_country/member.cgi" or &error("$logdir/$to_country/member.cgiﾌｧｲﾙが開けません");
+	print $fh9 "$name\n";
+	close $fh9;
+	++$cs{member}[$to_country];
 }
 
 =pod

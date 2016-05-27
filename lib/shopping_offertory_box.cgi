@@ -187,6 +187,7 @@ sub tp_100 {
 
 					$mes .= "黒豚神<ぶー<br>";
 					&mes_and_world_news("黒豚神様からアイテムをもらいました", 1);
+					&send_twitter("黒豚神様からアイテムをもらいました");
 				} else {
 					&get_god_item(5);
 
@@ -194,6 +195,7 @@ sub tp_100 {
 					$mes .= "いっつもお参りありがとう。<br>";
 					$mes .= "お礼にアイテムあげるね<br>";
 					&mes_and_world_news("神様からアイテムをもらいました", 1);
+					&send_twitter("神様からアイテムをもらいました");
 				}
 			}
 			unshift @lines, "$total<>$anger";
@@ -273,6 +275,7 @@ sub tp_200 {
 
 					$mes .= "黒豚神<ぶー<br>";
 					&mes_and_world_news("黒豚神様からアイテムをもらいました", 1);
+					&send_twitter("黒豚神様からアイテムをもらいました");
 				} else {
 					&get_god_item(0);
 
@@ -280,6 +283,7 @@ sub tp_200 {
 					$mes .= "いっつもお参りありがとう！<br>";
 					$mes .= "お礼にアイテムあげるね！<br>";
 					&mes_and_world_news("神様からアイテムをもらいました？", 1);
+					&send_twitter("神様からアイテムをもらいました？");
 				}
 			}
 		}elsif($is_satisfy){
@@ -292,6 +296,7 @@ sub tp_200 {
 
 					$mes .= "黒豚神<ぶー<br>";
 					&mes_and_world_news("黒豚神様からアイテムをもらいました", 1);
+					&send_twitter("黒豚神様からアイテムをもらいました");
 				} else {
 					&get_god_item(6);
 
@@ -299,6 +304,7 @@ sub tp_200 {
 					$mes .= "いっつもお参りありがとう。<br>";
 					$mes .= "お礼にアイテムあげるね<br>";
 					&mes_and_world_news("神様からアイテムをもらいました", 1);
+					&send_twitter("神様からアイテムをもらいました");
 				}
 			}
 		}else{
@@ -311,6 +317,7 @@ sub tp_200 {
 
 					$mes .= "黒豚神<ぶー<br>";
 					&mes_and_world_news("黒豚神様からアイテムをもらいました", 1);
+					&send_twitter("黒豚神様からアイテムをもらいました");
 				} else {
 					&get_god_item(4);
 
@@ -318,6 +325,7 @@ sub tp_200 {
 					$mes .= "いっつもお参りありがとう。<br>";
 					$mes .= "お礼にアイテムあげるね<br>";
 					&mes_and_world_news("神様からアイテムをもらいました", 1);
+					&send_twitter("神様からアイテムをもらいました");
 				}
 			}
 		}

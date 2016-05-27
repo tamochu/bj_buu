@@ -533,10 +533,16 @@ sub time_to_date {
 #================================================
 sub log_errors {
 	my $text = shift;
-	
+	return if $text =~ /そのような名前/;
+
 	my $url = "http://" . $ENV{'HTTP_HOST'} . $ENV{'REQUEST_URI'};
+	my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time());
+	$year += 1900;
+	$mon++;
+
+	my $time2 = sprintf("%04d-%02d-%02d %02d:%02d.%02d",$year,$mon,$mday,$hour,$min,$sec);;
 	open my $fh, ">> ./log/error.cgi";
-	print $fh "$text\n$url\n\n";
+	print $fh "$text $time2\n$url\n\n";
 	close $fh;
 }
 
@@ -607,6 +613,7 @@ sub make_player_name_list {
 	closedir $dh;
 	
 	open my $fh, "> $logdir/player_name_list.cgi";
+	eval { flock $fh, 2; };
 	print $fh @lines;
 	close $fh;
 }
@@ -615,24 +622,35 @@ sub make_player_name_list {
 # ﾌﾟﾚｲﾔｰリスト取得
 #================================================
 sub get_player_name_list {
+#	my @names = ();
+#	open my $fh, "< $logdir/player_name_list.cgi";
+#	while (my $name = <$fh>) {
+#		chomp($name);
+#		if ($name) {
+#			push @names, $name;
+#		}
+#	}
+#	close $fh;
 	my @names = ();
-	open my $fh, "< $logdir/player_name_list.cgi";
-	while (my $name = <$fh>) {
-		chomp($name);
-		if ($name) {
-			push @names, $name;
-		}
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $id = readdir $dh) {
+		next if $id =~ /\./;
+		next if $id =~ /backup/;
+		my $name = pack 'H*', $id;
+		push @names, $name;
 	}
-	close $fh;
+	closedir $dh;
 	
 	return @names;
 }
 
 #================================================
 # Twitterに投稿
+# 第二引数が 1 で mes_and_world_news ライク
 #================================================
 sub send_twitter {
 	my $message = shift;
+	my $flag = shift;
 
 	my $pid = fork;
 	die unless defined $pid;
@@ -643,6 +661,7 @@ sub send_twitter {
 	close STDIN;
 	close STDERR;
 
+	$message = $w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16') ? "$c_mの名無しが$message" : "$c_mの$m{name}が$message" if $flag;
 	my $ua = new LWP::UserAgent;
 	$ua->agent("AgentName/0.1 " . $ua->agent);
 	my %params = (
@@ -685,6 +704,9 @@ sub load_RWD {
 #			print qq|<meta name="viewport" content="width=device-width, maximum-scale=1.5, minimum-scale=0.5,user-scalable=yes,initial-scale=0.9" />|;
 #			print qq|<link rel="stylesheet" media="screen and (min-width: 481px) and (max-width: 720px)" href="$htmldir/tablet.css?$jstime" />|;
 	}
+#	elsif (!$is_mobile) {
+#		print qq|<meta name="viewport" content="width=device-width">|;
+#	}
 }
 
 1; # 削除不可

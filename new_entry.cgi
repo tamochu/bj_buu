@@ -68,7 +68,7 @@ sub new_entry {
 	&error("ŒÅ‘Ì¯•Ê”Ô†‚ğ‘—‚éİ’è‚É‚µ‚Ä‚­‚¾‚³‚¢") if $agent =~ /KDDI|UP\.Browser/ && !$ENV{HTTP_X_UP_SUBNO};
 
 	&error('‚ ‚È‚½‚ÌIP±ÄŞÚ½‚Í“o˜^‚ª‹Ö~‚³‚ê‚Ä‚¢‚Ü‚·') if &is_deny_addr;
-	&error('‘½d“o˜^‚Í‹Ö~‚µ‚Ä‚¢‚Ü‚·')                if (&is_renzoku_entry && !config_test);
+	&error('‘½d“o˜^‚Í‹Ö~‚µ‚Ä‚¢‚Ü‚·')                if (&is_renzoku_entry && !$config_test);
 	
 	&create_user;
 

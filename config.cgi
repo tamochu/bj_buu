@@ -35,7 +35,7 @@ $is_force_jpeg = 0;
 
 # ----------------------------
 # ﾀｲﾄﾙ
-$title = 'Blind Justice';
+$title = 'Blind Justice にゃあ鯖';
 
 # ﾀｲﾄﾙ画像(必要ない場合は「''」)
 $title_img = './html/title.jpg';

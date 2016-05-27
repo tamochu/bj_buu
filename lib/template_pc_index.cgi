@@ -53,6 +53,10 @@ form { margin: 0; padding: 7px; }
 			$login_list
 		</div>
 		<br>$country_html<br>
+		<div>
+			<a class="twitter-timeline"  href="https://twitter.com/nanamie_nyaa/lists/blind-justice" data-widget-id="735186218791505921" data-chrome="noheader nofooter" width="100%" height="500px" lang="ja">https://twitter.com/nanamie_nyaa/lists/blind-justiceのツイート</a>
+			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+		</div>
 	</td>
 	<td valign="top" align="center">
 		<div class="login_box">

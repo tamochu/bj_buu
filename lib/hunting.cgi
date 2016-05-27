@@ -540,7 +540,15 @@ sub random_icon {
 # 超ボスに勝利
 #=================================================
 sub win_boss_bonus {
-	&mes_and_world_news("<b>$m{name}とその仲間たちがボスを撃破しました</b>", 1);
+	my $w_name = &name_link($m{name});
+	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+		$w_name = '名無し';
+	}
+	my $message = "<b>$m{name}とその仲間たちがボスを撃破しました</b>";
+	$mes .= "$message<br>";
+	&write_world_news("<b>$c_mの$w_nameとその仲間たちがボスを撃破しました</b>", 1);
+	&send_twitter("$c_mの$w_nameとその仲間たちがボスを撃破しました");
+#	&mes_and_world_news("", 1);
 
 	open my $bfh, "+< $logdir/monster/boss.cgi" or &error("$logdir/monster/boss.cgiﾌｧｲﾙがありません");
 	my $head_line = <$bfh>;

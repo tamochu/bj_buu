@@ -137,7 +137,7 @@ sub war_win {
 #		$mem = 0;
 #	}
 #	$v += ($cs{capacity}[$m{country}] - $mem) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
-	$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
+	$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 5 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
 
 
 	# 国情勢により奪国力増加
@@ -260,6 +260,9 @@ sub war_win {
 	}
 	
 	my $mname = &name_link($m{name});
+	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+		$mname = '名無し';
+	}
 	if ($w{world} eq $#world_states - 5) {
 		&write_world_news(qq|$c_mの$mnameが<font color="#FF00FF"><b>$v</b> の$e2j{strong}を得る事に成功</font>したようです|);
 	} else {
@@ -462,9 +465,13 @@ sub _rescue {
 	while (my $line = <$fh>) {
 		my($name,$country,$flag) = split /<>/, $line;
 		if ($flag == 0 && $count < $max_rescue && ($country eq $m{country} || $union eq $country) && $country ne '0' ) {
+			my $mname = $m{name};
+			if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+				$mname = '名無し';
+			}
 			$mes .= "$c_yに捕らえられていた$nameを救出しました<br>";
 			$is_rescue = 1;
-			&write_world_news("$c_mの$m{name}が$c_yに捕らえられていた$nameの救出に成功しました");
+			&write_world_news("$c_mの$mnameが$c_yに捕らえられていた$nameの救出に成功しました");
 			&write_yran('res', 1, 1);
 			
 			# ﾚｽｷｭｰﾌﾗｸﾞ作成
@@ -514,32 +521,38 @@ sub _touitu {
 		if ($m{country} eq $w{country} || $union eq $w{country}) { # NPC国側の勝利
 			&mes_and_world_news("<em>悪魔達の率先者として$world_name大陸を支配することに成功しました</em>",1);
 			&write_legend('touitu', "深き闇より目覚めた$cs{name}[$w{country}]の猛者達が$mnameを筆頭とし$world_name大陸を支配する");
+			&send_twitter("深き闇より目覚めた$cs{name}[$w{country}]の猛者達が$mnameを筆頭とし$world_name大陸を支配する");
 			$is_npc_win = 1;
 		}
 		else {
 			&mes_and_world_news("<em>魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれました</em>",1);
 			&write_legend('touitu', "$c_mの$mnameとその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
+			&send_twitter("$c_mの$mnameとその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
 		}
 	}
 	elsif ($w{world} eq $#world_states-2) {
 		&mes_and_world_news("<em>$world_name大陸を二分する戦いは$c_mの$mnameとその仲間達の勝利に終わった</em>",1);
 		&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
+		&send_twitter("$c_mの$mnameが$world_name大陸を統一する");
 		$w{win_countries} = $m{country};
 	}
 	elsif ($w{world} eq $#world_states-3) {
 		&mes_and_world_news("<em>$world_name大陸を三分する戦いは$c_mの$mnameとその仲間達の勝利に終わった</em>",1);
 		&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
+		&send_twitter("$c_mの$mnameが$world_name大陸を統一する");
 		$w{win_countries} = $m{country};
 	}
 	else {
 		if ($union) {
 			$mes .= "<em>$world_name大陸を統一しました</em>";
 			&write_world_news("<em>$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一しました</em>",1);
-			&write_legend('touitu', "$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一する")
+			&write_legend('touitu', "$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一する");
+			&send_twitter("$c_m$cs{name}[$union]同盟の$mnameが$world_name大陸を統一する");
 		}
 		else {
 			&mes_and_world_news("<em>$world_name大陸を統一しました</em>",1);
 			&write_legend('touitu', "$c_mの$mnameが$world_name大陸を統一する");
+			&send_twitter("$c_mの$mnameが$world_name大陸を統一する");
 		}
 	}
 
@@ -548,7 +561,6 @@ sub _touitu {
 
 	$m{lib} = 'world';
 	$m{tp}  = 100;
-	
 }
 
 #=================================================

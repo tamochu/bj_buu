@@ -161,6 +161,7 @@ sub tp_110 {
 		}
 		$m{act} += 10;
 		&write_colosseum_news(qq| <i>$menus[$m{stock}][0] VÁ¬İËßµİ <font color="$cs{color}[$m{country}]">$m{name}</font> ’a¶</i>|, 1);
+		&send_twitter("$menus[$m{stock}][0] VÁ¬İËßµİ $m{name} ’a¶");
 		
 		if ($w{world} eq $#world_states-4) {
 			require './lib/fate.cgi';
@@ -259,6 +260,7 @@ sub _defence_c_up {
 				&_send_money_and_col_c_up($name, $defence_c);
 				&write_colosseum_news(qq| <i><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</i>|);
 				&write_legend("champ_$m{stock}", "$cs{name}[$country]‚Ì$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚·", 1, $name);
+				&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
 			}
 			else {
 				push @lines, "$name<>$country<>$max_hp<>$max_mp<>$at<>$df<>$mat<>$mdf<>$ag<>$cha<>$wea<>$skills<>$mes_win<>$mes_lose<>$icon<>$defence_c<>$wea_name<>$gua<>\n";
@@ -303,6 +305,7 @@ sub _rewrite_champ {
 		else {
 			&write_colosseum_news(qq| <b><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</b>|, 1, $name);
 		}
+		&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
 		
 		&_send_money_and_col_c_up($name, $defence_c);
 	}

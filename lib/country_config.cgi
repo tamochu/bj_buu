@@ -257,10 +257,10 @@ sub tp_300 {
 sub tp_310 {
 	require "$datadir/npc_war_$m{country}.cgi";
 	for my $i (0..$#npcs){
-		&error("$e2j{name}に不正な文字( ,;\"\'&<>\\\/ )が含まれています") if $in{"npc_$i"} =~ /[,;\"\'&<>\\\/]/;
+		&error("NPC名に不正な文字( ,;\"\'&<>\\\/ )が含まれています") if $in{"npc_$i"} =~ /[,;\"\'&<>\\\/]/;
 		#"
-		&error("$e2j{name}に不正な空白が含まれています") if $in{"npc_$i"} =~ /　/ || $in{"npc_$i"} =~ /\s/;
-		&error("$e2j{name}は全角7(半角14)文字までです") if length $in{"npc_$i"} > 14;
+		&error("NPC名に不正な空白が含まれています") if $in{"npc_$i"} =~ /　/ || $in{"npc_$i"} =~ /\s/;
+		&error("NPC名は全角7(半角14)文字までです") if length $in{"npc_$i"} > 14;
 		unless (defined $in{"npc_$i"}) {
 			$mes .= "やめました<br>";
 			&begin;
