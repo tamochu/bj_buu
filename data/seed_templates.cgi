@@ -263,6 +263,21 @@ EOM
 		},
 		-2
 	],
+	[18, 'g‚«ŒŽ',
+		{
+			'red_moon' => <<'EOM'
+		,'red_moon' => sub {
+			$v = shift;
+			my $mday = (localtime($time))[3];
+			if ($mday eq '1' || $mday eq '15') {
+				$v = int($v * 1.1);
+			}
+			return $v;
+		}
+EOM
+		},
+		5
+	],
 );
 
 1;
