@@ -46,7 +46,7 @@ if (-M "./html/all.html" >= $update_cycle_day) {
 	&write_all_players_html;
 	&backup_players;
 }
-&make_player_name_list;
+#&make_player_name_list;
 #&refresh_new_commer;
 
 exit;
@@ -588,8 +588,6 @@ sub create_world_chart {
 	print $out &footer_players_html;
 	close $out;
 }
-
-
 
 sub backup_players {
 	mkdir "./snap_shot/snap_shot_$time";

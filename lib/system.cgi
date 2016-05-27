@@ -616,15 +616,24 @@ sub make_player_name_list {
 # ÌßÚ²Ô°ƒŠƒXƒgŽæ“¾
 #================================================
 sub get_player_name_list {
+#	my @names = ();
+#	open my $fh, "< $logdir/player_name_list.cgi";
+#	while (my $name = <$fh>) {
+#		chomp($name);
+#		if ($name) {
+#			push @names, $name;
+#		}
+#	}
+#	close $fh;
 	my @names = ();
-	open my $fh, "< $logdir/player_name_list.cgi";
-	while (my $name = <$fh>) {
-		chomp($name);
-		if ($name) {
-			push @names, $name;
-		}
+	opendir my $dh, "$userdir" or &error("Õ°»Þ°ÃÞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
+	while (my $id = readdir $dh) {
+		next if $id =~ /\./;
+		next if $id =~ /backup/;
+		my $name = pack 'H*', $id;
+		push @names, $name;
 	}
-	close $fh;
+	closedir $dh;
 	
 	return @names;
 }
