@@ -25,7 +25,8 @@ sub begin_festival_world {
 	# 拙速以外の祭り情勢開始時の既存国すべての君主と君主ファイルを初期化
 	if ($w{year} % 40 != 10) {
 		for my $i (0 .. $w{country}) {
-			for my $key (qw/ceo war dom mil pro/) {
+			$cs{ceo}{$i} = '';
+			for my $key (qw/war dom mil pro/) {
 				$cs{$key}[$i] = '';
 				$cs{$key.'_c'}[$i] = 0;
 			}
@@ -77,7 +78,8 @@ sub end_festival_world {
 		&run_sessoku(0);
 	} else { # 混乱
 		for my $i (0 .. $w{country}) {
-			for my $key (qw/ceo war dom mil pro/) {
+			$cs{ceo}{$i} = '';
+			for my $key (qw/war dom mil pro/) {
 				$cs{$key}[$i] = '';
 				$cs{$key.'_c'}[$i] = 0;
 			}
