@@ -170,7 +170,7 @@ sub create_user {
 		$m{$k} = 0;
 	}
 	
-	$m{shuffle}  = 1; # 混乱時シャッフルされる
+	$m{shuffle}  = 0; # 0 で混乱時シャッフルされる
 	$m{seed} = 'human';
 	$m{coin} = $config_test ? 2500000 : 0;
 
