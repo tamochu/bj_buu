@@ -8,7 +8,7 @@ use File::Path;
 # 紅白 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 # 三国志 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 # 拙速 ﾉｰｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
-# 混乱 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
+# 混乱 ｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
 
 #================================================
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
@@ -326,22 +326,23 @@ sub run_konran {
 		&player_shuffle(1..$w{country});
 	} # 混乱開始時の処理
 	else { # 混乱終了時の処理
+		my($c1, $c2) = split /,/, $w{win_countries}; # 統一国の取得
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
 			next if $pid =~ /backup/;
 			my %you_datas = &get_you_datas($pid, 1);
 
-			&move_player2($you_datas{name}, $you_datas{country}, 0);
+			&move_player2($you_datas{name}, 0);
 			if ($you_datas{name} eq $m{name}){
 				$m{country} = 0;
 				$m{vote} = '';
 	
 				# 熟練度のﾘｽﾄｱ
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c"} = $m{$k."_c_t"};
-					$m{$k."_c_t"} = 0;
-				}
+#				for my $k (qw/war dom pro mil/) {
+#					$m{$k."_c"} = $m{$k."_c_t"};
+#					$m{$k."_c_t"} = 0;
+#				}
 				&write_user;
 			} else {
 				my $y_id = unpack 'H*', $you_datas{name};
@@ -353,30 +354,30 @@ sub run_konran {
 				if(index($line, "<>country;") >= 0){
 					$line =~ s/<>(country;).*?<>/<>${1}0<>/;
 				}else{
-					$line = "$k;0<>" . $line;
+					$line = "country;0<>" . $line;
 				}
 	
 				if(index($line, "<>vote;") >= 0){
 					$line =~ s/<>(vote;).*?<>/<>$1<>/;
 				}else{
-					$line = "$vote;<>" . $line;
+					$line = "vote;<>" . $line;
 				}
 	
 				# 代表熟練のﾘｽﾄｱ
-				for my $k (qw/war dom pro mil/) {
-					my $k1 = "${k}_c";
-					my $k2 = "${k}_c_t";
-					if(index($line, "<>$k1;") >= 0){
-						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
-					}else{
-						$line = "$k1;$you_datas{$k2}<>" . $line;
-					}
-					if(index($line, "<>$k2;") >= 0){
-						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
-					}else{
-						$line = "$k2;0<>" . $line;
-					}
-				}
+#				for my $k (qw/war dom pro mil/) {
+#					my $k1 = "${k}_c";
+#					my $k2 = "${k}_c_t";
+#					if(index($line, "<>$k1;") >= 0){
+#						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
+#					}else{
+#						$line = "$k1;$you_datas{$k2}<>" . $line;
+#					}
+#					if(index($line, "<>$k2;") >= 0){
+#						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
+#					}else{
+#						$line = "$k2;0<>" . $line;
+#					}
+#				}
 	
 				seek  $fh, 0, 0;
 				truncate $fh, 0;
@@ -384,7 +385,6 @@ sub run_konran {
 				print $fh $line_info;
 	
 				close $fh;
-
 
 #				&regist_you_data($you_datas{name}, 'country', 0);
 #				&regist_you_data($you_datas{name}, 'vote', '');
@@ -396,7 +396,7 @@ sub run_konran {
 #				}
 			}
 
-			my($c1, $c2) = split /,/, $w{win_countries};
+			# 統一国にいた人に卵
 			if ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
 				open my $fh, ">> $userdir/$pid/ex_c.cgi";
 				print $fh "fes_c<>1<>\n";
@@ -630,13 +630,46 @@ sub get_strong_ranking {
 #================================================
 sub wt_c_reset {
 	my ($m, $you_datas) = @_;
-	if ($you_datas{name} eq $m{name}){
-		$$m{wt_c_latest} = $m{wt_c};
-		$$m{wt_c} = 0;
+	if (${$you_datas}{name} eq ${$m}{name}){
+		${$m}{wt_c_latest} = ${$m}{wt_c};
+		${$m}{wt_c} = 0;
+		${$m}{vote} = ''; # 関数の意味的にこれは不適合だけど処理速度重視でこっちに
 		&write_user;
 	} else {
-		&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
-		&regist_you_data($you_datas{name}, "wt_c", 0);
+			my $y_id = unpack 'H*', ${$you_datas}{name};
+			open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
+			eval { flock $fh, 2; };
+			my $line = <$fh>;
+			my $line_info = <$fh>;
+
+			if(index($line, "<>wt_c_latest;") >= 0){
+				$line =~ s/<>(wt_c_latest;).*?<>/<>$1${$you_datas}{wt_c}<>/;
+			}else{
+				$line = "wt_c_latest;${$you_datas}{wt_c}<>" . $line;
+			}
+
+			if(index($line, "<>wt_c;") >= 0){
+				$line =~ s/<>(wt_c;).*?<>/<>${1}0<>/;
+			}else{
+				$line = "wt_c;0<>" . $line;
+			}
+
+			# 関数の意味的にこれは不適合だけど処理速度重視でこっちに
+			if(index($line, "<>vote;") >= 0){
+				$line =~ s/<>(vote;).*?<>/<>$1<>/;
+			}else{
+				$line = "vote;<>" . $line;
+			}
+
+			seek  $fh, 0, 0;
+			truncate $fh, 0;
+			print $fh $line;
+			print $fh $line_info;
+
+			close $fh;
+
+#		&regist_you_data(${$you_datas}{name}, "wt_c_latest", ${$you_datas}{wt_c});
+#		&regist_you_data(${$you_datas}{name}, "wt_c", 0);
 	}
 }
 
@@ -670,19 +703,34 @@ sub player_shuffle {
 
 		&wt_c_reset(\%m, \%you_datas); # 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
 
-		if ($you_datas{shuffle}) {
-			my $c_find = 0;
-			if ($you_datas{country}) {
+		# 混乱時シャッフルされないで true
+		# 紅白・三国志は関係ないので処理しない
+		# シャッフルされないで居残ってる人をプラスして player_line に足さない
+		if ($you_datas{shuffle} && $w{world} == $#world_states-1) {
+			# member.cgiを初期化しているのでシャッフル前の国に再度飛ばさないとデータの不一致が起きる
+			&move_player2($you_datas{name}, $you_datas{country});
+			if ($you_datas{country}) { # 仕官していたなら
+#				$country_num{$you_datas{country}}++;
+#				next;
 				for my $c (@countries) {
 					if ($c eq $you_datas{country}) {
 						$country_num{$c}++;
-						$c_find = 1;
 					}
 				}
 			}
-			if ($c_find) {
-				next;
-			}
+			next;
+#			my $c_find = 0;
+#			if ($you_datas{country}) { # 仕官しているなら
+#				for my $c (@countries) {
+#					if ($c eq $you_datas{country}) {
+#						$country_num{$c}++;
+#						$c_find = 1;
+#					}
+#				}
+#			}
+#			if ($c_find) {
+#				next;
+#			}
 		}
 		
 		push @player_line, "$you_datas{name}<>$you_datas{wt_c_latest}<>\n";
@@ -723,16 +771,17 @@ sub player_shuffle {
 	for my $nl (@new_line) {
 		my($nname, $nc) = split /<>/, $nl;
 		my %you_datas = &get_you_datas($nname);
-		
-		&move_player2($you_datas{name}, $you_datas{country}, $nc);
-		if ($you_datas{name} eq $m{name}){
-			$m{country} = $nc;
-			$m{vote} = '';
 
-			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
-			for my $k (qw/war dom pro mil/) {
-				$m{$k."_c_t"} = $m{$k."_c"};
-				$m{$k."_c"} = 0;
+		&move_player2($you_datas{name}, $nc);
+		if ($you_datas{name} eq $m{name}) {
+			$m{country} = $nc;
+
+			# 混乱じゃないなら代表熟練のﾊﾞｯｸｱｯﾌﾟ
+			if ($w{world} != $#world_states-1) {
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c_t"} = $m{$k."_c"};
+					$m{$k."_c"} = 0;
+				}
 			}
 			&write_user;
 		} else {
@@ -746,7 +795,7 @@ sub player_shuffle {
 				#&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
 				#&regist_you_data($you_datas{name}, $k."_c", 0);
 			#}
-			my $y_id = unpack 'H*', $nname;
+			my $y_id = unpack 'H*', $you_datas{name};
 			open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
 			eval { flock $fh, 2; };
 			my $line = <$fh>;
@@ -755,28 +804,24 @@ sub player_shuffle {
 			if(index($line, "<>country;") >= 0){
 				$line =~ s/<>(country;).*?<>/<>$1$nc<>/;
 			}else{
-				$line = "$k;$nc<>" . $line;
+				$line = "country;$nc<>" . $line;
 			}
 
-			if(index($line, "<>vote;") >= 0){
-				$line =~ s/<>(vote;).*?<>/<>$1<>/;
-			}else{
-				$line = "$vote;<>" . $line;
-			}
-
-			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
-			for my $k (qw/war dom pro mil/) {
-				my $k1 = "${k}_c_t";
-				my $k2 = "${k}_c";
-				if(index($line, "<>$k1;") >= 0){
-					$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
-				}else{
-					$line = "$k1;$you_datas{$k2}<>" . $line;
-				}
-				if(index($line, "<>$k2;") >= 0){
-					$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
-				}else{
-					$line = "$k2;0<>" . $line;
+			# 混乱じゃないなら代表熟練のﾊﾞｯｸｱｯﾌﾟ
+			if ($w{world} != $#world_states-1) {
+				for my $k (qw/war dom pro mil/) {
+					my $k1 = "${k}_c_t";
+					my $k2 = "${k}_c";
+					if(index($line, "<>$k1;") >= 0){
+						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
+					}else{
+						$line = "$k1;$you_datas{$k2}<>" . $line;
+					}
+					if(index($line, "<>$k2;") >= 0){
+						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
+					}else{
+						$line = "$k2;0<>" . $line;
+					}
 				}
 			}
 
@@ -792,7 +837,7 @@ sub player_shuffle {
 }
 
 sub move_player2 {
-	my($name, $from_country, $to_country) = @_;
+	my($name, $to_country) = @_;
 
 	my $p_id = unpack 'H*', $name;
 	my %datas = ();
