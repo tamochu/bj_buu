@@ -2,6 +2,7 @@
 require './config.cgi';
 require './config_game.cgi';
 require './lib/_bbs_chat.cgi';
+require './lib/_comment_tag.cgi';
 require "$datadir/profile.cgi";
 #================================================
 # “ú‹L Created by Merino
@@ -57,6 +58,8 @@ sub myself_blog {
 
 		my $name = $m{name};
 		$name .= "[$m{shogo}]" if $m{shogo};
+
+		$in{comment} = &comment_change($in{comment}, 0);
 		$in{comment} .= qq|<hr><font color="$cs{color}[$m{country}]">$cs{name}[$m{country}]</font> $name|;
 
 		my $icon_temp = $m{icon};
