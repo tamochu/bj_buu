@@ -540,9 +540,9 @@ sub log_errors {
 	$year += 1900;
 	$mon++;
 
-	my $time2 = sprintf("%04d-%02d-%02d %02d:%02d.%02d",$year,$mon,$mday,$hour,$min,$sec);;
+	my $time2 = sprintf("%04d-%02d-%02d %02d:%02d.%02d",$year,$mon,$mday,$hour,$min,$sec);
 	open my $fh, ">> ./log/error.cgi";
-	print $fh "$text $time2\n$url\n\n";
+	print $fh "$text $m{name} $time2\n$url\n\n";
 	close $fh;
 }
 
