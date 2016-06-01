@@ -17,6 +17,7 @@ sub new{
 }
 
 #./log/countries.cgiに直接アクセスしてデータを取得/設定
+#new_dataにzeroで空
 sub access_data{
 
 	my $self = shift;
@@ -30,6 +31,9 @@ sub access_data{
 		
 		#新しい値が設定されていれば設定、なければ取得
 		if($new_data){
+			if($new_data eq "zero"){
+				$new_data = 0;
+			}
 			$w{$data_name} = $new_data;
 			&write_cs;
 			&read_cs;
@@ -39,7 +43,6 @@ sub access_data{
 	};
 
 	return Util::fork_sub($sub_routine);
-
 }
 
 #災害を起こす(system_game.cgi::disaster()にバイパス)

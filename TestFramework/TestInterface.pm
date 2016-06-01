@@ -7,17 +7,13 @@ package TestInterface;
 use Carp;
 use File::Copy::Recursive qw(dircopy);
 
-#出力クラス
-require TestResult;
-
-
 sub new{
 
 	my $class = shift;
 	my $self = {};
 
 	#出力クラス
-	$self->{TEST_RESULT} = TestResult->new();
+	$self->{TEST_RESULT} = shift;
 
 	#テスト開始前後で退避させるフォルダ
 	$self->{FOLDERS_TO_SAVE} = [ 'log', 'datas', 'user' ];
@@ -78,7 +74,7 @@ sub run_test{
 	#テスト実行
 	eval{
 		require "$filename";
-	}
+	};
 
 	#エラーケースと成功ケースをそれぞれ別個に格納
 	if($@){
@@ -87,9 +83,6 @@ sub run_test{
 	else{
 		$self->{TEST_RESULT}->add_ok($filename);
 	}
-
-	#結果を出力
-	$self->{TEST_RESULT}->output_result();
 }
 
 #指定されたフォルダの全てのテストを実行
@@ -111,7 +104,7 @@ sub run_all_tests{
 		#テスト実行
 		eval{
 			require "$filename";
-		}
+		};
 
 		#エラーケースと成功ケースをそれぞれ別個に格納
 		if($@){
@@ -122,8 +115,14 @@ sub run_all_tests{
 		}
 	}
 
-	#出力
-	$self->{TEST_RESULT}->output_result();
 }
 
+#テスト結果を表示
+sub output_result{
 
+	my $self = shift;
+	$self->{TEST_RESULT}->output_result();
+
+}
+
+1;

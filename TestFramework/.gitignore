@@ -1,5 +1,6 @@
 #swap file
 *.swp
+*.swo
 
 #log file
 *.log

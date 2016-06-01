@@ -24,18 +24,21 @@ sub access_data{
 	my $self = shift;
 	my $user_name = shift;
 	my $key = shift;
-	
-	croak ("user_name and key should be given\n") unless ((defined $user_name) and (defined $key)); 
+	my $new_value = shift;
 
 	my $sub_routine = sub{
 
+		print "PA sub\n";
 		_load_config();
 		_read_user($user_name);
 
-		#新しい値が設定されていれば設定、なければ取得
-		if (@_){
 
-			my $new_value = shift;
+		#新しい値が設定されていれば設定、なければ取得
+		if ($new_value){
+		
+			if($new_value eq "zero"){
+				$new_value = 0;
+			}
 	
 			#y_の形のkeyなら%yに設定
 			if ($key =~ /^y_(.+)$/){
@@ -46,7 +49,7 @@ sub access_data{
 			}
 	
 			&write_user;
-			Util::_read_user($user_name);
+			_read_user($user_name);
 
 		}
 
@@ -133,6 +136,7 @@ sub shikan_player{
 	return Util::fork_sub($sub_routine);
 
 }
+
 
 #playerにアイテムを与える
 #todo
