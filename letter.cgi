@@ -30,6 +30,12 @@ sub letter_box_get {
 
 		&send_letter($in{name}, $in{is_save_log}) if $in{name} ne $admin_name || $rflag == 0;
 		print qq|<p>$in{name} に手紙を送りました</p>|;
+
+		# プライバシーを考慮し、誰が誰に送信したかだけをロギング
+		my $ltime = time();
+		open my $fh, ">> $logdir/letter_log.cgi";
+		print $fh "$m{name}<>$in{name}<>$ltime\n";
+		close $fh;
 	}
 
 	if ($in{mode} eq "refuse") {

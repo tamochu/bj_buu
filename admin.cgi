@@ -52,6 +52,7 @@ elsif ($in{mode} eq 'admin_parupunte')   { &admin_parupunte; }
 elsif ($in{mode} eq 'admin_compare')   { &admin_compare; }
 elsif ($in{mode} eq 'migrate_reset')   { &migrate_reset; }
 elsif ($in{mode} eq 'admin_all_pet_check')   { &admin_all_pet_check; }
+elsif ($in{mode} eq 'admin_letter_log_check')   { &admin_letter_log_check; }
 
 &top;
 &footer;
@@ -334,6 +335,12 @@ sub top {
 	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
 	print qq|<p><input type="submit" value="調査" class="button_s"></p></form></div>|;
 	
+	print qq|<br><br><br>|;
+	print qq|<div class="mes">手紙送信履歴<ul>|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_letter_log_check">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="送信履歴" class="button_s"></p></form></div>|;
+
 	print qq|<br><br><br>|;
 	my @files = glob "$logdir/monster/*.cgi";
 	for my $p_name (@files){
@@ -1170,3 +1177,22 @@ sub admin_parupunte {
 	$mes .= "<hr>改造ﾊﾟﾙﾌﾟﾝﾃを打ちました<br>";
 }
 
+#=================================================
+# 手紙の送信履歴（プライバシーを考慮し、誰が誰に送信したかだけをロギングしている）
+#=================================================
+sub admin_letter_log_check {
+	$mes .= qq|<table><tr><th>送信者</th><th>受信者</th><th>送信日時</th></tr>\n|;
+
+	open my $fh, "< $logdir/letter_log.cgi" or &error("$logdir/letter_log.cgiﾌｧｲﾙが開けません");
+	while (my $line = <$fh>) {
+		my($from_name, $to_name, $ltime) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ltime);
+		$year += 1900;
+		$mon++;
+		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+		$mes .= qq|<tr><td>$from_name</td><td>$to_name</td><td>$ltime2</td></tr>\n|;
+	}
+	close $fh;
+
+	$mes .= qq|</table>|;
+}
