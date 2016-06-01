@@ -118,7 +118,7 @@ sub letter_box_get {
 			}else{
 				print qq|<hr><input type="checkbox" name="delete" value="$btime">|;
 			}
-			print qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font><a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>[$bshogo] <font size="1">($bdate)</font><hr>|;
+			print qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font><a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>$bshogo <font size="1">($bdate)</font><hr>|;
 			print qq|$bcomment<br><hr><br>|;
 		}
 		else {
