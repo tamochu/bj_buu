@@ -8,7 +8,7 @@ use File::Path;
 # 紅白 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 # 三国志 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 # 拙速 ﾉｰｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
-# 混乱 ｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
+# 混乱 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 
 #================================================
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
@@ -24,19 +24,11 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 sub begin_festival_world {
 	# 拙速以外の祭り情勢開始時の既存国すべての君主と君主ファイルを初期化
 	if ($w{year} % 40 != 10) {
-		for my $i (0 .. $w{country}) {
-			$cs{ceo}{$i} = '';
-			for my $key (qw/war dom mil pro/) {
-				$cs{$key}[$i] = '';
-				$cs{$key.'_c'}[$i] = 0;
-			}
-			$cs{member}[$i] = 0;
-			open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiﾌｧｲﾙが開けません");
+		for my $i (1 .. $w{country}) {
+			$cs{ceo}[$i] = '';
+			open my $fh, "> $logdir/$i/leader.cgi";
 			close $fh;
-			open my $fh2, "> $logdir/$i/leader.cgi" or &error("$logdir/$i/leader.cgiﾌｧｲﾙが開けません");
-			close $fh2;
 		}
-		&write_cs;
 	}
 
 	if ($w{year} % 40 == 0){ # 不倶戴天
@@ -341,10 +333,10 @@ sub run_konran {
 				$m{vote} = '';
 	
 				# 熟練度のﾘｽﾄｱ
-#				for my $k (qw/war dom pro mil/) {
-#					$m{$k."_c"} = $m{$k."_c_t"};
-#					$m{$k."_c_t"} = 0;
-#				}
+				for my $k (qw/war dom pro mil/) {
+					$m{$k."_c"} = $m{$k."_c_t"};
+					$m{$k."_c_t"} = 0;
+				}
 				&write_user;
 			} else {
 				my $y_id = unpack 'H*', $you_datas{name};
@@ -366,20 +358,20 @@ sub run_konran {
 				}
 	
 				# 代表熟練のﾘｽﾄｱ
-#				for my $k (qw/war dom pro mil/) {
-#					my $k1 = "${k}_c";
-#					my $k2 = "${k}_c_t";
-#					if(index($line, "<>$k1;") >= 0){
-#						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
-#					}else{
-#						$line = "$k1;$you_datas{$k2}<>" . $line;
-#					}
-#					if(index($line, "<>$k2;") >= 0){
-#						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
-#					}else{
-#						$line = "$k2;0<>" . $line;
-#					}
-#				}
+				for my $k (qw/war dom pro mil/) {
+					my $k1 = "${k}_c";
+					my $k2 = "${k}_c_t";
+					if(index($line, "<>$k1;") >= 0){
+						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
+					}else{
+						$line = "$k1;$you_datas{$k2}<>" . $line;
+					}
+					if(index($line, "<>$k2;") >= 0){
+						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
+					}else{
+						$line = "$k2;0<>" . $line;
+					}
+				}
 	
 				seek  $fh, 0, 0;
 				truncate $fh, 0;
@@ -409,7 +401,6 @@ sub run_konran {
 		}
 		closedir $dh;
 		&write_cs;
-	} # 混乱終了時の処理
 }
 
 #================================================
@@ -632,46 +623,13 @@ sub get_strong_ranking {
 #================================================
 sub wt_c_reset {
 	my ($m, $you_datas) = @_;
-	if (${$you_datas}{name} eq ${$m}{name}){
-		${$m}{wt_c_latest} = ${$m}{wt_c};
-		${$m}{wt_c} = 0;
-		${$m}{vote} = ''; # 関数の意味的にこれは不適合だけど処理速度重視でこっちに
+	if ($you_datas{name} eq $m{name}){
+		$$m{wt_c_latest} = $m{wt_c};
+		$$m{wt_c} = 0;
 		&write_user;
 	} else {
-			my $y_id = unpack 'H*', ${$you_datas}{name};
-			open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
-			eval { flock $fh, 2; };
-			my $line = <$fh>;
-			my $line_info = <$fh>;
-
-			if(index($line, "<>wt_c_latest;") >= 0){
-				$line =~ s/<>(wt_c_latest;).*?<>/<>$1${$you_datas}{wt_c}<>/;
-			}else{
-				$line = "wt_c_latest;${$you_datas}{wt_c}<>" . $line;
-			}
-
-			if(index($line, "<>wt_c;") >= 0){
-				$line =~ s/<>(wt_c;).*?<>/<>${1}0<>/;
-			}else{
-				$line = "wt_c;0<>" . $line;
-			}
-
-			# 関数の意味的にこれは不適合だけど処理速度重視でこっちに
-			if(index($line, "<>vote;") >= 0){
-				$line =~ s/<>(vote;).*?<>/<>$1<>/;
-			}else{
-				$line = "vote;<>" . $line;
-			}
-
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh $line;
-			print $fh $line_info;
-
-			close $fh;
-
-#		&regist_you_data(${$you_datas}{name}, "wt_c_latest", ${$you_datas}{wt_c});
-#		&regist_you_data(${$you_datas}{name}, "wt_c", 0);
+		&regist_you_data($you_datas{name}, "wt_c_latest", $you_datas{wt_c});
+		&regist_you_data($you_datas{name}, "wt_c", 0);
 	}
 }
 
@@ -705,34 +663,19 @@ sub player_shuffle {
 
 		&wt_c_reset(\%m, \%you_datas); # 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ
 
-		# 混乱時シャッフルされないで true
-		# 紅白・三国志は関係ないので処理しない
-		# シャッフルされないで居残ってる人をプラスして player_line に足さない
-		if ($you_datas{shuffle} && $w{world} == $#world_states-1) {
-			# member.cgiを初期化しているのでシャッフル前の国に再度飛ばさないとデータの不一致が起きる
-			&move_player2($you_datas{name}, $you_datas{country});
-			if ($you_datas{country}) { # 仕官していたなら
-#				$country_num{$you_datas{country}}++;
-#				next;
+		if ($you_datas{shuffle}) {
+			my $c_find = 0;
+			if ($you_datas{country}) {
 				for my $c (@countries) {
 					if ($c eq $you_datas{country}) {
 						$country_num{$c}++;
+						$c_find = 1;
 					}
 				}
 			}
-			next;
-#			my $c_find = 0;
-#			if ($you_datas{country}) { # 仕官しているなら
-#				for my $c (@countries) {
-#					if ($c eq $you_datas{country}) {
-#						$country_num{$c}++;
-#						$c_find = 1;
-#					}
-#				}
-#			}
-#			if ($c_find) {
-#				next;
-#			}
+			if ($c_find) {
+				next;
+			}
 		}
 		
 		push @player_line, "$you_datas{name}<>$you_datas{wt_c_latest}<>\n";
@@ -768,74 +711,32 @@ sub player_shuffle {
 		}
 	}
 	
-#	require "./lib/move_player.cgi";
+	require "./lib/move_player.cgi";
 	# 振り分け
 	for my $nl (@new_line) {
 		my($nname, $nc) = split /<>/, $nl;
 		my %you_datas = &get_you_datas($nname);
-
-		&move_player2($you_datas{name}, $nc);
-		if ($you_datas{name} eq $m{name}) {
+		
+		&move_player($you_datas{name}, $you_datas{country}, $nc);
+		if ($you_datas{name} eq $m{name}){
 			$m{country} = $nc;
 
-			# 混乱じゃないなら代表熟練のﾊﾞｯｸｱｯﾌﾟ
-			if ($w{world} != $#world_states-1) {
-				for my $k (qw/war dom pro mil/) {
-					$m{$k."_c_t"} = $m{$k."_c"};
-					$m{$k."_c"} = 0;
-				}
+			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
+			for my $k (qw/war dom pro mil/) {
+				$m{$k."_c_t"} = $m{$k."_c"};
+				$m{$k."_c"} = 0;
 			}
 			&write_user;
 		} else {
-			# regist_you_data を使えばコードは綺麗になるが結果的に何千回とファイル操作するので、
-			# 一括してユーザーデータを書き換える（めちゃめちゃ高速になる）
-			#&regist_you_data($you_datas{name}, 'country', $nc);
-			#&regist_you_data($you_datas{name}, 'vote', '');
+			&regist_you_data($you_datas{name}, 'country', $nc);
 
 			# 代表熟練のﾊﾞｯｸｱｯﾌﾟ
-			#for my $k (qw/war dom pro mil/) {
-				#&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
-				#&regist_you_data($you_datas{name}, $k."_c", 0);
-			#}
-			my $y_id = unpack 'H*', $you_datas{name};
-			open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
-			eval { flock $fh, 2; };
-			my $line = <$fh>;
-			my $line_info = <$fh>;
-
-			if(index($line, "<>country;") >= 0){
-				$line =~ s/<>(country;).*?<>/<>$1$nc<>/;
-			}else{
-				$line = "country;$nc<>" . $line;
+			for my $k (qw/war dom pro mil/) {
+				&regist_you_data($you_datas{name}, $k."_c_t", $you_datas{$k."_c"});
+				&regist_you_data($you_datas{name}, $k."_c", 0);
 			}
-
-			# 混乱じゃないなら代表熟練のﾊﾞｯｸｱｯﾌﾟ
-			if ($w{world} != $#world_states-1) {
-				for my $k (qw/war dom pro mil/) {
-					my $k1 = "${k}_c_t";
-					my $k2 = "${k}_c";
-					if(index($line, "<>$k1;") >= 0){
-						$line =~ s/<>($k1;).*?<>/<>$1$you_datas{$k2}<>/;
-					}else{
-						$line = "$k1;$you_datas{$k2}<>" . $line;
-					}
-					if(index($line, "<>$k2;") >= 0){
-						$line =~ s/<>($k2;).*?<>/<>${1}0<>/;
-					}else{
-						$line = "$k2;0<>" . $line;
-					}
-				}
-			}
-
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh $line;
-			print $fh $line_info;
-
-			close $fh;
 		}
 	}
-	&write_cs;
 }
 
 sub move_player2 {
@@ -851,111 +752,4 @@ sub move_player2 {
 	++$cs{member}[$to_country];
 }
 
-=pod
-# 祭り情勢の開始と終了に紐づくので 1 ずつ空ける
-use constant FESTIVAL_TYPE => {
-	'kouhaku' => 1,
-	'sangokusi' => 3,
-	'konran' => 5,
-	'sessoku' => 7,
-	'dokuritu' => 9
-};
-
-# 祭り情勢の名称と、開始時なら 1 終了時 なら 0 を指定する
-sub festival_type {
-	my ($festival_name, $is_start) = @_;
-	return FESTIVAL_TYPE->{$festival_name} + $is_start;
-}
-
-sub player_migrate {
-	my $type = shift;
-
-	if ($type == &festival_type('kouhaku', 1)) { # 不倶戴天設定
-	}
-	elsif ($type == &festival_type('kouhaku', 0)) { # 不倶戴天解除
-	}
-	elsif ($type == &festival_type('sangokusi', 1)) { # 三国志設定
-	}
-	elsif ($type == &festival_type('sangokusi', 0)) { # 三国志解除
-		require "./lib/move_player.cgi";
-	}
-#	elsif ($type == &festival_type('konran', 1) || $type == &festival_type('sessoku', 1)) { # 混乱設定
-	elsif ($type == &festival_type('konran', 1)) { # 混乱設定
-	}
-#	elsif ($type == &festival_type('konran', 0) || $type == &festival_type('sessoku', 0)) { #混乱解除
-	elsif ($type == &festival_type('konran', 0)) { #混乱解除
-	}
-	elsif ($type == &festival_type('sessoku', 1)) { # 拙速開始
-#		&write_cs;
-	}
-	elsif ($type == &festival_type('sessoku', 0)) { # 拙速終了
-#		&cs_data_repair;
-#		&write_cs;
-	}
-	elsif ($type == &festival_type('dokuritu', 1)) { # 独立設定
-		for my $i (0 .. $w{country}) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			rcopy($from, $backup);
-		}
-		my $from = "$logdir/countries.cgi";
-		my $backup = "$logdir/countries_backup.cgi";
-		rcopy($from, $backup);
-	}
-	elsif ($type == &festival_type('dokuritu', 0)) { # 独立解除
-		require "./lib/move_player.cgi";
-		for my $i (1..$w{country}) {
-			my @names = &get_country_members($i);
-			for my $name (@names) {
-				$name =~ tr/\x0D\x0A//d;
-				if($name eq $m{name}){
-					&move_player($m{name}, $i, 0);
-					$m{country} = 0;
-					&write_user;
-				}
-				my %you_datas = &get_you_datas($name);
-				&move_player($name, $i, 0);
-				&regist_you_data($name, 'country', 0);
-
-				my($c1, $c2) = split /,/, $w{win_countries};
-				if ($c1 eq $i || $c2 eq $i) {
-					require './lib/shopping_offertory_box.cgi';
-					if ($cs{ceo}[$you_datas{country}] eq $you_datas{name}) {
-						&send_god_item(7, $cs{ceo}[$you_datas{country}]) for (1..2);
-					}
-					my $n_id = unpack 'H*', $name;
-					open my $fh, ">> $userdir/$n_id/ex_c.cgi";
-					print $fh "fes_c<>1<>\n";
-					close $fh;
-					
-					&send_item($name, 2, int(rand($#eggs)+1), 0, 0, 1);
-				}
-			}
-		}
-		for my $i (0 .. $w{country}) {
-			my $from = "$logdir/$i";
-			my $backup = $from . "_backup";
-			my $num = rmtree($from);
-			rcopy($backup, $from);
-		}
-		
-		my $i = 1;
-		open my $fh, "< $logdir/countries_backup.cgi" or &error("国ﾃﾞｰﾀが読み込めません");
-		my $world_line = <$fh>;
-		while (my $line = <$fh>) {
-			for my $hash (split /<>/, $line) {
-				my($k, $v) = split /;/, $hash;
-				if ($k eq 'name' || $k eq 'color' || $k eq 'win_c' || $k eq 'old_ceo' || $k eq 'ceo_continue') {
-					$cs{$k}[$i] = $v;
-				}
-			}
-			$w{country} = $i;
-			++$i;
-		}
-		close $fh;
-		
-		&cs_data_repair;# ???
-	}
-}
-=cut
 1;
