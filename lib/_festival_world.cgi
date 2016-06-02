@@ -752,4 +752,5 @@ sub move_player2 {
 	++$cs{member}[$to_country];
 }
 
+
 1;
