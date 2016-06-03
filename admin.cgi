@@ -54,6 +54,7 @@ elsif ($in{mode} eq 'migrate_reset')   { &migrate_reset; }
 elsif ($in{mode} eq 'admin_all_pet_check')   { &admin_all_pet_check; }
 elsif ($in{mode} eq 'admin_letter_log_check')   { &admin_letter_log_check; }
 elsif ($in{mode} eq 'admin_incubation_log_check')   { &admin_incubation_log_check; }
+elsif ($in{mode} eq 'admin_shopping_log_check')   { &admin_shopping_log_check; }
 
 &top;
 &footer;
@@ -345,6 +346,12 @@ sub top {
 	print qq|<br><br><br>|;
 	print qq|<div class="mes">孵化履歴<ul>|;
 	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_incubation_log_check">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="チェック" class="button_s"></p></form></div>|;
+
+	print qq|<br><br><br>|;
+	print qq|<div class="mes">購入履歴<ul>|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_shopping_log_check">|;
 	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
 	print qq|<p><input type="submit" value="チェック" class="button_s"></p></form></div>|;
 
@@ -1230,6 +1237,26 @@ sub admin_incubation_log_check {
 		$mon++;
 		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
 		$mes .= qq|<tr><td>$name</td><td>$egg</td><td>$pet</td><td>$ltime2</td></tr>\n|;
+	}
+	close $fh;
+
+	$mes .= qq|</table>|;
+}
+
+#=================================================
+# アイテムの購入履歴
+#=================================================
+sub admin_shopping_log_check {
+	$mes .= qq|<table><tr><th>購入者</th><th>経営者</th><th>ｱｲﾃﾑ</th><th>値段</th><th>購入日時</th></tr>\n|;
+
+	open my $fh, "< $logdir/shopping_log.cgi" or &error("$logdir/shopping_log.cgiﾌｧｲﾙが開けません");
+	while (my $line = <$fh>) {
+		my($m_name, $y_name, $item, $price, $ltime) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ltime);
+		$year += 1900;
+		$mon++;
+		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+		$mes .= qq|<tr><td>$m_name</td><td>$y_name</td><td>$item</td><td>$price</td><td>$ltime2</td></tr>\n|;
 	}
 	close $fh;
 

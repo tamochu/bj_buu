@@ -175,8 +175,15 @@ sub tp_100 {
 					
 					&send_item($m{name}, $kind, $item_no, $item_c, $item_lv, $sell_id);
 					&send_money($y{name}, "【$m{stock}($item_name)】$m{name}", $price, 1);
+					&sale_data_log($kind, $item_no, $item_c, $item_lv, $price, 1);
 					$is_rewrite = 1;
-					
+
+					# ショッピングをロギング
+					my $ltime = time();
+					open my $fh, ">> $logdir/shopping_log.cgi";
+					print $fh "$m{name}<>$y{name}<>$item_name<>$price<>$ltime\n";
+					close $fh;
+
 					# 売上金加算
 					open my $fh2, "+< $userdir/$shop_id/shop_sale.cgi" or &error("売上ﾌｧｲﾙが開けません");
 					eval { flock $fh2, 2; };
@@ -457,11 +464,11 @@ sub tp_410 {
 				if ($buyout_price && $need_money > $buyout_price) {
 					$need_money = $buyout_price
 				}
-				if ( $in{money} >= $need_money  && &is_buyable($kind, $item_no) ) {
+				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
 					my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
 								   : $kind eq '2' ? "[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 								   : $kind eq '3' ? "[ペ]$pets[$item_no][1]★$item_c"
-								   : 				"[ペ]$guas[$item_no][1]"
+								   : 				"[防]$guas[$item_no][1]"
 								   ;
 					
 					$m{total_auction} += $in{money};
@@ -473,6 +480,7 @@ sub tp_410 {
 						}
 						&send_money($m{name}, 'ｵｰｸｼｮﾝ会場', "-$in{money}");
 						&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $in{money});
+						&sale_data_log($kind, $item_no, $item_c, $item_lv, $in{money}, 3);
 						$mes .= "即決価格を提示しました<br>";
 						&write_send_news("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
 						&send_twitter("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
@@ -495,7 +503,7 @@ sub tp_410 {
 				my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
 							   : $kind eq '2' ? "[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 							   : $kind eq '3' ? "[ペ]$pets[$item_no][1]★$item_c"
-							   : 				"[ペ]$guas[$item_no][1]"
+							   : 				"[防]$guas[$item_no][1]"
 							   ;
 				
 				my $to_id = unpack 'H*', $to_name;
@@ -504,6 +512,7 @@ sub tp_410 {
 				}
 				&send_money($to_name, 'ｵｰｸｼｮﾝ会場', "-$item_price");
 				&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $item_price);
+				&sale_data_log($kind, $item_no, $item_c, $item_lv, $item_price, 2);
 				&write_send_news("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
 				&send_twitter("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
 				$is_rewrite = 1;

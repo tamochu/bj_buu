@@ -111,7 +111,7 @@ sub tp_110 {
 				if ($buyout_price && $need_money > $buyout_price) {
 					$need_money = $buyout_price
 				}
-				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no)) {
+				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
 					my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
 								   : $kind eq '2' ? "[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
 								   : $kind eq '3' ? "[ƒy]$pets[$item_no][1]š$item_c"
