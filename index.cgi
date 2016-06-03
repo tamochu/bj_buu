@@ -67,8 +67,8 @@ sub header2 {
 	
 	print qq|<html><head>|;
 	print qq|<meta http-equiv="Cache-Control" content="no-cache">|;
-#	print qq|<meta name="description" content="CGIゲーム">|;
-#	print qq|<meta name="keywords" content="ゲーム,blindjustice">|;
+	print qq|<meta name="description" content="このゲームで最強の国作ろうずｗｗｗｗｗｗｗｗｗ">|;
+	print qq|<meta name="keywords" content="黒豚鯖,blindjustice,ゲーム,CGI,無料">|;
 	unless ($is_mobile) {
 		print qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 		print qq|<link rel="shortcut icon" href="$htmldir/favicon.ico">|;
