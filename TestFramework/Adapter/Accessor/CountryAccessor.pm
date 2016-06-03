@@ -5,14 +5,16 @@
 
 use warnings;
 #use strict;
-
+use CGI::Carp;
+use File::Copy::Recursive qw( dircopy );
+use File::Path qw(rmtree);
 
 package CountryAccessor;
 
 require './TestFramework/Adapter/Accessor/Util.pm';
-use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
-use File::Copy::Recursive qw( dircopy );
-use File::Path qw(rmtree);
+
+#BJWrapper.pmのファイル名
+my $bj_wapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
 
 sub new{
 	my $class = shift;
@@ -31,6 +33,9 @@ sub access_data{
 
 	
 	$sub_routine = sub{
+
+		require $bj_wapper;
+		package BJWrapper;
 
 		#新しい値が設定されていれば設定、なければそのまま取得
 		_load_config();
@@ -54,7 +59,10 @@ sub get_num_country{
 	my $self = shift;
 
 	my $sub_routine = sub{
-		
+	
+		require $bj_wapper;
+		package BJWrapper;
+
 		_load_config();
 		&read_cs;
 		return $w{country};
@@ -81,6 +89,9 @@ sub add_country{
 	}
 
 	my $sub_routine = sub{
+	
+		require $bj_wapper;
+		package BJWrapper;
 
 		_load_config();
 
@@ -99,13 +110,17 @@ sub add_country{
 #国を削除(system_game.cgi::delete_countryが壊れているようなので自作)
 sub remove_country {
 	
-	carp "CountryAccessor::remove_country() is experimental\n";
+	carp ("CountryAccessor::remove_country() is experimental\n");
 
 	my $self = shift;
 	my $country_index_to_remove = shift;
 
 
 	$sub_routine = sub{	
+
+		require $bj_wapper;
+		package BJWrapper;
+
 		_load_config();
 
 		#国データ読み込み
@@ -134,7 +149,7 @@ sub remove_country {
 			
 			#元のフォルダ名-1にリネームしてテンプフォルダにコピー
 			my $orig = "$logdir/$i";
-			croak "$orig:$!" unless (-d $orig);
+			die ("$orig:$!") unless (-d $orig);
 			$i--;
 			my $dest = "$logdir/$temp_dir/$i";
 	
@@ -194,37 +209,4 @@ sub remove_country {
 	return Util::fork_sub($sub_routine);
 }
 
-
-#forkしたプロセスからbjのCGIをrequireする
-sub _load_config{
-
-	require "config.cgi";
-	require "config_game.cgi";
-}
-
-#ユーザー名から%m,%yにデータ読み込み
-sub _read_user{
-
-	my $user_name = shift;
-
-	my $id = unpack ('H*',$user_name);
-
-	open my $fh, "< $userdir/$id/user.cgi" or croak("couldn't open ", $userdir, "/", $id, "/user.cgi");
-	my $line = <$fh>;	
-	close $fh;
-
-	#pass検索
-	my $pass;
-	for my $hash (split /<>/, $line) {
-		my($k, $v) = split /;/, $hash;
-		if($k eq "pass") {
-			$pass = $v;	
-			last;
-		}
-	}
-
-	#%m %yへユーザーデータ読み込み
-	$in{id} = $id;
-	$in{pass} = $pass; 
-	&read_user;
-}
+1;

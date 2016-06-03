@@ -2,6 +2,7 @@
 # bjのcgiに名前空間を付けて使うためのラッパー
 #############################################
 package BJWrapper;
+use CGI::Carp;
 
 #bj.cgiのbefore_bj
 #decodeは行わない
@@ -45,7 +46,7 @@ sub _get_pass{
 	my $user_name = shift;
 	my $user_id = unpack('H*', $user_name);
 
-	open my $fh, "< $userdir/$user_id/user.cgi" or croak("couldn't open ", $userdir, "/", $user_id, "/user.cgi");
+	open my $fh, "< $userdir/$user_id/user.cgi" or die("couldn't open ", $userdir, "/", $user_id, "/user.cgi");
 	my $line = <$fh>;	
 	close $fh;
 

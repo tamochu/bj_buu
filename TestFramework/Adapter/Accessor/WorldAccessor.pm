@@ -8,6 +8,8 @@ use warnings;
 package WorldAccessor;
 require './TestFramework/Adapter/Accessor/Util.pm';
 
+#BJWrapper.pmのファイル名
+my $bj_wapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
 
 sub new{
 	my $class = shift;
@@ -17,7 +19,6 @@ sub new{
 }
 
 #./log/countries.cgiに直接アクセスしてデータを取得/設定
-#new_dataにzeroで空
 sub access_data{
 
 	my $self = shift;
@@ -26,17 +27,16 @@ sub access_data{
 
 	my $sub_routine = sub{
 
+		require $bj_wapper;
+		package BJWrapper;
+
 		_load_config();
 		&read_cs;
 		
 		#新しい値が設定されていれば設定、なければ取得
-		if($new_data){
-			if($new_data eq "zero"){
-				$new_data = 0;
-			}
+		if(defined $new_data){
 			$w{$data_name} = $new_data;
 			&write_cs;
-			&read_cs;
 		}
 	
 		return  $w{$data_name};
@@ -49,50 +49,19 @@ sub access_data{
 sub evoke_disaster{
 
 	my $self = shift;
+	my $disaster_type = shift;
 
 	my $sub_routine = sub{
+
+		require $bj_wapper;
+		package BJWrapper;
 		
 		_load_config();
-		&disaster(@_);
+		&disaster($disaster_type);
 	};
 
 	Util::fork_sub($sub_routine);
 
 }
 
-
-#forkしたプロセスからbjのCGIをrequireする
-sub _load_config{
-
-	require "config.cgi";
-	require "config_game.cgi";
-}
-
-#ユーザー名から%m,%yにデータ読み込み
-sub _read_user{
-
-	my $user_name = shift;
-
-	my $id = unpack ('H*',$user_name);
-
-	open my $fh, "< $userdir/$id/user.cgi" or croak("couldn't open ", $userdir, "/", $id, "/user.cgi");
-	my $line = <$fh>;	
-	close $fh;
-
-	#pass検索
-	my $pass;
-	for my $hash (split /<>/, $line) {
-		my($k, $v) = split /;/, $hash;
-		if($k eq "pass") {
-			$pass = $v;	
-			last;
-		}
-	}
-
-	#%m %yへユーザーデータ読み込み
-	$in{id} = $id;
-	$in{pass} = $pass; 
-	&read_user;
-}
-
-
+1;

@@ -97,6 +97,7 @@ sub remove_player{
 
 	my $self = shift;
 	my $name = shift;
+
 	my $sub_routine = sub{
 
 		require $bj_wapper;
@@ -129,6 +130,7 @@ sub shikan_player{
 
 		_load_config();
 		_read_user($name);
+		_is_bound($name);
 		&read_cs;
 		$mes = "";
 
@@ -180,39 +182,4 @@ sub accept_propose{
 #todo
 }
 
-
-
-#forkしたプロセスからbjのCGIをrequireする
-sub _load_config{
-
-	require "config.cgi";
-	require "config_game.cgi";
-}
-
-#ユーザー名から%m,%yにデータ読み込み
-sub _read_user{
-
-	my $user_name = shift;
-
-	my $id = unpack ('H*',$user_name);
-
-	open my $fh, "< $userdir/$id/user.cgi" or croak("couldn't open ", $userdir, "/", $id, "/user.cgi");
-	my $line = <$fh>;	
-	close $fh;
-
-	#pass検索
-	my $pass;
-	for my $hash (split /<>/, $line) {
-		my($k, $v) = split /;/, $hash;
-		if($k eq "pass") {
-			$pass = $v;	
-			last;
-		}
-	}
-
-	#%m %yへユーザーデータ読み込み
-	$in{id} = $id;
-	$in{pass} = $pass; 
-	&read_user;
-}
 1;
