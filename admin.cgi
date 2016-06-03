@@ -53,6 +53,7 @@ elsif ($in{mode} eq 'admin_compare')   { &admin_compare; }
 elsif ($in{mode} eq 'migrate_reset')   { &migrate_reset; }
 elsif ($in{mode} eq 'admin_all_pet_check')   { &admin_all_pet_check; }
 elsif ($in{mode} eq 'admin_letter_log_check')   { &admin_letter_log_check; }
+elsif ($in{mode} eq 'admin_incubation_log_check')   { &admin_incubation_log_check; }
 
 &top;
 &footer;
@@ -339,7 +340,13 @@ sub top {
 	print qq|<div class="mes">手紙送信履歴<ul>|;
 	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_letter_log_check">|;
 	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
-	print qq|<p><input type="submit" value="送信履歴" class="button_s"></p></form></div>|;
+	print qq|<p><input type="submit" value="チェック" class="button_s"></p></form></div>|;
+
+	print qq|<br><br><br>|;
+	print qq|<div class="mes">孵化履歴<ul>|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_incubation_log_check">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="チェック" class="button_s"></p></form></div>|;
 
 	print qq|<br><br><br>|;
 	my @files = glob "$logdir/monster/*.cgi";
@@ -1045,6 +1052,18 @@ sub admin_all_pet_check {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
+
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $pid = readdir $dh) {
+		next if $pid =~ /\./;
+		next if $pid =~ /backup/;
+		next unless -f "$userdir/$pid/user.cgi";
+		my %you_datas = &get_you_datas($pid, 1);
+
+		$mes .= "$you_datas{name} $you_datas{wt_c} $you_datas{wt_c_latest}<br>";
+	}
+	closedir $dh;
+
 }
 
 #=================================================
@@ -1191,6 +1210,26 @@ sub admin_letter_log_check {
 		$mon++;
 		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
 		$mes .= qq|<tr><td>$from_name</td><td>$to_name</td><td>$ltime2</td></tr>\n|;
+	}
+	close $fh;
+
+	$mes .= qq|</table>|;
+}
+
+#=================================================
+# 卵の孵化履歴
+#=================================================
+sub admin_incubation_log_check {
+	$mes .= qq|<table><tr><th>名前</th><th>卵</th><th>ﾍﾟｯﾄ</th><th>孵化日時</th></tr>\n|;
+
+	open my $fh, "< $logdir/incubation_log.cgi" or &error("$logdir/incubation_log.cgiﾌｧｲﾙが開けません");
+	while (my $line = <$fh>) {
+		my($name, $egg, $pet, $ltime) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ltime);
+		$year += 1900;
+		$mon++;
+		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+		$mes .= qq|<tr><td>$name</td><td>$egg</td><td>$pet</td><td>$ltime2</td></tr>\n|;
 	}
 	close $fh;
 

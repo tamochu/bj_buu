@@ -29,6 +29,12 @@ sub tp_1  {
 			my $pet_mes = $pets[$v][4] ? $pets[$v][4] : '‚¨‚¢‚·[';
 			$mes .= "‚È‚ñ‚ÆA$eggs[$m{egg}][1]‚Ì’†‚©‚ç $pets[$v][1] ‚ªY‚Ü‚ê‚Ü‚µ‚½<br>$pets[$v][1]ƒ$pet_mes<br><br>$pets[$v][1]‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 			&send_item($m{name}, 3, $v, 0, 0, , int(rand(100))+1);
+
+			# ›z‰»‚ğƒƒMƒ“ƒO
+			my $ltime = time();
+			open my $fh, ">> $logdir/incubation_log.cgi";
+			print $fh "$m{name}<>$eggs[$m{egg}][1]<>$pets[$v][1]<>$ltime\n";
+			close $fh;
 			if (rand(3) < 1) {
 				$m{egg} = 0;
 			} else {
@@ -44,6 +50,12 @@ sub tp_1  {
 			my $pet_mes = $pets[$v][4] ? $pets[$v][4] : '‚¨‚¢‚·[';
 			$mes .= "‚È‚ñ‚ÆA$eggs[$m{egg}][1]‚Ì’†‚©‚ç $pets[$v][1] ‚ªY‚Ü‚ê‚Ü‚µ‚½<br>$pets[$v][1]ƒ$pet_mes<br><br>$pets[$v][1]‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 			&send_item($m{name}, 3, $v, 0, 0, , int(rand(100))+1);
+
+			# ›z‰»‚ğƒƒMƒ“ƒO
+			my $ltime = time();
+			open my $fh, ">> $logdir/incubation_log.cgi";
+			print $fh "$m{name}<>$eggs[$m{egg}][1]<>$pets[$v][1]<>$ltime\n";
+			close $fh;
 			$m{egg} = 0;
 		}
 		else {
@@ -53,9 +65,15 @@ sub tp_1  {
 			my $pet_mes = $pets[$v][4] ? $pets[$v][4] : '‚¨‚¢‚·[';
 			$mes .= "‚È‚ñ‚ÆA$eggs[$m{egg}][1]‚Ì’†‚©‚ç $pets[$v][1] ‚ªY‚Ü‚ê‚Ü‚µ‚½<br>$pets[$v][1]ƒ$pet_mes<br><br>$pets[$v][1]‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 			&send_item($m{name}, 3, $v, 0, 0, , int(rand(100))+1);
+
+			# ›z‰»‚ğƒƒMƒ“ƒO
+			my $ltime = time();
+			open my $fh, ">> $logdir/incubation_log.cgi";
+			print $fh "$m{name}<>$eggs[$m{egg}][1]<>$pets[$v][1]<>$ltime\n";
+			close $fh;
 			$m{egg} = 0;
 		}
-		
+
 		if ($w{world} eq $#world_states-4) {
 			require './lib/fate.cgi';
 			&super_attack('incubation');

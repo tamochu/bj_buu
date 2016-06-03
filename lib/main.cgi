@@ -47,11 +47,14 @@ sub tp_1 { $cmd ? &b_menu(@menus) : &begin; }
 sub main_system {
 	# Lv up
 	if ($m{exp} >= 100) {
-		if ($m{egg}) {
-			$m{egg_c} += int(rand(6)+10);
-			$m{egg_c} += int(rand(16)+20) if $jobs[$m{job}][1] eq '—‘m';
-		}
-		&lv_up;
+#		my $l = int($m{exp} / 100);
+#		for my $i (1 .. $l) {
+			if ($m{egg}) {
+				$m{egg_c} += int(rand(6)+10);
+				$m{egg_c} += int(rand(16)+20) if $jobs[$m{job}][1] eq '—‘m';
+			}
+			&lv_up;
+#		}
 	}
 	# ÀÏºŞ¬’·
 	elsif (!$m{incubation_switch} && $m{egg} && $m{egg_c} >= $eggs[$m{egg}][2]) {
@@ -77,6 +80,12 @@ sub main_system {
 			my $pet_mes = $pets[$v][4] ? $pets[$v][4] : '‚¨‚¢‚·[';
 			$mes .= "‚È‚ñ‚ÆA$eggs[$m{egg}][1]‚Ì’†‚©‚ç $pets[$v][1] ‚ªY‚Ü‚ê‚Ü‚µ‚½<br>$pets[$v][1]ƒ$pet_mes<br><br>$pets[$v][1]‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 			&send_item($m{name}, 3, $v, 0, 0, , int(rand(100))+1);
+
+			# ›z‰»‚ğƒƒMƒ“ƒO
+			my $ltime = time();
+			open my $fh, ">> $logdir/incubation_log.cgi";
+			print $fh "$m{name}<>$eggs[$m{egg}][1]<>$pets[$v][1]<>$ltime\n";
+			close $fh;
 			if (rand(3) < 1) {
 				$m{egg} = 0;
 			} else {
@@ -92,6 +101,12 @@ sub main_system {
 			my $pet_mes = $pets[$v][4] ? $pets[$v][4] : '‚¨‚¢‚·[';
 			$mes .= "‚È‚ñ‚ÆA$eggs[$m{egg}][1]‚Ì’†‚©‚ç $pets[$v][1] ‚ªY‚Ü‚ê‚Ü‚µ‚½<br>$pets[$v][1]ƒ$pet_mes<br><br>$pets[$v][1]‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 			&send_item($m{name}, 3, $v, 0, 0, , int(rand(100))+1);
+
+			# ›z‰»‚ğƒƒMƒ“ƒO
+			my $ltime = time();
+			open my $fh, ">> $logdir/incubation_log.cgi";
+			print $fh "$m{name}<>$eggs[$m{egg}][1]<>$pets[$v][1]<>$ltime\n";
+			close $fh;
 			$m{egg} = 0;
 		}
 		else {
@@ -101,9 +116,15 @@ sub main_system {
 			my $pet_mes = $pets[$v][4] ? $pets[$v][4] : '‚¨‚¢‚·[';
 			$mes .= "‚È‚ñ‚ÆA$eggs[$m{egg}][1]‚Ì’†‚©‚ç $pets[$v][1] ‚ªY‚Ü‚ê‚Ü‚µ‚½<br>$pets[$v][1]ƒ$pet_mes<br><br>$pets[$v][1]‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 			&send_item($m{name}, 3, $v, 0, 0, , int(rand(100))+1);
+
+			# ›z‰»‚ğƒƒMƒ“ƒO
+			my $ltime = time();
+			open my $fh, ">> $logdir/incubation_log.cgi";
+			print $fh "$m{name}<>$eggs[$m{egg}][1]<>$pets[$v][1]<>$ltime\n";
+			close $fh;
 			$m{egg} = 0;
 		}
-		
+
 		if ($w{world} eq $#world_states-4) {
 			require './lib/fate.cgi';
 			&super_attack('incubation');
@@ -290,28 +311,13 @@ sub main_system {
 	}
 	
 	if ($m{name} eq "nanamie") {
-#		$m{seed} = ;
-#		for my $i (1..$w{country}) {
-#			$cs{state}[$i] = 5;
+#		for my $i (1 .. 200) {
+#			create_user2(int(rand(10))."".int(rand(10))."".int(rand(10))."".int(rand(10))."".int(rand(10)));
 #		}
-#		&write_cs;
-#		&mes_and_world_news("<b>$pets[$m{pet}][1]š$m{pet_c}‚ğg‚¢Še‘‚Ì$e2j{state}‚ª $country_states[5] ‚É‚È‚è‚Ü‚µ‚½</b>");
-#		if ($in{seed_change}) {
-#			&seed_change('change');
-#		} else {
-#			require './lib/shopping_offertory_box.cgi';
-#			&get_god_item(7);
-#			$mes .= qq|<form method="$method" action="$script">|;
-#			$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-#			$mes .= qq|<input type="hidden" name="seed_change" value="1">|;
-#			$mes .= qq|<input type="submit" value="‹­§í‘°•ÏX" class="button1"></form>|;
-#		}
-#		my $sedai_max = &seed_bonus('sedai_lv', 100);
-#		$mes .= $sedai_max;
-#
 	}
-}
 
+	$m{act} = 0 if $config_test;
+}
 
 #================================================
 # ‹‹—^
