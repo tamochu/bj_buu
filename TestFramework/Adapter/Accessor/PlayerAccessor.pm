@@ -4,11 +4,15 @@
 ####################################
 
 use warnings;
+use CGI::Carp;
 #use strict;
 
 package PlayerAccessor;
+
 require './TestFramework/Adapter/Accessor/Util.pm';
-use CGI::Carp;
+
+#BJWrapper.pmのファイル名
+my $bj_wapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
 
 sub new{
 	my $class = shift;
@@ -28,18 +32,16 @@ sub access_data{
 
 	my $sub_routine = sub{
 
-		print "PA sub\n";
+		require $bj_wapper;
+		package BJWrapper;
+
 		_load_config();
 		_read_user($user_name);
 
 
 		#新しい値が設定されていれば設定、なければ取得
-		if ($new_value){
+		if (defined($new_value)){
 		
-			if($new_value eq "zero"){
-				$new_value = 0;
-			}
-	
 			#y_の形のkeyなら%yに設定
 			if ($key =~ /^y_(.+)$/){
 				$y{$1} = $new_value;
@@ -74,6 +76,9 @@ sub create_player{
 	
 	my $sub_routine = sub{
 
+		require $bj_wapper;
+		package BJWrapper;
+
 		_load_config();
 		$ENV{REMOTE_ADDR} = $address;	
 		$ENV{QUERY_STRING} = "mode=new_entry&name=$name&pass=$pass&sex=$sex";
@@ -94,11 +99,16 @@ sub remove_player{
 	my $name = shift;
 	my $sub_routine = sub{
 
+		require $bj_wapper;
+		package BJWrapper;
+
 		_load_config();
 		_read_user($name);
 
 		require './lib/move_player.cgi';
+
 		&read_cs;
+
 		move_player($name, $m{country}, "del");
 	};
 
@@ -113,6 +123,9 @@ sub shikan_player{
 	my ($name, $to_country) = @_;
 
 	my $sub_routine = sub{
+
+		require $bj_wapper;
+		package BJWrapper;
 
 		_load_config();
 		_read_user($name);

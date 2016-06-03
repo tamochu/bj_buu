@@ -22,8 +22,9 @@ sub add_error{
 	my $self = shift;
 	my ($filename, $message) = @_;
 
-	my %set = (where=>$filename, message=> $message);
-	push($self->{ERROR_MESSAGES}, \%set);
+	my $set = [$filename, $message];
+
+	push(@{$self->{ERROR_MESSAGES}}, $set);
 }
 
 sub add_ok{
@@ -31,7 +32,7 @@ sub add_ok{
 	my $self = shift;
 	my $filename = shift;
 
-	push($self->{OK_MESSAGES}, $filename);
+	push(@{$self->{OK_MESSAGES}}, $filename);
 
 }
 
@@ -47,13 +48,13 @@ sub output_result{
 
 	print "\n\n***error results***\n\n";
 	for my $message (@{$self->{ERROR_MESSAGES}}){
-		print qq/error: at $message->{where}\n$message->{message}\n\n/;
+		print qq/error: at $message->[0]\n$message->[1]\n\n/;
 	}
 
 
 	#再初期化
-	$self->{OK_MESSAGES} = undef;
-	$self->{ERROR_MESSAGES} = undef;
+	$self->{OK_MESSAGES} = [];
+	$self->{ERROR_MESSAGES} = [];
 	print "\n***results reinitalized***\n";
 }
 

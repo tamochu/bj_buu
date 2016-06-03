@@ -35,7 +35,7 @@ sub access_data{
 		#新しい値が設定されていれば設定、なければそのまま取得
 		_load_config();
 		&read_cs;
-		if($new_data){
+		if(defined($new_data)){
 	
 			$cs{$data_name}[$country_index] = $new_data;
 			&write_cs;

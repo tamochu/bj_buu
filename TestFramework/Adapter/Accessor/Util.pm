@@ -3,7 +3,7 @@
 ############################################
 
 package Util;
-require './Jcode.pm';
+#require './Jcode.pm';
 
 #無名サブルーチンをフォークした先で実行する
 sub fork_sub{
@@ -18,12 +18,14 @@ sub fork_sub{
 	PARENT->autoflush(1);
 	select(STDOUT);	
 
-	#ソケットに改行文字が含まれているとprintした時に通信がそこで終わってしまうので
+	#改行文字が含まれているとprintした時にソケット通信がそこで終わってしまうので
 	#改行を文字に置き換えて通信した後に戻すためのマーク
 	my $mark = "replacement_for_cl";
 
 	# 親プロセス
-	if (my $pid = fork) {
+	my $pid = fork;
+	if ($pid) {
+
 	    my $line = "";
 	    close PARENT;
 	    chomp($line = <CHILD>);
@@ -36,7 +38,7 @@ sub fork_sub{
 		    die "$line";
 	    }
 
-	    waitpid($pid,0);
+	    wait;
 	    return $line;
 	}
 	#子プロセス
@@ -58,7 +60,10 @@ sub fork_sub{
 		$line =~ s/\n/$mark/;
 	    }
 
-	    $line .= $message;
+	    if(defined($message)){
+	    	$line .= $message;
+	    }
+
 	    #親にソケット通信でメッセージ送信
 	    print PARENT $line;
 	    close PARENT;
