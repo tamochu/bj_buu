@@ -491,7 +491,7 @@ sub tp_510 {
 				
 				$m{money} += $sall_price;
 
-				if (rand(3) < 2) {
+				if (rand(2) < 1) {
 					open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 					print $fh2 "$kind<>$item_no<>$item_c<>\n";
 					close $fh2;
