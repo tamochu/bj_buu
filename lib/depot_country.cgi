@@ -597,7 +597,7 @@ sub radio_my_depot {
 		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]Åö$item_lv($item_c/$weas[$item_no][4])<br>|
 				  : $kind eq '2' ? qq|[óë]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])<br>|
 				  : $kind eq '3' ? qq|[Çÿ]$pets[$item_no][1]Åö$item_c<br>|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
+				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]<br>|
 				  ;
 	}
 	close $fh;
