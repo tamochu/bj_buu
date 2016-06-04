@@ -368,8 +368,7 @@ sub lv_up {
 	++$m{lv};
 	
 	# 世代交代
-	my $sedai_max = &seed_bonus('sedai_lv', 100); # そもそも自分がエルフの時でも返り値が 100
-#	if ($m{lv} >= 100) {
+	my $sedai_max = &seed_bonus('sedai_lv', 100);
 	if ($m{lv} >= $sedai_max) {
 		$m{lv} = 1;
 		&c_up('sedai');
@@ -430,7 +429,6 @@ sub lv_up {
 				}
 				
 			}
-			$m{marriage} = '';
 		}
 		# 結婚していないとき
 		else {
@@ -535,6 +533,7 @@ sub lv_up {
 		} else {
 			&seed_change('');
 		}
+		$m{marriage} = '';
 #		&refresh_new_commer;
 	}
 	# レベルアップ
