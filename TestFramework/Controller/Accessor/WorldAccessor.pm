@@ -49,7 +49,7 @@ sub access_data{
 sub evoke_disaster{
 
 	my $self = shift;
-	my $disaster_type = shift;
+	my $more_switch = shift;
 
 	my $sub_routine = sub{
 
@@ -57,7 +57,7 @@ sub evoke_disaster{
 		package BJWrapper;
 		
 		_load_config();
-		&disaster($disaster_type);
+		&disaster($more_switch);
 	};
 
 	Util::fork_sub($sub_routine);

@@ -8,7 +8,7 @@
  - TestFrameworkのUIはCUI版とブラウザ版がある
 
 ### テストの書き方
- - Adapterクラス(./Adapter直下のクラス）のインスタンスメソッドを使って、疑似的なプレイのケースを書く
+ - Controllerクラス(./Controller直下のクラス）のインスタンスメソッドを使って、疑似的なプレイのケースを書く
  - ./Tests/sample.pmにサンプルテストがある(まだない)
 
 #### 構成
@@ -18,14 +18,14 @@
  
  + ./TestFramework
    + TestInterface(テストを実行するインターフェース)
-   + /Adapter(ユーザーがテストで使う抽象的な関数を持つクラスのフォルダ）
-     + PlayerAccessAdapter
+   + /Controller(ユーザーがテストで使う抽象的な関数を持つクラスのフォルダ）
+     + PlayerController
        + (プレイヤーデータの作成、削除、データ操作など)
-     + CountryAccessAdapter
+     + CountryController
        + (国データの作成、削除、データ操作など)
-     + WorldAccessAdapter
+     + WorldController
        + (世界情勢の変更や年度の変更など)
-     + SystemAccessAdapter
+     + SystemController
        + (システム時刻の偽装やファイルの保存復元など)
       + ./Accessor(Adapterが使う実際にBJのCGIやデータにアクセスするクラスのフォルダ)
         + PlayerAccessor
