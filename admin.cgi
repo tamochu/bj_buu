@@ -32,6 +32,8 @@ $in{sort} ||= 'addr';
 &read_cs;
 
 if    ($in{mode} eq 'admin_delete_user') { &admin_delete_user; }
+elsif ($in{mode} eq 'admin_get_depot_data')   { &admin_get_depot_data; }
+elsif ($in{mode} eq 'admin_get_akindo_data')   { &admin_get_akindo_data; }
 elsif ($in{mode} eq 'admin_refresh')     { &admin_refresh; }
 elsif ($in{mode} eq 'admin_go_neverland')     { &admin_go_neverland; }
 elsif ($in{mode} eq 'admin_repaire')     { &admin_repaire; }
@@ -97,7 +99,7 @@ sub top {
 	print qq|ﾘｾｯﾄは、画面に何も表\示されなくなったり、Nextループにはまった状態を修正します。<br>|;
 	print qq|<table class="table1"><tr>|;
 
-	for my $k (qw/削除 ﾛｸﾞｲﾝ 名前 ﾌｫﾙﾀﾞ ﾘｾｯﾄ 無所属へ 国 IPｱﾄﾞﾚｽ ﾎｽﾄ名 UserAgent(ﾌﾞﾗｳｻﾞ) 更新時間 ｱｸｾｽﾁｪｯｸ/) {
+	for my $k (qw/削除 ﾛｸﾞｲﾝ 倉庫 商人の店 名前 ﾌｫﾙﾀﾞ ﾘｾｯﾄ 無所属へ 国 IPｱﾄﾞﾚｽ ﾎｽﾄ名 UserAgent(ﾌﾞﾗｳｻﾞ) 更新時間 ｱｸｾｽﾁｪｯｸ/) {
 		print qq|<th>$k</th>|;
 	}
 	print qq|</tr>|;
@@ -113,7 +115,7 @@ sub top {
 	my $is_duplicated = 0;
 	for my $line (@lines) {
 		my($id, $name, $pass, $country, $addr, $host, $agent, $ldate) = split /<>/, $line;
-		
+
 		# もしホスト名が同じなら赤表示
 		if ( ($host !~ /admin_login/ && $addr eq $b_addr && $host eq $b_host && $agent eq $b_agent)
 			|| ($agent eq $b_agent && ($agent =~ /DoCoMo/ || $agent =~ /KDDI|UP\.Browser/ || $agent =~ /J-PHONE|Vodafone|SoftBank/)) ) {
@@ -122,6 +124,12 @@ sub top {
 					print qq|<tr class="stripe2">|;
 					print qq|<td><input type="checkbox" name="delete" value="$pid"></td>|;
 					print qq|<td><input type="button" class="button_s" value="ﾛｸﾞｲﾝ" onClick="location.href='$script?id=$pid&pass=$ppass';"></td>|;
+					print qq|<td><input type="button" class="button_s" value="倉庫" onClick="location.href='?mode=admin_get_depot_data&pass=$in{pass}&id=$pid&name=$pname';"></td>|;
+					print qq|<td>|;
+					if (-f "$userdir/$pid/shop_sale_detail.cgi") {
+						print qq|<input type="button" class="button_s" value="商人の店" onClick="location.href='?mode=admin_get_akindo_data&pass=$in{pass}&id=$pid&name=$pname';">|;
+					}
+					print qq|</td>|;
 					print qq|<td>$pname</td>|;
 					print qq|<td>$pid</td>|;
 					print qq|<td><input type="button" class="button_s" value="ﾘｾｯﾄ" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$pid&country=$in{country}&sort=$in{sort}';"></td>|;
@@ -149,6 +157,12 @@ sub top {
 		if ($in{sort} ne 'check' || $is_duplicated) {
 			print qq|<td><input type="checkbox" name="delete" value="$id"></td>|;
 			print qq|<td><input type="button" class="button_s" value="ﾛｸﾞｲﾝ" onClick="location.href='$script?id=$id&pass=$pass';"></td>|;
+			print qq|<td><input type="button" class="button_s" value="倉庫" onClick="location.href='?mode=admin_get_depot_data&pass=$in{pass}&id=$id&name=$name';"></td>|;
+			print qq|<td>|;
+			if (-f "$userdir/$id/shop_sale_detail.cgi") {
+				print qq|<input type="button" class="button_s" value="商人の店" onClick="location.href='?mode=admin_get_akindo_data&pass=$in{pass}&id=$id&name=$name';">|;
+			}
+			print qq|</td>|;
 			print qq|<td>$name</td>|;
 			print qq|<td>$id</td>|;
 			print qq|<td><input type="button" class="button_s" value="ﾘｾｯﾄ" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
@@ -1260,5 +1274,54 @@ sub admin_shopping_log_check {
 	}
 	close $fh;
 
+	$mes .= qq|</table>|;
+}
+
+#=================================================
+# 倉庫の中身確認
+#=================================================
+sub admin_get_depot_data {
+	my $pid = $in{id};
+
+	my $count = 0;
+	my $mes_sub;
+	$mes .= qq|$in{name}<br>\n|;
+	open my $fh2, "< $userdir/$pid/depot.cgi" or &error("倉庫ﾌｧｲﾙを開けませんでした");
+	while (my $line = <$fh2>) {
+		$count++;
+		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+
+		$mes_sub .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])|
+				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
+				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c|
+				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
+				  ;
+		$mes_sub .= "<br>";
+	}
+	close $fh2;
+	$mes .= "$count個<br>".$mes_sub;
+#	print qq|$</table>\n|;
+}
+
+#=================================================
+# 商人の店の販売履歴
+#=================================================
+sub admin_get_akindo_data {
+	my $pid = $in{id};
+
+	$mes .= qq|$in{name}<br>\n|;
+	$mes .= qq|<table><tr><th>販売ｱｲﾃﾑ</th><th>購入者</th><th>購入日時</th></tr>\n|;
+	open my $fh2, "< $userdir/$pid/shop_sale_detail.cgi" or &error("商人の店ﾌｧｲﾙを開けませんでした");
+	while (my $line = <$fh2>) {
+
+		my($item, $y_name, $ltime) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ltime);
+		$year += 1900;
+		$mon++;
+		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+
+		$mes .= qq|<tr><td>$item</td><td>$y_name</td><td>$ltime2</td></tr>|;
+	}
+	close $fh2;
 	$mes .= qq|</table>|;
 }
