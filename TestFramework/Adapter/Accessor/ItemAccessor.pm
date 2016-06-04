@@ -237,6 +237,7 @@ sub use_pet{
 
 
 		$ENV{QUERY_STRING} = $env_base."&cmd=4";
+
 		print "\n***in enter_bj env_base = $env_base***\n";
 		print "\n***in enter_bj m{lib} = $m{lib}***\n";
 		print "\n***in enter_bj m{tp} = $m{tp}***\n";
@@ -288,6 +289,10 @@ sub use_pet{
 	Util::fork_sub($enter_bj);
 	return Util::fork_sub($use);
 	
+}
+
+#マイルームでの使用後に処理が必要なペットの処理
+sub step_pet_effect{
 }
 
 1;
