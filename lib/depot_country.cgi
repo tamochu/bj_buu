@@ -586,19 +586,21 @@ sub tp_670 {
 #=================================================
 sub radio_my_depot {
 	my $count = 0;
-	my $sub_mes = qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>Ç‚ÇﬂÇÈ<br>|;
+	my $sub_mes = qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">Ç‚ÇﬂÇÈ</label><br>|;
 	open my $fh, "< $this_file" or &error("$this_file Ç™ì«Ç›çûÇﬂÇ‹ÇπÇÒ");
 	my $head_line = <$fh>;
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		$sub_mes .= qq|<input type="radio" name="cmd" value="$count">|;
-		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]Åö$item_lv($item_c/$weas[$item_no][4])<br>|
-				  : $kind eq '2' ? qq|[óë]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])<br>|
-				  : $kind eq '3' ? qq|[Çÿ]$pets[$item_no][1]Åö$item_c<br>|
+		$sub_mes .= qq|<input type="radio" id="$count" name="cmd" value="$count"><label for="$count">|;
+		$sub_mes .= qq|<label for="$count">| unless $is_mobile;
+		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]Åö$item_lv($item_c/$weas[$item_no][4])|
+				  : $kind eq '2' ? qq|[óë]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
+				  : $kind eq '3' ? qq|[Çÿ]$pets[$item_no][1]Åö$item_c|
 				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
 				  ;
+		$sub_mes .= qq|</label>| unless $is_mobile;
+		$sub_mes .= qq|<br>|;
 	}
 	close $fh;
 	

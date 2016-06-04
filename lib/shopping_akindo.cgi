@@ -143,6 +143,13 @@ sub tp_100 {
 					&send_money($y{name}, "Åy$m{stock}($item_name)Åz$m{name}", $price, 1);
 					&sale_data_log($kind, $item_no, $item_c, $item_lv, $price, 1);
 					$is_rewrite = 1;
+
+					# ÉVÉáÉbÉsÉìÉOÇÉçÉMÉìÉO
+					my $ltime = time();
+					open my $fh, ">> $logdir/shopping_log.cgi";
+					print $fh "$m{name}<>$y{name}<>$item_name<>$price<>$ltime\n";
+					close $fh;
+
 					
 					# îÑè„ã‡â¡éZ
 					open my $fh2, "+< $userdir/$shop_id/shop_sale.cgi" or &error("îÑè„Ãß≤ŸÇ™äJÇØÇ‹ÇπÇÒ");

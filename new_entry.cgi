@@ -170,6 +170,7 @@ sub create_user {
 		$m{$k} = 0;
 	}
 	
+	$m{shuffle}  = 0; # 0 ‚Å¬—ƒVƒƒƒbƒtƒ‹‚³‚ê‚é
 	$m{seed} = 'human';
 	$m{coin} = $config_test ? 2500000 : 0;
 

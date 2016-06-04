@@ -45,9 +45,15 @@ sub write_comment {
 		push @lines, $line;
 		last if @lines >= $max_log-1;
 	}
-	if($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')){
+
+	# この位置で判断すると情勢を取得できるプログラムからの呼び出しと、
+	# そうでないプログラムからの呼び出しで匿名が効いたり効かなかったり
+	# 情勢を取得できるプログラムからの呼び出しだった場合には強制的に匿名になるため、
+	# 手っ取り早い対処法として「<hr>【宣伝言板へのレス】」を含んでいるならば匿名にはしない
+	if ( ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) && $in{comment} !~ "<hr>【宣伝言板へのレス】") {
 		$mname = "名無し";
 	}
+
 	my %bbs_config = ();
 	$bbs_config{shogo_limit} = 16;
 	my $this_config = $this_file . '_config.cgi';
@@ -65,7 +71,7 @@ sub write_comment {
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
-	
+
 	if ($w{world} eq $#world_states-4) {
 		require './lib/fate.cgi';
 		&super_attack('voice');

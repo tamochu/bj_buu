@@ -48,7 +48,10 @@ if ($m{wt} > 0) { # S‘©ŠÔ
 		$main_screen .= qq|<script type="text/javascript"><!--\n nokori_time($m{wt}, $reset_rest);\n// --></script>\n|;
 		$main_screen .= qq|<noscript>$next_time_mes</noscript>\n<br>\n|;
 		$main_screen .= qq|“G‘[‘O‰ñF<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font> ˜A‘±<b>$m{renzoku_c}</b>‰ñ]<br>| if $m{renzoku_c};
-		$main_screen .= qq|Ÿ‚Ì‹‹—¿‚Ü‚Å $nokori_time_mes|;
+		$main_screen .= qq|Ÿ‚Ì‹‹—¿‚Ü‚Å $nokori_time_mes<br><br>|;
+
+		require "$datadir/twitter_bots.cgi";
+		$main_screen .= &{$twitter_bots[6]};
 	}
 	&n_menu;
 	$menu_cmd .= qq|<form method="$method" action="bj_rest_shop.cgi">|;

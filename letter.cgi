@@ -30,6 +30,12 @@ sub letter_box_get {
 
 		&send_letter($in{name}, $in{is_save_log}) if $in{name} ne $admin_name || $rflag == 0;
 		print qq|<p>$in{name} に手紙を送りました</p>|;
+
+		# プライバシーを考慮し、誰が誰に送信したかだけをロギング
+		my $ltime = time();
+		open my $fh, ">> $logdir/letter_log.cgi";
+		print $fh "$m{name}<>$in{name}<>$ltime\n";
+		close $fh;
 	}
 
 	if ($in{mode} eq "refuse") {
@@ -112,7 +118,7 @@ sub letter_box_get {
 			}else{
 				print qq|<hr><input type="checkbox" name="delete" value="$btime">|;
 			}
-			print qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font><a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>[$bshogo] <font size="1">($bdate)</font><hr>|;
+			print qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font><a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>$bshogo <font size="1">($bdate)</font><hr>|;
 			print qq|$bcomment<br><hr><br>|;
 		}
 		else {
