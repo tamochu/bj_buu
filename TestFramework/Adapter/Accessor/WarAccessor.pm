@@ -10,7 +10,7 @@ package WarAccessor;
 require './TestFramework/Adapter/Accessor/Util.pm';
 
 #BJWrapper.pmのファイル名
-my $bj_wapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
+my $bj_wrapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
 
 #main.cgiのメニュー上の戦争のコマンド番号
 my $menu_cmd_war = 11;
@@ -33,16 +33,17 @@ sub set_war{
 
 
 	#ブラウザから送られる環境変数の偽装の基礎部分
-	my $make_env_base = sub{
-		require $bj_wapper;
-		return BJWrapper::_make_env_base($player_name);
+	my $make_env = sub{
+		require $bj_wrapper;
+		package BJWrapper;
+		_make_env_base($player_name);
 	};
-	my $env_base = Util::fork_sub($make_env_base);
+	my $env_base = Util::fork_sub($make_env);
 	
 	#bj.cgiを開く
 	my $enter_bj = sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -58,7 +59,7 @@ sub set_war{
 	#bj.cgiを開きメニューから戦争を選択する
 	my $open_menu = sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -75,7 +76,7 @@ sub set_war{
 	#規模を選択する
 	my $select_war_mode = sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -90,7 +91,7 @@ sub set_war{
 	#国を選択して出撃
 	my $depart = sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -116,15 +117,16 @@ sub encount{
 	my $player_name = shift;
 
 	#ブラウザから送られる環境変数の偽装の基礎部分
-	my $make_env_base = sub{
-		require $bj_wapper;
-		return BJWrapper::_make_env_base($player_name);
+	my $make_env = sub{
+		require $bj_wrapper;
+		package BJWrapper;
+		_make_env_base($player_name);
 	};
-	my $env_base = Util::fork_sub($make_env_base);
+	my $env_base = Util::fork_sub($make_env);
 
 	my $enter_bj= sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -141,7 +143,7 @@ sub encount{
 	#限界ターンなどの提示画面を開く
 	my $open_turn = sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -165,16 +167,17 @@ sub step_war{
 	my $player_name = shift;
 	
 	#ブラウザから送られる環境変数の偽装の基礎部分
-	my $make_env_base = sub{
-		require $bj_wapper;
-		return BJWrapper::_make_env_base($player_name);
+	my $make_env = sub{
+		require $bj_wrapper;
+		package BJWrapper;
+		_make_env_base($player_name);
 	};
-	my $env_base = Util::fork_sub($make_env_base);
-	
+	my $env_base = Util::fork_sub($make_env);
+
 	#陣形を選んで交戦
 	my $select_formation = sub{
 
-		require $bj_wapper;
+		require $bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);

@@ -74,6 +74,11 @@ sub _is_bound{
 		die "is bound : m{wt} > 0"; 
 	}
 
+	#lib処理中
+	if($m{lib} ne ""){
+		die "is processing lib $m{lib}";
+	}
+
 }
 
 #bj.cgiの&decode部分で読み込む環境変数のid/passによる基礎部分の生成
@@ -83,10 +88,8 @@ sub _make_env_base{
 
 	my $player_id = unpack('H*', $player_name);
 	#pass回収
-	my $get_pass = sub{
-		return _get_pass($player_name);
-	};
-	my $pass = Util::fork_sub($get_pass);
+
+	my $pass = _get_pass($player_name);
 
 	#bj.cgiを開く時、decodeされるブラウザからの環境変数の偽装用変数
 	my $env_base = "id=$player_id&pass=$pass";

@@ -20,7 +20,7 @@ sub fork_sub{
 
 	#改行文字が含まれているとprintした時にソケット通信がそこで終わってしまうので
 	#改行を文字に置き換えて通信した後に戻すためのマーク
-	my $mark = "replacement_for_cl";
+	my $mark = "repl_for_cl";
 
 	# 親プロセス
 	my $pid = fork;
@@ -31,8 +31,9 @@ sub fork_sub{
 	    chomp($line = <CHILD>);
 	    close CHILD;
 
-	    #改行を元に戻す
+	    #置換された文字を元に戻す
 	    $line =~ s/$mark/\n/;
+
 
 	    if($line =~ /^exception/){
 		    die "$line";
@@ -52,6 +53,7 @@ sub fork_sub{
 
 	    eval{
 		    $message = $sub_routine->();
+
 	    };
 
 	    if($@){
@@ -65,6 +67,7 @@ sub fork_sub{
 	    }
 
 	    #親にソケット通信でメッセージ送信
+	    $line =~ s/\n/$mark/;
 	    print PARENT $line;
 	    close PARENT;
 	    exit;

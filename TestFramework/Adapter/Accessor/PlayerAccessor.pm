@@ -117,7 +117,7 @@ sub remove_player{
 
 }
 
-#プレイヤーに士官させる(lib/system_game.cig::b_menu経由)
+#プレイヤーに士官させる(lib/country_move.cgi経由)
 sub shikan_player{
 
 	my $self = shift;
@@ -150,36 +150,6 @@ sub shikan_player{
 
 	return Util::fork_sub($sub_routine);
 
-}
-
-
-#playerにアイテムを与える
-#todo
-sub give_item{
-}
-
-#playerにアイテムを装備させる
-#todo
-sub set_item{
-}
-
-#playerに装備したペットを使用させる
-#todo
-sub use_item{
-}
-#プレイヤーを結婚登録所に登録させる
-#todo
-sub regist_marriage{
-}	
-
-#プレイヤーにプロポーズさせる
-#todo
-sub propose{
-}
-
-#プレイヤーにプロポーズを受けさせる
-sub accept_propose{
-#todo
 }
 
 1;
