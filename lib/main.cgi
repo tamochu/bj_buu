@@ -436,7 +436,6 @@ sub lv_up {
 				}
 				
 			}
-			$m{marriage} = '';
 		}
 		# 結婚していないとき
 		else {
@@ -541,6 +540,7 @@ sub lv_up {
 		} else {
 			&seed_change('');
 		}
+		$m{marriage} = '';
 #		&refresh_new_commer;
 	}
 	# レベルアップ
