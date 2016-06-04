@@ -11,10 +11,10 @@ use File::Path qw(rmtree);
 
 package CountryAccessor;
 
-require './TestFramework/Adapter/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.pm';
 
 #BJWrapper.pmのファイル名
-my $bj_wapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
+my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
 
 sub new{
 	my $class = shift;

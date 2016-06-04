@@ -1,7 +1,7 @@
 #use strict;
 use warnings;
 
-package CountryAccessAdapter;
+package CountryAccessController;
 
 use lib qw(./Accessor);
 require CountryAccessor;
@@ -67,7 +67,7 @@ sub remove_country{
 	my $self = shift;
 
 	#引数が無ければエラー
-	unless (@_) { die ("CountryAccessAdapter::remove_country() needs arguments : the ndex of the target country"); };
+	unless (@_) { die ("CountryAccessController::remove_country() needs arguments : the ndex of the target country"); };
 
 	my $country_to_remove = shift;
 	$self->{COUNTRY_ACCESSOR}->remove_country($country_to_remove);

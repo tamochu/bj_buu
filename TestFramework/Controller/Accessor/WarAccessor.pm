@@ -7,10 +7,10 @@ use CGI::Carp;
 #use strict;
 
 package WarAccessor;
-require './TestFramework/Adapter/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.pm';
 
 #BJWrapper.pmのファイル名
-my $bj_wrapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
+my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
 
 #main.cgiのメニュー上の戦争のコマンド番号
 my $menu_cmd_war = 11;

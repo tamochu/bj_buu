@@ -9,10 +9,10 @@ use CGI::Carp;
 
 package PlayerAccessor;
 
-require './TestFramework/Adapter/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.pm';
 
 #BJWrapper.pmのファイル名
-my $bj_wapper = './TestFramework/Adapter/Accessor/BJWrapper.pm';
+my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
 
 sub new{
 	my $class = shift;
@@ -85,10 +85,7 @@ sub create_player{
 		require 'new_entry.cgi';
 	};
 
-	return Util::fork_sub($sub_routine);
-
-
-
+	Util::fork_sub($sub_routine);
 	
 }
 
