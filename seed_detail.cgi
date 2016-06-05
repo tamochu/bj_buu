@@ -26,7 +26,7 @@ sub seed_detail {
 		next if $seeds{$s}[0] eq '';
 		
 		print $is_mobile ? qq|<hr><h2>$seeds{$s}[0]</h2><br>$seeds{$s}[3]<br>|
-			: qq|<tr><th align="left">$seeds{$s}[0]</th></tr><tr><td>$seeds{$s}[3]</td></tr>|;
+			: qq|<tr><td align="left">$seeds{$s}[0]</td><td>$seeds{$s}[3]</td></tr>|;
 	}
 	print qq|</table>| unless $is_mobile;
 }
