@@ -3,10 +3,8 @@ use warnings;
 
 package WarController;
 
-use lib qw(./Accessor);
-require WarAccessor;
-require PlayerAccessor;
-
+require "./TestFramework/Controller/WarAccessor.pm";
+require "./TestFramework/Controller/PlayerAccessor.pm";
 #勝利結果
 use constant WIN => 1;
 use constant LOSE => 2;
@@ -24,7 +22,7 @@ sub new{
 
 	#戦争関連のアクセサ
 	$self->{WAR_ACCESSOR_INTERFACE} = WarAccessor->new(); 
-	$self->{PLAYER_ACCESSOR_INTERFACE} = PlayerAccessor();
+	$self->{PLAYER_ACCESSOR_INTERFACE} = PlayerAccessor->new();
 
 	return bless $self, $class;
 }

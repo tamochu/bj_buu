@@ -1,10 +1,8 @@
 #use strict;
 use warnings;
 
-package PlayerAccessAdapter;
-
-use lib qw(./Accessor);
-require PlayerAccessor;
+package PlayerController;
+require "./TestFramework/Controller/PlayerAccessor.pm";
 
 sub new{
 	my $class = shift;

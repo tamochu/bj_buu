@@ -1,10 +1,8 @@
 #use strict;
 use warnings;
 
-package CountryAccessController;
-
-use lib qw(./Accessor);
-require CountryAccessor;
+package CountryController;
+require "./TestFramework/Controller/CountryAccessor.pm";
 
 sub new{
 	my $class = shift;

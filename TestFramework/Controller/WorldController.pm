@@ -7,9 +7,7 @@
 use warnings;
 
 package WorldController;
-
-use lib qw(./Accessor);
-require WorldAccessor;
+require "./TestFramework/Controller/PlayerAccessor.pm";
 
 sub new{
 
