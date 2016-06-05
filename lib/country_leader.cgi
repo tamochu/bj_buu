@@ -54,17 +54,23 @@ sub tp_100 {
 	}
 	
 	my $sub_mes = '';
-	my $is_find = 0;
+	my $is_find = 0; # 投票しているか
+	my $is_find2 = 0; # 立候補しているか
 	open my $fh, "< $this_file" or &error('国リーダーファイルが読み込めません');
 	while (my $line = <$fh>) {
 		my($name, $vote) = split /<>/, $line;
 		$is_find = 1 if $name eq $m{vote};
+		$is_find2 = 1 if $name eq $m{name};
 		$sub_mes .= qq|<input type="radio" name="vote" value="$name">$name：$vote票<br>|;
 	}
 	close $fh;
 	
 	$mes .= '誰を支持しますか?<br>';
-	
+
+	# 国データ上で立候補していないかつ個人データ上で立候補していた場合には立候補を取り消す
+	if (!$is_find2 && $m{name} eq $m{vote}) {
+		$m{vote} = '';
+	}
 	$mes .= qq|$m{vote} を支持しています<br>| if $is_find;
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<input type="radio" name="vote" value="$m{vote}" checked>そのまま<br>| if $is_find;
@@ -148,7 +154,7 @@ sub tp_200 {
 sub tp_210 {
 	return if &is_ng_cmd(1);
 	
-	my $is_find = 0;
+	my $is_find = 0; # 立候補しているか
 	my @lines = ();
 	open my $fh, "< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
 	while (my $line = <$fh>) {
@@ -157,7 +163,6 @@ sub tp_210 {
 		push @lines, $line;
 	}
 	close $fh;
-
 
 	if ($cs{old_ceo}[$m{country}] eq $m{name}) {
 		$mes .= "貴方は$e2j{ceo}を$cs{ceo_continue}[$m{country}]回務めています<br>";
@@ -205,7 +210,7 @@ sub tp_310 {
 		&begin;
 		return;
 	}
-	
+
 	my @lines = ();
 	open my $fh, "+< $this_file" or &error('国リーダーファイルが開けません');
 	eval { flock $fh, 2 };
