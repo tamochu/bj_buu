@@ -23,10 +23,10 @@ sub seed_detail {
 	print qq|<tr><th>Ží‘°–¼</th><th>“Á’¥</th></tr>| unless $is_mobile;
 	
 	for my $s (keys(%seeds)) {
-		next if $seeds{$s]}[0] eq '';
+		next if $seeds{$s}[0] eq '';
 		
-		print $is_mobile ? qq|<hr><h2>$seeds{$s]}[0]</h2><br>$seeds{$s]}[3]<br>|
-			: qq|<tr><th align="left">$seeds{$s]}[0]</th></tr><tr><td>$seeds{$s]}[3]</td></tr>|;
+		print $is_mobile ? qq|<hr><h2>$seeds{$s}[0]</h2><br>$seeds{$s}[3]<br>|
+			: qq|<tr><th align="left">$seeds{$s}[0]</th></tr><tr><td>$seeds{$s}[3]</td></tr>|;
 	}
 	print qq|</table>| unless $is_mobile;
 }
