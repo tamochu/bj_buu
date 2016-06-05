@@ -28,8 +28,10 @@ my $treasury_base = 100000;
 my $type = '_casino';
 my $flag_file = "$logdir/sales_ranking_casino_cycle_flag.cgi";
 my $this_file = "$logdir/shop_list_casino.cgi";
+my $casino_cycle_day = int($sales_ranking_cycle_day / 5);
+$casino_cycle_day = 1 if $casino_cycle_day <= 0;
 
-&update_sales_ranking if -M $flag_file > $sales_ranking_cycle_day;
+&update_sales_ranking if -M $flag_file > $casino_cycle_day;
 &run;
 &footer;
 exit;
@@ -112,9 +114,34 @@ sub update_sales_ranking  {
 	}
 	@lines = map{ $_->[0] } sort { $b->[4] <=> $a->[4] } map { [$_, split /<>/] } @lines;
 	
+	my @new_lines = ();
+	if (@lines) {
+		my $line = pop @lines;
+		my $min_sale_c = 0;
+		while (@lines) {
+			my($shop_name, $name, $message, $sale_c, $sale_money, $display, $guild_number) = split /<>/, $line;
+			if (!$min_sale_c) {
+				$min_sale_c = $sale_c;
+			}
+			if ($sale_c == $min_sale_c) {
+				my $id = unpack 'H*', $name;
+				unlink "$userdir/$id/shop${type}.cgi";
+				unlink "$userdir/$id/shop_sale${type}.cgi";
+				&write_send_news("<b>$name‚ÌŒo‰c‚·‚é$shop_name‚ÍŒo‰c”j’]‚Ì‚½‚ß•Â“X‚µ‚Ü‚µ‚½</b>", 1, $name);
+				open my $fh, ">> $userdir/$id/ex_c.cgi";
+				print $fh "ban_c<>1<>\n";
+				close $fh;
+			} else {
+				unshift @new_lines, $line;
+			}
+			$line = pop @lines;
+		}
+		unshift @new_lines, $line;
+	}
+
 	$top_name = '';
 	$treasury = 0;
-	for my $line (@lines) {
+	for my $line (@new_lines) {
 		my($shop_name, $name, $message, $sale_c, $sale_money) = split /<>/, $line;
 		if ($top_name eq '') {
 			$top_name = $name;
@@ -155,6 +182,6 @@ sub update_sales_ranking  {
 	
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
-	print $fh @lines;
+	print $fh @new_lines;
 	close $fh;
 }

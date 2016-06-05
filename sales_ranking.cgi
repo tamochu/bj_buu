@@ -159,7 +159,7 @@ sub update_sales_ranking  {
 			if (!$min_sale_c) {
 				$min_sale_c = $sale_c;
 			}
-			if ($sale_c == $min_sale_c) {
+			if ($files[$in{no}][1] eq '' && $sale_c == $min_sale_c) {
 				my $id = unpack 'H*', $name;
 				unlink "$userdir/$id/shop${type}.cgi";
 				unlink "$userdir/$id/shop_sale${type}.cgi";

@@ -6,7 +6,7 @@ require 'config.cgi';
 
 #================================================
 &decode;
-my $this_dir = "$logdir/library";
+my $this_dir = "$logdir/library/book";
 
 &header;
 &header_library;
@@ -50,6 +50,7 @@ sub run {
 		++$count;
 	}
 	closedir $dh;
+	$sub_mes .= qq|<li><a href="seed_detail.cgi" target="_blank">í‘°ˆê——</a>|;
 	
 	print qq|Š‘ ” $count û<br>|;
 	print qq|$sub_mes<hr>|;
