@@ -592,7 +592,7 @@ sub radio_my_depot {
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		$sub_mes .= qq|<input type="radio" id="$count" name="cmd" value="$count"><label for="$count">|;
+		$sub_mes .= qq|<input type="radio" id="$count" name="cmd" value="$count">|;
 		$sub_mes .= qq|<label for="$count">| unless $is_mobile;
 		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])|
 				  : $kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
