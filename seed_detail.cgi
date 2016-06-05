@@ -1,15 +1,12 @@
 #!/usr/local/bin/perl --
 require 'config.cgi';
 require 'config_game.cgi';
-require "$datadir/seed_templates.cgi";
 #================================================
 # í‘°Ú×
 #================================================
 
 &decode;
 &header;
-&header_profile;
-&read_cs;
 
 my $table_class = $is_smart ? "table2" : "table1" ;
 
@@ -23,12 +20,13 @@ exit;
 #================================================
 sub seed_detail {
 	print qq|<table class="$table_class" cellpadding="3">| unless $is_mobile;
+	print qq|<tr><th>í‘°–¼</th><th>“Á’¥</th></tr>| unless $is_mobile;
 	
-	for my $i (0..$#seed_templates) {
-		next if $datas{$profile->[0]} eq '';
+	for my $s (keys(%seeds)) {
+		next if $seeds{$s]}[0] eq '';
 		
-		print $is_mobile ? qq|<hr><h2>$profile->[1]</h2><br>$datas{$profile->[0]}<br>|
-			: qq|<tr><th align="left">$profile->[1]</th></tr><tr><td>$datas{$profile->[0]}</td></tr>|;
+		print $is_mobile ? qq|<hr><h2>$seeds{$s]}[0]</h2><br>$seeds{$s]}[3]<br>|
+			: qq|<tr><th align="left">$seeds{$s]}[0]</th></tr><tr><td>$seeds{$s]}[3]</td></tr>|;
 	}
 	print qq|</table>| unless $is_mobile;
 }
