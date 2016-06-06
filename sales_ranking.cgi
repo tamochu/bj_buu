@@ -176,7 +176,8 @@ sub update_sales_ranking  {
 	}
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
-	print $fh @new_lines;
+#	print $fh @new_lines;
+	print $fh @lines;
 	close $fh;
 	
 	# 更新周期ﾌﾗｸﾞﾌｧｲﾙを更新
