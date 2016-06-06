@@ -391,9 +391,15 @@ sub tp_810{
 		return;
 	}
 	
-	
-	if($m{wea}){
-		&send_item($m{name}, 1, $m{wea}, $m{wea_c}, $m{wea_lv}, 1);
+	if ($m{wea}) {
+		# オリジナル武器持った状態でﾃﾝﾁﾄﾋﾄﾂを使うとオリジナル武器の中身がコピーされてしまう
+		# コピーされることではなくｸﾛﾑﾊｰﾂになって戻ってこないことが問題
+		if ($m{wea_name}) {
+			&send_item($m{name}, 1, 32, 0, 0, 1);
+		}
+		else {
+			&send_item($m{name}, 1, $m{wea}, $m{wea_c}, $m{wea_lv}, 1);
+		}
 	}
 	my $i;
 	if ($in{type} >= 1 && $in{type} <= 6) {
@@ -404,6 +410,13 @@ sub tp_810{
 	
 	$m{pet} = 0;
 	$m{wea} = $i;
+
+	# どうせ手放したらｸﾛﾊﾑ★0に戻るので★30になること自体はさほど問題にならなそう？
+	# むしろ★0持ってる状態と★30持ってる状態でﾃﾝﾁﾄﾋﾄﾂ使った時に損をする側がでるから一律★30にしてしまっても良いかと
+	# 代わりにオシャカデメリット
+	$m{wea_c} = 0;
+	$m{wea_lv} = 30;
+
 	$m{wea_name} = "$in{weapon_name}";
 	&mes_and_world_news("$in{weapon_name}を手に入れました");
 

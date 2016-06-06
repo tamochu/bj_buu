@@ -198,12 +198,9 @@ sub tp_210 {
 
 	my $line;
 	if ($cmd eq '1' && $m{wea}) {
-		if($m{wea_name}){
-			$m{wea} = 32;
-			$m{wea_c} = 0;
-			$m{wea_lv} = 0;
-		}
-		$line = "$cmd<>$m{wea}<>$m{wea_c}<>$m{wea_lv}<>\n";
+		# ここでオリ武器用に自データを書き換えてはいけない
+		# 爆発処理で意図せず return する可能性がある
+		$line = $m{wea_name} ? "$cmd<>32<>0<>0<>\n" : "$cmd<>$m{wea}<>$m{wea_c}<>$m{wea_lv}<>\n";
 	}
 	elsif ($cmd eq '2' && $m{egg}) {
 		$line = "$cmd<>$m{egg}<>$m{egg_c}<>0<>\n";
@@ -239,8 +236,6 @@ sub tp_210 {
 		if ($cmd eq '1') {
 			if($m{wea_name}){
 				$m{wea} = 32;
-				$m{wea_c} = 0;
-				$m{wea_lv} = 0;
 				$mes .= "持ち主の手を離れた途端$m{wea_name}はただの$weas[$m{wea}][1]になってしまった<br>";
 				$m{wea_name} = "";
 			}
@@ -377,7 +372,12 @@ sub tp_410 {
 		&begin;
 		return;
 	}
-	
+
+	if ($m{wea_name}) {
+		$mes .= "唯一無二の武器を送ることはできません<br>";
+		&begin;
+		return;
+	}
 	my @kinds = ('', 'wea', 'egg', 'pet', 'gua');
 	for my $taboo_item (@{ $taboo_items{ $kinds[$cmd] } }) {
 		if ($taboo_item eq $m{ $kinds[$cmd] }) {
@@ -471,6 +471,8 @@ sub tp_510 {
 	my($maxcount, $sub_mes) = &checkbox_my_depot;
 	my $count = 0;
 	my $is_rewrite = 0;
+	my @junk = ();
+	my @junk_log = ();
 	my %lock = &get_lock_item;
 	open my $fh, "+< $this_file" or &error("$this_fileが開けません");
 	eval { flock $fh, 2; };
@@ -488,18 +490,14 @@ sub tp_510 {
 					  : $kind eq '3' ? "$pets[$item_no][1]★$item_cを売りました<br>"
 					  :                "$guas[$item_no][1]を売りました<br>"
 					  ;
-				
+				$item_c = 0 if $kind eq '3'; # ｼﾞｬﾝｸにﾍﾟｯﾄを流す時はレベルを初期化
 				$m{money} += $sall_price;
 
+				# 大量に一括売却するとその数だけﾌｧｲﾙｵｰﾌﾟﾝするので1回で済むように変更
 				if (rand(2) < 1) {
-					open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiﾌｧｲﾙが開けません");
-					print $fh2 "$kind<>$item_no<>$item_c<>\n";
-					close $fh2;
+					push @junk, "$kind<>$item_no<>$item_c<>\n";
 				}
-				open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
-				print $fh3 "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
-				close $fh3;
-				
+				push @junk_log, "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
 				&penalty_depot($maxcount);
 			}
 		}
@@ -508,9 +506,20 @@ sub tp_510 {
 		}
 	}
 	if ($is_rewrite) {
+		# 自分の倉庫の書き込み
 		seek  $fh, 0, 0;
 		truncate $fh, 0; 
 		print $fh @lines;
+
+		# ｼﾞｬﾝｸに書き込み
+		open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiﾌｧｲﾙが開けません");
+		print $fh2 @junk;
+		close $fh2;
+
+		# ｼﾞｬﾝｸﾛｸﾞに書き込み
+		open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
+		print $fh3 @junk_log;
+		close $fh3;
 	}
 	close $fh;
 	&begin;

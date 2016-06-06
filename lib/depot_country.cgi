@@ -188,6 +188,11 @@ sub tp_200 {
 }
 sub tp_210 {
 	return if &is_ng_cmd(1..4);
+	if ($m{wea_name}) {
+		$mes .= "—Bˆê–³“ñ‚Ì•Ší‚ğ—a‚¯‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
+		&begin;
+		return;
+	}
 	my @kinds = ('', 'wea', 'egg', 'pet', 'gua');
 	for my $taboo_item (@{ $taboo_items{ $kinds[$cmd] } }) {
 		if ($taboo_item eq $m{ $kinds[$cmd] }) {

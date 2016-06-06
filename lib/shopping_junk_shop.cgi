@@ -160,7 +160,7 @@ sub tp_200 {
 		 || ($cmd eq '2' && $m{egg})
 		 || ($cmd eq '3' && $m{pet})
 		 || ($cmd eq '4' && $m{gua}) ) {
-		 
+			my $line;
 			if ($cmd eq '1') {
 				if($m{wea_name}){
 					$m{wea} = 32;
@@ -170,37 +170,37 @@ sub tp_200 {
 					$m{wea_name} = "";
 				}
 				$mes .= "$weas[$m{wea}][1]を売りました<br>";
-				$line = "$cmd<>$m{wea}<>$m{wea_c}<>\n";
+				$line = "$cmd<>$m{wea}<>$m{wea_c}<>";
 				$m{wea} = $m{wea_c} = $m{wea_lv} = 0;
 			}
 			elsif ($cmd eq '2') {
 				$mes .= "$eggs[$m{egg}][1]を売りました<br>";
-				$line = "$cmd<>$m{egg}<>$m{egg_c}<>\n";
+				$line = "$cmd<>$m{egg}<>$m{egg_c}<>";
 				$m{egg} = $m{egg_c} = 0;
 			}
 			elsif ($cmd eq '3') {
 				$mes .= "$pets[$m{pet}][1]★$m{pet_c}を売りました<br>";
-				$line = "$cmd<>$m{pet}<>0<>\n";
+				$line = "$cmd<>$m{pet}<>0<>";
 				$m{pet} = 0;
 			}
 			elsif ($cmd eq '4') {
 				$mes .= "$guas[$m{gua}][1]を売りました<br>";
-				$line = "$cmd<>$m{gua}<>0<>\n";
+				$line = "$cmd<>$m{gua}<>0<>";
 				$m{gua} = 0;
 			}
 			else {
 				&error('ｱｲﾃﾑの種類が異常です');
 			}
 			
-			$mes .= "お前いい人、仲良し。良いもの持てる $sall_money Gやる<br>";
+			$mes .= "お前いい人、仲良し。良いもの持てる $sall_price Gやる<br>";
 			$m{money} += $sall_price;
 			if (rand(2) < 1) {
 				open my $fh, ">> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
-				print $fh $line;
+				print $fh "$line\n";
 				close $fh;
 			}
 			open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
-			print $fh3 "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
+			print $fh3 "$line$m{name}<>$time<>0<>\n";
 			close $fh3;
 	}
 	&begin;
