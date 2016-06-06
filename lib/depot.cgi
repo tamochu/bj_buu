@@ -494,9 +494,9 @@ sub tp_510 {
 				$m{money} += $sall_price;
 
 				# ‘å—Ê‚ÉˆêŠ‡”„‹p‚·‚é‚Æ‚»‚Ì”‚¾‚¯Ì§²Ùµ°Ìßİ‚·‚é‚Ì‚Å1‰ñ‚ÅÏ‚Ş‚æ‚¤‚É•ÏX
-				if (rand(2) < 1) {
+#				if (rand(2) < 1) {
 					push @junk, "$kind<>$item_no<>$item_c<>\n";
-				}
+#				}
 				push @junk_log, "$kind<>$item_no<>$item_c<>$m{name}<>$time<>0<>\n";
 				&penalty_depot($maxcount);
 			}

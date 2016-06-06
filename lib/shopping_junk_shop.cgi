@@ -194,11 +194,11 @@ sub tp_200 {
 			
 			$mes .= "お前いい人、仲良し。良いもの持てる $sall_price Gやる<br>";
 			$m{money} += $sall_price;
-			if (rand(2) < 1) {
+#			if (rand(2) < 1) {
 				open my $fh, ">> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
 				print $fh "$line\n";
 				close $fh;
-			}
+#			}
 			open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
 			print $fh3 "$line$m{name}<>$time<>0<>\n";
 			close $fh3;
