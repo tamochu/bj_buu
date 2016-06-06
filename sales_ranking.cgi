@@ -150,6 +150,8 @@ sub update_sales_ranking  {
 		}
 	}
 	@lines = map{ $_->[0] } sort { $b->[4] <=> $a->[4] } map { [$_, split /<>/] } @lines;
+# 2016/06/07 comment out
+=pod
 	my @new_lines = ();
 	if (@lines) {
 		my $line = pop @lines;
@@ -174,10 +176,11 @@ sub update_sales_ranking  {
 		}
 		unshift @new_lines, $line;
 	}
+=cut
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
-#	print $fh @new_lines;
-	print $fh @lines;
+#	print $fh @new_lines; # 2016/06/07 comment out
+	print $fh @lines; # 2016/06/07 add
 	close $fh;
 	
 	# 更新周期ﾌﾗｸﾞﾌｧｲﾙを更新
