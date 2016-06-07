@@ -1,11 +1,12 @@
 ###############################################################################
-# システム時刻の偽装やファイルの保存、復元など
+# システム時刻の偽装など
 # システム時刻の偽装に関する関数はtime,localtimeなどの返り値を偽装し、単位は秒
 ###############################################################################
 
 package SystemController;
-use File::Path qw(make_path);
-
+use File::Path qw(make_path rmtree);
+use File::Copy qw(copy);
+use File::Copy::Recursive qw(fcopy dircopy);
 require "./TestFramework/Controller/Accessor/SystemAccessor.pm";
 
 
@@ -18,46 +19,28 @@ sub new {
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 
-	#callしたファイル名＋行数で退避ディレクトリを生成
+	#callしたファイルのパス＋行数で退避ディレクトリを生成
+	#cdからの相対ディレクトリなら先頭の./を削除、またファイルネーム中の.は全て削除する
+	#最終的にはdirname/child_direnameの形に変換
+	$caller_filename =~ s/^\.\///;
 	$caller_filename =~ s/\.//g;
-	my $savedir = ".".$caller_filename.$caller_num_line;
 
+	my $savedir = "./".$caller_filename.$caller_num_line;
 	$self = {};
 
 	#システムのアクセサ
 	$self->{SYSTEM_ACCESSOR} = SystemAccessor->new();
 
-	#データのセーブロード
-	$self->{SAVE_DIR} = $savedir; #ファイル/ディレクトリの退避ディレクトリ
-	$self->{SAVED_PATH} = []; #セーブされたファイルまたはディレクトリの元のパス/移動後のパス
-
 	#システム時刻の偽装の状態
 	use constant TIME_NATURAL => 0;
 	use constant TIME_CHANGED => 1;
 	use constant TIME_FIXED => 2;
-	
 	$self->{TIME_TYPE} = TIME_NATURAL;
-
-
 
 	return bless ($self, $class);
 
 }
 
-sub DESTROY{
-
-	my $self = shift;
-
-	#退避していたデータを復元
-	$self->restore();
-
-	#セーブフォルダ削除
-	rmdir $self->{SAVE_DIR};
-
-	#システム自国を元に戻す
-	$self->restore_time();
-
-}
 
 #systemのtimeを固定にする
 sub fix_time{
@@ -114,57 +97,4 @@ sub restore_time{
 	$self->{TIME_TYPE} = TIME_NATURAL;
 }
 
-#ディレクトリを退避
-sub save_dir{
-
-	my $self = shift;
-	my $src_path = shift;
-
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
-	my $error_info = "Error: $caller_filename at line $caller_num_line";
-
-	(-e $src_path) or die ("$error_info : $src_path does not exist");
-
-	#カレントはcurrentに変換
-	my $save_path = $src_path;
-	$save_path =~ s/\.//;
-	print "***save_path = $save_path***\n";
-	print "***self->{SAVE_DIR} = $self->{SAVE_DIR}***\n";
-
-	#保存先
-	my $dst_path = $self->{SAVE_DIR}.$save_path;
-
-	my $set = [ $src_path, $dst_path ];
-	push(@{$self->{SAVED_PATH}}, $set);
-
-	print "***set = $set->[0], $set->[1]***\n";
-	print "***$self->{SAVED_PATH}->[0]->[0]***\n";
-	print "***src = $src_path***\n***dst = $dst_path***\n";
-	print "***self->{SAVE_DIR} = $self->{SAVE_DIR}***\n";
-	unless ($self->{SYSTEM_ACCESSOR}->move($src_path, $dst_path)){
-		die ("$error_info : failed to save $src_path");
-	}
-	
-}
-
-
-#ファイル/フォルダの復元
-sub restore{
-
-	my $self = shift;
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
-	my $error_info = "Error: $caller_filename at line $caller_num_line";
-
-	for my $set (@{$self->{SAVED_PATH}}){
-		print "set =  $set->[1]  to $set->[0]\n";
-		unless($self->{SYSTEM_ACCESSOR}->move($set->[1], $set->[0])){
-			die ("$error_info : failed to restore $set->[1] to $set->[0]");
-		}
-	}
-
-	#再初期化
-	$self->{SAVED_PATH} = [];
-}
 1;

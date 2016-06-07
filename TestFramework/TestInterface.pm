@@ -5,7 +5,8 @@
 package TestInterface;
 
 use Carp;
-use File::Copy::Recursive qw(dircopy);
+use File::Path;
+require "./TestFramework/Controller/Accessor/SystemAccessor.pm";
 
 sub new{
 
@@ -16,55 +17,72 @@ sub new{
 	$self->{TEST_RESULT} = shift;
 
 	#テスト開始前後で退避させるフォルダ
-	$self->{FOLDERS_TO_SAVE} = [ 'log', 'datas', 'user' ];
-	$self->{ESCAPE_FOLDER} = "./escape";
+	$self->{FOLDERS_TO_BE_SAVED} = [ './log',  './user' ]; 
+	$self->{FOLDER_TO_SAVE} = "./TestFramework/save";
+	print "***in TI call create SA***\n";
+	$self->{SYSTEM_ACCESSOR} = SystemAccessor->new();
 
-	return bless ($self, $class);
+	bless $self, $class;
+
+	#ゲームデータを保存
+	$self->save_data();
+
+	return $self;
 
 }
+
 
 #ゲームデータを保存
-sub save_world{
+sub save_data{
 
 	my $self = shift;
-	my $num_folder = $self->{FOLDERS_TO_SAVE};
-	--$num_folder;
 
-	#退避先へコピー
-	for my $i (0 .. $num_folder){
+	#セーブフォルダ作成
+	mkpath($self->{FOLDER_TO_SAVE});
 
-		my $orig = $self->{FOLDERS_TO_SAVE}[$i];
-		my $dest = $self->{ESCAPE_FOLDER} . $self->{FOLDERS_TO_SAVE}[$i];
+	#退避
+	for my $dir (@{$self->{FOLDERS_TO_BE_SAVED}}){
+		unless (-d $dir){
+			croak("Couldn't identfy $dir as an existing directory");
+		}
 
-		dircopy($orig, $dest) or die @!;
-			
+		my $saved_dir = $dir;
+		$saved_dir =~ s/^\.//;
+		$saved_dir = $self->{FOLDER_TO_SAVE}.$saved_dir;
+		$self->{SYSTEM_ACCESSOR}->move_data($dir, $saved_dir);
 	}
 
+	#退避させた分は空フォルダを作成
+	#このフォルダは復元時に消去される
+	for my $dir (@{$self->{FOLDERS_TO_BE_SAVED}}){
+		eval {
+  			mkpath ($dir) or warn $!;
+		};
+		if ($@) {
+			croak $@;
+		}
+	}
 }
 
-#ゲームデータを復元
-sub recovery_world{
+sub DESTROY{
 
 	my $self = shift;
 
-	my $self = shift;
-	my $num_folder = $self->{FOLDERS_TO_SAVE};
-	--$num_folder;
+	#退避していたデータを復元
 
-	#元のフォルダを削除して退避先をコピー
-	for my $i (0 .. $num_folder){
+	for my $dir (@{$self->{FOLDERS_TO_BE_SAVED}}){
 
-		my $orig = $self->{FOLDERS_TO_SAVE}[$i];
-		my $dest = $self->{ESCAPE_FOLDER} . $self->{FOLDERS_TO_SAVE}[$i];
+		unless (-d $dir){
+			croak("Couldn't find $dir in DESTROY");
+		}	
 
-		rmdir $orig or die @!;
-		dircopy($orig, $dest) or die @!;
-			
-	}	
-	
+		my $saved_dir = $dir;
+		$saved_dir =~ s/^\.//;
+		$saved_dir = $self->{FOLDER_TO_SAVE}.$saved_dir;
+		$self->{SYSTEM_ACCESSOR}->move_data($saved_dir, $dir);
 
+	}
 }
-
 #テストを指定して実行
 sub run_test{
 
@@ -76,7 +94,7 @@ sub run_test{
 		require "$filename";
 	};
 
-	#エラーケースと成功ケースをそれぞれ別個に格納
+	#失敗したファイル名と成功したファイル名をそれぞれ別個に格納
 	if($@){
 		$self->{TEST_RESULT}->add_error($filename, $@);	
 	}
@@ -85,7 +103,7 @@ sub run_test{
 	}
 }
 
-#指定されたフォルダの全てのテストを実行
+#指定されたディレクトリの全てのテストを実行
 sub run_all_tests{
 
 	my $self = shift;

@@ -5,7 +5,7 @@
 package SystemAccessor;
 use lib qw(./TestFramework/lib);
 use Test::MockTime qw( :all );
-use File::Copy 'move';
+use File::Copy qw(copy);
 use File::Copy::Recursive qw(fcopy dircopy);
 use File::Path 'rmtree';
 
@@ -14,6 +14,7 @@ sub new {
 	my $class = shift;
 	my $self = {};
 
+	print "***in SA new was called***\n";
 	return bless($self, $class);
 
 }
@@ -50,21 +51,85 @@ sub restore_time{
 }
 
 
-#ディレクトリの移動
-sub move{
+#ファイル/ディレクトリの移動
+#移動先に同名フォルダがあれば削除してから移動
+sub move_data{
 
 	my $self = shift;
 	my $src_path = shift;
 	my $dst_path = shift;
 
+
+	print "***in SA move_data($src_path, $dst_path) was called***\n";
+	unless((defined $src_path) or (defined $dst_path)){
+		die("SystemAccessor::move_data needs src_path and dst_path");
+	}
+
+	#ディレクトリの場合
 	if(-d $src_path){
+		if(-d $dst_path){
+			rmtree($dst_path);
+			print "***in SA move_data called rmtree($dst_path)\n";
+		}
 		dircopy($src_path, $dst_path) or die $!;
-		rmtree($src_path);
+		print "***in SA move_data called dircopy($src_path,$dst_path)***\n";
+
+		#退避元を削除する
+		unless(rmtree($src_path)){
+			die ("failed to rmtree($src_path)\n");
+		}
+		print "***in SA move_data called rmtree($src_path)\n";
+	}
+	#ファイルの場合
+	elsif(-f $src_path){
+		if(-f $dst_path){
+			unless(unlink $dst_path){
+				die("failed to delete $dst_path");
+			}
+		}
+		copy($src_path, $dst_path) or die $!;
+
+		#退避元を削除する
+		unless(unlink $src_path){
+			die("failed to delete $src_path");
+		};
+
 	}
 	else{
 		die("Couldn't identify $src_path");
 	}
 
 }
+
+#ディレクトリ/ファイルのコピー
+#コピー先に同名ディレクトリ/ファイルがあれば削除してからコピーする
+sub copy{
+
+	my $self = shift;
+	my $src_path = shift;
+	my $dst_path = shift;
+
+	#ディレクトリの場合
+	if(-d $src_path){
+		if(-d $dst_path){
+			rmtree($dst_path);
+		}
+		dircopy($src_path, $dst_path) or die $!;
+	}
+	#ファイルの場合
+	elsif(-f $src_path){
+		if(-f $dst_path){
+			unless(unlink $dst_path){
+				die("failed to delete $dst_path");
+			}
+		}
+		copy($src_path, $dst_path);
+	}
+	else{
+		die("Couldn't identify $src_path");
+	}
+
+}
+
 
 1;
