@@ -673,8 +673,10 @@ sub junk_sub {
 
 		$mes .= "<td>";
 		$mes .= $kind eq '1' ? $weas[$item_no][1]
-			: $kind eq '2' ? $eggs[$item_no][1]
-			:				$pets[$item_no][1];
+			  : $kind eq '2' ? $eggs[$item_no][1]
+			  : $kind eq '3' ? $pets[$item_no][1]
+			  :                $guas[$item_no][1]
+			  ;
 		$mes .= "</td><td>$name</td>";
 		$mes .= $type ? "<td>”ƒ‚¢</td>" : "<td>”„‚è</td>";
 		$mes .= "<td>$jtime2<br></td></tr>";
