@@ -280,6 +280,14 @@ print "$w{country}<br>" if $config_test;
 			close $fh;
 			chmod $chmod, $output_file;
 		}
+		for my $file_name (1 .. $in{country}) {
+			if ($file_name != $i) {
+				my $output_file = "$logdir/$i/bbs_log_$file_name.cgi";
+				open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
+				close $fh;
+				chmod $chmod, $output_file;
+			}
+		}
 		# 国庫は1行目が設定なので予め書き込んでおかないと国庫にぶち込んだ1個目のアイテムが消失してしまう
 		my $output_file = "$logdir/$i/depot.cgi";
 		open my $fh, "> $output_file" or &error("$output_file ﾌｧｲﾙが作れませんでした");
