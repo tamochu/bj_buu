@@ -485,11 +485,8 @@ sub tp_510 {
 			} else {
 				$is_rewrite = 1;
 				
-				$mes .= $kind eq '1' ? "$weas[$item_no][1]を売りました<br>"
-					  : $kind eq '2' ? "$eggs[$item_no][1]を売りました<br>"
-					  : $kind eq '3' ? "$pets[$item_no][1]★$item_cを売りました<br>"
-					  :                "$guas[$item_no][1]を売りました<br>"
-					  ;
+				# ﾍﾟｯﾄだけ★情報追記 他は名前だけ
+				$mes .= &get_item_name($kind, $item_no, $item_c)."を売りました<br>";
 				$item_c = 0 if $kind eq '3'; # ｼﾞｬﾝｸにﾍﾟｯﾄを流す時はレベルを初期化
 				$m{money} += $sall_price;
 
@@ -554,12 +551,9 @@ sub tp_610 {
 				push @lines, $line;
 			} else {
 				$is_rewrite = 1;
-				
-				$mes .= $kind eq '1' ? "$weas[$item_no][1]を捨てました<br>"
-					  : $kind eq '2' ? "$eggs[$item_no][1]を捨てました<br>"
-					  : $kind eq '3' ? "$pets[$item_no][1]★$item_cを捨てました<br>"
-					  :                "$guas[$item_no][1]を捨てました<br>"
-					  ;
+
+				# ﾍﾟｯﾄだけ★情報追記 他は名前だけ
+				$mes .= &get_item_name($kind, $item_no, $item_c)."を捨てました<br>";
 			}
 		}
 		else {
@@ -646,18 +640,11 @@ sub radio_my_depot {
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		my $lock_mes = '';
-		if ($lock{"$kind<>$item_no<>"}) {
-			$lock_mes = ' ロックされてます';
-		}
+
 		$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count">|;
 		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
-		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])$lock_mes|
-				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes|
-				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c$lock_mes|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes|
-				  ;
+		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+		$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
 	}

@@ -1679,6 +1679,42 @@ sub get_rank_name {
 }
 
 #================================================
+# アイテム名取得
+# 第１引数と第２引数だけで名前
+# 第３引数まででﾍﾟｯﾄだけ★情報追加(ｼﾞｬﾝｸでﾍﾟｯﾄだけ★情報使ってるので)
+# 全引数を指定すると全アイテム情報追加
+# $kind アイテムの種類(1武器 2卵 3ﾍﾟｯﾄ 4防具)
+# $item_no アイテムの番号
+# $item_c アイテムが持つ数値(耐久値 孵化値 ★ なし)
+# $item_lv アイテムのレベル(★ なし なし なし)
+# 新しいアイテム種を追加したらここを変更すること
+#================================================
+sub get_item_name {
+	my($kind, $item_no, $item_c, $item_lv) = @_;
+
+	my $result = '';
+	# 第２引数まで有効ならアイテム名のみ
+	$result = $kind eq '1' ? "$weas[$item_no][1]"
+		  : $kind eq '2' ? "$eggs[$item_no][1]"
+		  : $kind eq '3' ? "$pets[$item_no][1]"
+		  :                "$guas[$item_no][1]"
+		  ;
+	if (defined($item_c)) {
+		if (defined($item_lv)) { # 全引数有効なら全アイテム情報
+			$result = $kind eq '1' ? "[$weas[$item_no][2]]$result★$item_lv($item_c/$weas[$item_no][4])"
+				  : $kind eq '2' ? "[卵]$result($item_c/$eggs[$item_no][2])"
+				  : $kind eq '3' ? "[ぺ]$result★$item_c"
+				  :                "[$guas[$item_no][2]]$result"
+				  ;
+		}
+		elsif ($kind eq '3') { # 第３引数有効かつﾍﾟｯﾄなら★情報追加
+			$result .= "★$item_c";
+		}
+	}
+	return $result;
+}
+
+#================================================
 # Twitterボット
 #================================================
 sub twitter_bot {

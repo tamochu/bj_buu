@@ -650,11 +650,7 @@ sub junk_sub {
 		my $jtime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
 
 		$mes .= "<td>";
-		$mes .= $kind eq '1' ? $weas[$item_no][1]
-			  : $kind eq '2' ? $eggs[$item_no][1]
-			  : $kind eq '3' ? $pets[$item_no][1]
-			  :                $guas[$item_no][1]
-			  ;
+		$mes .= &get_item_name($kind, $item_no);
 		$mes .= "</td><td>$name</td>";
 		$mes .= $type ? "<td>”ƒ‚¢</td>" : "<td>”„‚è</td>";
 		$mes .= "<td>$jtime2<br></td></tr>";
@@ -672,11 +668,7 @@ sub junk_sub {
 		my $jtime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
 
 		$mes .= "<td>";
-		$mes .= $kind eq '1' ? $weas[$item_no][1]
-			  : $kind eq '2' ? $eggs[$item_no][1]
-			  : $kind eq '3' ? $pets[$item_no][1]
-			  :                $guas[$item_no][1]
-			  ;
+		$mes .= &get_item_name($kind, $item_no);
 		$mes .= "</td><td>$name</td>";
 		$mes .= $type ? "<td>”ƒ‚¢</td>" : "<td>”„‚è</td>";
 		$mes .= "<td>$jtime2<br></td></tr>";
