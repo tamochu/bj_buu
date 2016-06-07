@@ -112,17 +112,25 @@ sub letter_box_get {
 		next if($bcomment !~ /全員に送信】/ && $in{type} eq 'country');
 		$bshogo = $bshogo ? "[$bshogo]" : '';
 		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
+
+		# 手紙の送信者表示 匿名の手紙は送信者の国名を非表示
+		my $from_data = $bcountry eq '-1'
+			? qq|From <a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>$bshogo <font size="1">($bdate)</font>|
+			: qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font><a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>$bshogo <font size="1">($bdate)</font>|
+			;
+
 		if ($is_mobile) {
 			if($in{mode} eq 'delete_all'){
 				print qq|<hr><input type="checkbox" name="delete" value="$btime" checked>|;
 			}else{
 				print qq|<hr><input type="checkbox" name="delete" value="$btime">|;
 			}
-			print qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font><a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>$bshogo <font size="1">($bdate)</font><hr>|;
+			print qq|$from_data<hr>|;
 			print qq|$bcomment<br><hr><br>|;
 		}
 		else {
-			$bshogo = "" if $is_smart;
+			# デザイン崩れる気しかしないけど匿名処理考えると称号非表示はマズいかも
+#			$bshogo = "" if $is_smart;
 #			print qq|<table class="table1" cellpadding="5" width="440"><tr><th align="left">|;
 			print qq|<table class="$table_class" cellpadding="5"><tr><th align="left">|;
 			if($in{mode} eq 'delete_all'){
@@ -130,7 +138,7 @@ sub letter_box_get {
 			}else{
 				print qq|<input type="checkbox" name="delete" value="$btime">|;
 			}
-			print qq|From <font color="$cs{color}[$bcountry]">$cs{name}[$bcountry]</font> <a href="letter.cgi?id=$id&pass=$pass&no=$in{no}&send_name=$bname">$bname</a>$bshogo <font size="1">($bdate)</font><br></th></tr>|;
+			print qq|$from_data<br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr></table><br>|;
 		}
 		++$count;

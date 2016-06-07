@@ -11,6 +11,7 @@ sub write_comment {
 	&error("–{•¶‚ª’·‚·‚¬‚Ü‚·(”¼Šp$max_comment•¶š‚Ü‚Å)") if length $in{comment} > $max_comment;
 	&error('‘‚«‚İŒ ŒÀ‚ª‚ ‚è‚Ü‚¹‚ñ') if (!&writer_check);
 
+	my $mcountry = $m{country};
 	if ($this_file =~ /$userdir\/(.*?)\//) {
 		my $wid = $1;
 		if (-f "$userdir/$wid/blacklist.cgi") {
@@ -22,7 +23,12 @@ sub write_comment {
 				}
 			}
 			close $fh;
+
 		}
+		# “½–¼‚Ìè†‚Í‘–¼”ñ•\¦
+		# 0 ‚ÍÈÊŞ×İ‚É‚È‚é‚Ì‚Å‚Æ‚è‚ ‚¦‚¸ -1 ‚É‚µ‚Ä letter.cgi ‘¤‚Åˆ—
+		# é“`Œ¾”Â‚Å‚Ìè†ƒŒƒX‚Í“½–¼‚É‚µ‚È‚¢
+		$mcountry = '-1' if ( ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) && $in{comment} !~ "<hr>yé“`Œ¾”Â‚Ö‚ÌƒŒƒXz");
 	}
 
 	my @lines = ();
@@ -66,7 +72,7 @@ sub write_comment {
 		}
 	}
 	my $mshogo = length($m{shogo}) > $bbs_config{shogo_limit} ? substr($m{shogo}, 0, $bbs_config{shogo_limit}) : $m{shogo};
-	unshift @lines, "$time<>$date<>$mname<>$m{country}<>$mshogo<>$addr<>$in{comment}<>$m{icon}<>\n";
+	unshift @lines, "$time<>$date<>$mname<>$mcountry<>$mshogo<>$addr<>$in{comment}<>$m{icon}<>\n";
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @lines;

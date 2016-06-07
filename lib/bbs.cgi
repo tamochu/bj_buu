@@ -62,7 +62,13 @@ sub run {
 	print qq|<textarea name="comment" cols="60" rows="$rows" wrap="soft" class="textarea1"></textarea><br>|;
 	print qq|<input type="submit" value="書き込む" class="button_s">|;
 	print qq|　 <input type="checkbox" name="is_save_log" value="1">ﾛｸﾞ保存</form><br>|;
-	print qq|<font size="2">$member_c人:$member</font><hr>|;
+	# 匿名処理 ここを有効にすると匿名情勢時に 同盟会議室 掲示板 運営掲示板 封印会議室(暗黒時は有効には成り得ない) もメンバー非表示になる
+#	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
+#		print qq|<font size="2">$member_c人:</font><hr>|;
+#	}
+#	else {
+		print qq|<font size="2">$member_c人:$member</font><hr>|;
+#	}
 
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
 	while (my $line = <$fh>) {
