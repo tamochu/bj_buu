@@ -38,6 +38,7 @@ elsif ($in{mode} eq 'admin_refresh')     { &admin_refresh; }
 elsif ($in{mode} eq 'admin_go_neverland')     { &admin_go_neverland; }
 elsif ($in{mode} eq 'admin_repaire')     { &admin_repaire; }
 elsif ($in{mode} eq 'junk_sub')          { &junk_sub($in{j_del}); }
+elsif ($in{mode} eq 'junk_show')          { &junk_show; }
 elsif ($in{mode} eq 'country_reset')     { &country_reset; }
 elsif ($in{mode} eq 'kinotake_god')      { &kinotake_god; }
 elsif ($in{mode} eq 'bug_prize')      { &bug_prize; }
@@ -216,7 +217,11 @@ sub top {
 	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
 	print qq|<p><input type="submit" value="密輸監視" class="button_s"></p>|;
 	print qq|<input type="radio" name="j_del" value="0">閲覧|;
-	print qq|<input type="radio" name="j_del" value="1" checked>ログ削除</form></div>|;
+	print qq|<input type="radio" name="j_del" value="1" checked>ログ削除</form>|;
+	print qq|<li>ジャンクショップの中身を確認します|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="junk_show">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="閲覧" class="button_s"></p></form></div>|;
 	
 	print qq|<br><br><br>|;
 	print qq|<div class="mes">垢比較：二つの垢のログイン状況を比較する<ul>|;
@@ -639,13 +644,20 @@ sub junk_sub {
 	$mes .= qq|<td>アイテムソ\ート<table class="table1"><tr><th>アイテム</th><th>名前</th><th>売り/買い</th><th>時間</th></tr>|;
 	for my $line (@lines){
 		my($kind, $item_no, $item_c, $name, $jtime, $type) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($jtime);
+		$year += 1900;
+		$mon++;
+		my $jtime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+
 		$mes .= "<td>";
 		$mes .= $kind eq '1' ? $weas[$item_no][1]
-			: $kind eq '2' ? $eggs[$item_no][1]
-			:				$pets[$item_no][1];
+			  : $kind eq '2' ? $eggs[$item_no][1]
+			  : $kind eq '3' ? $pets[$item_no][1]
+			  :                $guas[$item_no][1]
+			  ;
 		$mes .= "</td><td>$name</td>";
 		$mes .= $type ? "<td>買い</td>" : "<td>売り</td>";
-		$mes .= "<td>$jtime<br></td></tr>";
+		$mes .= "<td>$jtime2<br></td></tr>";
 	}
 	$mes .= qq|</table></td>|;
 	@lines = map { $_->[0] }
@@ -654,13 +666,18 @@ sub junk_sub {
 	$mes .= qq|<td>時間ソ\ート<table class="table1"><tr><th>アイテム</th><th>名前</th><th>売り/買い</th><th>時間</th></tr>|;
 	for my $line (@lines){
 		my($kind, $item_no, $item_c, $name, $jtime, $type) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($jtime);
+		$year += 1900;
+		$mon++;
+		my $jtime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+
 		$mes .= "<td>";
 		$mes .= $kind eq '1' ? $weas[$item_no][1]
 			: $kind eq '2' ? $eggs[$item_no][1]
 			:				$pets[$item_no][1];
 		$mes .= "</td><td>$name</td>";
 		$mes .= $type ? "<td>買い</td>" : "<td>売り</td>";
-		$mes .= "<td>$jtime<br></td></tr>";
+		$mes .= "<td>$jtime2<br></td></tr>";
 	}
 	$mes .= qq|</table></td>|;
 	$mes .= qq|<tr></table>|;
@@ -670,6 +687,28 @@ sub junk_sub {
 		truncate $fh3, 0;
 	}
 	close $fh3;
+}
+
+#=================================================
+# ｼﾞｬﾝｸｼｮｯﾌﾟの中身確認
+#=================================================
+sub junk_show {
+	my $count = 0;
+	my $mes_sub;
+	open my $fh, "< $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiを開けませんでした");
+	while (my $line = <$fh>) {
+		$count++;
+		my($kind, $item_no, $item_c) = split /<>/, $line;
+
+		$mes_sub .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★0($item_c/$weas[$item_no][4])|
+				  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
+				  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c|
+				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
+				  ;
+		$mes_sub .= "<br>";
+	}
+	close $fh;
+	$mes .= "$count個<br>".$mes_sub;
 }
 
 #=================================================
