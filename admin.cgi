@@ -693,13 +693,7 @@ sub junk_show {
 	while (my $line = <$fh>) {
 		$count++;
 		my($kind, $item_no, $item_c) = split /<>/, $line;
-
-		$mes_sub .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š0($item_c/$weas[$item_no][4])|
-				  : $kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
-				  : $kind eq '3' ? qq|[‚Ø]$pets[$item_no][1]š$item_c|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
-				  ;
-		$mes_sub .= "<br>";
+		$mes_sub .= &get_item_name($kind, $item_no, $item_c)."<br>";
 	}
 	close $fh;
 	$mes .= "$countŒÂ<br>".$mes_sub;
@@ -1055,12 +1049,14 @@ sub admin_summer_lot_list_up {
 #=================================================
 sub bug_prize {
 	my ($kind, $item_no, $item_c, $item_lv) = split /_/, $in{prize};
-	
-	$item_mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-				: $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-				: $kind eq '3' ? "$pets[$item_no][1]š$item_c"
-				:                "$guas[$item_no][1]"
-				;
+
+	# ‚¿‚å‚Á‚Æ•\‹L•Ï‚í‚Á‚¿‚á‚¤‚¯‚Ç‘å‚µ‚½‚±‚Æ‚È‚¢‚¶‚á‚ë
+	$item_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+#	$item_mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
+#				: $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
+#				: $kind eq '3' ? "$pets[$item_no][1]š$item_c"
+#				:                "$guas[$item_no][1]"
+#				;
 	
 	&send_item($in{send_name}, $kind, $item_no, $item_c, $item_lv, 1);
 	&write_send_news(qq|yƒoƒO”­Œ©•ñVz$in{send_name}‚É$item_mes‚ğ‘—‚è‚Ü‚·B|);
@@ -1094,11 +1090,7 @@ sub admin_all_pet_check {
 	@lines = map { $_->[0] } sort { $a->[2] <=> $b->[2] || $a->[3] <=> $b->[3] || $a->[4] <=> $b->[4] || $a->[1] cmp $b->[1] } map { [$_, split /<>/] } @lines;
 	for my $line (@lines) {
 		my($name, $kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		$mes .= $kind eq '1' ? qq|$name:[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])<br>|
-				  : $kind eq '2' ? qq|$name:[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])<br>|
-				  : $kind eq '3' ? qq|$name:[‚Ø]$pets[$item_no][1]š$item_c<br>|
-				  :			       qq|$name:[$guas[$item_no][2]]$guas[$item_no][1]<br>|
-				  ;
+		$mes .= "$name:".&get_item_name($kind, $item_no, $item_c, $item_lv)."<br>";
 	}
 }
 
@@ -1324,12 +1316,7 @@ sub admin_get_depot_data {
 		$count++;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 
-		$mes_sub .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])|
-				  : $kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
-				  : $kind eq '3' ? qq|[‚Ø]$pets[$item_no][1]š$item_c|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
-				  ;
-		$mes_sub .= "<br>";
+		$mes_sub .= &get_item_name($kind, $item_no, $item_c, $item_lv)."<br>";
 	}
 	close $fh2;
 	$mes .= "$countŒÂ<br>".$mes_sub;

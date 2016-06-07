@@ -127,11 +127,8 @@ sub tp_100 {
 			
 			&send_item($m{name}, $kind, $item_no, $item_c);
 			&sale_data_log($kind, $item_no, $item_c, 0, $buy_price, 4);
-			$mes .= $kind eq '1' ? $weas[$item_no][1]
-				  : $kind eq '2' ? $eggs[$item_no][1]
-				  : $kind eq '3' ? $pets[$item_no][1]
-				  :				   $guas[$item_no][1]
-				  ;
+
+			$mes .= &get_item_name($kind, $item_no); # ƒAƒCƒeƒ€–¼‚¾‚¯
 			$mes .= '‚ð”ƒ‚¢‚Ü‚µ‚½<br>';
 			
 		}

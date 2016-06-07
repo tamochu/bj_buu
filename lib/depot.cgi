@@ -354,6 +354,11 @@ sub tp_410 {
 		&begin;
 		return;
 	}
+	elsif ($m{wea_name}) {
+		$mes .= "—Bˆê–³“ñ‚Ì•Ší‚ğ‘—‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
+		&begin;
+		return;
+	}
 
 	my $send_id = unpack 'H*', $in{send_name};
 	my %datas = &get_you_datas($send_id, 1);
@@ -373,11 +378,6 @@ sub tp_410 {
 		return;
 	}
 
-	if ($m{wea_name}) {
-		$mes .= "—Bˆê–³“ñ‚Ì•Ší‚ğ‘—‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
-		&begin;
-		return;
-	}
 	my @kinds = ('', 'wea', 'egg', 'pet', 'gua');
 	for my $taboo_item (@{ $taboo_items{ $kinds[$cmd] } }) {
 		if ($taboo_item eq $m{ $kinds[$cmd] }) {
@@ -405,13 +405,6 @@ sub tp_410 {
 	}
 	
 	if ($cmd eq '1' && $m{wea}) {
-		if($m{wea_name}){
-			$m{wea} = 32;
-			$m{wea_c} = 0;
-			$m{wea_lv} = 0;
-			$mes .= "‚¿å‚Ìè‚ğ—£‚ê‚½“r’[$m{wea_name}‚Í‚½‚¾‚Ì$weas[$m{wea}][1]‚É‚È‚Á‚Ä‚µ‚Ü‚Á‚½<br>";
-			$m{wea_name} = "";
-		}
 		&send_item($in{send_name}, $cmd, $m{wea}, $m{wea_c}, $m{wea_lv}, &is_sabakan);
 		&mes_and_send_news("$in{send_name}‚É$weas[$m{wea}][1]‚ğ‘—‚è‚Ü‚µ‚½");
 		$m{wea} = $m{wea_c} = $m{wea_lv} = 0;
@@ -676,18 +669,11 @@ sub checkbox_my_depot {
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		my $lock_mes = '';
-		if ($lock{"$kind<>$item_no<>"}) {
-			$lock_mes = ' ƒƒbƒN‚³‚ê‚Ä‚Ü‚·';
-		}
+
 		$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1">|;
 		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
-		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])$lock_mes|
-				  : $kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes|
-				  : $kind eq '3' ? qq|[‚Ø]$pets[$item_no][1]š$item_c$lock_mes|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes|
-				  ;
+		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+		$sub_mes .= ' ƒƒbƒN‚³‚ê‚Ä‚Ü‚·' if $lock{"$kind<>$item_no<>"};
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
 	}
@@ -727,15 +713,11 @@ sub checkbox_my_depot_lock_checked {
 		}
 		$sub_mes .= qq|>|;
 		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
-		
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])$lock_mes|
-				  : $kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])$lock_mes|
-				  : $kind eq '3' ? qq|[‚Ø]$pets[$item_no][1]š$item_c$lock_mes|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]$lock_mes|
-				  ;
+		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+		$sub_mes .= $lock_mes;
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
-}
+	}
 	close $fh;
 	
 	$m{is_full} = $count >= $max_depot ? 1 : 0;

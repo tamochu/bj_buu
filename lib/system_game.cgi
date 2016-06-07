@@ -481,18 +481,7 @@ sub send_item {
 		close $fh2; 
 	}
 	
-	if ($kind eq '1') {
-		$s_mes = "$weas[$item_no][1]";
-	}
-	elsif ($kind eq '2') {
-		$s_mes = "$eggs[$item_no][1]";
-	}
-	elsif ($kind eq '3') {
-		$s_mes = "$pets[$item_no][1]";
-	}
-	elsif ($kind eq '4') {
-		$s_mes = "$guas[$item_no][1]";
-	}
+	$s_mes = &get_item_name($kind, $item_no); # ƒAƒCƒeƒ€–¼‚¾‚¯
 	if (-f "$userdir/$send_id/depot_watch.cgi"){
 		my $depot_line = '';
 		open my $rfh, "< $userdir/$send_id/depot.cgi";

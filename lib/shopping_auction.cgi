@@ -69,11 +69,12 @@ sub tp_100 {
 	$m{total_auction} = 0;
 	while (my $line = <$fh>) {
 		my($bit_time, $no, $kind, $item_no, $item_c, $item_lv, $from_name, $to_name, $item_price, $buyout_price) = split /<>/, $line;
-		my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-					   : $kind eq '2' ? "[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-					   : $kind eq '3' ? "[ƒy]$pets[$item_no][1]š$item_c"
-					   : 				"[–h]$guas[$item_no][1]"
-					   ;
+		my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
+#		my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
+#					   : $kind eq '2' ? "[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
+#					   : $kind eq '3' ? "[ƒy]$pets[$item_no][1]š$item_c"
+#					   : 				"[–h]$guas[$item_no][1]"
+#					   ;
 		my $item_state = $time + 3600 * 24 > $bit_time ? "‚»‚ë‚»‚ë":
 						$time + ($auction_limit_day - 1) * 3600 * 24 > $bit_time ? "‚Ü‚¾‚Ü‚¾":"new";
 		unless($buyout_price){
@@ -112,11 +113,7 @@ sub tp_110 {
 					$need_money = $buyout_price
 				}
 				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
-					my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-								   : $kind eq '2' ? "[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-								   : $kind eq '3' ? "[ƒy]$pets[$item_no][1]š$item_c"
-								   : 				"[–h]$guas[$item_no][1]"
-								   ;
+					my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 					
 					$m{total_auction} += $in{money};
 					$mes .= "$item_title‚É $in{money} G‚Å“üD‚µ‚Ü‚µ‚½<br>";
@@ -147,11 +144,7 @@ sub tp_110 {
 			}
 			# —Dˆ—
 			elsif ($time > $bit_time) {
-				my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-							   : $kind eq '2' ? "[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-							   : $kind eq '3' ? "[ƒy]$pets[$item_no][1]š$item_c"
-							   : 				"[–h]$guas[$item_no][1]"
-							   ;
+				my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 				
 				my $to_id = unpack 'H*', $to_name;
 				if(-e "$userdir/$to_id/user.cgi"){
@@ -260,6 +253,9 @@ sub tp_210 {
 			
 			if ($cmd eq '1' && $m{wea}) {
 				if($m{wea_name}){
+					$m{wea} = 32;
+					$m{wea_c} = 0;
+					$m{wea_lv} = 0;
 					$mes .= "‚¿å‚Ìè‚ğ—£‚ê‚½“r’[$m{wea_name}‚Í‚½‚¾‚Ì$weas[$m{wea}][1]‚É‚È‚Á‚Ä‚µ‚Ü‚Á‚½<br>";
 					$m{wea_name} = "";
 				}
