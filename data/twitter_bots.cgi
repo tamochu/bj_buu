@@ -126,6 +126,22 @@
 			return "hinenoyaƒ‰¿Ši’²¸‚Ì•ñ\nŒ»İ‚Ì$item_name‚Ì•½‹Ï‘Šê‚Í${item_value}G‚Å‚·";
 		}
 	},
+	sub {
+		# V’…“ú‹Lbot
+		my $count = 0;
+		my @blogs = ();
+		open my $fh, "< $logdir/blog_news.cgi" or &error("$logdir/blog_news.cgiÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
+		while (my $line = <$fh>) {
+			push @blogs, $line;
+			$count++;
+			last if $count > 9;
+		}
+		close $fh;
+
+		my $str = $blogs[int(rand(@blogs))];
+		$str =~ s|<.*?>(.*?)<a href="(.*?)">(.*?)<.*?(\(.*?\)).*|$1$3 $4\nhttp://www.pandora.nu/nyaa/cgi-bin/bj/$2|g;
+		return $str;
+	},
 );
 
 1;
