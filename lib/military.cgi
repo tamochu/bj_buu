@@ -259,11 +259,23 @@ sub tp_910 { &form1('洗脳を行う(長期)') }
 sub form1 {
 	$mes .= "$c_yに到着しました<br>";
 	$m{tp} += 10;
-	$m{value} = int(rand(20))+5;
-	$m{value} += int(rand(10)+1); # ゲームバランスを考えて初期値ﾌﾞｰｽﾄはそのまま
+	$m{value} = int(rand(20))+5;#$config_test ? 0 : int(rand(20))+5;
+	$m{value} += int(rand(10)+1);#$config_test ? 0 : int(rand(10)+1); # ゲームバランスを考えて初期値ﾌﾞｰｽﾄはそのまま
 	$m{value} += 30 if $y{country} && ($pets[$m{pet}][2] ne 'no_ambush' || ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) && &is_patrol($_[0]);
 	$m{stock} = 0;
 	$m{turn} = 0;
+	if ($config_test) {
+		if ($m{tp} == 420) {
+			if (int(rand(5)) < 1) {
+				$mes .= "「袋返しの術！」<br>（味方と思わせ堂々と城内に入る…！）<br>";
+				$m{turn} = 200;
+			}
+			else {
+				$mes .= "「逃止の術！」<br>（途中で逃げた振りをして城内に侵入する…！）<br>";
+				$m{turn} = 100;
+			}
+		}
+	}
 	$mes .= "敵兵の気配【 $m{value}% 】<br>";
 	$mes .= 'どうしますか?<br>';
 	&menu($_[0],'引きあげる');
@@ -292,6 +304,9 @@ sub exe2 {
 		if ( $m{value} > rand(110)+35 ) { # 失敗 単純にrand(100)にすると30%くらいで見つかってしまうので rand(110)+30に変更
 			$mes .= "敵兵に見つかってしまった!!<br>";
 			
+			if ($m{tp} == 420) {
+				$m{turn} = $m{turn} > 200 ? $m{turn} - 200 : ($m{turn} > 100 ? $m{turn} - 100 : $m{turn}) ;
+			}
 			$m{tp} = 1900;
 			&n_menu;
 		}
@@ -309,6 +324,7 @@ sub exe2 {
 					$m{value} += int(rand(10)+1);
 				}
 			}
+#			$m{value} = 0 if $config_test;
 			&loop_menu;
 			$m{tp} -= 10;
 		}
@@ -321,8 +337,15 @@ sub exe2 {
 			&n_menu;
 		}
 		elsif ($m{tp} eq '420') { # 内部偵察
-			$m{tp} += 20;
-			&{ 'tp_'.$m{tp} };
+			if ($m{turn} == 100 || $m{turn} == 200) { # 何もしないで引き上げ
+				$m{turn} = $m{turn} == 200 ? $m{turn} - 200 : ($m{turn} == 100 ? $m{turn} - 100 : $m{turn}) ;
+				&refresh;
+				&n_menu;
+			}
+			else {
+				$m{tp} += 20;
+				&{ 'tp_'.$m{tp} };
+			}
 		}
 		else {
 			$m{tp} += 20;
@@ -396,15 +419,31 @@ sub tp_330 { # 洗脳成功
 	$mes .= "[ 連続$m{turn}回成功 ﾄｰﾀﾙ洗脳 $m{stock} ]<br>";
 }
 sub tp_430{ # 偵察
-	$mes .= $m{turn} eq '1' ? "$e2j{food}の情報を手に入れました!<br>"
-		  : $m{turn} eq '2' ? "$e2j{money}の情報を手に入れました!<br>"
-		  : $m{turn} eq '3' ? "$e2j{soldier}の情報を手に入れました!<br>"
-		  : $m{turn} eq '4' ? "$e2j{tax}の情報を手に入れました!<br>"
-		  : $m{turn} eq '5' ? "$e2j{state}の情報を手に入れました!<br>"
-		  : $m{turn} eq '6' ? "$e2j{strong}の情報を手に入れました!<br>"
-		  : $m{turn} >   7  ? "会議室の会話を聞きました!<br>"
-		  :                   "城内部へと向かってみます<br>"
-		  ;
+
+	if ($config_test) {
+		if ($m{turn} > 100 && $m{turn} < 200) {
+			$mes .= $m{turn} eq '101' ? "$e2j{food}の情報を手に入れました!<br>"
+				  : $m{turn} eq '102' ? "$e2j{money}の情報を手に入れました!<br>"
+				  : $m{turn} eq '103' ? "$e2j{soldier}の情報を手に入れました!<br>"
+				  : $m{turn} >   104  ? "会議室の会話を聞きました!<br>"
+				  :                   "城内部へと向かってみます<br>"
+				  ;
+		}
+		elsif ($m{turn} > 200) {
+			$mes .= "会議室の会話を聞きました!<br>";
+		}
+	}
+	else {
+		$mes .= $m{turn} eq '1' ? "$e2j{food}の情報を手に入れました!<br>"
+			  : $m{turn} eq '2' ? "$e2j{money}の情報を手に入れました!<br>"
+			  : $m{turn} eq '3' ? "$e2j{soldier}の情報を手に入れました!<br>"
+			  : $m{turn} eq '4' ? "$e2j{tax}の情報を手に入れました!<br>"
+			  : $m{turn} eq '5' ? "$e2j{state}の情報を手に入れました!<br>"
+			  : $m{turn} eq '6' ? "$e2j{strong}の情報を手に入れました!<br>"
+			  : $m{turn} >   7  ? "会議室の会話を聞きました!<br>"
+			  :                   "城内部へと向かってみます<br>"
+			  ;
+	}
 }
 sub tp_530{ # 偽計
 	my $v = $m{turn} <= 1 ? 1:
@@ -573,17 +612,30 @@ sub exe3 {
 # ----------------------------
 sub tp_440 { # 偵察
 	$mes .= "【$c_yの情報】<br>";
-	$mes .= "$e2j{food}：$cs{food}[$y{country}] <br>"       if $m{turn} >= 1;
-	$mes .= "$e2j{money}：$cs{money}[$y{country}] <br>"     if $m{turn} >= 2;
-	$mes .= "$e2j{soldier}：$cs{soldier}[$y{country}] <br>" if $m{turn} >= 3;
-	$mes .= "$e2j{tax}：$cs{tax}[$y{country}]% <br>"        if $m{turn} >= 4;
-	$mes .= "$e2j{state}：$country_states[ $cs{state}[$y{country}] ]<br>" if $m{turn} >= 5;
-	$mes .= "$e2j{strong}：$cs{strong}[$y{country}] <br>"   if $m{turn} >= 6;
+	if ($config_test) {
+		if ($m{turn} > 100 && $m{turn} < 200) {
+			$mes .= "$e2j{food}：$cs{food}[$y{country}] <br>"       if $m{turn} >= 101;
+			$mes .= "$e2j{money}：$cs{money}[$y{country}] <br>"     if $m{turn} >= 102;
+			$mes .= "$e2j{soldier}：$cs{soldier}[$y{country}] <br>" if $m{turn} >= 103;
+		}
+		elsif ($m{turn} > 200) {
+		}
+	}
+	else {
+		$mes .= "$e2j{food}：$cs{food}[$y{country}] <br>"       if $m{turn} >= 1;
+		$mes .= "$e2j{money}：$cs{money}[$y{country}] <br>"     if $m{turn} >= 2;
+		$mes .= "$e2j{soldier}：$cs{soldier}[$y{country}] <br>" if $m{turn} >= 3;
+		$mes .= "$e2j{tax}：$cs{tax}[$y{country}]% <br>"        if $m{turn} >= 4;
+		$mes .= "$e2j{state}：$country_states[ $cs{state}[$y{country}] ]<br>" if $m{turn} >= 5;
+		$mes .= "$e2j{strong}：$cs{strong}[$y{country}] <br>"   if $m{turn} >= 6;
+	}
 	$mes .= "上記の情報を$c_mの会議室に報告しますか?<br>";
 	&menu('やめる','報告する');
 	$m{tp} += 10;
 }	
 sub tp_450 {
+	my $turn = $m{turn};
+	$m{turn} = $turn > 200 ? $turn - 200 : ($turn > 100 ? $turn - 100 : $turn) ;
 	&c_up('tei_c') for 1 .. $m{turn};
 	&military_master_c_up('tei_c');
 	&use_pet('tei') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '36');
@@ -594,12 +646,13 @@ sub tp_450 {
 		$mes .= "今までの功績が認められ $vm Gの功労金があたえられた<br>";
 	}
 	my $lcomment = "<br>";
-	if ($m{turn} > 7) {
-		$m{turn} += $m{turn} - 7 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
-		&write_yran('tei', $m{turn}-7, 1);
+	my $need_count = $config_test ? ($turn > 200 ? 0 : ($turn > 100 ? 3 : 7)) : 7;
+	if ($m{turn} > $need_count) {
+		$m{turn} += $m{turn} - $need_count if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
+		&write_yran('tei', $m{turn}-$need_count, 1);
 		$mes .= "$c_yの会議室の情報をいくつか盗み聞きできた<br>";
 		
-		my $count = 7;
+		my $count = $need_count;
 		my @bbs_logs = ();
 		open my $fh, "< $logdir/$y{country}/bbs.cgi" or &error("BBSログが読み込めません");
 		while (my $line = <$fh>) {
@@ -618,21 +671,34 @@ sub tp_450 {
 			$w_name = '名無し';
 		}
 		my $comment = "【$c_y】";
-		$comment .= "$e2j{food}：$cs{food}[$y{country}]/"       if $m{turn} >= 1;
-		$comment .= "$e2j{money}：$cs{money}[$y{country}]/"     if $m{turn} >= 2;
-		$comment .= "$e2j{soldier}：$cs{soldier}[$y{country}]/" if $m{turn} >= 3;
-		$comment .= "$e2j{tax}：$cs{tax}[$y{country}]%/"        if $m{turn} >= 4;
-		$comment .= "$e2j{state}：$country_states[ $cs{state}[$y{country}] ]/" if $m{turn} >= 5;
-		$comment .= "$e2j{strong}：$cs{strong}[$y{country}]/"   if $m{turn} >= 6;
-		$comment .= '<br>会話を立ち聞きしました' if $m{turn} > 7;
+		if ($config_test) {
+			if ($turn > 100 && $turn < 200) {
+				$comment .= "$e2j{food}：$cs{food}[$y{country}]/"       if $m{turn} >= 1;
+				$comment .= "$e2j{money}：$cs{money}[$y{country}]/"     if $m{turn} >= 2;
+				$comment .= "$e2j{soldier}：$cs{soldier}[$y{country}]/" if $m{turn} >= 3;
+				$comment .= '<br>会話を立ち聞きしました' if $m{turn} > 4;
+			}
+			elsif ($turn > 200) {
+				$comment .= '会話を立ち聞きしました';
+			}
+		}
+		else {
+			$comment .= "$e2j{food}：$cs{food}[$y{country}]/"       if $m{turn} >= 1;
+			$comment .= "$e2j{money}：$cs{money}[$y{country}]/"     if $m{turn} >= 2;
+			$comment .= "$e2j{soldier}：$cs{soldier}[$y{country}]/" if $m{turn} >= 3;
+			$comment .= "$e2j{tax}：$cs{tax}[$y{country}]%/"        if $m{turn} >= 4;
+			$comment .= "$e2j{state}：$country_states[ $cs{state}[$y{country}] ]/" if $m{turn} >= 5;
+			$comment .= "$e2j{strong}：$cs{strong}[$y{country}]/"   if $m{turn} >= 6;
+			$comment .= '<br>会話を立ち聞きしました' if $m{turn} > 7;
+		}
 		my $comment2 = '';
-		$comment2 .= $lcomment if $m{turn} > 7;
+		$comment2 .= $lcomment if $m{turn} > $need_count;
 
 		my @lines = ();
 		open my $fh, "+< $logdir/$m{country}/bbs.cgi" or &error("$logdir/$m{country}/bbs.cgi ﾌｧｲﾙが開けません");
 		eval { flock $fh, 2; };
 		push @lines, $_ while <$fh>;
-		pop @lines;
+		pop @lines if @lines > 50;
 		unshift @lines, "$time<>$date<>$w_name<>$m{country}<>$m{shogo}<>$addr<>$comment<>$m{icon}<>\n";
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
