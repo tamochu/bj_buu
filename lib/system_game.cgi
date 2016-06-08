@@ -1148,8 +1148,8 @@ sub alltime_event {
 			}
 		}
 	}
-	if ($w{world} eq '12') {
-		if (rand(1000) < 1) {
+	if (($w{world} eq '12') || ($w{world_sub} eq '12')) {
+		if (rand(10000) < 1) {
 			&disaster(1);
 			&write_cs;
 		}
@@ -1681,24 +1681,20 @@ sub get_rank_name {
 sub get_item_name {
 	my($kind, $item_no, $item_c, $item_lv) = @_;
 
-	my $result = '';
-	# 第２引数まで有効ならアイテム名のみ
-	$result = $kind eq '1' ? "$weas[$item_no][1]"
-		  : $kind eq '2' ? "$eggs[$item_no][1]"
-		  : $kind eq '3' ? "$pets[$item_no][1]"
-		  :                "$guas[$item_no][1]"
-		  ;
-	if (defined($item_c)) {
-		if (defined($item_lv)) { # 全引数有効なら全アイテム情報
-			$result = $kind eq '1' ? "[$weas[$item_no][2]]$result★$item_lv($item_c/$weas[$item_no][4])"
-				  : $kind eq '2' ? "[卵]$result($item_c/$eggs[$item_no][2])"
-				  : $kind eq '3' ? "[ぺ]$result★$item_c"
-				  :                "[$guas[$item_no][2]]$result"
+	my $result;
+	if (defined($item_lv)) { # 全引数有効ならアイテム情報
+		$result = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
+				  : $kind eq '2' ? "[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
+				  : $kind eq '3' ? "[ぺ]$pets[$item_no][1]★$item_c"
+				  :                "[$guas[$item_no][2]]$guas[$item_no][1]"
+			  ;
+	}
+	else { # 全引数有効じゃないならアイテム名
+		$result = $kind eq '1' ? "$weas[$item_no][1]"
+				  : $kind eq '2' ? "$eggs[$item_no][1]"
+				  : $kind eq '3' ? (defined($item_c) ? "$pets[$item_no][1]★$item_c" : "$pets[$item_no][1]") # 第３引数有効かつﾍﾟｯﾄならレベル付加
+				  :                "$guas[$item_no][1]"
 				  ;
-		}
-		elsif ($kind eq '3') { # 第３引数有効かつﾍﾟｯﾄなら★情報追加
-			$result .= "★$item_c";
-		}
 	}
 	return $result;
 }
