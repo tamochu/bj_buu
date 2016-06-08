@@ -91,11 +91,7 @@ sub tp_1 {
 			next if ($price == 5000000);
 			$mes .= qq|<tr><td><input type="radio" id="$no" name="cmd" value="$no">|;
 			$mes .= qq|<label for="$no">| unless $is_mobile;
-			$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-				  : $kind eq '3' ? "$pets[$item_no][1]š$item_c"
-				  : 			   "$guas[$item_no][1]"
-				  ;
+			$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # í—Ş”ñ•\¦
 			$mes .= qq|</label>| unless $is_mobile;
 			$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
 		}
@@ -131,11 +127,7 @@ sub tp_100 {
 				if ($m{money} >= $price && &is_buyable($kind, $item_no)) {
 					$m{money} -= $price;
 					
-					my $item_name = $kind eq '1' ? $weas[$item_no][1]
-								  : $kind eq '2' ? $eggs[$item_no][1]
-								  : $kind eq '3' ? $pets[$item_no][1]
-								  :				   $guas[$item_no][1]
-								  ;
+					my $item_name = &get_item_name($kind, $item_no);
 					$mes .= "$item_name‚ğ”ƒ‚¢‚Ü‚µ‚½<br>$item_name‚Í—a‚©‚èŠ‚É‘—‚ç‚ê‚Ü‚µ‚½<br>";
 					my $sell_id = int(rand(1000)+1);
 					
@@ -262,11 +254,7 @@ sub tp_200 {
 		my $gc = "#ffffff";
 		$mes .= qq|<tr><td><input type="radio" id="$name$item_no" name="cmd" value="$name">|;
 		$mes .= qq|<label for="$name$item_no">| unless $is_mobile;
-		$mes .= $kind eq '1' ? "$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])"
-			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-			  : $kind eq '3' ? "$pets[$item_no][1]š$item_c"
-			  : 			   "$guas[$item_no][1]"
-			  ;
+		$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # í—Ş”ñ•\¦
 		$price = '”ñ•\¦' if $price == 99999999;
 		$mes .= qq|</label>| unless $is_mobile;
 		$mes .= qq|</td><td><font color="$gc">$name</font></td><td>$price<br></td></tr>|;

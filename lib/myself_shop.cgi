@@ -117,11 +117,7 @@ sub tp_100 {
 	while (my $line = <$fh>) {
 		my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
 		$mes .= qq|<tr><td><input type="checkbox" name="cmd_$no" value="1">|;
-		$mes .= $kind eq '1' ? "$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-			  : $kind eq '3' ? "$pets[$item_no][1]★$item_c"
-			  : 			   "$guas[$item_no][1]"
-			  ;
+		$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
 	}
 	close $fh;
@@ -151,21 +147,16 @@ sub tp_110 {
 			
 			if ($in{"cmd_$no"}) {
 				$checked = 1;
-				if($in{price} == 0){
-					      &send_item($m{name}, $kind, $item_no, $item_c, $item_lv);
-					      
-					      $mes .= $kind eq '1' ? "$weas[$item_no][1]"
-					      	   : $kind eq '2' ? "$eggs[$item_no][1]"
-					      	   : $kind eq '3' ? "$pets[$item_no][1]"
-					  	 	  :		   "$guas[$item_no][1]"
-					  	   ;
-						   $mes .= 'を預かり所に戻しました<br>';
-				}elsif ($in{price} =~ /[^0-9]/ || $in{price} <= 0 || $in{price} > 5000000) {
-			      	      $mes .= '値段は 1 G 以上 500万0000 G以内にする必要があります<br>';
-			      	      &begin;
-			      	      return;
-				}else {
-				      push @lines, "$no<>$kind<>$item_no<>$item_c<>$item_lv<>$in{price}<>\n";
+				if ($in{price} == 0) {
+					&send_item($m{name}, $kind, $item_no, $item_c, $item_lv);
+					$mes .= &get_item_name($kind, $item_no);
+					$mes .= 'を預かり所に戻しました<br>';
+				} elsif ($in{price} =~ /[^0-9]/ || $in{price} <= 0 || $in{price} > 5000000) {
+					$mes .= '値段は 1 G 以上 500万0000 G以内にする必要があります<br>';
+					&begin;
+					return;
+				} else {
+					push @lines, "$no<>$kind<>$item_no<>$item_c<>$item_lv<>$in{price}<>\n";
 				}
 			}
 			else {
@@ -203,13 +194,8 @@ sub tp_200 {
 	open my $fh, "< $userdir/$id/depot.cgi" or &error("$userdir/$id/depot.cgi が読み込めません");
 	while (my $line = <$fh>) {
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-
 		$mes .= qq|<input type="checkbox" name="cmd$i" value="1" /><a href="shop_big_data.cgi?item=${kind}_${item_no}" target="_blank">|;
-		$mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])|
-			  : $kind eq '2' ? qq|[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
-			  : $kind eq '3' ? qq|[ぺ]$pets[$item_no][1]★$item_c|
-			  :				   qq|[$guas[$item_no][2]]$guas[$item_no][1]|
-			  ;
+		$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		++$i;
 		$mes .= qq|</a><br>|;
 	}
@@ -259,11 +245,7 @@ sub tp_210 {
 			print $fh2 "$last_no<>$kind<>$item_no<>$item_c<>$item_lv<>$in{price}<>\n";
 			close $fh2;
 			
-			$mes .= $kind eq '1' ? "$weas[$item_no][1]"
-				  : $kind eq '2' ? "$eggs[$item_no][1]"
-				  : $kind eq '3' ? "$pets[$item_no][1]★$item_c"
-				  :				   "$guas[$item_no][1]"
-				  ;
+			$mes .= &get_item_name($kind, $item_no, $item_c);
 			$mes .= "を $in{price} Gで店頭に並べました<br>";
 			$item_num++;
 			$put = 1;

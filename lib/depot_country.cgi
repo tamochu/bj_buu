@@ -352,16 +352,13 @@ sub tp_400 {
 	my @lines = ();
 	open my $fh, "< $this_log" or &error("$this_log‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $line = <$fh>){
-	      my($kind, $item_no, $item_c, $item_lv, $name, $type) = split /<>/, $line;
-	      $mes .= "$name ‚ª";
-	      $mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])|
-		     :$kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
-		     :$kind eq '3' ? qq|[‚Ø]$pets[$item_no][1]š$item_c|
-		     :               qq|[$guas[$item_no][2]]$guas[$item_no][1]|;
-	      $mes .= "‚ğ";
-	      $mes .= $type eq '1' ? "—a‚¯‚Ü‚µ‚½<br>":
-	      		$type eq '0' ? "ˆø‚«o‚µ‚Ü‚µ‚½<br>":
-	      		"’D‚¢‚Ü‚µ‚½<br>";
+		my($kind, $item_no, $item_c, $item_lv, $name, $type) = split /<>/, $line;
+		$mes .= "$name ‚ª";
+		$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+		$mes .= "‚ğ";
+		$mes .= $type eq '1' ? "—a‚¯‚Ü‚µ‚½<br>":
+					$type eq '0' ? "ˆø‚«o‚µ‚Ü‚µ‚½<br>":
+					"’D‚¢‚Ü‚µ‚½<br>";
 	}
 	close $fh;
 	&begin;
@@ -488,15 +485,8 @@ sub tp_650 {
 			close $fh;
 			
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $new_line;
-			if ($kind eq '1') {
-				$mes .= "$weas[$item_no][1]‚ğ’D‚¢‚Ü‚µ‚½<br>";
-			}
-			elsif ($kind eq '2') {
-				$mes .= "$eggs[$item_no][1]‚ğ’D‚¢‚Ü‚µ‚½<br>";
-			}
-			elsif ($kind eq '3') {
-				$mes .= "$pets[$item_no][1]‚ğ’D‚¢‚Ü‚µ‚½<br>";
-			}
+			$mes .= &get_item_name($kind, $item_no);
+			$mes .= "‚ğ’D‚¢‚Ü‚µ‚½<br>";
 
 			my @log_lines = ();
 			open my $lfh, "+< $logdir/$y{country}/depot_log.cgi" or &error("$logdir/$y{country}/depot_log.cgi‚ªŠJ‚¯‚Ü‚¹‚ñ");
@@ -599,11 +589,7 @@ sub radio_my_depot {
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 		$sub_mes .= qq|<input type="radio" id="$count" name="cmd" value="$count">|;
 		$sub_mes .= qq|<label for="$count">| unless $is_mobile;
-		$sub_mes .= $kind eq '1' ? qq|[$weas[$item_no][2]]$weas[$item_no][1]š$item_lv($item_c/$weas[$item_no][4])|
-				  : $kind eq '2' ? qq|[—‘]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])|
-				  : $kind eq '3' ? qq|[‚Ø]$pets[$item_no][1]š$item_c|
-				  :			       qq|[$guas[$item_no][2]]$guas[$item_no][1]|
-				  ;
+		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
 	}

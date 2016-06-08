@@ -125,11 +125,7 @@ sub tp_1 {
 			next if ($price == 5000000);
 			$mes .= qq|<tr><td><input type="radio" id="$no" name="cmd" value="$no">|;
 			$mes .= qq|<label for="$no">| unless $is_mobile;
-			$mes .= $kind eq '1' ? "$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-				  : $kind eq '3' ? "$pets[$item_no][1]★$item_c"
-				  : 			   "$guas[$item_no][1]"
-				  ;
+			$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # 種類非表示
 			$mes .= qq|</label>| unless $is_mobile;
 			$mes .= qq|</td><td align="right">$price G<br></td></tr>|;
 		}
@@ -165,11 +161,7 @@ sub tp_100 {
 				if ($m{money} >= $price && &is_buyable($kind, $item_no)) {
 					$m{money} -= $price;
 					
-					my $item_name = $kind eq '1' ? $weas[$item_no][1]
-								  : $kind eq '2' ? $eggs[$item_no][1]
-								  : $kind eq '3' ? $pets[$item_no][1]
-								  :				   $guas[$item_no][1]
-								  ;
+					my $item_name = &get_item_name($kind, $item_no); # アイテム名のみ
 					$mes .= "$item_nameを買いました<br>$item_nameは預かり所に送られました<br>";
 					my $sell_id = int(rand(1000)+1);
 					
@@ -295,11 +287,7 @@ sub tp_200 {
 		my $gc = "#ffffff";
 		$mes .= qq|<tr><td><input type="radio" id="$name$item_no" name="cmd" value="$name">|;
 		$mes .= qq|<label for="$name$item_no">| unless $is_mobile;
-		$mes .= $kind eq '1' ? "$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-			  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-			  : $kind eq '3' ? "$pets[$item_no][1]★$item_c"
-			  : 			   "$guas[$item_no][1]"
-			  ;
+		$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # 種類非表示
 		$price = '非表示' if $price == 99999999;
 		$mes .= qq|</label>| unless $is_mobile;
 		$mes .= qq|</td><td><font color="$gc">$name</font></td><td>$price<br></td></tr>|;
@@ -361,11 +349,7 @@ sub tp_300 {#mobile
 		$num++;
 		if ($num >= $cmd * $mobile_max && $num < ($cmd + 1) * $mobile_max){
 			$mes .= qq|<tr><td><input type="radio" name="cmd" value="$name">|;
-			$mes .= $kind eq '1' ? "$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-				  : $kind eq '2' ? "$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-				  : $kind eq '3' ? "$pets[$item_no][1]★$item_c"
-				  : 			   "$guas[$item_no][1]"
-				  ;
+			$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # 種類非表示
 			$price = '非表示' if $price == 99999999;
 			$mes .= qq|</td><td>$name</td><td>$price<br></td></tr>|;
 		}
@@ -421,11 +405,7 @@ sub tp_400 {
 	$m{total_auction} = 0;
 	while (my $line = <$fh>) {
 		my($bit_time, $no, $kind, $item_no, $item_c, $item_lv, $from_name, $to_name, $item_price, $buyout_price) = split /<>/, $line;
-		my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-					   : $kind eq '2' ? "[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-					   : $kind eq '3' ? "[ペ]$pets[$item_no][1]★$item_c"
-					   : 				"[ペ]$guas[$item_no][1]"
-					   ;
+		my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 		my $item_state = $time + 3600 * 24 > $bit_time ? "そろそろ":
 						$time + ($auction_limit_day - 1) * 3600 * 24 > $bit_time ? "まだまだ":"new";
 		unless($buyout_price){
@@ -465,11 +445,7 @@ sub tp_410 {
 					$need_money = $buyout_price
 				}
 				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
-					my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-								   : $kind eq '2' ? "[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-								   : $kind eq '3' ? "[ペ]$pets[$item_no][1]★$item_c"
-								   : 				"[防]$guas[$item_no][1]"
-								   ;
+					my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 					
 					$m{total_auction} += $in{money};
 					$mes .= "$item_titleに $in{money} Gで入札しました<br>";
@@ -500,11 +476,7 @@ sub tp_410 {
 			}
 			# 落札処理
 			elsif ($time > $bit_time) {
-				my $item_title = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]★$item_lv($item_c/$weas[$item_no][4])"
-							   : $kind eq '2' ? "[卵]$eggs[$item_no][1]($item_c/$eggs[$item_no][2])"
-							   : $kind eq '3' ? "[ペ]$pets[$item_no][1]★$item_c"
-							   : 				"[防]$guas[$item_no][1]"
-							   ;
+				my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 				
 				my $to_id = unpack 'H*', $to_name;
 				if(-e "$userdir/$to_id/user.cgi"){
