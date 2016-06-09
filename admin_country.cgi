@@ -65,6 +65,7 @@ elsif ($in{mode} eq 'restore_country') { &restore_country; }
 elsif ($in{mode} eq 'modify_country') { &modify_country; }
 elsif ($in{mode} eq 'change_year')     { &admin_change_year;     }
 elsif ($in{mode} eq 'change_game_lv')     { &admin_change_game_lv;     }
+elsif ($in{mode} eq 'change_world')     { &admin_change_world;     }
 elsif ($in{step}) { &{ 'step_' . $in{step} }; }
 else { &step_1; }
 &footer;
@@ -164,6 +165,23 @@ EOM
 		<input type="hidden" name="mode" value="change_game_lv">
 		<input type="hidden" name="pass" value="$in{pass}">
 		<input type="text" name="game_lv" value="1" class="text_box_s" style="text-align: right">Lv<br>
+		<p><input type="submit" value="変更" class="button1"></p>
+	</form>
+	</div>
+	<br>
+	<div class="mes">
+	情勢を変更する<br>
+	<form method="$method" action="$this_script">
+		<input type="hidden" name="mode" value="change_world">
+		<input type="hidden" name="pass" value="$in{pass}">
+		<select name="world">
+EOM
+		for my $i (0 .. $#world_states) {
+			my $selected = $in{world} == $i ? " selected=\"selected\"" : "";
+			print qq|<option value="$i" label="$world_states[$i]"$selected>$world_states[$i]</option>|;
+		}
+	print <<"EOM";
+		</select>情勢<br>
 		<p><input type="submit" value="変更" class="button1"></p>
 	</form>
 	</div>
@@ -437,6 +455,18 @@ sub admin_change_game_lv {
 
 	print qq|<p>統一難易度を$w{game_lv}にしました!</p>|;
 }
+
+#=================================================
+# 情勢を変更
+#=================================================
+sub admin_change_world {
+	&read_cs;
+	$w{world} = $in{world};
+	&write_cs;
+
+	print qq|<p>情勢を$w{world}にしました!</p>|;
+}
+
 
 #=================================================
 # 国を追加
