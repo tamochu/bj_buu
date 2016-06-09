@@ -359,13 +359,16 @@ sub radio_my_depot {
 		close $fh;
 	}
 	my $count = 0;
-	my $sub_mes = qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+	my $sub_mes = qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 	open my $fh, "< $this_file" or &error("$this_file ‚ª“Ç‚Ýž‚ß‚Ü‚¹‚ñ");
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		$sub_mes .= qq|<input type="radio" name="cmd" value="$count">|;
+		$sub_mes .= qq|<input type="radio" id="$count" name="cmd" value="$count">|;
+		$sub_mes .= qq|<label for="$count">| unless $is_mobile;
 		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+		$sub_mes .= qq|</label>| unless $is_mobile;
+		$sub_mes .= qq|<br>|;
 	}
 	close $fh;
 	
