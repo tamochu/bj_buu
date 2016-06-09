@@ -426,7 +426,7 @@ sub tp_430{ # ’ã@
 				  : $m{turn} eq '102' ? "$e2j{money}‚Ìî•ñ‚ğè‚É“ü‚ê‚Ü‚µ‚½!<br>"
 				  : $m{turn} eq '103' ? "$e2j{soldier}‚Ìî•ñ‚ğè‚É“ü‚ê‚Ü‚µ‚½!<br>"
 				  : $m{turn} >   104  ? "‰ï‹cº‚Ì‰ï˜b‚ğ•·‚«‚Ü‚µ‚½!<br>"
-				  :                   "é“à•”‚Ö‚ÆŒü‚©‚Á‚Ä‚İ‚Ü‚·<br>"
+				  :                   "“¦‚°‚½U‚è‚ğ‚µ‚Äé“à•”‚Ö‚ÆN“ü‚µ‚Ä‚İ‚Ü‚·<br>"
 				  ;
 		}
 		elsif ($m{turn} > 200) {
@@ -646,7 +646,7 @@ sub tp_450 {
 		$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $vm G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
 	}
 	my $lcomment = "<br>";
-	my $need_count = $config_test ? ($turn > 200 ? 0 : ($turn > 100 ? 3 : 7)) : 7;
+	my $need_count = $config_test ? ($turn > 200 ? 0 : ($turn > 100 ? 4 : 7)) : 7;
 	if ($m{turn} > $need_count) {
 		$m{turn} += $m{turn} - $need_count if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
 		&write_yran('tei', $m{turn}-$need_count, 1);
