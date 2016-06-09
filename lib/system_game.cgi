@@ -1149,7 +1149,7 @@ sub alltime_event {
 		}
 	}
 	if (($w{world} eq '12') || ($w{world_sub} eq '12')) {
-		if (rand(10000) < 1) {
+		if (rand(2500) < 1) {
 			&disaster(1);
 			&write_cs;
 		}
@@ -1690,7 +1690,7 @@ sub get_item_name {
 				  : $kind eq '3' ? "[ぺ]$pets[$item_no][1]★$item_c"
 				  :                "[$guas[$item_no][2]]$guas[$item_no][1]"
 			  ;
-		$result = substr($result, 4) if $flag;
+		$result = substr($result, 4) if $flag; # $flag が有効ならアイテム種を非表示
 	}
 	else { # 全引数有効じゃないならアイテム名
 		$result = $kind eq '1' ? "$weas[$item_no][1]"
