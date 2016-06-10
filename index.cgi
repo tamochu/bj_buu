@@ -21,7 +21,7 @@ sub get_login_member {
 	my %cs_c  = ();
 	my %sames = ();
 	my $list  = '';
-	open my $fh, "+< $logdir/login.cgi" or &error('Û¸Ş²İØ½Ä‚ªŠJ‚¯‚Ü‚¹‚ñ');
+	open my $fh, "+< $logdir/login.cgi" or &error('ï¾›ï½¸ï¾ï½²ï¾ï¾˜ï½½ï¾„ãŒé–‹ã‘ã¾ã›ã‚“');
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		my($ltime, $name, $country, $shogo, $message, $icon) = split /<>/, $line;
@@ -67,8 +67,7 @@ sub header2 {
 	
 	print qq|<html><head>|;
 	print qq|<meta http-equiv="Cache-Control" content="no-cache">|;
-	print qq|<meta name="description" content="‚±‚ÌƒQ[ƒ€‚ÅÅ‹­‚Ì‘ì‚ë‚¤‚¸‚—‚—‚—‚—‚—‚—‚—‚—‚—">|;
-	print qq|<meta name="keywords" content="•“ØI,blindjustice,ƒQ[ƒ€,CGI,–³—¿">|;
+	print qq|<meta name="robots" content="none">|;
 	unless ($is_mobile) {
 		print qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 		print qq|<link rel="shortcut icon" href="$htmldir/favicon.ico">|;
@@ -85,9 +84,9 @@ sub header2 {
 #			print qq|<link rel="stylesheet" media="screen and (min-width: 481px) and (max-width: 720px)" href="$htmldir/tablet.css?$jstime" />|;
 #		}
 	} else {
-		# ƒKƒ‰ƒP[‚ÅŠO•”CSS‚Ì“Ç‚İ‚İ‚ÍNG
-		# HTMLƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚ñ‚¾Œã‚ÉCSSƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş‚½‚ßA
-		# ‘f‚ÌHTML‚ª•\¦‚³‚ê‚½Œã‚ÉCSS‚ª“K—p‚³‚ê‰æ–Ê‚ªƒ`ƒ‰‚Â‚­‚È‚Ç‚Ì–â‘è‚ª‚ ‚é
+		# ã‚¬ãƒ©ã‚±ãƒ¼ã§å¤–éƒ¨CSSã®èª­ã¿è¾¼ã¿ã¯NG
+		# HTMLãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã å¾Œã«CSSãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ãŸã‚ã€
+		# ç´ ã®HTMLãŒè¡¨ç¤ºã•ã‚ŒãŸå¾Œã«CSSãŒé©ç”¨ã•ã‚Œç”»é¢ãŒãƒãƒ©ã¤ããªã©ã®å•é¡ŒãŒã‚ã‚‹
 		print qq|<style type="text/css"><!-- a.clickable_name {color: inherit; text-decoration: none;} --></style>|;
 	}
 #	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
