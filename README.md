@@ -1,6 +1,7 @@
 # bj_buu
-blind justice•“ØIƒ\[ƒXƒR[ƒh
-ƒpƒXƒ[ƒh“™‚Í”²‚¢‚Ä‚é‚Â‚à‚è‚Å‚·‚ªc‚Á‚Ä‚½‚ç˜A—‚¨Šè‚¢‚µ‚Ü‚·B
+blind justiceé»’è±šé¯–ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰
+ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ç­‰ã¯æŠœã„ã¦ã‚‹ã¤ã‚‚ã‚Šã§ã™ãŒæ®‹ã£ã¦ãŸã‚‰é€£çµ¡ãŠé¡˜ã„ã—ã¾ã™ã€‚
+ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¯ãƒ¼ã‚¯é–‹ç™ºç”¨ãƒ–ãƒ©ãƒ³ãƒ
 
 @see http://buu.pandora.nu/cgi-bin/bj/index.cgi
 @see http://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi?
