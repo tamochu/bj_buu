@@ -50,10 +50,10 @@ sub begin {
 		$mes .= qq|<input type="submit" value="代表\評議会" class="button1"></form>|;
 	}
 	
-	&menu('やめる', '代表\評議会', '国内一括送信', '税率調整', '追放者議決', '追放者申\請', '国代表\を辞任','国に寄付');
+	&menu('やめる', '代表\評議会', '国内一括送信', '税率調整', '追放者議決', '追放者申\請', '国代表\を辞任','国に寄付', '一斉表作成');
 }
 sub tp_1 {
-	return if &is_ng_cmd(1..7);
+	return if &is_ng_cmd(1..8);
 	
 	$m{tp} = $cmd * 100;
 	&{ 'tp_'.$m{tp} };
@@ -452,6 +452,132 @@ sub tp_710 {
 	
 	&begin;
 }
+
+#=================================================
+# 一斉表作成
+#=================================================
+sub wl {
+	my ($hour, $min, $min2) = @_;
+	$min += $min2;
+	if ($min >= 60) {
+		# 分が 60 以上なら時を増やして分を 60 未満に
+		$hour += int($min / 60);
+		$min = $min % 60;
+	}
+	return sprintf("%02d:%02d", $hour, $min);
+
+}
+sub tp_800 {
+	$layout = 2;
+
+	# 一斉表テンプレートの読み込み
+	# ファイルがなければデフォルトテンプレート
+	my @templates = ();
+	my $p_id = unpack 'H*', $m{name};
+	if (!(-e "$userdir/$p_id/isseihyo.cgi") || (-s "$userdir/$p_id/isseihyo.cgi") < 1) {
+		push(@templates, "通常型(初期テンプレ)<>0;長期発<>15;通常発<>23;倍速発<>25;布告・停戦発<>45;一斉凸<>47;停戦着<>\n");
+		open my $fh, "> $userdir/$p_id/isseihyo.cgi" or &error("$userdir/$p_id/isseihyo.cgi ﾌｧｲﾙが読み込めません");
+		print $fh $templates[0];
+		close $fh;
+	}
+	else {
+		open my $fh, "< $userdir/$p_id/isseihyo.cgi" or &error("$userdir/$p_id/isseihyo.cgi ﾌｧｲﾙが読み込めません");
+		while (my $l = <$fh>) {
+			push(@templates, $l) if $l ne "\n";
+		}
+		close $fh;
+	}
+
+	my @wars_type = ();
+	my @text = ();
+	for my $i (0 .. $#templates) {
+		my @line = split("<>", $templates[$i]);
+		push(@wars_type, $line[0]); # テンプレの名前を取得
+		$templates[$i] =~ s|<>|<>\n|g; # ユーザーが編集しやすいように改行
+	}
+
+	my ($min, $hour) = (localtime($time))[1 .. 2];
+	my $now = sprintf("%02d:%02d", $hour, $min);
+
+	# 分を将来で一番近い 5 か 0 に丸めたさらに20分後
+	my $min_low = $min - int(($min * 0.1)) * 10;
+	$min += $min_low < 5 ? 25 - $min_low : 30 - $min_low;
+	if ($min >= 60) {
+		# 分が 60 以上なら時を増やして分を 60 未満に
+		$hour += int($min / 60);
+		$min = $min % 60;
+	}
+
+	my $ttime = sprintf("%02d:%02d", $hour, $min);
+
+	$mes .= qq|<form method="$method" action="$script">|;
+	$mes .= qq|開始時刻：<input type="text" name="time" value="$ttime" class="text_box_s"> 現在：$now<br><br>|;
+
+	$mes .= qq|目標：<select name="target">|;
+	for my $target (1 .. $w{country}) {
+		$mes .= qq|<option value="$target" label="$cs{name}[$target]">$cs{name}[$target]</option>|;
+	}
+	$mes .= qq|</select><br><br>|;
+
+	$mes .= qq|テンプレ：<select name="type">|;
+	for my $type (0 .. $#wars_type) {
+		$mes .= qq|<option value="$type" label="$wars_type[$type]">$wars_type[$type]</option>|;
+	}
+	$mes .= qq|</select><br><br>|;
+
+	$mes .= qq|布告人員：<input type="text" name="hukoku" value="$m{name}" class="text_box_s"><br><br>|;
+	$mes .= qq|停戦人員：<input type="text" name="teisen" value="" class="text_box_s"><br><br>|;
+
+	$mes .= qq|ｺﾒﾝﾄ：<select name="text">|;
+	$mes .= qq|<option value="" label="----">特になし</option>|;
+	$mes .= qq|<option value="停戦役募集中" label="停戦役募集中">停戦役募集中</option>|;
+	$mes .= qq|</select><br><br>|;
+
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<input type="submit" value="作成する" class="button1"><br><br>|;
+	$mes .= qq|<hr>各行末には必ず&lt;&gt;を書くこと<br>1行目が一斉表\の名称<br>セミコロンの左側に開始時刻を基準にしたn分後を指定、<br>セミコロンの右側にその時刻の行動を書く<br>|;
+
+	for my $i (0 .. 4) {
+		$mes .= qq|<textarea name="text_$i" rows="10" cols="25">$templates[$i]</textarea><br>|;
+	}
+	$mes .= qq|</form>|;
+
+	$m{tp} += 10;
+	&n_menu;
+}
+sub tp_810 {
+	if ($in{time}) {
+		my @templates = ();
+		my $p_id = unpack 'H*', $m{name};
+		open my $fh, "> $userdir/$p_id/isseihyo.cgi" or &error("$userdir/$p_id/isseihyo.cgi ﾌｧｲﾙが読み込めません");
+		for my $i (0 .. 4) {
+			$in{"text_$i"} =~ s|&lt;&gt;|<>|g;
+			$in{"text_$i"} =~ s|&#59||g;
+			print $fh qq/$in{"text_$i"}\n/;
+			push(@templates, $in{"text_$i"});
+		}
+		close $fh;
+
+		my ($hour, $min) = split(/:/, $in{time});
+		my $sub_mes = "目標：$cs{name}[$in{target}]\n\n";
+		my @line = split( /<>/, $templates[$in{type}] );
+		for my $i (1 .. $#line) {
+			my @array = split( /;/, $line[$i]);
+			$sub_mes .= &wl($hour, $min, $array[0])." $array[1]\n";
+		}
+		$sub_mes .= "\n布告：$in{hukoku}\n";
+		$sub_mes .= "停戦：$in{teisen}";
+		$sub_mes .= "\n\n$in{text}" if $in{text};
+
+		$mes .= qq|<textarea name="text_$i" rows="15" cols="35">$sub_mes</textarea><br>|;
+	}
+	else {
+		$mes .= 'やめました<br>';
+	}
+	
+	&begin;
+}
+
 #=================================================
 # 追放しようとしている人は自国の人? 1(true) or 0(false)
 #=================================================
