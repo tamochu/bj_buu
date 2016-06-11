@@ -1,0 +1,9 @@
+#swap file
+*.swp
+*.swo
+
+#lnk file
+*.lnk
+
+#log file
+*.log
