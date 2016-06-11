@@ -1,0 +1,12 @@
+#swap file
+*.swp
+*.swo
+
+#lnk file
+*.lnk
+
+#log file
+*.log
+
+#test file
+TestController
