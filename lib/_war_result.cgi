@@ -336,7 +336,8 @@ sub war_win {
 		}
 		else{
 			require './lib/vs_npc.cgi';
-			if( rand(4) < $npc_war  || ($cs{strong}[$w{country}] < 30000 && rand(3) < $npc_war) ) {
+#			if( rand(4) < $npc_war  || ($cs{strong}[$w{country}] < 30000 && rand(3) < $npc_war) ) {
+			if( rand(4) < 1  || ($cs{strong}[$w{country}] < 30000 && rand(3) < 1) ) {
 			    &npc_war;
 			}
 		}
