@@ -354,7 +354,7 @@ sub tp_410 {
 		&begin;
 		return;
 	}
-	elsif ($m{wea_name}) {
+	elsif ($cmd eq '1' && $m{wea_name}) {
 		$mes .= "—Bˆê–³“ñ‚Ì•Ší‚ğ‘—‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
 		&begin;
 		return;
