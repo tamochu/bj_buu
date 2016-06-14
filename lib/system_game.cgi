@@ -1608,11 +1608,7 @@ sub create_sale_data_chart {
 		
 		my $chdx = join ',', @x;
 		my $chdy = join ',', @y;
-		my $item_title = $k eq '1' ? "[$weas[$n][2]]$weas[$n][1]"
-					   : $k eq '2' ? "[卵]$eggs[$n][1]"
-					   : $k eq '3' ? "[ペ]$pets[$n][1]"
-					   : 				"[$guas[$n][2]]$guas[$n][1]"
-					   ;
+		my $item_title = &get_item_title($k, $n);;
 		$csv = $item_title . "\n" . $csv;
 		# CSVﾌｧｲﾙ作成
 		my $csv_file = "./html/item_$k" . "_" . "$n.csv";
@@ -1699,6 +1695,21 @@ sub get_item_name {
 				  :                "$guas[$item_no][1]"
 				  ;
 	}
+	return $result;
+}
+
+#================================================
+# アイテム名取得（相場表で使うアイテムのタイトル用…）
+#================================================
+sub get_item_title {
+	my($kind, $item_no) = @_;
+
+	my $result;
+	$result = $kind eq '1' ? "[$weas[$item_no][2]]$weas[$item_no][1]"
+			  : $kind eq '2' ? "[卵]$eggs[$item_no][1]"
+			  : $kind eq '3' ? "[ペ]$pets[$item_no][1]"
+			  :                "[$guas[$item_no][2]]$guas[$item_no][1]"
+			  ;
 	return $result;
 }
 
