@@ -34,6 +34,19 @@ sub begin {
 
 sub tp_1 {
 	return if &is_ng_cmd(1..4);
+	if ($cmd ne '4') {
+		if($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]){
+			$mes .= "$shogos[1][0]は合成できない。残念<br>";
+			$m{tp}
+			&begin;
+			return;
+		}
+		unless ($pets[$m{pet}][5]) {
+			$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
+			&begin;
+			return;
+		}
+	}
 	
 	$layout = 2;
 	if($cmd eq '1'){
@@ -46,7 +59,11 @@ sub tp_1 {
 			++$count;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 			if($kind eq '3' ){
-				$mes .= qq|<input type="radio" id="$count" name="cmd" value="$count"><label for="$count">[ぺ]$pets[$item_no][1]★$item_c</label><br>|;
+				$mes .= qq|<input type="radio" id="$count" name="cmd" value="$count">|;
+				$mes .= qq|<label for="$count">| unless $is_mobile;
+				$mes .= qq|[ぺ]$pets[$item_no][1]★$item_c|;
+				$mes .= qq|</label>| unless $is_mobile;
+				$mes .= qq|<br>|;
 			}
 		}
 		close $fh;
@@ -66,7 +83,7 @@ sub tp_1 {
 				}
 			}
 		}
-		$mes .= "<br>だよ。";
+		$mes .= "<br>だよ。<br>";
 		&begin;
 		return;
 	}else{
@@ -83,7 +100,11 @@ sub tp_1 {
 				if ($cmd eq '3' && $item_no == 126) {
 					$checked = ' checked';
 				}
-				$mes .= qq|<input type="checkbox" id="$count" name="pet_$count" value="1"$checked><label for="$count">[ぺ]$pets[$item_no][1]★$item_c</label><br>|;
+				$mes .= qq|<input type="checkbox" id="$count" name="pet_$count" value="1"$checked>|;
+				$mes .= qq|<label for="$count">| unless $is_mobile;
+				$mes .= qq|[ぺ]$pets[$item_no][1]★$item_c|;
+				$mes .= qq|</label>| unless $is_mobile;
+				$mes .= qq|<br>|;
 			}
 		}
 		close $fh;
@@ -99,18 +120,8 @@ sub tp_1 {
 # 合成
 #=================================================
 sub tp_100 {
-	if($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]){
-		$mes .= "$shogos[1][0]は合成できない。残念<br>";
-		&begin;
-		return;
-	}
 	if($m{is_full}){
 		$mes .= "預り所がいっぱいで合成したﾍﾟｯﾄが入らないよ<br>";
-		&begin;
-		return;
-	}
-	unless ($pets[$m{pet}][5]) {
-		$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
 		&begin;
 		return;
 	}
@@ -147,16 +158,6 @@ sub tp_100 {
 # 一括合成
 #=================================================
 sub tp_200 {
-	if($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]){
-		$mes .= "$shogos[1][0]は合成できない。残念<br>";
-		&begin;
-		return;
-	}
-	unless ($pets[$m{pet}][5]) {
-		$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
-		&begin;
-		return;
-	}
 	
 	open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 	my $count = 0;
