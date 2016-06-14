@@ -379,10 +379,11 @@ sub npc_get_strong { # ’D‘
 	close $fh;
 	$name =~ tr/\x0D\x0A//d;
 	
-	my $v = int(rand(300)+300);
-	$cs{strong}[$w{country}] += $v;
-	$cs{strong}[$country]    -= $v;
-	&write_world_news(qq|$cs{name}[$w{country}]‚Ì$npcs[int(rand(@npcs))]{name}‚ª$cs{name}[$country]‚ÉNUA$name‚Ì•”‘à‚ğŒ‚”j‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤‚±‚Æ‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
+	# àÂ’m’Ç‰Á‚É‚æ‚Á‚ÄƒvƒŒƒCƒ„[‚Ì’D‘—Í‚ªˆê—¥‚Å‚Í‚È‚­‚È‚Á‚½‚Ì‚Å _war_result.cgi ‚Å’è‹`
+#	my $v = int(rand(300)+300);
+	$cs{strong}[$w{country}] += $npc_v;
+	$cs{strong}[$country]    -= $npc_v;
+	&write_world_news(qq|$cs{name}[$w{country}]‚Ì$npcs[int(rand(@npcs))]{name}‚ª$cs{name}[$country]‚ÉNUA$name‚Ì•”‘à‚ğŒ‚”j‚µ <font color="#FF00FF"><b>$npc_v</b> ‚Ì$e2j{strong}‚ğ’D‚¤‚±‚Æ‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
 	$cs{is_die}[$w{country}] = 0 if $cs{is_die}[$w{country}];
 }
 #=================================================

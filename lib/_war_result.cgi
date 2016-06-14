@@ -206,6 +206,11 @@ sub war_win {
 		$v = int($v / 10);
 	}
 	
+	# 暗黒側カウンターの基本奪国力（少数やｳﾛﾎﾞ用）
+	# 統一期限切れそうになると封印側が有利になるのは、
+	# 統一期限切れた時に暗黒生きてても負け扱いだしどうせならちゃんと封印しろっていう仕様かと思われる
+	$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
+
 	# 奪国力上限
 	if ($v !~ /^(\d)\1+$/) { # ｿﾞﾛ目(ｳﾛﾎﾞﾛｽ使用時など)
 		if ($m{value} < 1) { # 少数精鋭
@@ -218,6 +223,8 @@ sub war_win {
 				}
 				else {
 					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
+					# 暗黒側カウンターの奪国力
+					$npc_v = int(rand(525)+975) if $w{world} eq $#world_states;
 				}
 			}else{
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
@@ -225,6 +232,8 @@ sub war_win {
 				}
 				else {
 					$v = $v > 1000  ? int(rand(200)+800) : int($v);
+					# 暗黒側カウンターの奪国力
+					$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
 				}
 			}
 			# 統一期限が近づいてきたらﾌﾟﾗｽ
