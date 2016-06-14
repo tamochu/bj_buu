@@ -9,10 +9,10 @@ use CGI::Carp;
 
 package PlayerAccessor;
 
-require './TestFramework/Controller/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.cgi';
 
-#BJWrapper.pmのファイル名
-my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
+#BJWrapper.cgiのファイル名
+my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
 
 sub new{
 	my $class = shift;
@@ -75,33 +75,23 @@ sub create_player{
 
 
 	#new_entry.cgiからプレイヤー作成
-	my $create= sub{
+	my $create = sub{
 
 		require $bj_wrapper;
 		package BJWrapper;
 
+		_load_config();
+
 		#同じ名前のプレイヤーが既にいるとnew_entry.cgiからは例外を吐かないのでここで判定
-		eval{
-			_read_user($name);
-		};
-		unless($@){
-			die("PlayerAccessor::creat_player failed: $name already exists");
+		my $dir = unpack('H*', $name);
+		if(-d "$userdir/$dir"){
+			die("PlayerAccessor::creat_player failed: $name already exists\n");
 		}
 
-
-		_load_config();
+		$ENV{REQUEST_METHOD} = "";	
 		$ENV{REMOTE_ADDR} = $address;	
 		$ENV{QUERY_STRING} = "mode=new_entry&name=$name&pass=$pass&sex=$sex";
 		require 'new_entry.cgi';
-
-		#作成されたかチェック
-		my $saved_mes = $mes;
-		eval{
-			_read_user($name);
-		};
-		if($@){
-			die ("PlayerAccessor::create_player failed : $name: $saved_mes\n");
-		}
 	};
 
 	#login.cgiを一度呼ばないと直後の処理でエラーが出る
@@ -111,21 +101,22 @@ sub create_player{
 		package BJWrapper;
 
 		_load_config();
+		$ENV{REQUEST_METHOD} = "";	
 		$ENV{QUERY_STRING} = "login_name=$name&pass=$pass";
 		require 'login.cgi';
-
 	};
 
 	#bj.cgiを開きリフレッシュを呼ぶ
 	my $back_bj = sub{
+
 		require $bj_wrapper;
 		package BJWrapper;
-
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base; 
 		require "bj.cgi";
-
 	};
 
+	
 	Util::fork_sub($create);
 	Util::fork_sub($login);
 	Util::fork_sub($back_bj);
@@ -185,6 +176,7 @@ sub shikan_player{
 
 		$mes = "";
 		#国情報
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=7"; 
 		require "bj.cgi";
 		_read_user($name);
@@ -202,6 +194,7 @@ sub shikan_player{
 		_read_user($name);
 
 		#士官
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=2"; 
 		require "bj.cgi";
 		_read_user($name);
@@ -219,10 +212,11 @@ sub shikan_player{
 		_read_user($name);
 
 		#国を選択
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$to_country"; 
 		require "bj.cgi";
 		_read_user($name);
-		die ("failed to select country : m{} = $m{tp} mes = $mes\n") if ($m{tp} ne 300);
+		die ("failed to select country : m{tp} = $m{tp} mes = $mes\n") if ($m{tp} ne 300);
 
 	};
 
@@ -236,18 +230,27 @@ sub shikan_player{
 		_read_user($name);
 
 		#士官
+		$ENV{REQUEST_METHOD} = "";	
 		$ENV{QUERY_STRING} = $env_base."&cmd=1"; 
 		require "bj.cgi";
 		_read_user($name);
-		die ("failed to shikan : m{} = $m{tp} mes = $mes\n") if ($m{country} ne $to_country);
+		
+		#チェック。放浪時はm{country}は0
+		&read_cs;
+		my $num_country = $w{country};
+		if($to_country eq ($num_country+1)){
+			$to_country = 0;
+		}
+		die ("failed to shikan : m{country} = $m{country} mes = $mes\n") if ($m{country} ne $to_country);
 
 	};
 
-	#bj.cgiを開きリフレッシュを呼ぶ
+	#bj.cgiを開く
 	my $back_bj = sub{
 		require $bj_wrapper;
 		package BJWrapper;
 
+		$ENV{REQUEST_METHOD} = "";	
 		$ENV{QUERY_STRING} = $env_base; 
 		require "bj.cgi";
 
@@ -261,4 +264,24 @@ sub shikan_player{
 
 }
 
+
+#bj.cgiを開く
+sub open_bj{
+
+	my $self = shift;
+	my $name = shift;
+
+	$enter_bj = sub {
+
+		require $bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($name);
+
+		require "bj.cgi";
+	};
+
+	Util::fork_sub($enter_bj);
+}
 1;

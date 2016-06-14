@@ -6,15 +6,16 @@
 use CGI;
 $CGI::LIST_CONTEXT_WARN = 0;
 use CGI::Carp;
-require "./TestFramework/TestInterface.pm";
-require "./TestFramework/TestResultBrowser.pm";
+require "./TestFramework/TestInterface.cgi";
+require "./TestFramework/TestResultBrowser.cgi";
 
 #結果出力用のHTML
 my $output_html = "./TestFramework/result.html";
 
 my $q = new CGI;
 #テスト開始
-print $q->header;
+print $q->header(-charset => "Shift_JIS");
+print $q->start_html();
 
 #認証
 #my $in = {};
@@ -24,13 +25,6 @@ unless(&_is_valid_passward){
 	print $q->end_html;
 	exit;
 }
-print qq|<p>valid pass</p><br>|;
-print $q->end_html;
-exit;
-
-
-
-
 
 #設定回収
 my @files = $q->param('file');
@@ -51,16 +45,16 @@ $test_interface->save_data();
 
 #テスト実行
 $test_interface->run_all_tests(@files);
+
+#テスト結果を出力
 $test_interface->output_result();
 
 #復元
 $test_interface->restore_data();
 
-#テスト結果にリダイレクト
-$output_html =~ s/^\.\///;
-print $q->redirect("http://localhost/bj_buu/TestFramework/result.html");
-print $q->end_html;
-
+#終了
+print $q->end_html();
+exit;
 
 #パスワードチェック
 sub _is_valid_passward{

@@ -13,21 +13,22 @@ require WorldController;
 require CountryController;
 
 
+
 #時刻の誤差
 my $time_margin = 1;
 
 #国と人
 my $username_first_part = "test";
-my $username_sufix = 12; 
-my $username_sufix2 = $username_sufix + 2;
-my $username_sufix3 = $username_sufix + 4;
+my $username_sufix = 20; 
+my $username_sufix2 = $username_sufix + 30;
+my $username_sufix3 = $username_sufix + 31;
 my $username = $username_first_part.$username_sufix;
 my $username2 = $username_first_part.$username_sufix2;
 my $user_id = unpack ('H*', $username);
 my $user_id2 = unpack ('H*', $username2);
 my $passward = "test4a";
-my $first_country = 2;
-my $second_country = 3;
+my $first_country = 1;
+my $second_country = 2;
 my $third_country;
 my $added_country_name = "test_country";
 
@@ -55,6 +56,7 @@ sub test_wac{
 	my $cc = CountryController->new();
 	my $wac = WarController->new();
 
+	print STDERR "***test_wac p1***\n";
 	$pc->create_player($username, $passward,1);
 	$pc->access_data($username, "money", 4000000);
 	$cc->access_data($first_country, "capacity", 30);
@@ -67,14 +69,17 @@ sub test_wac{
 	$cc->access_data($first_country, "soldier", 100000);
 
 	#小規模戦争進軍成功
+	print STDERR "***test_wac p2***\n";
 	$wac->action_set_war($username, $second_country, 1);
 
 	#戦闘成功
+	print STDERR "***test_wac p3***\n";
 	$pc->access_data($username, "wt", 0);
 	$wac->action_encount($username);
 	$wac->action_complete_war($username);
 
 	#戦争の勝利成功
+	print STDERR "***test_wac p4***\n";
 	$pc->access_data($username, "renzoku_c", 0);
 	$pc->access_data($username, "act", 0);
 	$wac->action_set_war($username, $second_country, 1);
@@ -83,6 +88,7 @@ sub test_wac{
 	$wac->action_win_war($username);
 
 	#戦争の敗北成功
+	print STDERR "***test_wac p5***\n";
 	$pc->access_data($username, "renzoku_c", 0);
 	$pc->access_data($username, "act", 0);
 	$wac->action_set_war($username, $second_country, 1);
@@ -91,6 +97,7 @@ sub test_wac{
 	$wac->action_lose_war($username);
 
 	#ターン切れドロー成功
+	print STDERR "***test_wac p6***\n";
 	$pc->access_data($username, "renzoku_c", 0);
 	$pc->access_data($username, "act", 0);
 	$wac->action_set_war($username, $second_country, 1);
@@ -99,6 +106,7 @@ sub test_wac{
 	$wac->action_draw_war_turn($username);
 	
 	#両軍壊滅ドロー成功
+	print STDERR "***test_wac p7***\n";
 	$pc->access_data($username, "renzoku_c", 0);
 	$pc->access_data($username, "act", 0);
 	$wac->action_set_war($username, $second_country, 1);
@@ -109,6 +117,7 @@ sub test_wac{
 	#進軍失敗
 	#長期戦争には階級が足りない
 	eval{
+		print STDERR "***test_wac p8***\n";
 		$wac->action_set_war($username, $second_country, WarController::LARGE);
 	};
 	unless($@){
@@ -117,7 +126,11 @@ sub test_wac{
 
 	#進軍失敗
 	#物資が足りない
+	$pc->access_data($username, "wt", 0);
+	$pc->access_data($username, "lib", "");
+	$pc->access_data($username, "tp", 0);
 	eval{
+		print STDERR "***test_wac p9***\n";
 		$cc->access_data($first_country, "food", 0);
 		$wac->action_set_war($username, $second_country, WarController::SMALL);
 	};
@@ -132,6 +145,10 @@ sub test_wac{
 	#着弾失敗
 	#戦争に出ていない
 	eval{
+		print STDERR "***test_wac p10***\n";
+		$pc->access_data($username, "wt", 0);
+		$pc->access_data($username, "lib", "");
+		$pc->access_data($username, "tp", 0);
 		$wac->action_encount($username);
 	};
 	unless($@){
@@ -152,11 +169,11 @@ sub test_pc{
 	############################
 	#プレイヤー生成成功テスト
 	############################
-	print "***test_pc p1***\n";
+	print STDERR "***test_pc p1***\n";
 	eval{
-		print "***test_pc p1-1***\n";
+		print STDERR "***test_pc p1-1***\n";
 		$pc->create_player($username, $passward,1, "1.1.1.$username_sufix");
-		print "***test_pc p1-2***\n";
+		print STDERR "***test_pc p1-2***\n";
 		$pc->create_player($username2, $passward,1);
 	};
 	if($@){
@@ -168,8 +185,8 @@ sub test_pc{
 	############################
 	eval{
 		#不十分な引数
-		print "***test_pc p2***\n";
-		$pa->create_player("name", "pass");
+		print STDERR "***test_pc p2***\n";
+		$pc->create_player("name", "pass");
 	};
 	unless($@){
 		die("test_pc create_player fail test : invalid arguments");
@@ -177,49 +194,49 @@ sub test_pc{
 
 	eval{
 		#同じプレイヤー名
-		print "***test_pc p3***\n";
+		print STDERR "***test_pc p3***\n";
 		$pc->create_player($username, $passward,1, "1.1.1.$username_sufix3");
 	};
 	unless($@){
 		die("test_pc create_player fail test : same name player exists"); 
 	}
 
-	eval{
+	#eval{
 		#重複IP
-		print "***test_pc p4***\n";
-		$pc->create_player($username."a", $passward,1, "1.1.1.$username_sufix");
-	};
-	unless($@){
-		die("test_pc create_player fail test : same ip"); 
-	}
+		#	print STDERR "***test_pc p4***\n";
+		#$pc->create_player($username."a", $passward,1, "1.1.1.$username_sufix");
+		#};
+		#unless($@){
+		#die("test_pc create_player fail test : same ip"); 
+		#}
 
 	############################
 	#士官　成功
 	############################
 
-	print "***test_pc p4***\n";
+	print STDERR "***test_pc p4***\n";
 	eval{
 		#国番号１に士官
-		print "***test_pc p4-1***\n";
+		print STDERR "***test_pc p4-1***\n";
 		$pc->access_data($username, "money", 1000000);
-		$wc->access_data($first_country, "capacity", 30);
+		$cc->access_data($first_country, "capacity", 30);
 		$pc->action_shikan_player($username, $first_country);
 
-		#ネバランに士官
-		print "***test_pc p4-2***\n";
-		$pc->access_data($username, "wt", 0);
-		$pc->action_shikan_player($username, $first_country);
+		#放浪/todo
+		print STDERR "***test_pc p4-2***\n";
+		$pc->refresh_player($username);
+		$pc->action_shikan_player($username, ($wc->access_data("country") + 1));
 
 		#国番号２に士官
-		print "***test_pc p4-3***\n";
-		$pc->access_data($username, "wt", 0);
-		$wc->access_data($second_country, "capacity", 30);
+		print STDERR "***test_pc p4-3***\n";
+		$pc->refresh_player($username);
+		$cc->access_data($second_country, "capacity", 30);
 		$pc->action_shikan_player($username, $second_country);
 
 		#国番号２から国番号１に士官
-		print "***test_pc p4-4***\n";
+		print STDERR "***test_pc p4-4***\n";
 		$pc->access_data($username, "wt", 0);
-		$wc->access_data($first_country, "capacity", 30);
+		$cc->access_data($first_country, "capacity", 30);
 		$pc->action_shikan_player($username, $first_country);
 
 	};
@@ -232,69 +249,54 @@ sub test_pc{
 	############################
 	eval{
 		#拘束中に士官
-		print "***test_pc p5***\n";
-		$pa->access_data($username2, "wt", 100);
-		$pa->action_shikan_player($username2, $second_country);
+		print STDERR "***test_pc p5***\n";
+		$pc->access_data($username2, "wt", 100);
+		$pc->action_shikan_player($username2, $second_country);
 	};
 	unless($@){
 		die("test_pc create_player fail test : is bound");
 	}
-	$pa->access_data($username2, "wt", 0);
-	$pa->access_data($username2, "tp", 0);
-	$pa->access_data($username2, "turn", 0);
-	$pa->access_data($username2, "lib", "");
 
 	eval{
 		#lib処理中に士官
-		print "***test_pc p6***\n";
-		$pa->access_data($username2, "wt", 0);
-		$pa->access_data($username2, "lib", "yay");
-		$pa->action_shikan_player($username2, $second_country);
+		print STDERR "***test_pc p6***\n";
+		$pc->refresh_player($username2);
+		$pc->access_data($username2, "lib", "yay");
+		$pc->action_shikan_player($username2, $second_country);
 	};
 	unless($@){
 		die("test_pc create_player fail test : is processing another lib");
 	}
-	$pa->access_data($username2, "wt", 0);
-	$pa->access_data($username2, "tp", 0);
-	$pa->access_data($username2, "turn", 0);
-	$pa->access_data($username2, "lib", "");
 
 	eval{
 		#存在しない国に士官
-		print "***test_pc p7***\n";
-		$pa->access_data($username2, "wt", 0);
+		print STDERR "***test_pc p7***\n";
+		$pc->refresh_player($username2);
 		my $num_country = $wa->access_data("country");
-		$pa->action_shikan_player($username2, $num_country+1);
+		$pc->action_shikan_player($username2, $num_country+3);
 	};
 	unless($@){
 		die("test_pc create_player fail test : invalid country number");
 	}
-	$pa->access_data($username2, "wt", 0);
-	$pa->access_data($username2, "tp", 0);
-	$pa->access_data($username2, "turn", 0);
-	$pa->access_data($username2, "lib", "");
 
 	eval{
 		#お金が足りない
-		print "***test_pc p8***\n";
-		$pa->access_data($username2, "wt", 0);
-		$pa->access_data($username2, "money", 0);
-		$pa->action_shikan_player($username2, $num_country+1);
+		print STDERR "***test_pc p8***\n";
+		$pc->action_shikan_player($username2, $first_country);
+		$pc->refresh_player($username2);
+		$pc->access_data($username2, "money", 0);
+		$pc->action_shikan_player($username2, $second_country);
 	};
 	unless($@){
 		die("test_pc create_player fail test : no money");
 	}
-	$pa->access_data($username2, "wt", 0);
-	$pa->access_data($username2, "tp", 0);
-	$pa->access_data($username2, "turn", 0);
-	$pa->access_data($username2, "lib", "");
 
 	############################
 	#プレイヤー削除成功テスト
 	############################
 	eval{
-		print "***test_pc p9***\n";
-		$pa->remove_player($username2);
+		print STDERR "***test_pc p9***\n";
+		$pc->remove_player($username2);
 	};
 	if($@){
 		die("test_pc remove_player success test", $@);
@@ -305,15 +307,15 @@ sub test_pc{
 	############################
 	eval{
 		#存在しないプレイヤー
-		print "***test_pc p10***\n";
-		$pa->remove_player("invalid_name");
+		print STDERR "***test_pc p10***\n";
+		$pc->remove_player("invalid_name");
 	};
 	unless($@){
 		die("test_pc create_player fail test : invalid name");
 	}
 
 	#後片付け
-	$pa->remove_player($username);
+	$pc->remove_player($username);
 
 }
 
@@ -377,11 +379,17 @@ sub test_cc{
 
 	#国追加成功
 	$cc->admin_add_country();
-	print "***in TC w{country} = ",$wc->access_data("country"), "***\n";
+	print STDERR "***in TC w{country} = ",$wc->access_data("country"), "***\n";
 	if($wc->access_data("country") ne 4){
 		die ("test_cc admin_add_country success\n");
 	}
 
+	#デフォルトでおまかせ国データ作成
+	$cc->admin_reset_countries();
+	$num_country = $wc->access_data("country");
+	if($num_country ne 6){
+		die ("test_cc admin_reset_countries default success\n\$num_country expected : 6, actual : $num_country \n");
+	}
 	
 }
 

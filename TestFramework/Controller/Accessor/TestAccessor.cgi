@@ -4,11 +4,11 @@ package TestAccessor;
 
 use feature 'say';
 use lib qw(./TestFramework/Controller/Accessor);
-require "CountryAccessor.pm";
-require "WorldAccessor.pm";
-require "WarAccessor.pm";
-require "PlayerAccessor.pm";
-require "ItemAccessor.pm";
+require "CountryAccessor.cgi";
+require "WorldAccessor.cgi";
+require "WarAccessor.cgi";
+require "PlayerAccessor.cgi";
+require "ItemAccessor.cgi";
 
 my $username_first_part = "test";
 my $username_sufix = "28";

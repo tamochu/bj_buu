@@ -6,10 +6,10 @@ use warnings;
 #use strict;
 
 package WorldAccessor;
-require './TestFramework/Controller/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.cgi';
 
-#BJWrapper.pmのファイル名
-my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
+#BJWrapper.cgiのファイル名
+my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
 
 sub new{
 	my $class = shift;

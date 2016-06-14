@@ -7,10 +7,10 @@ use CGI::Carp;
 #use strict;
 
 package WarAccessor;
-require './TestFramework/Controller/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.cgi';
 
-#BJWrapper.pmのファイル名
-my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
+#BJWrapper.cgiのファイル名
+my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
 
 #main.cgiのメニュー上の戦争のコマンド番号
 my $menu_cmd_war = 11;
@@ -52,6 +52,7 @@ sub set_war{
 		$m{lib} = "main";
 		$m{tp} = 1;
 		&write_user;
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$menu_cmd_war";
 		require "bj.cgi";
 		_read_user($player_name);
@@ -69,6 +70,7 @@ sub set_war{
 		_read_user($player_name);
 		$mes = "";
 
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$mode";
 		require "bj.cgi";
 		_read_user($player_name);
@@ -83,6 +85,7 @@ sub set_war{
 
 		_before_bj($player_name);
 		$mes = "";
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$target_country";
 		require "bj.cgi";
 		_read_user($player_name);
@@ -96,6 +99,7 @@ sub set_war{
 		package BJWrapper;
 
 		_before_bj($player_name);
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$target_country";
 		require "bj.cgi";
 		_read_user($player_name);
@@ -130,6 +134,7 @@ sub encount{
 		package BJWrapper;
 
 		_before_bj($player_name);
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base;
 		$mes = "";
 		
@@ -148,6 +153,7 @@ sub encount{
 
 		_before_bj($player_name);
 		$mes = "";
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base;
 		require "bj.cgi";
 		_read_user($player_name);
@@ -183,6 +189,7 @@ sub step_war{
 		_before_bj($player_name);
 		_read_user($player_name);
 
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd_formation";
 		require "bj.cgi";
 		_read_user($player_name);

@@ -23,6 +23,15 @@ sub _load_config{
 	#&twitter_botを上書きして抑制
 	no warnings 'redefine';
     	*twitter_bot = sub {};	
+
+	#&errorを上書きして例外でスローするようにする
+	*error = sub{
+		my($error_mes, $is_need_header) = @_;
+		my $caller_filename = (caller 0)[1];
+		my $caller_num_line = (caller 0)[2];
+		my $error_info = "system_game.cgi::error was called at $caller_filename at line $caller_num_line\n";
+		die("$error_info error message = $error_mes\n");
+	};
 }
 
 #ユーザー名から%m,%yにデータ読み込み

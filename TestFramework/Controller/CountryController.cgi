@@ -2,7 +2,7 @@
 use warnings;
 
 package CountryController;
-require "./TestFramework/Controller/Accessor/CountryAccessor.pm";
+require "./TestFramework/Controller/Accessor/CountryAccessor.cgi";
 
 sub new{
 	my $class = shift;

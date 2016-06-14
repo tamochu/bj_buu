@@ -55,7 +55,7 @@ sub init{
 
 	#メッセージウィンドウ
 	print qq|<div id="messageWindow" style = "background-color: lavender; border:#ff0000 solid 1px;">|;
-	print qq|<p>開発中。触るな危険</p>|;
+	print qq|<p>開発中</p>|;
 	print qq|</div>|;
 }
 

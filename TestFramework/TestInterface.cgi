@@ -6,7 +6,8 @@ package TestInterface;
 
 use Carp;
 use File::Path;
-require "./TestFramework/Controller/Accessor/SystemAccessor.pm";
+require "./TestFramework/Controller/Accessor/SystemAccessor.cgi";
+require "./TestFramework/Controller/Accessor/StopStdout.cgi";
 
 sub new{
 
@@ -89,6 +90,9 @@ sub restore_data{
 #テストを指定して実行
 sub run_test{
 
+	#標準出力を抑制
+	my $stop_stdout = tie local *STDOUT, 'StopStdout';
+
 	my $self = shift;
 	my $filename = shift;
 	
@@ -109,9 +113,16 @@ sub run_test{
 #指定されたディレクトリの全てのテストを実行
 sub run_all_tests{
 
-	my $self = shift;
-	my @dir = shift;
+	#標準出力を抑制
+	my $stop_stdout = tie local *STDOUT, 'StopStdout';
 
+	my $self = shift;
+	my @dir = @_;
+
+	print "<br> in TI test run_all_tests<br>";
+	for my $file(@dir){
+		print "test found:$file<br>";
+	}
 	#全てのテストを実行
 	foreach my $filename (@dir){
 

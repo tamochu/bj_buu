@@ -13,7 +13,7 @@ sub new{
 	#コンストラクタで与えられなければデフォルト値
 	$self->{HTML_PATH} = shift;	
 	unless($self->{HTML_PATH}){
-		$self->{HTML_PATH} = "./TestFramework/result.html";
+		$self->{HTML_PATH} = "./TestFramework/result.dat";
 	}
 
 	#メッセージのプール
@@ -44,27 +44,29 @@ sub add_ok{
 
 }
 
-#出力用のHTMLを生成
+#出力用の中間HTML（body部のみ)を生成して保存
 sub output_result{
 
 	my $self = shift;
 
-
-	open(FH, "> $self->{HTML_PATH}") or croak("Can't open $self->{HTML_PATH}, $@");
-	print FH qq|<html><head><title>Results></title></head><body>|;
-	print FH qq|<b>OK</b><br>|;
+	#ＯＫメッセージ
+	print qq|<b>OK</b><br>|;
+	print qq|<div style = "background-color: lavender; border:#000000 solid 1px">|;
 	for my $ok_filename (@{$self->{OK_MESSAGES}}){
-		 print FH qq|$ok_filename<br>|;
+		 print qq|<font color="blue">$ok_filename</font><br>|;
 	}
+	print qq|</div>|;
 
-	print FH qq|<br>*************************************<br><br><b>Error</b><br>|;
+	print qq|<br>*************************************<br><br><b>Error</b><br>|;
+
+	#ＥＲＲＯＲメッセージ
 	for my $message (@{$self->{ERROR_MESSAGES}}){
-		print FH qq|<font color="red">$message->[0]</font><br>|;
-		print FH qq|$message->[1]<br><br><br>|;
+		print qq|<div style = "background-color: lavender; border:#000000 solid 1px">|;
+		print  qq|<font color="red"><b>$message->[0]<b></font><br>|;
+		$message->[1] =~ s/\n/<br>/g;
+		print  qq|$message->[1]|;
+		print qq|</div><br>|;
 	}
-
-	print FH qq|</body></html>|;
-	close FH;
 }
 
 1;

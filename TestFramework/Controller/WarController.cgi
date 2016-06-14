@@ -1,10 +1,11 @@
 #use strict;
 use warnings;
+use TestFramework::Controller::ControllerConst;
 
 package WarController;
 
-require "./TestFramework/Controller/Accessor/WarAccessor.pm";
-require "./TestFramework/Controller/Accessor/PlayerAccessor.pm";
+require "./TestFramework/Controller/Accessor/WarAccessor.cgi";
+require "./TestFramework/Controller/Accessor/PlayerAccessor.cgi";
 
 
 sub new{
@@ -20,16 +21,14 @@ sub new{
 
 #進軍させる
 #進軍するプレイヤー名、対象の国、進軍規模(定数)
-use constant SMALL => 0;
-use constant MEDIUM => 1;
-use constant LARGE => 2;
+
 sub action_set_war{
 
 	my $self = shift;
 	my ($player_name, $target_country, $mode) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless ((defined $player_name) and (defined $target_country) and (defined $mode)){
@@ -62,8 +61,8 @@ sub action_encount{
 	my $self = shift;
 	my $player_name = shift;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $player_name){
@@ -95,10 +94,10 @@ sub action_encount{
 sub action_step_war{
 
 	my $self = shift;
-	my ($player_name) = @_;
+	my $player_name = shift;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $player_name){
@@ -125,20 +124,14 @@ sub action_step_war{
 }
 
 
-#無限ループ防止のための最大ターンの範囲で勝敗が付くまで戦争を行う
-use constant MAX_TURN => 50;
-#戻り値は勝敗結果の定数
-use constant WIN => 1;
-use constant LOSE => 2;
-use constant DRAW => 3;
-use constant PRISONED => 4;
+
 sub action_complete_war{
 
 	my $self = shift;
 	my ($player_name) = shift;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	my $ret = undef;
@@ -163,7 +156,7 @@ sub action_complete_war{
 		my $check_draw_c = $self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "draw_c");
 
 		#決着がつくまで戦闘
-		for my $i (0 .. MAX_TURN){
+		for my $i (0 .. ControllerConst::WAR_MAX_TURN){
 
 			$self->{WAR_ACCESSOR_INTERFACE}->step_war($player_name);
 			if($self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "lib") ne "war"){
@@ -174,18 +167,18 @@ sub action_complete_war{
 
 		
 		if($check_win_c lt $self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "win_c")){
-			return WarController::WIN;
+			return ControllerConst::WAR_RESULT_WIN;
 		}
 		elsif ($check_lose_c lt $self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "lose_c")){
 			if($self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "lib") eq "prison"){
-				return  WarController::PRISONED;
+				return  ControllerConst::WAR_RESULT_PRISONED;
 			}
 			else{
-				return  WarController::LOSE;
+				return  ControllerConst::WAR_RESULT_LOSE;
 			}
 		}
 		elsif ($check_draw_c lt $self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "draw_c")){
-			return  WarController::DRAW;
+			return  ControllerConst::WAR_RESULT_DRAW;
 		}
 		else{
 			die ("$error_info : failed to complete war: \n");
@@ -205,8 +198,8 @@ sub action_win_war{
 	my $self = shift;
 	my ($player_name) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $player_name){
@@ -253,8 +246,8 @@ sub action_lose_war{
 	my $self = shift;
 	my ($player_name) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $player_name){
@@ -303,8 +296,8 @@ sub action_draw_war_turn{
 	my $self = shift;
 	my ($player_name) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $player_name){
@@ -353,8 +346,8 @@ sub action_draw_war_kaimetu{
 	my $self = shift;
 	my ($player_name) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $player_name){

@@ -7,10 +7,10 @@ use CGI::Carp;
 #use strict;
 
 package ItemAccessor;
-require './TestFramework/Controller/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.cgi';
 
-#BJWrapper.pmのファイル名
-my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
+#BJWrapper.cgiのファイル名
+my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
 
 sub new{
 	my $class = shift;

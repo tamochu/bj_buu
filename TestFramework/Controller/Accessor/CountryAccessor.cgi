@@ -11,10 +11,10 @@ use File::Path qw(rmtree);
 
 package CountryAccessor;
 
-require './TestFramework/Controller/Accessor/Util.pm';
+require './TestFramework/Controller/Accessor/Util.cgi';
 
-#BJWrapper.pmのファイル名
-my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.pm';
+#BJWrapper.cgiのファイル名
+my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
 
 sub new{
 	my $class = shift;
@@ -22,13 +22,6 @@ sub new{
 
 	my $self = {};
 	
-	if(defined $admin_pass){
-		$self->{ADMIN_PASS} = $admin_pass;
-	}
-	else{
-		$self->{ADMIN_PASS} = "pass";
-	}
-
 	return bless ($self, $class);
 }
 #./log/countries.cgiのデータに直接アクセスして取得/設定
@@ -83,7 +76,6 @@ sub get_num_country{
 }
 
 #国を追加(admin_country.cgi経由)
-#戻り値は現在の国数
 sub add_country{
 
 	print "***in CA add_country was called***\n";
@@ -104,6 +96,8 @@ sub add_country{
 	
 		require $bj_wapper;
 		package BJWrapper;
+		#admin_pass上書き
+		$admin_pass = "pass";
 
 		_load_config();
 
@@ -111,17 +105,11 @@ sub add_country{
 		my $num_country = $w{counyry};
 
 		#環境変数を偽装しadmin_country.cgiを呼び出す
- 		$ENV{QUERY_STRING} = "mode=add_country&pass=".$self->{ADMIN_PASS}."&add_name=$add_name&add_color=$add_color";
+		$admin_pass = "pass";
+		$ENV{REQUEST_METHOD} = "";
+ 		$ENV{QUERY_STRING} = "mode=add_country&pass=pass&add_name=$add_name&add_color=$add_color";
 		print "***in CA add_country ENV{QUERY_STRING} = $ENV{QUERY_STRING}***\n";
 		require "admin_country.cgi";	
-
-		#チェック
-		&read_cs;
-		if($w{country} le $num_country){
-			die "\$w{country}:$w{country} should be greater than \$num_country:$num_country\n";
-		}
-
-		return $w{country};
 
 	};
 
@@ -133,24 +121,25 @@ sub add_country{
 #設定は%settingのリファレンスで受け渡す
 sub reset_countries{
 
-	print "***in CA reset_country was called***\n";
+	print "***in CA reset_country was called***<br>";
+
 	my $self = shift;
 	my $setting = shift;
 
-	print "***in CA reset_country was called and define enter_admin***\n";
 	my $enter_admin = sub{
 	
-		print "***in CA enter sub***\n";
+		print  "***in CA enter sub***<br>";
 		require $bj_wapper;
 		package BJWrapper;
 
-		print "***in CA reset_countries before load_config***\n";
+		print "***in CA reset_countries before load_config***<br>";
 
 		_load_config();
-
+		
 		#環境変数を偽装しadmin_country.cgiを呼び出す
-		print "***in CA reset_countries before creating ENV***\n";
- 		$ENV{QUERY_STRING} = "pass=". $self->{ADMIN_PASS}."&step=3".
+		$admin_pass = "pass";
+		$ENV{REQUEST_METHOD} = "";
+ 		$ENV{QUERY_STRING} = "pass=pass&step=3".
 			"&world=$setting->{world}&year=$setting->{year}&country=$setting->{country}";
 
 		#名前と国のカラー
@@ -158,11 +147,11 @@ sub reset_countries{
 			$ENV{QUERY_STRING} .= "&name_$i=country$i&color_$i=#FFFF00";
 		}
 
-		print "***in CA reset_countries ENV{QUERY_STRING} = $ENV{QUERY_STRING}***\n";
 		require "admin_country.cgi";	
 		&read_cs;
 		
 		#チェック
+		print "***in CA reset_countries this might not be called<br>";
 		if(($w{country} ne $setting->{country})
 		 or($w{year} ne $setting->{year})){
 	 		die "failed to reset_countries\n";

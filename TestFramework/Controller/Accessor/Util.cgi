@@ -3,10 +3,13 @@
 ############################################
 
 package Util;
-#require './Jcode.pm';
 
 #無名サブルーチンをフォークした先で実行する
 sub fork_sub{
+
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
+	my $error_info = "$caller_filename at line $caller_num_line";
 
 	use Socket;
 	use IO::Handle;
@@ -30,13 +33,12 @@ sub fork_sub{
 	    close PARENT;
 	    chomp($line = <CHILD>);
 	    close CHILD;
-
 	    #置換された文字を元に戻す
-	    $line =~ s/$mark/\n/;
+	    $line =~ s/$mark/\n/g;
 
 
 	    if($line =~ /^exception/){
-		    die "$line\n";
+		    die "$error_info : $line\n";
 	    }
 
 	    wait;
@@ -50,16 +52,14 @@ sub fork_sub{
 	    #サブルーチン実行
 	    my $line = "";
 	    my $message ="";
-
 	    eval{
 		    $message = $sub_routine->();
-
 	    };
 
 	    if($@){
-		$line .= "exception was thrown in the forked process\n";
+		$line .= "exception was thrown in forked process\n";
 		$line .= $@; 
-		$line =~ s/\n/$mark/;
+		$line =~ s/\n/$mark/g;
 	    }
 
 	    if(defined($message)){
@@ -74,5 +74,4 @@ sub fork_sub{
 	}
 
 }
-
 1;

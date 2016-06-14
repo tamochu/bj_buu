@@ -2,7 +2,7 @@
 use warnings;
 
 package PlayerController;
-require "./TestFramework/Controller/Accessor/PlayerAccessor.pm";
+require "./TestFramework/Controller/Accessor/PlayerAccessor.cgi";
 
 sub new{
 	my $class = shift;
@@ -32,14 +32,26 @@ sub access_data{
 
 }
 
+#tp,wtを0に、libを空にした状態でbj.cgiを開く
+sub refresh_player{
+
+	my $self = shift;
+	my $name = shift;
+
+	$self->access_data($name, "wt", 0);
+	$self->access_data($name, "lib", "");
+	$self->access_data($name, "tp", 0);
+	$self->{PLAYER_ACCESSOR_INTERFACE}->open_bj($name);
+
+}
 #player作成
 sub create_player{
 
 	my $self = shift;
 	my ($name, $pass, $sex, $address) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless ((defined $name) and (defined $pass) and (defined $sex)){
@@ -51,19 +63,18 @@ sub create_player{
 		$address = "10.1.1.$self->{IP_ADDRESS_COUNT}";
 		$self->{IP_ADDRESS_COUNT}++;
 	}
-
-	my $new_name = undef;
+	my $new_name;
 	eval{
 		$self->{PLAYER_ACCESSOR_INTERFACE}->create_player($name, $pass, $sex, $address);
 		$new_name = $self->{PLAYER_ACCESSOR_INTERFACE}->access_data($name, "name");
 	};
 	if($@){
-		die("$error_info : failed to create player\n", $@);
+		die("$error_info : create_player()\n", $@);
 	}
 
 	#チェック
 	if($new_name ne $name){
-		die("$error_info : failed to create player $name\n");
+		die("$error_info : create_player $name\n");
 	}
 }
 
@@ -73,8 +84,8 @@ sub action_shikan_player{
 	my $self = shift;
 	my ($name, $to_country) = @_;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless ((defined $name) and (defined $to_country)){
@@ -89,12 +100,7 @@ sub action_shikan_player{
 		
 	};
 	if($@){
-		die ("$error_info : failed to shikan\n", $@);	
-	}
-
-	#チェック
-	if($new_country ne $to_country){
-		die ("$error_info : failed to shikan. $name moved to country $new_country\n");
+		die ("$error_info : action_shikan_player\n", $@);	
 	}
 
 }
@@ -105,8 +111,8 @@ sub remove_player{
 	my $self = shift;
 	my $name = shift;
 
-	my $caller_filename = (caller 1)[1];
-	my $caller_num_line = (caller 1)[2];
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless (defined $name){
@@ -118,7 +124,7 @@ sub remove_player{
 		$self->{PLAYER_ACCESSOR_INTERFACE}->remove_player($name);
 	};
 	if($@){
-		die ("$error_info : failed to remove_player\n");
+		die ("$error_info : remove_player\n");
 	}
 
 	#チェック
@@ -126,7 +132,7 @@ sub remove_player{
 		$self->access_data($name, "name");
 	};
 	unless($@){
-		die ("$error_info : failed to remove_player\n");
+		die ("$error_info : remove_player\n");
 	}
 	$@ = "";
 }

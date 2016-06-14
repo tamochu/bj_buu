@@ -7,7 +7,7 @@
 use warnings;
 
 package WorldController;
-require "./TestFramework/Controller/Accessor/WorldAccessor.pm";
+require "./TestFramework/Controller/Accessor/WorldAccessor.cgi";
 
 sub new{
 
