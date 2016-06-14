@@ -216,7 +216,7 @@ $cooldown_time = 6 * 3600;
 #=================================================
 sub regist_mes {
 	$force = shift;
-	$tm = qq|<hr>•KE‹Z|;
+	$tm = qq|y•KE‹Zz|;
 	my $attack = &get_attack;
 	my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack;
 	&count_check($a_max_count, $a_count, $a_last_attack);

@@ -246,6 +246,10 @@ sub my_status_mobile {
 		my $attack_set = &get_attack;
 		if ($attack_set ne '') {
 			$mes .= &regist_mes(0);
+			my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack_set;
+			my $nokori_time = ($a_last_attack + $cooldown_time) - $time;
+			my $nokori_time_mes = sprintf("–ñ<b>%d</b><b>%02d</b>•ªŒã", $nokori_time / 3600, $nokori_time % 3600 / 60);
+			$mes .= qq|<br><br>Ÿ‚Ì•KE‹Z”­“®‚Ü‚Å $nokori_time_mes|;
 		}
 		$mes .= qq|<br><form method="$method" action="$script">|;
 		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
@@ -335,7 +339,7 @@ sub my_status_pc {
 		$mes .= qq|<tr><th>–¼‘O</th><td>$pets[$m{pet}][1]š$m{pet_c}</td>|;
 		$mes .= qq|<th>Œø‰Ê</th><td>$pet_effects[$m{pet}]</td></tr>|;
 		if($pet_sub_effects[$m{pet}]){
-			$mes .= qq|<tr><th>’Ç‰ÁŒø‰Ê</th><td>$pet_sub_effects[$m{pet}]</td></tr>|;
+			$mes .= qq|<tr><th>’Ç‰ÁŒø‰Ê</th><td colspan="3">$pet_sub_effects[$m{pet}]</td></tr>|;
 		}
 		$mes .= qq|</table>|;
 		if ($pets[$m{pet}][2] eq 'myself' || ($m{pet} == 31 && &is_ceo)) {
@@ -352,6 +356,10 @@ sub my_status_pc {
 		my $attack_set = &get_attack;
 		if ($attack_set ne '') {
 			$mes .= &regist_mes(0);
+			my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack_set;
+			my $nokori_time = ($a_last_attack + $cooldown_time) - $time;
+			my $nokori_time_mes = sprintf("–ñ<b>%d</b><b>%02d</b>•ªŒã", $nokori_time / 3600, $nokori_time % 3600 / 60);
+			$mes .= qq|<br><br>Ÿ‚Ì•KE‹Z”­“®‚Ü‚Å $nokori_time_mes|;
 		}
 		$mes .= qq|<br><form method="$method" action="$script">|;
 		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
