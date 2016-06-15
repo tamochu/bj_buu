@@ -3,7 +3,8 @@ my $this_file = "$userdir/$id/super.cgi";
 # ‰p—Y
 #=================================================
 # —â‹pŠúŠÔ
-$cooldown_time = 6 * 3600;
+$coolhour = 6;
+$cooldown_time = 60;#$coolhour * 3600;#6 * 3600;
 # ƒgƒŠƒK[
 @triggers = (
 #	[0]No	[1]–¼‘O			[2]type			[3]”{—¦	[4]‘I‘ğ‰Â”\	[5]”­“®—¦(%)
@@ -219,10 +220,12 @@ sub regist_mes {
 	$tm = qq|y•KE‹Zz|;
 	my $attack = &get_attack;
 	my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack;
-	&count_check($a_max_count, $a_count, $a_last_attack);
-	$attack = &get_attack;
+	my $is_count = &count_check($a_max_count, $a_count, $a_last_attack);
+	$attack = &get_attack;# HHH
 	if ($attack eq '' || $force) {
-		$tm .= qq|<br><select name="trigger" class="menu1">|;
+		$tm .= qq|<form method="$method" action="$script">|;
+
+		$tm .= qq|<select name="trigger" class="menu1">|;
 		for my $i (0..$#triggers) {
 			next if !$triggers[$i][4];
 			$tm .= qq|<option value="$i">$triggers[$i][1]</option>|;
@@ -258,15 +261,50 @@ sub regist_mes {
 		$tm .= qq|</select>|;
 		
 		$tm .= qq|<br><input type="text" name="voice" class="text_box_b"/>|;
-		$tm .= qq|<br><input type="checkbox" name="random" value="1"/>“K“–|;
+		$tm .= qq|<br><br><input type="checkbox" name="random" value="1"/>“K“–|;
+		$tm .= qq|<input type="hidden" name="regist_attack"/>|;
+		$tm .= qq|<input type="hidden" name="mode" value="regist_attack">|;
+		$tm .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$tm .= qq|<input type="submit" value="•KE‹Z‚ğİ’è‚·‚é" class="button1"></form>|;
+
 	} else {
-		my ($year, $trigger, $timing, $demerit, $max_count, $effect, $voice, $random) = split /<>/, $attack;
-		$tm .= qq|<br>$triggers[$trigger][1]|;
-		$tm .= qq|<br>$timings[$timing][1]|;
-		$tm .= qq|<br>$demerits[$demerit][1]|;
-		$tm .= qq|<br>$max_counts[$max_count][1]‰ñ|;
-		$tm .= qq|<br>$effects[$effect][1]|;
-		$tm .= qq|<br>ƒZƒŠƒtu$voicev|;
+		my ($year, $trigger, $timing, $demerit, $max_count, $effect, $voice, $random, $last_attack) = split /<>/, $attack;
+		unless ($is_count) {
+	#		my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack_set;
+	
+			unless ($is_mobile) {
+				$tm .= qq|<table class="table1" cellpadding="3">|;
+				$tm .= qq|<tr><th>s“®</th><td>$triggers[$trigger][1]</td></tr>|;
+				$tm .= qq|<tr><th>ğŒ</th><td>$timings[$timing][1]</td></tr>|;
+				$tm .= qq|<tr><th>ƒfƒƒŠƒbƒg</th><td>$demerits[$demerit][1]</td></tr>|;
+				$tm .= qq|<tr><th>‰ñ”</th><td>$max_counts[$max_count][1]‰ñ</td></tr>|;
+				$tm .= qq|<tr><th>Œø‰Ê</th><td>$effects[$effect][1]</td></tr>|;
+				$tm .= qq|<tr><th>¾ØÌ</th><td>u$voicev</td></tr>|;
+				$tm .= qq|</table>|;
+			}
+			else {
+				$tm .= qq|<br>$triggers[$trigger][1]|;
+				$tm .= qq|<br>$timings[$timing][1]|;
+				$tm .= qq|<br>$demerits[$demerit][1]|;
+				$tm .= qq|<br>$max_counts[$max_count][1]‰ñ|;
+				$tm .= qq|<br>$effects[$effect][1]|;
+				$tm .= qq|<br>ƒZƒŠƒtu$voicev|;
+			}
+
+#			$tm .= qq|<br>Ÿ‚Ì•KE‹Z”­“®‚Ü‚Å <font color="#FF0000"><b>‚n‚jI</b></font>|;
+
+			$tm .= qq|<br><form method="$method" action="$script">|;
+			$tm .= qq|<input type="hidden" name="mode" value="use_attack">|;
+			$tm .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			$tm .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
+			$tm .= qq|<input type="submit" value="•KE‹Z‚ğg—p‚·‚é" class="button1"></form>|;
+		}
+		else {
+			my $nokori_time = ($last_attack + $cooldown_time) - $time;
+			my $nokori_time_mes = '';
+			$nokori_time_mes = sprintf("–ñ<b>%d</b><b>%02d</b>•ªŒã", $nokori_time / 3600, $nokori_time % 3600 / 60);
+			$tm .= qq|<br>•KE‹Z‚ÌÄİ’è‚Ü‚Å $nokori_time_mes|;
+		}
 	}
 
 	return $tm;
@@ -404,6 +442,29 @@ sub del_attack {
 	}
 }
 #=================================================
+# •KE‹Z‰ğœ
+#=================================================
+sub cancel_attack {
+	if (-f "$this_file") {
+		@lines = ();
+		open my $fh, "+< $this_file" or &error("$this_file‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
+		eval { flock $fh, 2; };
+		while (my $line = <$fh>) {
+			my ($year, $trigger, $timing, $demerit, $max_count, $effect, $voice, $count, $last_attack) = split /<>/, $line;
+			if ($year eq $w{year}) {
+				$count++;
+				push @lines, "$year<>$trigger<>$timing<>$demerit<>0<>$effect<>$voice<>$count<>$time<>\n";
+			} else {
+				push @lines, $line;
+			}
+		}
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh @lines;
+		close $fh;
+	}
+}
+#=================================================
 # •KE‹Zg—p
 #=================================================
 sub use_count_up {
@@ -457,7 +518,7 @@ sub super_attack {
 	}
 	my ($year, $trigger, $timing, $demerit, $max_count, $effect, $voice, $count, $last_attack) = split /<>/, $attack;
 	if ($key eq 'luxury') {
-		&use_count_up;
+		&cancel_attack;
 	}
 	if ($key ne $triggers[$trigger][2] || rand(100) > $triggers[$trigger][5]) {
 		return;

@@ -171,13 +171,24 @@ sub tp_1 {
 				$m{pet} = 0;
 			}
 		}
-	} elsif ($in{mode} eq 'use_attack' && $w{world} eq $#world_states-4) {
+	} elsif ($in{mode} eq 'use_attack' && $w{world} eq $#world_states-4 && $m{country}) {
 		require './lib/fate.cgi';
 		if ($in{luxury}) {
 			&super_attack('luxury');
+			$mes .= "•KE‹Z‚Ìİ’è‚ğ‰ğœ‚µ‚Ü‚µ‚½<br>Äİ’è‚Í $coolhour ŠÔŒã‚É‚Å‚«‚Ü‚·";
 		} else {
 			&super_attack('myroom');
 		}
+		&refresh;
+		&n_menu;
+	} elsif ($in{mode} eq 'regist_attack' && $w{world} eq $#world_states-4 && $m{country}) {
+		if ($in{voice}) {
+			require './lib/fate.cgi';
+			if (&regist_attack($in{trigger}, $in{timing}, $in{demerit}, $in{max_count}, $in{effect}, $in{voice}, $in{random})) {
+				$mes .= '•KE‹Z‚ğİ’è‚µ‚Ü‚µ‚½B';
+			}
+		}
+
 		&refresh;
 		&n_menu;
 	}
@@ -204,7 +215,7 @@ sub my_status_mobile {
 	my $sub_ag  = '';
 	if ($m{wea}) {
 		my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
-		$mes .= qq|<hr>y•Šíî•ñz<br><ul>|;
+		$mes .= qq|y•Šíî•ñz<br><ul>|;
 		$mes .= qq|<li>–¼‘O:$wname|;
 		$mes .= qq|<li>‘®«:$weas[$m{wea}][2]|;
 		$mes .= qq|<li>‹­‚³:$weas[$m{wea}][3]|;
@@ -214,7 +225,7 @@ sub my_status_mobile {
 		elsif ($weas[$m{wea}][2] =~ /•—|‰Š|—‹/)    { $sub_mat = "+$weas[$m{wea}][3]"; $sub_ag = "-$weas[$m{wea}][5]"; }
 	}
 	if ($m{gua}) {
-		$mes .= qq|<hr>y–h‹ïî•ñz<br><ul>|;
+		$mes .= qq|y–h‹ïî•ñz<br><ul>|;
 		$mes .= qq|<li>–¼‘O:$guas[$m{gua}][1]|;
 		$mes .= qq|<li>‘®«:$guas[$m{gua}][2]|;
 		$mes .= qq|<li>‹­‚³:$guas[$m{gua}][3]|;
@@ -241,21 +252,18 @@ sub my_status_mobile {
 		$mes .= qq|<hr>|;
 	}
 
-	if ($w{world} eq $#world_states-4) {
+	if ($w{world} eq $#world_states-4 && $m{country}) {
 		require './lib/fate.cgi';
-		my $attack_set = &get_attack;
-		if ($attack_set ne '') {
+#		my $attack_set = &get_attack;
+#		if ($attack_set ne '') {
 			$mes .= &regist_mes(0);
-			my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack_set;
-			my $nokori_time = ($a_last_attack + $cooldown_time) - $time;
-			my $nokori_time_mes = sprintf("–ñ<b>%d</b><b>%02d</b>•ªŒã", $nokori_time / 3600, $nokori_time % 3600 / 60);
-			$mes .= qq|<br><br>Ÿ‚Ì•KE‹Z”­“®‚Ü‚Å $nokori_time_mes|;
-		}
-		$mes .= qq|<br><form method="$method" action="$script">|;
-		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
-		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
-		$mes .= qq|<input type="submit" value="•KE‹Z‚ğg—p‚·‚é" class="button1"></form>|;
+#		}
+#		$mes .= qq|<br><form method="$method" action="$script">|;
+#		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
+#		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+#		$mes .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
+#		$mes .= qq|<input type="submit" value="•KE‹Z‚ğg—p‚·‚é" class="button1"></form>|;
+		$mes .= '<hr>';
 	}
 	my $m_st = &m_st;
 	$mes .=<<"EOM";
@@ -303,13 +311,14 @@ sub my_status_pc {
 	for my $m_skill (split /,/, $m{skills}) {
 		$skill_info .= qq|<tr><td align="center">$skills[$m_skill][2]</td><td>$skills[$m_skill][1]</td><td align="right">$skills[$m_skill][3]<br></td></tr>|;
 	}
-	
+
+	$mes .= '<hr>';
 	my $sub_at  = '';
 	my $sub_mat = '';
 	my $sub_ah  = '';
 	if ($m{wea}) {
 		my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
-		$mes .= qq|<hr>y•Šíî•ñz<br>|;
+		$mes .= qq|y•Šíî•ñz<br>|;
 		$mes .= qq|<table class="table1" cellpadding="3"><tr>|;
 		$mes .= qq|<th>–¼‘O</th><td>$wname</td>|;
 		$mes .= qq|<th>‘®«</th><td>$weas[$m{wea}][2]</td>|;
@@ -321,7 +330,7 @@ sub my_status_pc {
 		elsif ($weas[$m{wea}][2] =~ /•—|‰Š|—‹/)    { $sub_mat = "£$weas[$m{wea}][3]"; $sub_ag = "¥$weas[$m{wea}][5]"; }
 	}
 	if ($m{gua}) {
-		$mes .= qq|<hr>y–h‹ïî•ñz<br>|;
+		$mes .= qq|y–h‹ïî•ñz<br>|;
 		$mes .= qq|<table class="table1" cellpadding="3"><tr>|;
 		$mes .= qq|<th>–¼‘O</th><td>$guas[$m{gua}][1]</td>|;
 		$mes .= qq|<th>‘®«</th><td>$guas[$m{gua}][2]</td>|;
@@ -351,21 +360,18 @@ sub my_status_pc {
 		$mes .= qq|<hr size="1">|;
 	}
 
-	if ($w{world} eq $#world_states-4) {
+	if ($w{world} eq $#world_states-4 && $m{country}) {
 		require './lib/fate.cgi';
-		my $attack_set = &get_attack;
-		if ($attack_set ne '') {
+#		my $attack_set = &get_attack;
+#		if ($attack_set ne '') {
 			$mes .= &regist_mes(0);
-			my ($a_year, $a_trigger, $a_timing, $a_demerit, $a_max_count, $a_effect, $a_voice, $a_count, $a_last_attack) = split /<>/, $attack_set;
-			my $nokori_time = ($a_last_attack + $cooldown_time) - $time;
-			my $nokori_time_mes = sprintf("–ñ<b>%d</b><b>%02d</b>•ªŒã", $nokori_time / 3600, $nokori_time % 3600 / 60);
-			$mes .= qq|<br><br>Ÿ‚Ì•KE‹Z”­“®‚Ü‚Å $nokori_time_mes|;
-		}
-		$mes .= qq|<br><form method="$method" action="$script">|;
-		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
-		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
-		$mes .= qq|<input type="submit" value="•KE‹Z‚ğg—p‚·‚é" class="button1"></form>|;
+#		}
+#		$mes .= qq|<br><form method="$method" action="$script">|;
+#		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
+#		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+#		$mes .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
+#		$mes .= qq|<input type="submit" value="•KE‹Z‚ğg—p‚·‚é" class="button1"></form>|;
+		$mes .= '<hr size="1">';
 	}
 	
 	my $m_st = &m_st;

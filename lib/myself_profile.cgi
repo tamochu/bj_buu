@@ -30,10 +30,10 @@ sub begin {
 		my $boch_pet = $m{sex} eq '1' ? '”]“à‰Å' : 'Ï½º¯Ä·¬×';
 		$mes .= qq|<hr>$boch_pet<br><input type="text" name="boch_pet" value="$m{boch_pet}" class="text_box_b"><br>|; 
 	}
-	if ($w{world} eq $#world_states-4) {
-		require './lib/fate.cgi';
-		$mes .= &regist_mes(0);
-	}
+#	if ($w{world} eq $#world_states-4) {
+#		require './lib/fate.cgi';
+#		$mes .= &regist_mes(0);
+#	}
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="•ÏX‚·‚é" class="button1"></p></form>|;
 	&n_menu;
@@ -90,14 +90,14 @@ sub tp_1 {
 			$m{boch_pet} = $in{boch_pet};
 			$mes .= $m{sex} eq '1' ? '”]“à‰Å‚É–¼‘O‚ğ•t‚¯‚Ü‚µ‚½<br>':'Ï½º¯Ä·¬×‚É–¼‘O‚ğ•t‚¯‚Ü‚µ‚½<br>';
 		}
-		if ($w{world} eq $#world_states-4) {
-			if ($in{voice}) {
-				require './lib/fate.cgi';
-				if (&regist_attack($in{trigger}, $in{timing}, $in{demerit}, $in{max_count}, $in{effect}, $in{voice}, $in{random})) {
-					$mes .= '•KE‹Z‚ğİ’è‚µ‚Ü‚µ‚½B';
-				}
-			}
-		}
+#		if ($w{world} eq $#world_states-4) {
+#			if ($in{voice}) {
+#				require './lib/fate.cgi';
+#				if (&regist_attack($in{trigger}, $in{timing}, $in{demerit}, $in{max_count}, $in{effect}, $in{voice}, $in{random})) {
+#					$mes .= '•KE‹Z‚ğİ’è‚µ‚Ü‚µ‚½B';
+#				}
+#			}
+#		}
 	}
 	else {
 		$mes .= '‚â‚ß‚Ü‚µ‚½<br>';
