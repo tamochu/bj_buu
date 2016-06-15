@@ -189,8 +189,7 @@ sub tp_1 {
 			}
 		}
 
-		&refresh;
-		&n_menu;
+		&begin;
 	}
 	else {
 		&b_menu(@menus);
@@ -254,15 +253,7 @@ sub my_status_mobile {
 
 	if ($w{world} eq $#world_states-4 && $m{country}) {
 		require './lib/fate.cgi';
-#		my $attack_set = &get_attack;
-#		if ($attack_set ne '') {
-			$mes .= &regist_mes(0);
-#		}
-#		$mes .= qq|<br><form method="$method" action="$script">|;
-#		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
-#		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-#		$mes .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
-#		$mes .= qq|<input type="submit" value="•KŽE‹Z‚ðŽg—p‚·‚é" class="button1"></form>|;
+		$mes .= &regist_mes(0);
 		$mes .= '<hr>';
 	}
 	my $m_st = &m_st;
@@ -362,15 +353,7 @@ sub my_status_pc {
 
 	if ($w{world} eq $#world_states-4 && $m{country}) {
 		require './lib/fate.cgi';
-#		my $attack_set = &get_attack;
-#		if ($attack_set ne '') {
-			$mes .= &regist_mes(0);
-#		}
-#		$mes .= qq|<br><form method="$method" action="$script">|;
-#		$mes .= qq|<input type="hidden" name="mode" value="use_attack">|;
-#		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-#		$mes .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
-#		$mes .= qq|<input type="submit" value="•KŽE‹Z‚ðŽg—p‚·‚é" class="button1"></form>|;
+		$mes .= &regist_mes(0);
 		$mes .= '<hr size="1">';
 	}
 	

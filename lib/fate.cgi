@@ -4,7 +4,7 @@ my $this_file = "$userdir/$id/super.cgi";
 #=================================================
 # 冷却期間
 $coolhour = 6;
-$cooldown_time = 60;#$coolhour * 3600;#6 * 3600;
+$cooldown_time = $coolhour * 3600;
 # トリガー
 @triggers = (
 #	[0]No	[1]名前			[2]type			[3]倍率	[4]選択可能	[5]発動率(%)
@@ -540,7 +540,7 @@ sub super_attack {
 							* (1 + ($cs{capacity}[$m{country}] - $mem) * 0.1));
 	$e_mes = $effects[$effect][4];
 	&use_count_up;
-	&mes_and_world_news("必殺技を開放しました。<br><b>$m{name}「$voice」</b><br>$e_mes", 1);
+	&mes_and_world_news("必殺技を開放し、$e_mes。<br><b>$m{name}「$voice」</b>", 1);
 }
 #=================================================
 # 修正後所属人数

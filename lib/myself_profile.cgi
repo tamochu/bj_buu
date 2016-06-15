@@ -90,14 +90,6 @@ sub tp_1 {
 			$m{boch_pet} = $in{boch_pet};
 			$mes .= $m{sex} eq '1' ? '脳内嫁に名前を付けました<br>':'ﾏｽｺｯﾄｷｬﾗに名前を付けました<br>';
 		}
-#		if ($w{world} eq $#world_states-4) {
-#			if ($in{voice}) {
-#				require './lib/fate.cgi';
-#				if (&regist_attack($in{trigger}, $in{timing}, $in{demerit}, $in{max_count}, $in{effect}, $in{voice}, $in{random})) {
-#					$mes .= '必殺技を設定しました。';
-#				}
-#			}
-#		}
 	}
 	else {
 		$mes .= 'やめました<br>';
