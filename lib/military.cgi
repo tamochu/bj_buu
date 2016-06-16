@@ -96,7 +96,7 @@ sub tp_600 {
 		print $fh "$time<>$m{name}<>\n";
 		close $fh;
 
-		&write_yran("contr_mil_$GWT", 1, 1);
+#		&write_yran("contr_mil_$GWT", 1, 1);
 		&wait;
 	}
 	elsif ($cmd eq '2') {
@@ -106,7 +106,7 @@ sub tp_600 {
 		$m{value} = 'ambush';
 		$m{tp} += 10;
 
-		&write_yran("contr_mil_$GWT", 1, 1);
+#		&write_yran("contr_mil_$GWT", 1, 1);
 
 		&wait;
 	}
@@ -239,7 +239,7 @@ sub exe1 {
 			$m{renzoku_c} = 1;
 		}
 
-		&write_yran("contr_mil_$GWT", 1, 1);
+#		&write_yran("contr_mil_$GWT", 1, 1);
 
 		&wait;
 	}
@@ -830,7 +830,8 @@ sub tp_1000 {
 	&daihyo_c_up('mil_c'); # ë„ï\ènó˚ìx
 	if ( $w{world} eq $#world_states) {
 		require './lib/vs_npc.cgi';
-		if (rand(12) < $npc_mil || ($cs{strong}[$w{country}] < 50000 && rand(4) < $npc_mil) ){ 		
+#		if (rand(12) < $npc_mil || ($cs{strong}[$w{country}] < 50000 && rand(4) < $npc_mil) ){ 		
+		if (rand(12) < 1 || ($cs{strong}[$w{country}] < 50000 && rand(4) < 1) ) {
 		   &npc_military;
 		}
 	}

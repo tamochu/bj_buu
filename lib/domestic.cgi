@@ -77,7 +77,7 @@ sub exe1 {
 		 :               $GWT
 		 ;
 
-	&write_yran("contr_dom_$GWT", 1, 1);
+#	&write_yran("contr_dom_$GWT", 1, 1);
 
 	$m{tp} += 10;
 	$m{turn} = $cmd;
@@ -104,7 +104,7 @@ sub tp_400 {
 		}
 		$mes .= "$_[0]Œ‹‰Ê‚Í$GWT•ªŒã<br>";
 
-		&write_yran("contr_dom_$GWT", 1, 1);
+#		&write_yran("contr_dom_$GWT", 1, 1);
 
 		&wait;
 	}

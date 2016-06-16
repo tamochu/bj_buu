@@ -199,7 +199,7 @@ sub tp_100 {
 			$m{renzoku_c} = 1;
 		}
 
-		&write_yran("contr_war_$GWT", 1, 1);
+#		&write_yran("contr_war_$GWT", 1, 1);
 
 		&wait;
 		&write_cs;
