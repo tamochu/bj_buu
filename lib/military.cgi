@@ -96,7 +96,6 @@ sub tp_600 {
 		print $fh "$time<>$m{name}<>\n";
 		close $fh;
 
-#		&write_yran("contr_mil_$GWT", 1, 1);
 		&wait;
 	}
 	elsif ($cmd eq '2') {
@@ -105,8 +104,6 @@ sub tp_600 {
 		$mes .= "Ÿ‚És“®‚Å‚«‚é‚Ì‚Í$GWT•ªŒã‚Å‚·<br>";
 		$m{value} = 'ambush';
 		$m{tp} += 10;
-
-#		&write_yran("contr_mil_$GWT", 1, 1);
 
 		&wait;
 	}
@@ -238,8 +235,6 @@ sub exe1 {
 			$m{renzoku} = $y{country};
 			$m{renzoku_c} = 1;
 		}
-
-#		&write_yran("contr_mil_$GWT", 1, 1);
 
 		&wait;
 	}
