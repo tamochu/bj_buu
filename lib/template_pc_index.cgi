@@ -64,12 +64,13 @@ form { margin: 0; padding: 7px; }
 			$login_box_html
 		</div>
 		<div align="left" style="padding: 0.2em 2em;">
+			<p><a href="new_entry.cgi" class="link1">[> 新規登録</a></p>
+			<p class="text_small">登録前に説明書必読!</p>
 			<p><a href="readme.html" class="link1">[> Readme　</a></p>
 			<p><a href="http://www13.atwiki.jp/blindjustice/" class="link1">[> 説明書　</a></p>
 			<p><a href="http://www43.atwiki.jp/bjkurobutasaba/" class="link1">[> wiki　</a></p>
 			<p class="text_small">質問する前に必ず読むこと!</p>
-			<p><a href="new_entry.cgi" class="link1">[> 新規登録</a></p>
-			<p class="text_small">登録前に説明書必読!</p>
+			<p><a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/imgboard.cgi" class="link1">[> 画像掲示板</a></p>
 		</div>
 		
 		<hr style="border: 1px dashed #CCC;">

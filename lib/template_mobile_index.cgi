@@ -45,6 +45,7 @@ sub index {
 <li><a href="pop_ranking_middle.cgi">l‹C×İ·İ¸Ş(‹â)</a>
 <li><a href="library.cgi">}‘ŠÙ</a>
 <li><a href="shop_big_data.cgi">‘Šê</a>
+<li><a href="../upbbs/imgboard.cgi">‰æ‘œŒf¦”Â</a>
 
 </ol>
 <hr>

@@ -31,6 +31,7 @@ sub index {
 <li><a href="http://www13.atwiki.jp/blindjustice/">à–¾‘</a>
 <li><a href="http://www43.atwiki.jp/bjkurobutasaba/">Wiki</a>
 <li><a href="new_entry.cgi">V‹K“o˜^</a>
+<li><a href="../upbbs/imgboard.cgi">‰æ‘œŒf¦”Â</a>
 <li><a href="players.cgi">ÌßÚ²Ô°ˆê——</a>
 <li><a href="legend.cgi">—I‹v‚ÌÎ”è</a>
 <li><a href="sales_ranking.cgi">¤l×İ·İ¸Ş</a>
