@@ -23,13 +23,11 @@ if ($config_test) {
 	};
 }
 
-
 #================================================
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
 	# 拙速以外の祭り情勢開始時の既存国すべての君主と君主ファイルを初期化
-	# 開始時の方が全体的に軽いので分散する意味で終了時ではなくここで
 	if ($w{year} % 40 != 10) {
 		for my $i (0 .. $w{country}) {
 			$cs{old_ceo}[$i] = $cs{ceo}[$i] if $w{year} % 40 != 30; # 紅白・三国志のみ $cs{old_ceo} に退避している
@@ -176,22 +174,30 @@ sub end_kouhaku_sangokusi {
 			&write_user;
 		}
 		else { # 対象が他キャラならば
-			open my $fh, "+< $userdir/$pid/user.cgi" or &error("$userdir/$pid/user.cgi ﾌｧｲﾙが開けません");
-			eval { flock $fh, 2; };
-			my $line = <$fh>;
-			my $line_info = <$fh>;
+			my @data = (
+				['country', 0],
+				['y_country', 0],
+				['vote', ''],
+			);
 
-			$line = &create_you_data(\%you_datas, $line, 0, 1); # 代表熟練度ﾘｽﾄｱ
-			# ﾈﾊﾞﾗﾝに飛ばすついでに敗戦国にいたら負け称号付与
-			$line = &add_you_penalty_data(\%you_datas, $line) unless $c1 eq $you_datas{country} || $c2 eq $you_datas{country};
-			if (index($line, "<>y_country;") >= 0) { $line =~ s/<>(y_country;).*?<>/<>${1}0<>/; }
-			else { $line = "y_country;<>" . $line; }
+			unless ($c1 eq $you_datas{country} || $c2 eq $you_datas{country}) {
+				my @data2 = (
+					['shogo', "$cs{name}[$you_datas{country}](笑)"],
+					['trick_time', $time + 3600 * 24 * 3],
+					['shogo_t', "$cs{name}[$you_datas{country}](笑)"]
+				);
+				push @data, @data2;
+			}
 
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh $line;
-			print $fh $line_info;
-			close $fh;
+			for my $k (qw/war dom pro mil/) {
+				my @data3 = (
+					["${k}_c", $you_datas{"${k}_c_t"}],
+					["${k}_c_t", 0]
+				);
+				push @data, @data3;
+			}
+
+			&regist_you_array($you_datas{name}, @data);
 		}
 	}
 	closedir $dh;
@@ -314,16 +320,11 @@ sub run_konran {
 				&write_user;
 			}
 			else { # 対象が他キャラならば
-				open my $fh, "+< $userdir/$pid/user.cgi" or &error("$userdir/$pid/user.cgi ﾌｧｲﾙが開けません");
-				eval { flock $fh, 2; };
-				my $line = <$fh>;
-				my $line_info = <$fh>;	
-				$line = &create_you_data(\%you_datas, $line, 0);
-				seek  $fh, 0, 0;
-				truncate $fh, 0;
-				print $fh $line;
-				print $fh $line_info;
-				close $fh;
+				my @data = (
+					['country', 0],
+					['vote', '']
+				);
+			&regist_you_array($you_datas{name}, @data);
 			}
 
 			# 統一国にいた人に卵
@@ -492,30 +493,11 @@ sub wt_c_reset {
 		$$m{wt_c} = 0;
 		&write_user;
 	} else {
-		my $y_id = unpack 'H*', $$you_datas{name};
-		open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
-		eval { flock $fh, 2; };
-		my $line = <$fh>;
-		my $line_info = <$fh>;
-
-		if(index($line, "<>wt_c_latest;") >= 0){
-			$line =~ s/<>(wt_c_latest;).*?<>/<>$1$$you_datas{wt_c}<>/;
-		}else{
-			$line = "wt_c_latest;$$you_datas{wt_c}<>" . $line;
-		}
-
-		if(index($line, "<>wt_c;") >= 0){
-			$line =~ s/<>(wt_c;).*?<>/<>${1}0<>/;
-		}else{
-			$line = "wt_c;0<>" . $line;
-		}
-
-		seek  $fh, 0, 0;
-		truncate $fh, 0;
-		print $fh $line;
-		print $fh $line_info;
-
-		close $fh;
+		my @data = (
+			['wt_c_latest', $$you_datas{wt_c}],
+			['wt_c', 0]
+		);
+		&regist_you_array($$you_datas{name}, @data);
 	}
 }
 
@@ -556,13 +538,7 @@ sub player_shuffle {
 			# member.cgiを初期化しているのでシャッフル前の国に再度飛ばさないとデータの不一致が起きる
 			&move_player2($you_datas{name}, $you_datas{country});
 			if ($you_datas{country}) { # 仕官していたなら
-#				$country_num{$you_datas{country}}++;
-#				next;
-				for my $c (@countries) {
-					if ($c eq $you_datas{country}) {
-						$country_num{$c}++;
-					}
-				}
+				$country_num{$you_datas{country}}++;
 			}
 			next;
 #			my $c_find = 0;
@@ -618,7 +594,7 @@ sub player_shuffle {
 		my $pid = unpack 'H*', $nname;
 		my %you_datas = &get_you_datas($pid, 1);
 
-		&move_player2($nname, $nc);
+		&move_player2($you_datas{name}, $nc);
 		# 対象が自キャラならば
 		if ($you_datas{name} eq $m{name}) {
 			$m{country} = $nc; # 所属国の書き換え
@@ -635,16 +611,22 @@ sub player_shuffle {
 		}
 		# 対象が他キャラならば
 		else {
-			open my $fh, "+< $userdir/$pid/user.cgi" or &error("$userdir/$pid/user.cgi ﾌｧｲﾙが開けません");
-			eval { flock $fh, 2; };
-			my $line = <$fh>;
-			my $line_info = <$fh>;
-			$line = &create_you_data(\%you_datas, $line, $nc, 0);
-			seek  $fh, 0, 0;
-			truncate $fh, 0;
-			print $fh $line;
-			print $fh $line_info;
-			close $fh;
+			my @data = (
+				['country', $nc],
+				['vote', '']
+			);
+
+			# 混乱情勢でなければ代表熟練度の書き換え
+			if ($w{world} != $#world_states-1) {
+				for my $k (qw/war dom pro mil/) {
+					my @data2 = (
+						["${k}_c_t", $you_datas{"${k}_c"}],
+						["${k}_c", 0]
+					);
+					push @data, @data2;
+				}
+			}
+			&regist_you_array($you_datas{name}, @data);
 		}
 	}
 	&write_cs;
@@ -663,6 +645,7 @@ sub move_player2 {
 	++$cs{member}[$to_country];
 }
 
+=pod
 #================================================
 # 一括 regist_you_data する時に最低限必要なデータを作成し返す
 # 第１引数は get_you_datas の戻り値を示すポインタ
@@ -717,7 +700,7 @@ sub add_you_penalty_data {
 
 	return $user_line;
 }
-
+=cut
 #================================================
 # 1位 (int(国数/2)+1)位 国数位 の国力順位を配列で返す
 # 拙速用だけどなんか使い道あるかも？
