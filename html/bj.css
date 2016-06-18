@@ -100,9 +100,6 @@ a img     { border: 0; }
 	background: #333;
 }
 
-
-
-
 /*--------------------------------------
  Ã°ÌÞÙ
 --------------------------------------*/
@@ -152,6 +149,27 @@ td,th {
 }
 tr.stripe1 td { background-color: #222; }
 tr.stripe2 td { background-color: #C00; }
+.blog_letter {
+	border: 2px solid #999;
+	border-collapse: collapse;
+	border-spacing: 0;
+	width:100%;
+}
+.blog_letter th {
+	border: 2px solid #999;
+	background: #336;
+	white-space: nowrap;
+}
+.blog_letter td {
+	border: 1px solid #999;
+	background: #333;
+	white-space: normal;
+	word-break: break-all;
+}
+p.img img {
+	width: 100%;
+	vertical-align: middle;
+}
 /*--------------------------------------
  ÎÞÀÝ
 --------------------------------------*/

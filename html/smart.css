@@ -24,18 +24,6 @@
 	overflow-x:scroll;
 }
 
-.table2 {
-	width:100%;
-	overflow:scroll;
-}
-.table2 th {
-	border: 2px solid #999;
-	background: #336;
-	white-space: nowrap;
-}
-.table2 td {
-	white-space: nowrap;
-}
 
 .cmd_form {
 	display:inline;
