@@ -28,8 +28,13 @@ sub get_login_member {
 		next if $time > $ltime + $login_min * 60;
 		next if ++$sames{$name} > 1;
 		
-		if ($is_mobile || $is_smart) {
+		if ($is_mobile) {
 			$list .= qq|<font color="$cs{color}[$country]">$name</font>,|;
+		}
+		elsif ($is_smart) {
+			my $yid = unpack 'H*', $name;
+			$list .= qq|<font color="$cs{color}[$country]">$name</font>,|;
+			$cs_c{"${country}_member"} .= qq|<a href="profile.cgi?id=$yid&country=$country" class="clickable_name"><font color="$cs{color}[$country]">$name</font></a>,|;
 		}
 		else {
 			my $yid = unpack 'H*', $name;
