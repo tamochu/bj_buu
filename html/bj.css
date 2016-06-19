@@ -166,6 +166,23 @@ tr.stripe2 td { background-color: #C00; }
 	white-space: normal;
 	word-break: break-all;
 }
+.table3 {
+	border: 2px solid #999;
+	border-collapse: collapse;
+	border-spacing: 0;
+	width:100%;
+}
+.table3 th {
+	border: 2px solid #999;
+	background: #336;
+	white-space: nowrap;
+}
+.table3 td {
+	border: 1px solid #999;
+	background: #333;
+	white-space: normal;
+	word-break: break-all;
+}
 p.img img {
 	width: 100%;
 	vertical-align: middle;
