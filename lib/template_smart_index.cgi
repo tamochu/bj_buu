@@ -13,11 +13,61 @@ sub index {
 	my($cook_name, $cook_pass, $cook_is_cookie) = &get_cookie;
 	my $checked = $cook_is_cookie ? 'checked' : '';
 
+	my $login_box_html = '';
+	if ($cs_c{all} >= $max_login) {
+		$login_box_html .= qq|<br><p style="font-size: 16px; color: #FF0; font-weight: bold;">ﾛｸﾞｲﾝ規制中</p><p>ﾛｸﾞｲﾝ人数が減るまでしばらくお待ちください。携帯からのﾛｸﾞｲﾝは可能\です。</p><br>|;
+	}
+	else {
+		$login_box_html .= qq|<form method="$method" action="login.cgi" style="margin: 0 auto; padding: 0;"><table class="table1" style="margin:0 auto;height:68px;">|;
+		$login_box_html .= qq|<tr><th style="font-family: monospace;">ﾌﾟﾚｲﾔｰ名:</th><td><input type="text" name="login_name" value="$cook_name" class="text_box1"></td><td rowspan="3"><input type="submit" value="ログイン" class="button_login"></td></tr>|;
+		$login_box_html .= qq|<tr><th style="font-family: monospace;">ﾊﾟｽﾜｰﾄﾞ:</th><td><input type="password" name="pass" value="$cook_pass" class="text_box1"></td></tr>|;
+		$login_box_html .= qq|<tr><td colspan="2" style="text-align:center;"><input type="checkbox" id="cookie" name="is_cookie" value="1" $checked><label for="cookie">次回から入力省略</label></th></tr>|;
+#		$login_box_html .= qq|<tr><td colspan="2" style="font-family: monospace;"><input type="submit" value="ログイン" class="button_login"></th></tr>|;
+		$login_box_html .= qq|</table></form>|;
+	}
+
+	my @navigator = (
+		['Readme', 'readme.html'],
+		['説明書', 'http://www13.atwiki.jp/blindjustice/'],
+		['Wiki', 'http://www43.atwiki.jp/bjkurobutasaba/'],
+		['新規登録', 'new_entry.cgi'],
+		['ﾌﾟﾚｲﾔｰ一覧', 'players.cgi'],
+		['悠久の石碑', 'legend.cgi'],
+		['商人ﾗﾝｷﾝｸﾞ', 'sales_ranking.cgi'],
+		['ｺﾝﾃｽﾄ会場', 'contest.cgi'],
+	);
+
+	my $navi_html = '<div class="navi">';
+	for $i (0 .. $#navigator) {
+		$navi_html .= qq|<form action="$navigator[$i][1]">\n<input type="submit" value="$navigator[$i][0]" class="navi_button">\n</form>|;
+		$navi_html .= qq|<br class="smart_br">| if ($i+1) % 2 == 0;
+		$navi_html .= qq|<br class="tablet_br">| if ($i+1) % 4 == 0;
+	}
+	$navi_html .= '</div>';
+
 	$cs_c{all} ||= 0;
 	$cs_c{0}   ||= 0;
 
+	my @lines = &get_countries_mes();
+
+	my $country_html;
+	$country_html .= qq|ﾛｸﾞｲﾝ中 $cs_c{all}人 [<font color="$cs{color}[0]">$cs{name}[0]</font> $cs_c{0}人]<br>|;
+	$country_html .= qq|<table cellpadding="4" class="blog_letter">|; # blog_letter はそのうち table3 に
+	for my $i (1 .. $w{country}) {
+		my $c_count = defined $cs_c{$i} ? $cs_c{$i} : 0;
+		
+		my($country_mes, $country_mark) = split /<>/, $lines[$i];
+		$country_mark = 'non_mark.gif' if $country_mark eq '';
+		$country_html .= qq|<tr><td><img src="$icondir/$country_mark"></td>|;
+		$country_html .= qq|<td style="color: #333; background-color: $cs{color}[$i];width:100%;"><b>$cs{name}[$i]</b> $cs{ceo}[$i]<br>$country_mes</td></tr>\n|;
+		$country_html .= qq|<td colspan="2"">$c_count人:$cs_c{"${i}_member"}</td></tr>\n| if $cs_c{"${i}_member"};
+	}
+	$country_html .= qq|</table>|;
+
 	print <<"EOM";
-<p>Chromeのデータセーバーを無効にしないとアクセスできません</p>
+<p>
+Chromeのデータセーバーを無効にしないとアクセスできません
+</p>
 <form method="$method" action="login.cgi">
 <div>ﾌﾟﾚｲﾔｰ名:<input type="text" name="login_name" value="$cook_name"></div>
 <div>ﾊﾟｽﾜｰﾄﾞ:<input type="password" name="pass" value="$cook_pass"></div>
@@ -60,6 +110,18 @@ sub index {
 基本拘束時間 $GWT分<br>
 給与 $salary_hour時間毎<br>
 君主の任期 $reset_ceo_cycle_year年周期
+<hr>
+ここから下は改装中の見本<br>
+スマホ縦画面：<a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/img-box/img20160620044658.png">img20160620044658.png</a><br>
+スマホ横画面：<a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/img-box/img20160620044721.png">img20160620044721.png</a><br>
+↑みたくなってなかったらとりあえずリロードしたりブラウザの再起動<br>
+それでもダメなら使ってる端末とブラウザを nanamie に手紙で報告
+<hr>
+$login_box_html
+<hr>
+$navi_html
+<hr>
+$country_html
 <hr>
 EOM
 }
