@@ -16,10 +16,10 @@ use File::Path;
 
 if ($config_test) {
 	use constant FESTIVAL_COUNTRY_PROPERTY => {
-		'kouhaku' => [2, 1, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
-		'sangokusi' => [3, 1, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
-#		'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
-#		'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
+#		'kouhaku' => [2, 1, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
+#		'sangokusi' => [3, 1, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
+		'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
+		'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
 	};
 }
 
@@ -184,7 +184,7 @@ sub end_kouhaku_sangokusi {
 				my @data2 = (
 					['shogo', "$cs{name}[$you_datas{country}](笑)"],
 					['trick_time', $time + 3600 * 24 * 3],
-					['shogo_t', "$cs{name}[$you_datas{country}](笑)"]
+					['shogo_t', ''] # 称号固定はｱﾘﾖｼぐらい？
 				);
 				push @data, @data2;
 			}
@@ -324,7 +324,7 @@ sub run_konran {
 					['country', 0],
 					['vote', '']
 				);
-			&regist_you_array($you_datas{name}, @data);
+				&regist_you_array($you_datas{name}, @data);
 			}
 
 			# 統一国にいた人に卵
