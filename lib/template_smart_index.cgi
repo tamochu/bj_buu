@@ -26,6 +26,13 @@ sub index {
 		$login_box_html .= qq|</table></form>|;
 	}
 
+	my $entry_box_html = '<div class="entry_box_s">';
+		$entry_box_html .= qq|<form action="readme.html">\n<input type="submit" value="Readme" class="navi_button" style="">\n</form>|;
+		$entry_box_html .= qq|<form action="http://www13.atwiki.jp/blindjustice/.html">\n<input type="submit" value="説明書" class="navi_button" style="">\n</form>|;
+		$entry_box_html .= qq|<form action="http://www43.atwiki.jp/bjkurobutasaba/">\n<input type="submit" value="Wiki" class="navi_button" style="">\n</form>|;
+		$entry_box_html .= qq|<br><form action="new_entry.cgi" class="new_entry">\n<input type="submit" value="新規登録" class="navi_button" style="width:100% !important;">\n</form></div>|;
+
+
 	my @navigator = (
 		['Readme', 'readme.html'],
 		['説明書', 'http://www13.atwiki.jp/blindjustice/'],
@@ -35,13 +42,39 @@ sub index {
 		['悠久の石碑', 'legend.cgi'],
 		['商人ﾗﾝｷﾝｸﾞ', 'sales_ranking.cgi'],
 		['ｺﾝﾃｽﾄ会場', 'contest.cgi'],
+		['過去の栄光', 'news.cgi'],
+#		['HOME', "$home_m"], # ホームにホームボタン要らなくね？
+#		['ﾘｾｯﾄ処理', 'reset_player.cgi'], # 別枠
+		['廃人ﾗﾝｷﾝｸﾞ', 'player_ranking.cgi'],
+		['主力表\', 'main_player.cgi'],
+		['主力表\2', 'main_player2.cgi'],
+		['一年ﾗﾝｷﾝｸﾞ', 'year_player_ranking.cgi'],
+		['国別ﾗﾝｷﾝｸﾞ', 'year_player_ranking_country.cgi'],
+#		['人気ﾗﾝｷﾝｸﾞ(金)', 'pop_ranking_gold.cgi'], # データなし
+#		['人気ﾗﾝｷﾝｸﾞ(銀)', 'pop_ranking_middle.cgi'], # データなし
+		['図書館', 'library.cgi'],
+		['相場', 'shop_big_data.cgi'],
+		['画像掲示板', '../upbbs/imgboard.cgi'],
+#		['ｶﾀ~ﾉｱﾌﾟﾘ', 'CatasoApp-release-signed.apk'], # ファイルだからここじゃないとして、まずファイルがない
+#		['', ''],
 	);
 
 	my $navi_html = '<div class="navi">';
-	for $i (0 .. $#navigator) {
+	$navi_html .= qq|<form action="$navigator[0][1]">\n<input type="submit" value="$navigator[0][0]" class="navi_button">\n</form>|;
+	$navi_html .= qq|<form action="$navigator[1][1]">\n<input type="submit" value="$navigator[1][0]" class="navi_button">\n</form>|;
+	$navi_html .= qq|<form action="$navigator[2][1]">\n<input type="submit" value="$navigator[2][0]" class="navi_button">\n</form><br>|;
+	$navi_html .= qq|<form action="$navigator[3][1]" style="width:100% !important;">\n<input type="submit" value="$navigator[3][0]" class="navi_button" style="width:240px;">\n</form><br>|;
+	for $i (4 .. $#navigator) {
 		$navi_html .= qq|<form action="$navigator[$i][1]">\n<input type="submit" value="$navigator[$i][0]" class="navi_button">\n</form>|;
-		$navi_html .= qq|<br class="smart_br">| if ($i+1) % 2 == 0;
-		$navi_html .= qq|<br class="tablet_br">| if ($i+1) % 4 == 0;
+#		if ($i > 3) {
+		if ($i < $#navigator) {
+			$navi_html .= qq|<br class="smart_br">| if ($i-3) % 3 == 0;
+			$navi_html .= qq|<br class="tablet_br">| if ($i-3) % 5 == 0;
+		}
+#		}
+#		else {
+#			$navi_html .= qq|<br>| if $i > 1;
+#		}
 	}
 	$navi_html .= '</div>';
 
@@ -122,6 +155,16 @@ $login_box_html
 $navi_html
 <hr>
 $country_html
+<hr>
+定員[ $w{player}/$max_entry人 ]<br>
+ﾌﾟﾚｲﾔｰ保存期間 $auto_delete_day日(1世代目Lv.1は1日)<br>
+基本拘束時間 $GWT分<br>
+給与 $salary_hour時間毎 君主の任期 $reset_ceo_cycle_year年周期
+<hr>
+<ol>
+<li><a href="reset_player.cgi">ﾘｾｯﾄ処理</a>
+<li><a href="CatasoApp-release-signed.apk">ｶﾀ~ﾉｱﾌﾟﾘ</a>
+</ol>
 <hr>
 EOM
 }
