@@ -71,7 +71,12 @@ $(function(){
     $("a[href = '#tab_script']").hover(function(){ 
             $("#msg_window").find("p").text("スクリプトを実行する。");
             $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("util : 便利なスクリプト");
+            $("#msg_window").find("p").append("util    : 便利なスクリプトが入っているディレクトリ");
+            $("#msg_window").find("p").append("<br>");
+            $("#msg_window").find("p").append("samples : スクリプトやコントローラーのチュートリアル");
+            $("#msg_window").find("p").append("<br>");
+            $("#msg_window").find("p").append("itself  : コントローラーやアクセッサーのテスト");
+
         });
 });
 
@@ -79,6 +84,9 @@ $(function(){
 $(function(){
     $("a[href = '#tab_saveload']").hover(function(){ 
             $("#msg_window").find("p").text("データを保存/復元する");
+            $("#msg_window").find("p").append("<br>");
+            $("#msg_window").find("p").append("復元されても保存されていたデータは消えない");
+
         });
 });
 

@@ -27,3 +27,19 @@ p.msg_class {
 	background-color:#761c0c !important;
 	color:#fff;
 }
+
+.sbt_wide{
+	width:60%;
+	height:40px;
+	background-color:#e83f22;
+	border:none;
+	color:#fff;
+	font-size:13px;
+	font-weight:700;
+	text-align:center;
+	
+}
+.sbt_wide:hover{
+	background-color:#761c0c !important;
+	color:#fff;
+}
