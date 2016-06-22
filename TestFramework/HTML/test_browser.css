@@ -1,0 +1,29 @@
+#msg_window{  background-color: lavender;
+	      border:#ffffff solid 1px;
+	      width:100%;
+	      height:15%;
+}
+
+p.msg_class {
+	font-family: "ＭＳ ゴシック",sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+}	
+
+.content_box{background-color: lavender;}
+
+.sbt_1{
+	width:80px;
+	height:40px;
+	background-color:#e83f22;
+	border:none;
+	color:#fff;
+	font-size:13px;
+	font-weight:700;
+	text-align:center;
+	
+}
+.sbt_1:hover{
+	background-color:#761c0c !important;
+	color:#fff;
+}

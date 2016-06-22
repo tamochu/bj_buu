@@ -7,8 +7,8 @@ package SystemController;
 use File::Path qw(make_path rmtree);
 use File::Copy qw(copy);
 use File::Copy::Recursive qw(fcopy dircopy);
-require "./TestFramework/Controller/Accessor/SystemAccessor.cgi";
-
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::system_accessor;
 
 sub new {
 

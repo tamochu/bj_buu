@@ -4,9 +4,8 @@ use TestFramework::Controller::ControllerConst;
 
 package WarController;
 
-require "./TestFramework/Controller/Accessor/WarAccessor.cgi";
-require "./TestFramework/Controller/Accessor/PlayerAccessor.cgi";
-
+require $ControllerConst::war_accessor;
+require $ControllerConst::player_accessor;
 
 sub new{
 	my $class = shift;

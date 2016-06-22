@@ -6,10 +6,8 @@ use warnings;
 #use strict;
 
 package WorldAccessor;
-require './TestFramework/Controller/Accessor/Util.cgi';
-
-#BJWrapper.cgiのファイル名
-my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::accessor_util;
 
 sub new{
 	my $class = shift;
@@ -27,7 +25,7 @@ sub access_data{
 
 	my $sub_routine = sub{
 
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -53,7 +51,7 @@ sub evoke_disaster{
 
 	my $sub_routine = sub{
 
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		
 		_load_config();

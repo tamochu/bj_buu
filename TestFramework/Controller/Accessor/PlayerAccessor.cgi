@@ -8,11 +8,10 @@ use CGI::Carp;
 #use strict;
 
 package PlayerAccessor;
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::accessor_util;
 
-require './TestFramework/Controller/Accessor/Util.cgi';
 
-#BJWrapper.cgiのファイル名
-my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
 
 sub new{
 	my $class = shift;
@@ -32,7 +31,7 @@ sub access_data{
 
 	my $sub_routine = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -77,7 +76,7 @@ sub create_player{
 	#new_entry.cgiからプレイヤー作成
 	my $create = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -97,7 +96,7 @@ sub create_player{
 	#login.cgiを一度呼ばないと直後の処理でエラーが出る
 	my $login = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -109,7 +108,7 @@ sub create_player{
 	#bj.cgiを開きリフレッシュを呼ぶ
 	my $back_bj = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base; 
@@ -131,7 +130,7 @@ sub remove_player{
 
 	my $sub_routine = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -157,7 +156,7 @@ sub shikan_player{
 	#ブラウザから送られる環境変数の偽装の基礎部分
 	my $make_env = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_make_env_base($name);
 
@@ -167,7 +166,7 @@ sub shikan_player{
 	#国情報を開く
 	my $enter_bj = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -187,7 +186,7 @@ sub shikan_player{
 	#国情報から国選択画面へ
 	my $country_info = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -205,7 +204,7 @@ sub shikan_player{
 	#国選択画面から国を選択
 	my $select_country = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -223,7 +222,7 @@ sub shikan_player{
 	#士官
 	my $shikan = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -247,7 +246,7 @@ sub shikan_player{
 
 	#bj.cgiを開く
 	my $back_bj = sub{
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		$ENV{REQUEST_METHOD} = "";	
@@ -273,7 +272,7 @@ sub open_bj{
 
 	$enter_bj = sub {
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();

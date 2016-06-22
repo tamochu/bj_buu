@@ -7,7 +7,8 @@
 use warnings;
 
 package WorldController;
-require "./TestFramework/Controller/Accessor/WorldAccessor.cgi";
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::world_accessor;
 
 sub new{
 

@@ -7,10 +7,8 @@ use CGI::Carp;
 #use strict;
 
 package ItemAccessor;
-require './TestFramework/Controller/Accessor/Util.cgi';
-
-#BJWrapper.cgiのファイル名
-my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::accessor_util;
 
 sub new{
 	my $class = shift;
@@ -28,7 +26,7 @@ sub give_item{
 
 	my $sub_routine = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_load_config();
 
@@ -64,7 +62,7 @@ sub get_item_index{
 
 	my $sub_routine = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_load_config();
 		
@@ -88,7 +86,7 @@ sub get_item_index{
 		close $fh;
 	
 		#無ければ例外をスロー
-		die ("no such a item in $player_namedepot.cgi") unless (defined $index);
+		(defined $index) or die "no such a item ($kind, $item_no, $item_c, $item_lv) is in $player_name/depot.cgi\n"; 
 		return $index;
 	};
 
@@ -97,14 +95,14 @@ sub get_item_index{
 }
 
 #アイテムを引き出す
-sub draw_item{
+sub action_draw_item{
 
 	my $self = shift;
 	my ($player_name, $item_index) = @_;
 
 	#ブラウザから送られる環境変数の偽装の基礎部分
 	my $make_env = sub{
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_make_env_base($player_name);
 	};
@@ -114,14 +112,16 @@ sub draw_item{
 	#bj.cgiを開き預り所へ行く
 	my $enter_bj = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
 		_is_bound($player_name);
+
 		$m{lib} = "depot";
 		&write_user;
 
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base;
 
 		require "bj.cgi";
@@ -133,10 +133,12 @@ sub draw_item{
 	#引き出すを選ぶ
 	my $select_draw = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
+
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=1";
 
 		require "bj.cgi";
@@ -148,11 +150,12 @@ sub draw_item{
 	#一覧からアイテムを選び引き出す
 	my $select_item = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
 		$item_index++;
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$item_index";
 
 		require "bj.cgi";
@@ -165,10 +168,11 @@ sub draw_item{
 	#やめるコマンドでm{tp}を1に
 	my $break_depot= sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=0";
 
 		require "bj.cgi";
@@ -180,10 +184,11 @@ sub draw_item{
 	#やめるでrefresh()を呼ぶ
 	my $back_bj = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=0";
 
 		require "bj.cgi";
@@ -203,14 +208,14 @@ sub draw_item{
 }
 
 #ペットを使う
-sub use_pet{
+sub action_use_pet{
 
 	my $self = shift;
-	my ($player_name, $item_index) = @_;
+	my $player_name = shift;
 
 	#ブラウザから送られる環境変数の偽装の基礎部分
 	my $make_env = sub{
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_make_env_base($player_name);
 	};
@@ -221,7 +226,7 @@ sub use_pet{
 	#bj.cgiを開きマイルームへ行く
 	my $enter_bj = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -236,15 +241,12 @@ sub use_pet{
 		die ("$pets[$m{pet}][1] cannot be activated in myroom") if ($pets[$m{pet}][2] ne 'myself' );
 
 
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=4";
 
-		print "\n***in enter_bj env_base = $env_base***\n";
-		print "\n***in enter_bj m{lib} = $m{lib}***\n";
-		print "\n***in enter_bj m{tp} = $m{tp}***\n";
 		require "bj.cgi";
 
 		_read_user($player_name);
-		print "\n***in enter_bj after m{lib} = $m{lib}***\n";
 		die ("failed to draw item : m{tp} expect 1:actual  $m{tp} :mes = $mes") if ($m{tp} ne 1);
 	};
 
@@ -252,19 +254,16 @@ sub use_pet{
 	#ペットを使う
 	my $use= sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
 
-		print "***in use m{lib} = $m{lib}***\n";
-		print "***in use m{tp} = $m{tp}***\n";
 
+		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&mode=use_pet";
 		require "bj.cgi";
 		
-		print "***in use after m{lib} = $m{lib}***\n";
-		print "***in use after m{tp} = $m{tp}***\n";
 
 		_read_user($player_name);
 
@@ -272,14 +271,13 @@ sub use_pet{
 		if(($m{pet} eq 0) and ($m{lib} eq "")){
 			return 0;
 		}
-		#消費された後にlibの状態が変わるﾍﾟｯﾄ（投獄など)
+		#消費された後にlibの状態が変わるﾍﾟｯﾄ
 		if(($m{pet} eq 0) and ($m{lib} ne "")){
-			print "***m{lib} = $m{lib}***\n";
 			return 1;
 		}
-		#マイルームでの使用後に処理が必要なペット
-		elsif(($m{pet} ne 0) and ($m{lib} ne "")){
-			return $m{tp};
+		#消費されずにlibの状態が変わるペット
+		elsif(($m{pet} ne 1) and ($m{lib} ne "")){
+			return 2;
 		}
 		else{
 			die("unexpected pet was used : $pets[$m{pet}][1]"); 
@@ -292,7 +290,27 @@ sub use_pet{
 }
 
 #マイルームでの使用後に処理が必要なペットの処理
-sub step_pet_effect{
+sub action_step_pet{
+
+	my $self = shift;
+	my $player_name = shift;
+	my @argvs = @_;
+
+	#現在装備しているペットの外部ファイル化された処理を取得
+	my $get_pet = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_before_bj($player_name);
+		return $m{pet};
+	};
+	my $my_pet = Util::fork_sub($get_pet);
+
+	#ペット特有の処理をする
+	print STDERR "do ./TestFramework/Controller/Accessor/ItemAccessorSpecific/pet$my_pet.pm\n";
+	do "./TestFramework/Controller/Accessor/ItemAccessorSpecific/pet$my_pet.pm";
+	enact($player_name, @argvs);
 }
 
 1;

@@ -7,7 +7,7 @@ package TestInterface;
 use Carp;
 use File::Path;
 require "./TestFramework/Controller/Accessor/SystemAccessor.cgi";
-require "./TestFramework/Controller/Accessor/StopStdout.cgi";
+require "./TestFramework/Controller/StopStdout.pm";
 
 sub new{
 
@@ -20,7 +20,7 @@ sub new{
 	$self->{FOLDERS_TO_BE_SAVED} = []; 
 
 	#ファイルを退避させておくディレクトリ
-	$self->{FOLDER_TO_SAVE} = "./TestFramework/save";
+	$self->{FOLDER_TO_SAVE} = "./TestFramework/savetemp";
 
 	$self->{SYSTEM_ACCESSOR} = SystemAccessor->new();
 
@@ -50,6 +50,11 @@ sub save_data{
 
 	my $self = shift;
 
+	#引数があればセーブ先を変更
+	if(@_){
+		$self->{FOLDER_TO_SAVE} = shift;
+	}
+
 	#セーブフォルダ作成
 	mkpath($self->{FOLDER_TO_SAVE});
 
@@ -72,8 +77,16 @@ sub restore_data{
 
 	my $self = shift;
 
-	#退避していたディレクトリを復元
+	#復元後のデータを消去するかのフラグ
+	my $is_to_delete = 1;
 
+	#引数があれば退避先を変更
+	if(@_){
+		$is_to_delete = 0;
+		$self->{FOLDER_TO_SAVE} = shift;
+	}
+
+	#退避していたディレクトリを復元
 	for my $dir (@{$self->{FOLDERS_TO_BE_SAVED}}){
 
 		unless (-d $dir){
@@ -83,7 +96,12 @@ sub restore_data{
 		my $saved_dir = $dir;
 		$saved_dir =~ s/^\.//;
 		$saved_dir = $self->{FOLDER_TO_SAVE}.$saved_dir;
-		$self->{SYSTEM_ACCESSOR}->move_data($saved_dir, $dir);
+		if($is_to_delete){
+			$self->{SYSTEM_ACCESSOR}->move_data($saved_dir, $dir);
+		}
+		else{
+			$self->{SYSTEM_ACCESSOR}->copy_data($saved_dir, $dir);
+		}
 
 	}
 }
@@ -126,10 +144,16 @@ sub run_all_tests{
 	#全てのテストを実行
 	foreach my $filename (@dir){
 
+		#退避
+		$self->save_data();
+
 		#テスト実行
 		eval{
 			require "$filename";
 		};
+
+		#復元
+		$self->restore_data();
 
 		#エラーケースと成功ケースをそれぞれ別個に格納
 		if($@){

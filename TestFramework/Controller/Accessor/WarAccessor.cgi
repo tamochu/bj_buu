@@ -7,10 +7,8 @@ use CGI::Carp;
 #use strict;
 
 package WarAccessor;
-require './TestFramework/Controller/Accessor/Util.cgi';
-
-#BJWrapper.cgiのファイル名
-my $bj_wrapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::accessor_util;
 
 #main.cgiのメニュー上の戦争のコマンド番号
 my $menu_cmd_war = 11;
@@ -34,7 +32,7 @@ sub set_war{
 
 	#ブラウザから送られる環境変数の偽装の基礎部分
 	my $make_env = sub{
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_make_env_base($player_name);
 	};
@@ -43,7 +41,7 @@ sub set_war{
 	#bj.cgiから戦争を選ぶ
 	my $enter_bj = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -63,7 +61,7 @@ sub set_war{
 	#規模選択
 	my $select_mode = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -80,7 +78,7 @@ sub set_war{
 	#相手国を選び出発
 	my $select_country= sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -95,7 +93,7 @@ sub set_war{
 	#国を選択して出撃
 	my $depart = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -122,7 +120,7 @@ sub encount{
 
 	#ブラウザから送られる環境変数の偽装の基礎部分
 	my $make_env = sub{
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_make_env_base($player_name);
 	};
@@ -130,7 +128,7 @@ sub encount{
 
 	my $enter_bj= sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -148,7 +146,7 @@ sub encount{
 	#限界ターンなどの提示画面を開く
 	my $open_turn = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);
@@ -174,7 +172,7 @@ sub step_war{
 	
 	#ブラウザから送られる環境変数の偽装の基礎部分
 	my $make_env = sub{
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		_make_env_base($player_name);
 	};
@@ -183,7 +181,7 @@ sub step_war{
 	#陣形を選んで交戦
 	my $select_formation = sub{
 
-		require $bj_wrapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_before_bj($player_name);

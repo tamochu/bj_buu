@@ -4,17 +4,17 @@ package test_browser;
 use CGI::Carp;
 use CGI;
 
-#ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¯ãƒ¼ã‚¯ã®ãƒ«ãƒ¼ãƒˆ
+#ƒtƒŒ[ƒ€ƒ[ƒN‚Ìƒ‹[ƒg
 my $framework_root = "./TestFramework";
-#ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¯ãƒ¼ã‚¯ç›´ä¸‹ã®ãƒ†ã‚¹ãƒˆãƒ•ã‚©ãƒ«ãƒ€
+#ƒtƒŒ[ƒ€ƒ[ƒN’¼‰º‚ÌƒeƒXƒgƒtƒHƒ‹ƒ_
 my $test_root = "Tests";
-#ãƒ†ã‚¹ãƒˆã‚’å®Ÿè¡Œã™ã‚‹cgi
-my $test_runner = "./test_runner.cgi";
+#ƒeƒXƒg‚ğÀs‚·‚écgi
+my $test_runner = "test_runner.cgi";
+#ƒZ[ƒu•ƒ[ƒh‚ÌƒfƒBƒŒƒNƒgƒŠ
+my $dir_to_save = "$framework_root/save";
 
 
 my $q = CGI->new();
-my $in = {};
-&decode;
 &print_header;
 &init;
 &print_footer;
@@ -22,46 +22,110 @@ my $in = {};
 
 
 
-#åˆæœŸåŒ–
+#‰Šú‰»
 sub init{
 
-	#ãƒ‘ã‚¹ãƒã‚§ãƒƒã‚¯
+	#ƒpƒXƒ`ƒFƒbƒN
 	unless(&_is_valid_passward){
 		print qq|<p>invalid passward</p>|;
 		return 1;
 	}
 
+	#ƒƒbƒZ[ƒWƒEƒBƒ“ƒhƒE
+	print qq|<div id="msg_window">|;
+	print qq|<p class="msg_class">ŠJ”­’†</p>|;
+	print qq|</div>|;
+
+	#ƒ^ƒu¶¬
+ 	print qq|
+<div id="tabs">
+	<ul>
+        <li><a href="#tab_saveload">ƒZ[ƒu•ƒ[ƒh</a></li>
+        <li><a href="#tab_script">ƒXƒNƒŠƒvƒg</a></li>
+        <li><a href="#tab_manual">è“®</a></li>
+   	</ul>|;
+	&generate_saveload_tab;
+	&generate_script_tab;
+	&generate_manual_tab;
+	print qq|</div>|;
+
+
+}
+
+#ƒZ[ƒu•ƒ[ƒh—p‚Ìtab¶¬
+sub generate_saveload_tab{
+
+	print qq|<div id="tab_saveload">|;
+
+	print qq|<form action="$test_runner" method="post">|;
+	print qq|<input type="hidden" name="mode" value="save">|;
+	print qq|<input type="hidden" name="dir_to_save" value="$dir_to_save">|;
+	print qq|<input type="hidden" name="pass" value="|;
+	print $q->param("pass");
+	print qq|">|;
+	print qq|<input type="submit" class="sbt_1" name="submit" value="ƒZ[ƒu">|;
+	print qq|</form>|;
+	print qq|<form action="$test_runner" method="post">|;
+	print qq|<input type="hidden" name="mode" value="load">|;
+	print qq|<input type="hidden" name="dir_to_save" value="$dir_to_save">|;
+	print qq|<input type="hidden" name="pass" value="|;
+	print $q->param("pass");
+	print qq|">|;
+	print qq|<input type="submit" class="sbt_1" name="submit" value="ƒ[ƒh">|;
+	print qq|</form>|;
+
+	print qq|</div>|;
+}
+
+#ƒXƒNƒŠƒvƒg—p‚Ìtab¶¬
+sub generate_script_tab{
+
+	print qq|<div id="tab_script">|;
 	print qq|<form action="$test_runner" method="post">|;
 
-	#ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ä½œæˆ
-	print qq|<div id="treeList" style = "background-color: lavender">|;
-	print qq|<label>ãƒ†ã‚¹ãƒˆé¸æŠ</label>|;
+	#ƒ`ƒFƒbƒNƒ{ƒbƒNƒXì¬
+	print qq|<div id="treeList" class="content_box">|;
+	print qq|<label>ƒXƒNƒŠƒvƒg‘I‘ğ</label>|;
 	print qq|<ul>|;
 	_load_tests($framework_root,$test_root);
 	print qq|</ul>|;
 	print qq|</div>|;
 
-	#è¨­å®šç”¨divä½œæˆ
-	print qq|<div id="settingWindow" style = "background-color: lavender">|;
-	print qq|<label>è¨­å®šé¸æŠ</label>|;
-	print qq|<ul>ãƒ†ã‚¹ãƒˆå‰ã«TestFramework/saveã«ä¿å­˜ã™ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª|;
+	#İ’è—pdivì¬
+	print qq|<div id="settingWindow" class="content_box">|;
+	print qq|<label>İ’è‘I‘ğ</label>|;
+	print qq|<ul>‚»‚ê‚¼‚ê‚ÌƒeƒXƒg‘O‚ÅTestFramework/save‚É‘Ş”ğ‚³‚¹‚Ä‚»‚ê‚¼‚ê‚ÌƒeƒXƒgŒã‚É•œŒ³‚·‚éƒfƒBƒŒƒNƒgƒŠ|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./log" checked="checked">log</label></li>|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./data" checked="checked">data</label></li>|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./html" checked="checked">html</label></li>|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./user" checked="checked">user</label></li>|;
 	print qq|</ul>|;
 	print qq|</div>|;
-	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
-	print qq|<input type="submit" name="submit" value="å®Ÿè¡Œ">|;
+	print qq|<input type="hidden" name="mode" value="script">|;
+	print qq|<input type="hidden" name="pass" value="|;
+	print $q->param("pass");
+	print qq|">|;
+	print qq|<input type="submit" class="sbt_1" name="submit" value="Às">|;
 	print qq|</form>|;
+	print qq|</div>|;
 
-	#ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
-	print qq|<div id="messageWindow" style = "background-color: lavender; border:#ff0000 solid 1px;">|;
-	print qq|<p>é–‹ç™ºä¸­</p>|;
+}
+
+#è“®‚ÅƒRƒ“ƒgƒ[ƒ‹‚·‚éƒ^ƒu
+sub generate_manual_tab{
+
+	print qq|<div id="tab_manual">|;
+	print qq|<form action="$test_runner" method="post">|;
+	print qq|<input type="hidden" name="mode" value="manual">|;
+	print qq|<input type="hidden" name="pass" value="|;
+	print $q->param("pass");
+	print qq|">|;
+	print qq|<input type="submit" class="sbt_1" name="submit" value="Às">|;
+	print qq|</form>|;
 	print qq|</div>|;
 }
 
-#å†å¸°çš„ã«ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’æ¢ç´¢ã—ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã‚’ä½œã‚‹
+#Ä‹A“I‚ÉƒfƒBƒŒƒNƒgƒŠ‚ğ’Tõ‚µƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚ğì‚é
 sub _load_tests{
 
 	my $parent_path = shift;
@@ -76,10 +140,14 @@ sub _load_tests{
 	my @file_list;
 	for my $name (@list){
 		if(-f $parent_path."/".$this_dirname."/".$name){
-			push(@file_list, $name);
+			
+			#cgi, pm, tŠg’£q‚Ì‚İ•\¦
+			if($name =~ /\.cgi$|\.pm$|\.t$/){
+				push(@file_list, $name);
+			}
 		}
 		elsif(-d $parent_path."/".$this_dirname."/".$name){
-			#è¦ªã®ãƒ‘ã‚¹ã¯ç„¡è¦–
+			#e‚ÌƒpƒX‚Í–³‹
 			unless($name =~ /\.$/){
 				push(@dir_list, $name);
 			}
@@ -88,17 +156,17 @@ sub _load_tests{
 	
 
 	print qq|<li>|;
-	#è‡ªèº«ã®ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹
+	#©g‚Ìƒ`ƒFƒbƒNƒ{ƒbƒNƒX
 	print qq|<label><input type="checkbox"><font color="red">$this_dirname</font></label>|;
 	print qq|<ul>|;
-	#ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹
+	#ƒtƒ@ƒCƒ‹‚Ìƒ`ƒFƒbƒNƒ{ƒbƒNƒX
 	for my $file(@file_list){
 		print qq|<li>|;
 		print qq|<label><input type="checkbox" name="file" value="$dir_name/$file">$file</label>|;
 		print qq|</li>|;
 	}
 
-	#å­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã¸
+	#qƒfƒBƒŒƒNƒgƒŠ‚Ö
 	for my $dir (@dir_list){
 		_load_tests($dir_name, $dir);
 	}
@@ -109,15 +177,24 @@ sub _load_tests{
 
 #header
 sub print_header{
-	#print $q->header(-charset => "Shift_JIS" );
-	print $q->header(-charset => "utf-8" );
-	print $q->start_html(
-		-title=>"Blind Justice ãƒ†ã‚¹ãƒˆãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¯ãƒ¼ã‚¯",
-		-script=>{-type=>'text/javascript',-src=>"http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"},
-		-lang=>"ja-JP"
-	);
-
-	print qq|<script type='text/javascript' src="$framework_root/js/test_gui.js"></script>|;
+	print qq|
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja-JP" xml:lang="ja-JP">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Blind Justice ƒeƒXƒgƒtƒŒ[ƒ€ƒ[ƒN</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/jquery-ui.min.js"></script>
+<script src="$framework_root/HTML/js/test_gui.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/redmond/jquery-ui.css">
+<link rel="stylesheet" href="$framework_root/HTML/test_browser.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/i18n/jquery-ui-i18n.min.js"></script>
+    <script>
+        \$(function(){
+	    \$( '#tabs' ) . tabs();
+        });
+    </script>
+</head>
+<body>|;
 }
 
 #footer
@@ -127,50 +204,13 @@ sub print_footer{
 
 }
 
-#decode
-sub decode{
-	my ($k,$v,$buf);
-	my $err_flag = 0;
-	
-	if ($ENV{REQUEST_METHOD} eq 'POST') {
-		&error if $ENV{CONTENT_LENGTH} > 51200;
-		read STDIN, $buf, $ENV{CONTENT_LENGTH};
-	}
-	else {
-		&error if length $ENV{QUERY_STRING} > 51200;
-		$buf = $ENV{QUERY_STRING};
-	}
-	
-	for my $pair (split /&/, $buf) {
 
-		($k,$v) = split /=/, $pair;
-		$v =~ tr/+/ /;
-		$v =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'H2', $1/eg;
-
-		# è¨˜å·ç½®æ›ãˆ
-		$v =~ s/&/&amp/g;
-		$v =~ s/;/&#59;/g;
-		$v =~ s/&amp/&amp;/g;
-		$v =~ s/,/&#44;/g;
-		$v =~ s/</&lt;/g;
-		$v =~ s/>/&gt;/g;
-		$v =~ s/"/&quot;/g;#"
-		$v =~ s/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]//g;
-		$v =~ s/\.\.\///g;
-		$v =~ s/ã€ãƒ€ã‚¤ã‚¹ã€‘/(ãƒ€ã‚¤ã‚¹)/g;
-		
-		$in{$k} = $v;
-		
-		push @delfiles, $v if $k eq 'delete';
-	}
-	$cmd = $in{cmd};
-}
-
-#ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
+#ƒpƒXƒ[ƒhƒ`ƒFƒbƒN
 sub _is_valid_passward{
 
 	require "./TestFramework/testframework_passward.pm";
-	if($in{pass} ne $testframework_passward::passward){
+	
+	if($q->param("pass") ne $testframework_passward::passward){
 		return 0;
 	}
 	return 1;

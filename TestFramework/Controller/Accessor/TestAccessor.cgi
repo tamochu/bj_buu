@@ -20,11 +20,11 @@ my $second_country = 3;
 my $added_country_name = "test_country";
 
 #test_ca();
-test_pa();
+#test_pa();
 #test_wa();
 #taihi();
 #test_wara();
-#test_ia();
+test_ia();
 
 sub taihi{
 	my $pa =  PlayerAccessor->new();
@@ -270,7 +270,6 @@ sub test_ia{
 
 	print "***test_ia start***\n\n";
 	my $pa = PlayerAccessor->new();
-	my $wara = WarAccessor->new();
 	my $ca = CountryAccessor->new();
 	my $wa = WorldAccessor->new();
 	my $ia = ItemAccessor->new();

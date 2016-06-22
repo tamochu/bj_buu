@@ -11,10 +11,10 @@ use File::Path qw(rmtree);
 
 package CountryAccessor;
 
-require './TestFramework/Controller/Accessor/Util.cgi';
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::accessor_util;
 
-#BJWrapper.cgiのファイル名
-my $bj_wapper = './TestFramework/Controller/Accessor/BJWrapper.cgi';
+
 
 sub new{
 	my $class = shift;
@@ -37,7 +37,7 @@ sub access_data{
 	
 	$sub_routine = sub{
 
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		#新しい値が設定されていれば設定、なければそのまま取得
@@ -63,7 +63,7 @@ sub get_num_country{
 
 	my $sub_routine = sub{
 	
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();
@@ -94,7 +94,7 @@ sub add_country{
 
 	my $enter_admin= sub{
 	
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 		#admin_pass上書き
 		$admin_pass = "pass";
@@ -129,7 +129,7 @@ sub reset_countries{
 	my $enter_admin = sub{
 	
 		print  "***in CA enter sub***<br>";
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		print "***in CA reset_countries before load_config***<br>";
@@ -172,7 +172,7 @@ sub remove_country {
 
 	$sub_routine = sub{	
 
-		require $bj_wapper;
+		require $ControllerConst::bj_wrapper;
 		package BJWrapper;
 
 		_load_config();

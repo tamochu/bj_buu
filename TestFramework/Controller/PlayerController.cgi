@@ -2,7 +2,8 @@
 use warnings;
 
 package PlayerController;
-require "./TestFramework/Controller/Accessor/PlayerAccessor.cgi";
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::player_accessor;
 
 sub new{
 	my $class = shift;
@@ -44,6 +45,7 @@ sub refresh_player{
 	$self->{PLAYER_ACCESSOR_INTERFACE}->open_bj($name);
 
 }
+
 #player作成
 sub create_player{
 
@@ -89,7 +91,7 @@ sub action_shikan_player{
 	my $error_info = "Error: $caller_filename at line $caller_num_line";
 
 	unless ((defined $name) and (defined $to_country)){
-		die ("$error_info : needs at least name and to_country\n");
+		die ("$error_info : action_shikan_player needs at least name and to_country\n");
 	}
 
 	#士官させる
@@ -124,7 +126,7 @@ sub remove_player{
 		$self->{PLAYER_ACCESSOR_INTERFACE}->remove_player($name);
 	};
 	if($@){
-		die ("$error_info : remove_player\n");
+		die ("$error_info : remove_player failed\n", $@);
 	}
 
 	#チェック
@@ -132,7 +134,7 @@ sub remove_player{
 		$self->access_data($name, "name");
 	};
 	unless($@){
-		die ("$error_info : remove_player\n");
+		die ("$error_info : remove_player failed\n");
 	}
 	$@ = "";
 }

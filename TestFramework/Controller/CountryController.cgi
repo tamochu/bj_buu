@@ -2,7 +2,8 @@
 use warnings;
 
 package CountryController;
-require "./TestFramework/Controller/Accessor/CountryAccessor.cgi";
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::country_accessor;
 
 sub new{
 	my $class = shift;

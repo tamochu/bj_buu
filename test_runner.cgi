@@ -1,62 +1,167 @@
 #!/usr/local/bin/perl --
 ################################################
-# test_browser.cgiã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹ãƒ†ã‚¹ãƒˆå®Ÿè¡Œéƒ¨åˆ†
+# test_browser.cgi‚©‚çŒÄ‚Ño‚³‚ê‚éƒeƒXƒgÀs•”•ª
 ################################################
-
 use CGI;
 $CGI::LIST_CONTEXT_WARN = 0;
 use CGI::Carp;
 require "./TestFramework/TestInterface.cgi";
 require "./TestFramework/TestResultBrowser.cgi";
 
-#çµæœå‡ºåŠ›ç”¨ã®HTML
+#ƒtƒŒ[ƒ€ƒ[ƒN‚Ìƒ‹[ƒg
+my $framework_root ="./TestFramework";
+#Œ‹‰Êo—Í—p‚ÌHTML
 my $output_html = "./TestFramework/result.html";
+#–ß‚èæ
+my $back_to = "test_browser.cgi";
 
 my $q = new CGI;
-#ãƒ†ã‚¹ãƒˆé–‹å§‹
-print $q->header(-charset => "Shift_JIS");
-print $q->start_html();
 
-#èªè¨¼
-#my $in = {};
-#&decode;
-unless(&_is_valid_passward){
-	print qq|<p>invalid pass</p><br>|;
-	print $q->end_html;
+&init;
+&run;
+&end;
+
+#‰Šú‰»
+sub init{
+
+
+	#ƒwƒbƒ_
+	print qq|
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja-JP" xml:lang="ja-JP">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<title>Œ‹‰Ê</title>
+<link rel="stylesheet" href="$framework_root/HTML/test_browser.css">
+</head>
+<body>|;
+
+	#”FØ
+	unless(&_is_valid_passward){
+		print qq|<div id="msg_window"><p class="msg_class">invalid pass</p></div><br>|;
+		print $q->end_html;
+		exit;
+	}
+}
+
+#ƒ‚[ƒh•Ê‚Éˆ—Às
+sub run{
+
+	my $mode = $q->param('mode');
+	
+	if($mode eq "save"){
+		&_run_save;
+	}
+	elsif($mode eq "load"){
+		&_run_load;
+	}
+	elsif($mode eq "script"){
+		&_run_script;
+	}
+	elsif($mode eq "manual"){
+		&_run_manual;
+	}
+}
+
+#ƒZ[ƒuƒ‚[ƒh
+sub _run_save{
+
+	#İ’è‰ñû
+	my $dir_to_save = $q->param('dir_to_save');
+	unless($dir_to_save){
+		print qq|dir_to_save‚ª—^‚¦‚ç‚ê‚Ä‚¢‚È‚¢<br>|;
+		return;
+	}
+
+	#ƒeƒXƒgƒCƒ“ƒ^[ƒtƒF[ƒXƒNƒ‰ƒX¶¬
+	my $result = TestResultBrowser->new($output_html);
+	my $test_interface = TestInterface->new($result);
+
+	#ƒZ[ƒu
+	$test_interface->add_save_dir("./data");
+	$test_interface->add_save_dir("./log");
+	$test_interface->add_save_dir("./html");
+	$test_interface->add_save_dir("./user");
+	$test_interface->save_data($dir_to_save);
+	print qq|<div id="msg_window"><p class="msg_class">data, log, html, userƒfƒBƒŒƒNƒgƒŠ‚ğ$dir_to_save‚ÉƒZ[ƒu‚µ‚½</p></div><br>|;
+}
+
+#ƒ[ƒhƒ‚[ƒh
+sub _run_load{
+
+	#İ’è‰ñû
+	my $dir_to_save = $q->param('dir_to_save');
+	unless($dir_to_save){
+		print qq|dir_to_save‚ª—^‚¦‚ç‚ê‚Ä‚¢‚È‚¢<br>|;
+		return;
+	}
+
+	#ƒeƒXƒgƒCƒ“ƒ^[ƒtƒF[ƒXƒNƒ‰ƒX¶¬
+	my $result = TestResultBrowser->new($output_html);
+	my $test_interface = TestInterface->new($result);
+
+	#ƒ[ƒh
+	$test_interface->add_save_dir("./data");
+	$test_interface->add_save_dir("./log");
+	$test_interface->add_save_dir("./html");
+	$test_interface->add_save_dir("./user");
+	$test_interface->restore_data($dir_to_save);
+	print qq|<div id="msg_window"><p class="msg_class">data, log, html, userƒfƒBƒŒƒNƒgƒŠ‚ğ$dir_to_save‚Éƒ[ƒh‚µ‚½</p></div><br>|;
+}
+
+#ƒXƒNƒŠƒvƒgƒ‚[ƒh
+sub _run_script{
+
+	#İ’è‰ñû
+	my @files = $q->param('file');
+	unless(@files){
+		print qq|<div id="msg_window"><p class="msg_class">ƒXƒNƒŠƒvƒg‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚È‚¢</p></div><br>|;
+		return;
+	}
+	my @settings_save= $q->param('setting_save');
+
+	#ƒeƒXƒgƒCƒ“ƒ^[ƒtƒF[ƒXƒNƒ‰ƒX¶¬
+	my $result = TestResultBrowser->new($output_html);
+	my $test_interface = TestInterface->new($result);
+	
+	#‘Ş”ğƒfƒBƒŒƒNƒgƒŠİ’è
+	for my $setting_save (@settings_save){
+		$test_interface->add_save_dir($setting_save);
+	}
+	
+	#ƒeƒXƒgÀs
+	$test_interface->run_all_tests(@files);
+	
+	#ƒeƒXƒgŒ‹‰Ê‚ğo—Í
+	$test_interface->output_result();
+	
+	#•œŒ³
+	$test_interface->restore_data();
+
+}
+
+#ƒ}ƒjƒ…ƒAƒ‹ƒ‚[ƒh
+sub _run_manual{
+	print qq|<div id="msg_window"><p class="msg_class">ŠJ”­’†</p></div><br>|;
+}
+
+#I—¹ˆ—
+sub end{
+
+	#–ß‚éƒ{ƒ^ƒ“¶¬
+	print qq|<form action="$back_to" method="post">|;
+	print qq|<input type="hidden" name="pass" value="|;
+	print $q->param("pass");
+	print qq|">|;
+	print qq|<input type="submit" class="sbt_1" name="submit" value="–ß‚é">|;
+	print qq|</form>|;
+
+	#I—¹
+	print $q->end_html();
 	exit;
+
 }
 
-#è¨­å®šå›å
-my @files = $q->param('file');
-unless(@files){
-	print "no file is given";
-}
-my @settings_save= $q->param('setting_save');
-
-#ãƒ†ã‚¹ãƒˆã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚¯ãƒ©ã‚¹ç”Ÿæˆ
-my $result = TestResultBrowser->new($output_html);
-my $test_interface = TestInterface->new($result);
-
-#é€€é¿
-for my $setting_save (@settings_save){
-	$test_interface->add_save_dir($setting_save);
-}
-$test_interface->save_data();
-
-#ãƒ†ã‚¹ãƒˆå®Ÿè¡Œ
-$test_interface->run_all_tests(@files);
-
-#ãƒ†ã‚¹ãƒˆçµæœã‚’å‡ºåŠ›
-$test_interface->output_result();
-
-#å¾©å…ƒ
-$test_interface->restore_data();
-
-#çµ‚äº†
-print $q->end_html();
-exit;
-
-#ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
+#ƒpƒXƒ[ƒhƒ`ƒFƒbƒN
 sub _is_valid_passward{
 
 	require "./TestFramework/testframework_passward.pm";
