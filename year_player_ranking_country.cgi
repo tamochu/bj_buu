@@ -1,7 +1,6 @@
 #!/usr/local/bin/perl --
 require 'config.cgi';
 require 'config_game.cgi';
-use Time::HiRes qw(gettimeofday tv_interval);
 #=================================================
 # 廃人ﾗﾝｷﾝｸﾞ Created by oiiiuiiii
 #=================================================
@@ -70,11 +69,8 @@ sub run {
 			my($number,$name) = split /<>/, $line;
 			last if($number == 0);
 			my $id_name = $name;
-#			my $from_c;
 			if($rank_status[$no][0] eq 'strong'){
 				$id_name =~ s/ .*?から最も奪う//;
-#				$from_c = $name;
-#				$from_c =~ s/.*?( .*?から最も奪う)/\1/g;
 			}
 			my $player_id =  unpack 'H*', $id_name;
 			$d_rank = $rank if ($pre_number != $number);
@@ -94,20 +90,17 @@ sub run {
 # 廃人ﾗﾝｷﾝｸﾞを更新
 #=================================================
 sub update_player_ranking  {
-	my $t0 = [gettimeofday];
-
 	my @line = ();
 	my $last_year = $w{year} - 1;
-
 	push @line, "$last_year\n";
 	$country = $in{no};
 
-	my %sames = ();
 	my @p_ranks = ();
 	for my $no (0 .. $#rank_status) {
 		push(@{$p_ranks[$no]}, [0, 0]);
 	}
 
+	my %sames = ();
 	open my $cfh, "< $logdir/$country/member.cgi" or &error("$logdir/$country/member.cgiﾌｧｲﾙが開けません");
 	while (my $player = <$cfh>) {
 		$player =~ tr/\x0D\x0A//d;
@@ -146,61 +139,29 @@ sub update_player_ranking  {
 				}
 
 				# ﾗﾝｷﾝｸﾞに自分のﾃﾞｰﾀを挿入ｿｰﾄ、ﾗﾝｸ外に出たﾃﾞｰﾀを削除
-				my $rank_size = $#{$p_ranks[$no]};
-				for my $rank (0 .. $rank_size) {
+				# 同位の考慮はしなくてもええんでね
+				for my $rank (0 .. $#{$p_ranks[$no]}) {
 					if ($ydata{$status} > $p_ranks[$no][$rank][0]) {
 						splice(@{$p_ranks[$no]}, $rank, 0, [$ydata{$status}, "$player$from"]);
-						if ($#{$p_ranks[$no]} > $max_ranking) {
-							splice(@{$p_ranks[$no]}, $#{$p_ranks[$no]}-1, 1);
-						}
+						splice(@{$p_ranks[$no]}, $#{$p_ranks[$no]}-1, 1) if $#{$p_ranks[$no]} > $max_ranking; # ﾀﾞﾐｰﾃﾞｰﾀが1個あるから$#
 						last;
 					}
 				}
 			}
-
 		}
 		close $fh;
 	}
 	close $cfh;
 
+	# 各種ﾗﾝｷﾝｸﾞの10位以内のﾌﾟﾚｲﾔｰを追加
 	for my $no (0 .. $#rank_status) {
-=pod
-		# 高速化のために sort を使わずﾗﾝｸｲﾝﾌﾟﾚｲﾔｰの上位者を抜き出す
-		my $count = 0;
-		my $old_max_value = 0;
-		my @ranking = (0, 0); # 順位, ダブリ
-		while ($max_ranking > $ranking[0]) {
-			last unless @{$p_ranks[$no]};
-	
-			# sort の代わりにトップを順次抜き出す
-			my $max_value = 0;
-			my $max_index = 0;
-			for my $index (0 .. $#{$p_ranks[$no]}) {
-				if ($p_ranks[$no][$index][0] > $max_value) {
-					$max_value = $p_ranks[$no][$index][0];
-					$max_index = $index;
-				}
-			}
-	
-			# 2位以下が上位と同じ数値ならダブリ数うｐ、違うならダブリ数リセット
-			$ranking[1] = $old_max_value > $max_value ? 0 : $ranking[1]+1 if $count > 0;
-			$ranking[0] = $count+1 - $ranking[1]; # (インデックス+1) - ダブリ数 = 順位
-=cut
-
-			for my $rank (0 .. $max_ranking-1) {
-				push(@line, "$p_ranks[$no][$rank][0]<>$p_ranks[$no][$rank][1]<>\n");
-			}
-#			push(@line, join('<>', @{splice(@{$p_ranks[$no]}, $max_index, 1)})."<>\n");
-#			$count++;
-#			$old_max_value = $max_value;
+		for my $rank (0 .. $#{$p_ranks[$no]}-1) {
+			push(@line, "$p_ranks[$no][$rank][0]<>$p_ranks[$no][$rank][1]<>\n");
 		}
 		push @line, "0<><>\n";
 	}
 
-#	open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
-#	print $fh @line;
-#	close $fh;
-
-	my $timer = tv_interval($t0);
-	print "$timer ms<br>";
+	open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
+	print $fh @line;
+	close $fh;
 }
