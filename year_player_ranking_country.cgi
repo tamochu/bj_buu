@@ -5,6 +5,7 @@ require 'config_game.cgi';
 # ”pl×İ·İ¸Ş Created by oiiiuiiii
 #=================================================
 
+
 my @rank_status = (
 #•Ï”,•\¦–¼,Å’á’l
 	['strong','’D‘—Í',500],
