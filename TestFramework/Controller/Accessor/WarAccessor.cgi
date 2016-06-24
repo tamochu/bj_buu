@@ -191,7 +191,7 @@ sub step_war{
 		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd_formation";
 		require "bj.cgi";
 		_read_user($player_name);
-		die ("failed to step_war : m{tp} = $m{tp}\n") unless (($m{tp} eq 120) or ($m{tp} eq 130) or ($m{tp} eq 0));
+		die ("failed to step_war : m{tp} = $m{tp}\n") unless (($m{tp} eq 120) or ($m{tp} eq 130) or ($m{tp} eq 0) or ($m{lib} eq "world"));
 
 	};
 
