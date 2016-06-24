@@ -227,6 +227,29 @@ sub _load_tests{
 
 #header
 sub print_header{
+
+	#ヘッダ
+	print $q->header( -charset => 'Shift_JIS');
+	print $q->start_html(
+		-title => "テストフレームワーク",
+		-script=> [
+				{-type => 'text/javascript',
+				 -src  => "http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"},
+				{-type => 'text/javascript',
+				 -src  => "http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"},
+				{-type => 'text/javascript',
+				 -src  => "$framework_root/HTML/js/test_gui.js"},
+				{-type => 'text/javascript',
+				 -src  => "$framework_root/HTML/js/test_browser_menu.js"}
+			  ],
+		-style=> [
+				{-src  => "http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.css"},
+				{-src  => "$framework_root/HTML/test_browser.css"}
+			 ]	
+
+	);
+
+=pod
 	print qq|
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ja-JP" xml:lang="ja-JP">
 <head>
@@ -254,6 +277,7 @@ sub print_header{
 </head>
 
 <body>|;
+=cut
 }
 
 #footer

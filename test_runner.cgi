@@ -26,10 +26,9 @@ sub init{
 
 
 	#ヘッダ
+	print $q->header( -charset => 'Shift_JIS');
 	print qq|
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ja-JP" xml:lang="ja-JP">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
 <title>結果</title>
 <link rel="stylesheet" href="$framework_root/HTML/test_browser.css">
 </head>
