@@ -52,7 +52,7 @@ sub init{
 
 }
 
-#セーブ＆ロード用のtab生成
+#セーブ＆ロード用のタブ
 sub generate_saveload_tab{
 
 	print qq|<div id="tab_saveload">|;
@@ -79,7 +79,7 @@ sub generate_saveload_tab{
 	print qq|</div>|;
 }
 
-#スクリプト用のtab生成
+#スクリプト用のタブ
 sub generate_script_tab{
 
 	print qq|<div id="tab_script">|;
@@ -248,36 +248,6 @@ sub print_header{
 			 ]	
 
 	);
-
-=pod
-	print qq|
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ja-JP" xml:lang="ja-JP">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-<title>Blind Justice テストフレームワーク</title>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.css">
-<link rel="stylesheet" href="$framework_root/HTML/test_browser.css">
-<script src="$framework_root/HTML/js/test_gui.js"></script>
-<script src="$framework_root/HTML/js/test_browser_menu.js"></script>
-<script>
-	\$(function(){
-		\$( '#tabs' ) . tabs();
-        });
-</script>
-<script>
-	\$(function() {
-		var menu = \$('div > #menu');
-		menu.menu({
-			position: {my: "left top", at: "right top" }
-		});
-	});
-</script>
-</head>
-
-<body>|;
-=cut
 }
 
 #footer

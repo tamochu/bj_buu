@@ -1,3 +1,14 @@
+
+
+
+$(function(){
+	$( '#tabs' ) . tabs();
+	var menu = $('div > #menu');
+	menu.menu({
+		position: {my: "left top", at: "right top" }
+	});
+});
+
 //設定ボタンが押された時のオンクリックハンドラ
 function OnSettingButtonClick(){
 	
@@ -70,12 +81,13 @@ $(function() {
 $(function(){
     $("a[href = '#tab_script']").hover(function(){ 
             $("#msg_window").find("p").text("スクリプトを実行する。");
+            $("#msg_window").find("p").append("<br><br>");
+            $("#msg_window").find("p").append("tests   : テスト");
             $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("util    : 便利なスクリプトが入っているディレクトリ");
+            $("#msg_window").find("p").append("samples : テストとコントローラーのチュートリアル");
             $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("samples : スクリプトやコントローラーのチュートリアル");
-            $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("itself  : コントローラーやアクセッサーのテスト");
+            $("#msg_window").find("p").append("util    : 便利なスクリプト");
+
 
         });
 });
@@ -93,8 +105,6 @@ $(function(){
 //手動タブホバー時のクリックハンドラ
 $(function(){
     $("a[href = '#tab_manual']").hover(function(){ 
-            $("#msg_window").find("p").text("コントローラーをブラウザから操作する");
-            $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("開発中");
+            $("#msg_window").find("p").text("コントローラーをブラウザから使用する");
         });
 });

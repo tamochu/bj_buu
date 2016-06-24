@@ -41,6 +41,7 @@ function make_selectbox(name, array_option, first_value){
 		ret += "</option>";
 		value ++;
 	}
+	ret += "</select>";
 	return ret;
 };
 
@@ -84,14 +85,16 @@ $(function(){
 $(function(){
     $("#create_player", "#player_controller").on({
 	"click": function(){ 
+
+		var sex = ["男性", "女性"];
         	$("#menu_input_form").replaceWith(
 			    menu_header 
 			   +make_description("プレイヤー名")
 			   +make_textbox("value1")
 			   +make_description("パスワード")
 			   +make_textbox("value2")
-			   +make_description("性別(１で男性、２で女性）")
-			   +make_textbox("value3", "1")
+			   +make_description("性別")
+			   +make_selectbox("value3", sex, 1)
 			   +make_description("ＩＰアドレス(ブラウザ版は調整中。デフォルト値のまま使って)")
 			   +make_textbox("value4", "1.1.1.1")
 			   +menu_footer
@@ -240,6 +243,12 @@ $(function(){
    });
 });
 
+//WorldController
+$(function(){
+    $("#world_controller").hover(function(){ 
+            $("#msg_window").find("p").text("世界設定のコントローラー");
+        });
+});
 
 //WorldController::access_data
 $(function(){
@@ -281,6 +290,13 @@ $(function(){
 
 	}
    });
+});
+
+//WarController
+$(function(){
+    $("#war_controller").hover(function(){ 
+            $("#msg_window").find("p").text("戦争関連のコントローラー");
+        });
 });
 
 //WarController::action_set_war

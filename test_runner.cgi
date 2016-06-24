@@ -27,12 +27,13 @@ sub init{
 
 	#ƒwƒbƒ_
 	print $q->header( -charset => 'Shift_JIS');
-	print qq|
-<head>
-<title>Œ‹‰Ê</title>
-<link rel="stylesheet" href="$framework_root/HTML/test_browser.css">
-</head>
-<body>|;
+	print $q->start_html(
+		-title => "Œ‹‰Ê",
+		-style=> [
+				{-src  => "$framework_root/HTML/test_browser.css"}
+			 ]	
+
+	);
 
 	#”FØ
 	unless(&_is_valid_passward){
