@@ -1,1 +1,0 @@
-die("deliverliry thrown exception");
