@@ -222,11 +222,14 @@ sub action_win_war{
 
 		#戦闘
 		$self->{WAR_ACCESSOR_INTERFACE}->step_war($player_name);
-		unless($self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "lib") eq ""){
+
+		#戦争状態が終わっているかチェック
+		my $current_lib = $self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "lib");
+		unless($current_lib ne "war"){
 			die ("$error_info : failed to win_war\n");
 		}
 		
-		#チェック
+		#勝利数がカウントされているかチェック
 		if(($self->{PLAYER_ACCESSOR_INTERFACE}->access_data($player_name, "win_c") - $win_c) ne 1){
 			die ("$error_info : failed to win_war\n");
 		}
