@@ -20,7 +20,6 @@ sub new{
 
 #進軍させる
 #進軍するプレイヤー名、対象の国、進軍規模(定数)
-
 sub action_set_war{
 
 	my $self = shift;

@@ -43,3 +43,29 @@ p.msg_class {
 	background-color:#761c0c !important;
 	color:#fff;
 }
+
+.menu_wide{
+	width:25%;
+	float: left;
+}
+
+.menu_form_class{
+	float: left;
+	margin-left: 5%;
+}
+
+.clearfix:after {
+content: ".";
+display: block;
+height: 0;
+clear: both;
+visibility: hidden;
+}
+
+.clearfix {display: inline-table;}
+ 
+/* Hides from IE-mac \*/
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
+

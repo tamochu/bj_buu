@@ -166,6 +166,30 @@ sub run_all_tests{
 
 }
 
+#テストを引数付きで実行
+sub run_test_with_argv{
+
+	#標準出力を抑制
+	my $stop_stdout = tie local *STDOUT, 'StopStdout';
+
+	my $self = shift;
+	my $filename = shift;
+	
+	#テスト実行
+	eval{
+		require "$filename";
+		&run(@_)
+	};
+
+	#失敗したファイル名と成功したファイル名をそれぞれ別個に格納
+	if($@){
+		$self->{TEST_RESULT}->add_error($filename, $@);	
+	}
+	else{
+		$self->{TEST_RESULT}->add_ok($filename);
+	}
+}
+
 #テスト結果を表示
 sub output_result{
 

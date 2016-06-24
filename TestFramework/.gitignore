@@ -7,3 +7,7 @@
 
 #log file
 *.log
+
+#saveファイル
+save
+savetemp

@@ -84,8 +84,8 @@ $(function(){
 $(function(){
     $("a[href = '#tab_saveload']").hover(function(){ 
             $("#msg_window").find("p").text("データを保存/復元する");
-            $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("復元されても保存されていたデータは消えない");
+            $("#msg_window").find("p").append("<br>Controllerで変更される可能性があるdata, log, html, userディレクトリをセーブ＆ロードする");
+            $("#msg_window").find("p").append("<br>新しくセーブし直すまで保存されたデータは消えない");
 
         });
 });

@@ -6,11 +6,11 @@ use CGI;
 
 #フレームワークのルート
 my $framework_root = "./TestFramework";
-#フレームワーク直下のテストフォルダ
-my $test_root = "Tests";
+#フレームワーク直下のスクリプトフォルダ
+my $test_root = "Scripts";
 #テストを実行するcgi
 my $test_runner = "test_runner.cgi";
-#セーブ＆ロードのディレクトリ
+#セーブ＆ロードの保存先ディレクトリ
 my $dir_to_save = "$framework_root/save";
 
 
@@ -40,9 +40,9 @@ sub init{
  	print qq|
 <div id="tabs">
 	<ul>
-        <li><a href="#tab_saveload">セーブ＆ロード</a></li>
-        <li><a href="#tab_script">スクリプト</a></li>
         <li><a href="#tab_manual">手動</a></li>
+        <li><a href="#tab_script">スクリプト</a></li>
+        <li><a href="#tab_saveload">セーブ＆ロード</a></li>
    	</ul>|;
 	&generate_saveload_tab;
 	&generate_script_tab;
@@ -57,13 +57,14 @@ sub generate_saveload_tab{
 
 	print qq|<div id="tab_saveload">|;
 
+	print qq|<div align="center">|;
 	print qq|<form action="$test_runner" method="post">|;
 	print qq|<input type="hidden" name="mode" value="save">|;
 	print qq|<input type="hidden" name="dir_to_save" value="$dir_to_save">|;
 	print qq|<input type="hidden" name="pass" value="|;
 	print $q->param("pass");
 	print qq|">|;
-	print qq|<input type="submit" class="sbt_1" name="submit" value="セーブ">|;
+	print qq|<input type="submit" class="sbt_wide" name="submit" value="セーブ">|;
 	print qq|</form>|;
 	print qq|<form action="$test_runner" method="post">|;
 	print qq|<input type="hidden" name="mode" value="load">|;
@@ -71,8 +72,9 @@ sub generate_saveload_tab{
 	print qq|<input type="hidden" name="pass" value="|;
 	print $q->param("pass");
 	print qq|">|;
-	print qq|<input type="submit" class="sbt_1" name="submit" value="ロード">|;
+	print qq|<input type="submit" class="sbt_wide" name="submit" value="ロード">|;
 	print qq|</form>|;
+	print qq|</div>|;
 
 	print qq|</div>|;
 }
@@ -94,7 +96,7 @@ sub generate_script_tab{
 	#設定用div作成
 	print qq|<div id="settingWindow" class="content_box">|;
 	print qq|<label>設定選択</label>|;
-	print qq|<ul>それぞれのテスト前でTestFramework/saveに退避させてそれぞれのテスト後に復元するディレクトリ|;
+	print qq|<ul>それぞれのスクリプトの実行前後でTestFramework/saveに退避させて復元するディレクトリ|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./log" checked="checked">log</label></li>|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./data" checked="checked">data</label></li>|;
 	print qq|<li><label><input type="checkbox" name="setting_save" value="./html" checked="checked">html</label></li>|;
@@ -115,13 +117,61 @@ sub generate_script_tab{
 sub generate_manual_tab{
 
 	print qq|<div id="tab_manual">|;
-	print qq|<form action="$test_runner" method="post">|;
-	print qq|<input type="hidden" name="mode" value="manual">|;
+
+	#メニュー生成
+	print qq|<div class="clearfix">|;
+	print qq|<ul id="menu" class="menu_wide">|;
+	print qq|  <li id="player_controller">PlayerController|;
+	print qq|    <ul>|; 
+	print qq|    	<li id="access_data">access_data</li>|; 
+	print qq|    	<li id="create_player">create_player</li>|; 
+	print qq|    	<li id="action_shikan_player">action_shikan_player</li>|; 
+	print qq|    	<li id="remove_player">remove_player</li>|; 
+	print qq|    	<li id="refresh_player">refresh_player</li>|; 
+	print qq|    </ul>|; 
+	print qq|  </li>|;
+	print qq|  <li id="country_controller">CountryController|;
+	print qq|    <ul>|; 
+	print qq|    	<li id="access_data">access_data</li>|; 
+	print qq|    	<li id="admin_add_country">admin_add_country</li>|; 
+	print qq|    	<li id="admin_reset_countries">admin_reset_countries</li>|; 
+	print qq|    </ul>|; 
+	print qq|  </li>|;
+	print qq|  <li id="world_controller">WorldController|;
+	print qq|    <ul>|; 
+	print qq|    	<li id="access_data">access_data</li>|; 
+	print qq|    	<li id="evoke_disaster">evoke_disaster</li>|; 
+	print qq|    </ul>|; 
+	print qq|  </li>|;
+	print qq|  <li id="war_controller">WarController|;
+	print qq|    <ul>|; 
+	print qq|    	<li id="action_set_war">action_set_war</li>|; 
+	print qq|    	<li id="action_encount">action_encount</li>|; 
+	print qq|    	<li id="action_step_war">action_step_war</li>|; 
+	print qq|    	<li id="action_complete_war">action_complete_war</li>|; 
+	print qq|    	<li id="action_win_war">action_win_war</li>|; 
+	print qq|    	<li id="action_lose_war">action_lose_war</li>|; 
+	print qq|    	<li id="action_draw_war_turn">action_draw_war_turn</li>|; 
+	print qq|    	<li id="action_draw_war_kaimetu">action_draw_war_kaimetu</li>|; 
+	print qq|    </ul>|; 
+	print qq|  </li>|;
+
+	print qq|</ul>|;
+
+
+	
+	#それぞれのメニューの入力フォーム
+	print qq|<form id="menu_form" action="$test_runner" method="post">|;
+	print qq|<div id="menu_input_form" class="menu_form_class">|;
+	print qq|</div>|;
 	print qq|<input type="hidden" name="pass" value="|;
 	print $q->param("pass");
 	print qq|">|;
-	print qq|<input type="submit" class="sbt_1" name="submit" value="実行">|;
+	print qq|<input type="hidden" name="mode" value="manual">|;
+	print qq|<input type="submit" class="sbt_1" class="menu_form_class" name="submit" value="実行">|;
 	print qq|</form>|;
+	print qq|</div>|;#menu_top
+
 	print qq|</div>|;
 }
 
@@ -182,18 +232,27 @@ sub print_header{
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
 <title>Blind Justice テストフレームワーク</title>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/jquery-ui.min.js"></script>
-<script src="$framework_root/HTML/js/test_gui.js"></script>
-<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/themes/redmond/jquery-ui.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.css">
 <link rel="stylesheet" href="$framework_root/HTML/test_browser.css">
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.19/i18n/jquery-ui-i18n.min.js"></script>
-    <script>
-        \$(function(){
-	    \$( '#tabs' ) . tabs();
+<script src="$framework_root/HTML/js/test_gui.js"></script>
+<script src="$framework_root/HTML/js/test_browser_menu.js"></script>
+<script>
+	\$(function(){
+		\$( '#tabs' ) . tabs();
         });
-    </script>
+</script>
+<script>
+	\$(function() {
+		var menu = \$('div > #menu');
+		menu.menu({
+			position: {my: "left top", at: "right top" }
+		});
+	});
+</script>
 </head>
+
 <body>|;
 }
 

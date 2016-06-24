@@ -105,7 +105,7 @@ sub _run_load{
 	$test_interface->add_save_dir("./html");
 	$test_interface->add_save_dir("./user");
 	$test_interface->restore_data($dir_to_save);
-	print qq|<div id="msg_window"><p class="msg_class">data, log, html, userディレクトリを$dir_to_saveにロードした</p></div><br>|;
+	print qq|<div id="msg_window"><p class="msg_class">data, log, html, userディレクトリを$dir_to_saveからロードした</p></div><br>|;
 }
 
 #スクリプトモード
@@ -134,14 +134,36 @@ sub _run_script{
 	#テスト結果を出力
 	$test_interface->output_result();
 	
-	#復元
-	$test_interface->restore_data();
-
 }
 
 #マニュアルモード
 sub _run_manual{
-	print qq|<div id="msg_window"><p class="msg_class">開発中</p></div><br>|;
+
+	#引数を回収
+	my $file = $q->param('file');
+	unless($file){
+		print qq|<div id="msg_window"><p class="msg_class">ファイルが選択されていない</p></div><br>|;
+		return;
+	}
+	my @argv_constants = qw(value1 value2 value3 value4);
+	my $argvs = {};
+	for $argv (@argv_constants){
+		my $param = $q->param($argv);
+		if(defined $param){
+			$argvs->{$argv} = $param;
+		}
+	}
+
+	#テストインターフェースクラス生成
+	my $result = TestResultBrowser->new($output_html);
+	my $test_interface = TestInterface->new($result);
+
+	#テスト実行
+	$test_interface->run_test_with_argv($file, $argvs);
+
+	#テスト結果を出力
+	$test_interface->output_result();
+
 }
 
 #終了処理
