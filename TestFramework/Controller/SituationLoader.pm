@@ -11,7 +11,7 @@ sub save_situation{
 	my $dirs = ["log", "user", "html", "data"];
 
 	for my $dir (@$dirs){
-		$sa->move_data("./$dir", "$ControllerConst::situation_save_dir/$situation_name/$dir");
+		$sa->copy_data("./$dir", "$ControllerConst::situation_save_dir/$situation_name/$dir");
 	}
 
 }
@@ -24,7 +24,7 @@ sub load_situation{
 	my @dirs = ["log", "user", "html", "data"];
 
 	for $dir (@$dirs){
-		$sa->move_data("$ControllerConst::situation_save_dir/$situation_name/$dir", "./$dir");
+		$sa->copy_data("$ControllerConst::situation_save_dir/$situation_name/$dir", "./$dir");
 	}
 
 }
