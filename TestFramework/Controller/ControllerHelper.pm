@@ -1,15 +1,16 @@
 package ControllerHelper;
+use TestFramework::Controller::ControllerConst;
 
 #adminからコピーしたすべてのユーザー名を調べる関数
 sub get_all_users {
 	my @lines = ();
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	opendir my $dh, "$ControllerConst::user_dir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 	while (my $id = readdir $dh) {
 		next if $id =~ /\./;
 		next if $id =~ /backup/;
 		next if ($in{sort} eq 'player' && $in{checkid} && $in{checkid} ne $id);
 		
-		open my $fh, "< $userdir/$id/user.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません");
+		open my $fh, "< $ControllerConst::user_dir/$id/user.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません");
 		my $line_data = <$fh>;
 		my $line_info = <$fh>;
 		close $fh;
@@ -21,8 +22,8 @@ sub get_all_users {
 			$m{$k} = $v;
 		}
 		
-		if(-f "$userdir/$id/access_log.cgi" && ($in{sort} eq 'check' || ($in{sort} eq 'player' && $in{checkid}))){
-			open my $fh2, "< $userdir/$id/access_log.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません");
+		if(-f "$ControllerConst::user_dir/$id/access_log.cgi" && ($in{sort} eq 'check' || ($in{sort} eq 'player' && $in{checkid}))){
+			open my $fh2, "< $ControllerConst::user_dir/$id/access_log.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません");
 			while (my $line_info_add = <$fh2>){
 				($m{addr}, $m{host}, $m{agent}) = split /<>/, $line_info_add;
 				my $line = "$id<>";
@@ -55,4 +56,4 @@ sub get_all_users {
 	return @lines;
 }
 
-
+1;

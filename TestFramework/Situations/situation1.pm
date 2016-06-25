@@ -12,7 +12,7 @@ sub refresh{
 
 	#既存プレイヤー削除
 	require $ControllerConst::controller_helper;
-	my $lines = get_all_users();
+	my @lines = ControllerHelper::get_all_users();
 	for my $line (@lines){
 		my @vars = split(/<>/, $line);
 		$pc->remove_player($vars[1]);
@@ -22,20 +22,21 @@ sub refresh{
 	$cc->admin_reset_countries();
 
 	#プレイヤーキャラクタ
-	my $common_passward = "situation1";　#共通パスワード
+	my $common_passward = "situation1";
+	#名前はsituation1country1male
 	my $players = [
-		{ name=>"s1c1m", sex=>1, country=>1},
-		{ name=>"s1c1f", sex=>2, country=>1},
-		{ name=>"s1c2m", sex=>1  country=>2},
-		{ name=>"s1c2f", sex=>2  country=>2},
-		{ name=>"s1c3m", sex=>1  country=>3},
-		{ name=>"s1c3f", sex=>2  country=>3},
-		{ name=>"s1c4m", sex=>1  country=>4},
-		{ name=>"s1c4f", sex=>2  country=>4},
-		{ name=>"s1c5m", sex=>1  country=>4},
-		{ name=>"s1c5f", sex=>2  country=>5},
-		{ name=>"s1c6m", sex=>1  country=>6},
-		{ name=>"s1c6f", sex=>2  country=>6}
+		{ name=>"s1c1m", sex=>1,  country=>1},
+		{ name=>"s1c1f", sex=>2,  country=>1},
+		{ name=>"s1c2m", sex=>1,  country=>2},
+		{ name=>"s1c2f", sex=>2,  country=>2},
+		{ name=>"s1c3m", sex=>1,  country=>3},
+		{ name=>"s1c3f", sex=>2,  country=>3},
+		{ name=>"s1c4m", sex=>1,  country=>4},
+		{ name=>"s1c4f", sex=>2,  country=>4},
+		{ name=>"s1c5m", sex=>1,  country=>4},
+		{ name=>"s1c5f", sex=>2,  country=>5},
+		{ name=>"s1c6m", sex=>1,  country=>6},
+		{ name=>"s1c6f", sex=>2,  country=>6}
 	];
 
 
@@ -53,10 +54,13 @@ sub refresh{
 	}
 
 	#士官
-	for my $player (@players){
+	for my $player (@$players){
 		$pc->action_shikan_player($player->{name}, $player->{country});
 	}
 
+	#セーブ
+	require  $ControllerConst::situation_loader;
+	SituationLoader::save_situation("situation1");
 }
 
 
