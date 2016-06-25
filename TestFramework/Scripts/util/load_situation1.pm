@@ -7,5 +7,6 @@ sub run{
 	use TestFramework::Controller::ControllerConst;
 	
 	require  $ControllerConst::situation_loader;
-	SituationLoader::load_situation("situation1");}
+	SituationLoader::load_situation("situation1");
+}
 1;
