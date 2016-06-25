@@ -33,7 +33,7 @@ sub refresh{
 		{ name=>"s1c3f", sex=>2,  country=>3},
 		{ name=>"s1c4m", sex=>1,  country=>4},
 		{ name=>"s1c4f", sex=>2,  country=>4},
-		{ name=>"s1c5m", sex=>1,  country=>4},
+		{ name=>"s1c5m", sex=>1,  country=>5},
 		{ name=>"s1c5f", sex=>2,  country=>5},
 		{ name=>"s1c6m", sex=>1,  country=>6},
 		{ name=>"s1c6f", sex=>2,  country=>6}
