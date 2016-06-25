@@ -21,9 +21,9 @@ sub load_situation{
 	my $situation_name = shift;
 	require $ControllerConst::system_accessor;
 	my $sa = SystemAccessor->new();
-	my @dirs = ["log", "user", "html", "data"];
+	my $dirs = ["log", "user", "html", "data"];
 
-	for $dir (@$dirs){
+	for my $dir (@$dirs){
 		$sa->copy_data("$ControllerConst::situation_save_dir/$situation_name/$dir", "./$dir");
 	}
 
