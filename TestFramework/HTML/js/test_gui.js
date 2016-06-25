@@ -82,9 +82,7 @@ $(function(){
     $("a[href = '#tab_script']").hover(function(){ 
             $("#msg_window").find("p").text("スクリプトを実行する。");
             $("#msg_window").find("p").append("<br><br>");
-            $("#msg_window").find("p").append("tests   : テスト");
-            $("#msg_window").find("p").append("<br>");
-            $("#msg_window").find("p").append("samples : テストとコントローラーのチュートリアル");
+            $("#msg_window").find("p").append("tests   : テストケース");
             $("#msg_window").find("p").append("<br>");
             $("#msg_window").find("p").append("util    : 便利なスクリプト");
 

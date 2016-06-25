@@ -8,6 +8,7 @@ our $testframework_root = "./TestFramework";
 our $controller_dir = "$testframework_root/Controller";
 our $accessor_dir = "$controller_dir/Accessor";
 our $item_accessor_specific = "$accessor_dir/ItemAccessorSpecific";
+our $situation_save_dir = "$testframework_root/Situations";
 
 #モジュールのパス
 our $player_accessor = "$accessor_dir/PlayerAccessor.cgi";
@@ -22,6 +23,7 @@ our $war_accessor = "$accessor_dir/WarAccessor.cgi";
 our $war_controller = "$controller_dir/WarController.cgi";
 our $item_accessor = "$accessor_dir/ItemAccessor.cgi";
 our $item_controller = "$controller_dir/ItemController.cgi";
+our $situation_loader = "$controller_dir/SituationLoader.pm";
 
 #bjのcgiをrequireする際のラッパー
 our $bj_wrapper = "$accessor_dir/BJWrapper.cgi";
