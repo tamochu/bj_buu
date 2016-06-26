@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl --
 require 'config.cgi';
 require 'config_game.cgi';
-
+#use Time::HiRes qw(gettimeofday tv_interval);
 use File::Copy;
 #=================================================
 # 一年ﾗﾝｷﾝｸﾞ Created by oiiiuiiii
@@ -99,7 +99,8 @@ sub run {
 # 廃人ﾗﾝｷﾝｸﾞを更新
 #=================================================
 sub update_player_ranking  {
-	for my $i(1..10){
+#	my $t0 = [gettimeofday];
+	for my $i(1..10){
 		my $to_file_name;
 		my $old_year = 10 - $i;
 		my $old_file_name = $this_file;
@@ -122,7 +123,7 @@ sub update_player_ranking  {
 
 	my %sames = ();
 	my @line = ();
-	my @p_ranks = ();
+	my @p_ranks = ([0, 0, 0]); # 挿入ｿｰﾄ用比較対象 [値, 名前, 国番号]
 	my $status = $rank_status[$in{no}][0];
 	my $rank_min = $rank_status[$in{no}][2];
 	
@@ -179,11 +180,61 @@ sub update_player_ranking  {
 			}
 			close $fh;
 			next if $p_status < $rank_min;
-			push @p_ranks, [$p_status, $player, $country]; # ﾗﾝｸｲﾝﾌﾟﾚｲﾔｰの追加
+
+			# 各ﾌﾟﾚｲﾔｰを挿入ｿｰﾄしながらﾗﾝｸ付けし、ﾗﾝｸ外になった順位は削除
+			# ﾗﾝｷﾝｸﾞが埋まっていて最下位より小さければﾗﾝｸｲﾝする訳がない
+			next if ($#p_ranks >= $max_ranking) && ($p_ranks[$#p_ranks-1][0] > $p_status);
+			my $is_insert = 0; # 挿入しているか
+			my @count = (1, 0); # 総数, 通過数
+			my ($prev_rank, $prev_value) = (0, 0); # 1つ上位の順位と値
+			for my $j (0 .. $#p_ranks) {
+				# 挿入ｿｰﾄでﾌﾟﾚｲﾔｰを大きい順に並べる
+				# 同時に順位も計算するので挿入は一回のみ
+				if ($p_status > $p_ranks[$j][0] && !$is_insert) {
+					splice(@p_ranks, $j, 0, [$p_status, $player, $country]);
+					$is_insert = 1;
+				}
+
+				# ﾗﾝｷﾝｸﾞから出たﾌﾟﾚｲﾔｰを除外
+				# 同順位があるので1人ではなく全員削除
+				$count[1] = $prev_value == $p_ranks[$j][0] ? $count[1]+1 : 0;
+				my $rank = $count[0] - $count[1]; # 回数 - ダブり数 = 順位
+				if ($rank > $prev_rank && $prev_rank >= $max_ranking) {
+					splice(@p_ranks, $j, 1) while $p_ranks[$j][0];
+					last; # 全員削除したので次の要素はない
+				}
+
+				# 次の要素がﾗﾝｸ外かどうか判定するのに順位と値が必要
+				($prev_rank, $prev_value) = ($rank, $p_ranks[$j][0]);
+				$count[0]++;
+			}
 		}
 		close $cfh;
 	}
 
+	# ﾗﾝｸｲﾝ時にｿｰﾄしてるので 0 番目が 1位
+	my $max_value = $p_ranks[0][0]; # ﾗﾝｷﾝｸﾞ1位の値
+	for my $i (0 .. $#p_ranks-1) {
+		# 給料ﾗﾝｷﾝｸﾞ以外の1位のプレイヤーに No.1 熟練付与
+		if ($status ne 'sal' && $max_value == $p_ranks[$i][0]) {
+			my $no1_name = $p_ranks[$i][1];
+			$no1_name =~ s/\s.*?から最も奪う$//;
+			my $n_id = unpack 'H*', $no1_name;
+			open my $ufh, ">> $userdir/$n_id/ex_c.cgi";
+			print $ufh "no1_c<>1<>\n";
+			close $ufh;
+		}
+
+		push(@line, "$p_ranks[$i][0]<>$p_ranks[$i][1]<>$p_ranks[$i][2]\n");
+#		print "$p_ranks[$i][0] $p_ranks[$i][1] $p_ranks[$i][2]<br>";
+	}
+
+	# 配列にリファレンスぶち込みまくるといつどこでどう参照されてるのか把握しにくくGCが働かない可能性があるとか
+	# 明示的に解放してやらないとメモリリーク起こすらしい？ 解放してもダメ？
+	# そもそも配列に無名リファレンスを挿入したり削除したりという処理が根本的にアウト？
+	undef(@p_ranks);
+
+=pod
 	# ﾗﾝｸｲﾝﾌﾟﾚｲﾔｰのうち上位者を抜き出して1位のプレイヤーにNo.1熟練付与
 	# 高速化のために sort を使ってないけど0.08秒ぐらいしか差がない…元のデータが大きければ効果ありそう
 	my $count = 0;
@@ -220,7 +271,7 @@ sub update_player_ranking  {
 		$count++;
 		$old_max_value = $max_value;
 	}
-
+=cut
 =pod
 	if (@p_ranks) {
 		# sortで1行にできるけど配列の全要素を操作せずにﾗﾝｸｲﾝするﾌﾟﾚｲﾔｰだけをﾋﾟｯｸする↑の方が速い
@@ -251,5 +302,8 @@ sub update_player_ranking  {
 	open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
 	print $fh @line;
 	close $fh;
+
+#	my $timer = tv_interval($t0);
+#	print "$timer ms<br>";
 }
 
