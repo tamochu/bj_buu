@@ -120,21 +120,17 @@ sub update_player_ranking  {
 		}
 	}
 
-
 	my %sames = ();
 	my @line = ();
-	my @p_ranks = (1,'','');
+	my @p_ranks = ();
 	my $status = $rank_status[$in{no}][0];
 	my $rank_min = $rank_status[$in{no}][2];
 	
 	my $last_year = $w{year} - 1;
-	
 	push @line, "$last_year\n";
 
 	for my $country (0 .. $w{country}) {
-
 		open my $cfh, "< $logdir/$country/member.cgi" or &error("$logdir/$country/member.cgiﾌｧｲﾙが開けません");
-
 		while (my $player = <$cfh>) {
 			$player =~ tr/\x0D\x0A//d;
 			next if ++$sames{$player} > 1;
@@ -142,138 +138,117 @@ sub update_player_ranking  {
 			unless (-f "$userdir/$player_id/year_ranking.cgi") {
 				next;
 			}
-			
-			my %p;
-			my %pb = &get_you_datas($player_id, 1);
-			
+
+			my $p_status = 0;
 			open my $fh, "< $userdir/$player_id/year_ranking.cgi" or &error("year_ranking.cgiﾌｧｲﾙが開けません");
 			while (my $line = <$fh>) {
+				next if (index($line, "year;$last_year", 0) < 0) || # 前年以外のデータは無意味なので解析しない
+							(index($line, $status, 0) < 0); # 参照先データを持たない人まで解析しても無意味
+
+				# 前年の一年ﾗﾝｷﾝｸﾞﾃﾞｰﾀの取り出し
 				my %ydata;
 				for my $hash (split /<>/, $line) {
 					my($k, $v) = split /;/, $hash;
 					$ydata{$k} = $v;
-					if($k eq 'year'){
-						if($v != $last_year){
-							next;
-						}
+				}
+
+				if ($status eq 'mil_sum') {
+					$ydata{$status} = $ydata{gou};
+					if($ydata{cho} > $ydata{$status}){
+						$ydata{$status} = $ydata{cho};
+					}
+					if($ydata{sen} > $ydata{$status}){
+						$ydata{$status} = $ydata{sen};
 					}
 				}
-				if($ydata{year} == $last_year){
-					if($status eq 'mil_sum'){
-						$ydata{$status} = $ydata{gou};
-						if($ydata{cho} > $ydata{$status}){
-							$ydata{$status} = $ydata{cho};
-						}
-						if($ydata{sen} > $ydata{$status}){
-							$ydata{$status} = $ydata{sen};
+				elsif ($status eq 'strong') {
+					my $strong_c;
+					my $strong_v = 0;
+					for my $from_c (1 .. $w{country}){
+						if($strong_v < $ydata{"strong_".$from_c}){
+							$strong_v = $ydata{"strong_".$from_c};
+							$strong_c = $from_c;
 						}
 					}
-					if($ydata{$status}){
-						$p{$status} = $ydata{$status};
-						$p{name} = $pb{name};
-						if($status eq 'strong'){
-							my $strong_c;
-							my $strong_v = 0;
-							for my $from_c (1 .. $w{country}){
-								if($strong_v < $ydata{"strong_$from_c"}){
-									$strong_v = $ydata{"strong_$from_c"};
-									$strong_c = $from_c;
-								}
-							}
-							$p{name} .= " $cs{name}[$strong_c]から最も奪う";
-						}
-						if($status eq 'win'){
-							if($ydata{war} > 20){
-								$p{$status} = 100 * $ydata{$status} / $ydata{war};
-							}else{
-								$p{$status} = 0;
-							}
-						}
-						$p{country} = $pb{country};
-					}
+					$player .= " $cs{name}[$strong_c]から最も奪う";
 				}
+				elsif ($status eq 'win') {
+					$ydata{$status} = $ydata{war} > 20 ? 100 * $ydata{$status} / $ydata{war} : 0;
+				}
+				$p_status = $ydata{$status};
 			}
 			close $fh;
-			
-			next if $p{$status} < $rank_min;
-			
-			my @datas = ();
-			my @rdata = ();
-			my $i = 1;
-			
-			while ($i <= $max_ranking){
-				$rdata[0] = shift @p_ranks;
-				$rdata[1] = shift @p_ranks;
-				$rdata[2] = shift @p_ranks;
-				if ($rdata[0] <= $p{$status}) {
-					push @datas, $p{$status}, $p{name}, $p{country};
-					push @datas, $rdata[0], $rdata[1], $rdata[2] unless $i >= $max_ranking && $p{$status} != $rdata[0];
-					$i++;
-					my $last_number = $datas[-3];
-					while($i <= $max_ranking || $last_number == $p_ranks[0]){
-						my $cash;
-						$cash = shift @p_ranks;
-						push @datas, $cash;
-						$last_number = $cash;
-						$cash = shift @p_ranks;
-						push @datas, $cash;
-						$cash = shift @p_ranks;
-						push @datas, $cash;
-						last if $cash eq '';
-						$i++;
-					}
-				}else {
-					push @datas, $rdata[0], $rdata[1], $rdata[2];
-					$i++;
-				}
-				last if $rdata[1] eq '';
-			}
-			@p_ranks = ();
-			push @p_ranks, @datas;
+			next if $p_status < $rank_min;
+			push @p_ranks, [$p_status, $player, $country]; # ﾗﾝｸｲﾝﾌﾟﾚｲﾔｰの追加
 		}
 		close $cfh;
 	}
-	my $no1_flag = 1;
-	my $no1_value = 0;
-	while ($p_ranks[1] ne '') {
-		my @data;
-		for my $j (0..2){
-			$data[$j] = shift @p_ranks;
+
+	# ﾗﾝｸｲﾝﾌﾟﾚｲﾔｰのうち上位者を抜き出して1位のプレイヤーにNo.1熟練付与
+	# 高速化のために sort を使ってないけど0.08秒ぐらいしか差がない…元のデータが大きければ効果ありそう
+	my $count = 0;
+	my $old_max_value = 0;
+	my @ranking = (0, 0); # 順位, ダブリ
+	while ($max_ranking > $ranking[0]) {
+		last unless @p_ranks;
+
+		# sort の代わりにトップを順次抜き出す
+		my $max_value = 0;
+		my $max_index = 0;
+		for my $index (0 .. $#p_ranks) {
+			if ($p_ranks[$index][0] > $max_value) {
+				$max_value = $p_ranks[$index][0];
+				$max_index = $index;
+			}
 		}
-		if(($no1_flag == 1 || $data[0] == $no1_value) && $status ne 'sal'){
-			my $no1_name = $data[1];
-			$no1_name =~ tr/\x0D\x0A//d;
+
+		# 2位以下が上位と同じ数値ならダブリ数うｐ、違うならダブリ数リセット
+		$ranking[1] = $old_max_value > $max_value ? 0 : $ranking[1]+1 if $count > 0;
+		$ranking[0] = $count+1 - $ranking[1]; # (インデックス+1) - ダブリ数 = 順位
+
+		# 給料ﾗﾝｷﾝｸﾞ以外の1位のプレイヤーに No.1 熟練付与
+		if ($status ne 'sal' && $ranking[0] == 1) {
+			my $no1_name = $p_ranks[$max_index][1];
 			$no1_name =~ s/\s.*?から最も奪う$//;
 			my $n_id = unpack 'H*', $no1_name;
 			open my $ufh, ">> $userdir/$n_id/ex_c.cgi";
 			print $ufh "no1_c<>1<>\n";
 			close $ufh;
-			
-			if ($no1_flag) {
-				$no1_flag = 0;
-				$no1_value = $data[0];
-			}
 		}
-		if($status eq 'rank'){
-			$data[1] =~ tr/\x0D\x0A//d;
-			my $player_id = unpack 'H*', $data[1];
-			my %p = &get_you_datas($player_id, 1);
-			my $rank_name = &get_rank_name($p{rank}, $p{name});
-			if ($p{super_rank}){
-				$rank_name = '';
-				$rank_name .= '★' for 1 .. $p{super_rank};
-				$rank_name .= $p{rank_name};
-			}
-			push @line, "$rank_name<>$data[1]<>$data[2]\n";
-		}else {
-			push @line, "$data[0]<>$data[1]<>$data[2]\n";
-		}
+
+		push(@line, join('<>', @{splice(@p_ranks, $max_index, 1)})."\n");
+		$count++;
+		$old_max_value = $max_value;
 	}
 
-	open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
+=pod
+	if (@p_ranks) {
+		# sortで1行にできるけど配列の全要素を操作せずにﾗﾝｸｲﾝするﾌﾟﾚｲﾔｰだけをﾋﾟｯｸする↑の方が速い
+		@p_ranks = sort {$b->[0] <=> $a->[0]} @p_ranks;
 
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
+		# ﾗﾝｷﾝｸﾞﾃﾞｰﾀの書き込み準備
+		my @ranking = (0, 0); # 順位, ダブリ
+		for my $count (0 .. $#p_ranks) {
+			# 2位以下が上位と同じ数値ならダブリ数うｐ、違うならダブリ数リセット
+			$ranking[1] = $p_ranks[$count-1][0] > $p_ranks[$count][0] ? 0 : $ranking[1]+1 if $count > 0;
+			$ranking[0] = $count+1 - $ranking[1]; # (インデックス+1) - ダブリ数 = 順位
+
+			# 給料ﾗﾝｷﾝｸﾞ以外の1位のプレイヤーに No.1 熟練付与
+			if ($status ne 'sal' && $ranking[0] == 1) {
+				my $no1_name = $p_ranks[0][1];
+				$no1_name =~ s/\s.*?から最も奪う$//;
+				my $n_id = unpack 'H*', $no1_name;
+				open my $ufh, ">> $userdir/$n_id/ex_c.cgi";
+				print $ufh "no1_c<>1<>\n";
+				close $ufh;
+			}
+
+			push @line, "$p_ranks[$count][0]<>$p_ranks[$count][1]<>$p_ranks[$count][2]\n";
+			last if $ranking[0] >= $max_ranking; # 順位が $max_ranking 以上になったらお終い
+		}
+	}
+=cut
+	open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
 	print $fh @line;
 	close $fh;
 }

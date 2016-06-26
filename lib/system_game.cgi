@@ -836,6 +836,66 @@ sub regist_you_data {
 	close $fh;
 }
 #================================================
+# 相手ﾃﾞｰﾀ変更  結婚時と闘技場の熟練度UP時に使用
+#================================================
+# my @array = (['変更したい変数1', '値1'], ['変更したい変数2', '値2']);
+# &regist_you_array('相手の名前', @array);
+sub regist_you_array {
+	my $name = shift;
+	my @data = @_;
+	return if $name eq '' || !@data;
+	
+	my $y_id = unpack 'H*', $name;
+	return unless -f "$userdir/$y_id/user.cgi";
+
+	# 書き換え対象によっては待ち伏せを解除 1度やれば済むので2回目以降はなし
+	my $bool = 0;
+	for my $i (0 .. $#data) {
+		last if $bool;
+		my $k = $data[$i][0];
+		my $v = $data[$i][1];
+
+		if ($k eq 'lib' || $k eq 'value') {
+			my %you_datas = &get_you_datas($y_id,1);
+			if(($k eq 'lib' && $you_datas{lib} eq 'military' && $you_datas{tp} eq '610') || ($k eq 'value' && $you_datas{value} eq 'military_ambush')){
+				$bool = 1;
+				my @lines = ();
+				open my $fh, "+< $logdir/$you_datas{country}/patrol.cgi" or &error("$logdir/$you_datas{country}/patrol.cgiﾌｧｲﾙが開けません");
+				eval { flock $fh, 2; };
+				while (my $line = <$fh>) {
+					my($pat_time,$p_name) = split /<>/, $line;
+					next if $p_name eq $name;
+					push @lines, $line;
+				}
+				seek  $fh, 0, 0;
+				truncate $fh, 0;
+				print $fh @lines;
+				close $fh;
+			}
+		}
+	}
+
+	open my $fh, "+< $userdir/$y_id/user.cgi" or &error("$userdir/$y_id/user.cgi ﾌｧｲﾙが開けません");
+	eval { flock $fh, 2; };
+	my $line = <$fh>;
+	my $line_info = <$fh>;
+	for my $i (0 .. $#data) {
+		my $k = $data[$i][0];
+		my $v = $data[$i][1];
+
+		if(index($line, "<>$k;") >= 0){
+			$line =~ s/<>($k;).*?<>/<>$1$v<>/;
+		}else{
+			$line = "$k;$v<>" . $line;
+		}
+	}
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh $line;
+	print $fh $line_info;
+	close $fh;
+}
+#================================================
 # 牢獄に追加
 #================================================
 sub add_prisoner {

@@ -234,10 +234,16 @@ sub tp_310 {
 # –¼—_E
 #=================================================
 sub tp_400 {
+	if ($m{rank_exp} <= 6210 || $m{rank} != $#ranks) { # (13*13*10) + (14*14*10) + (16*16*10) ‚©‚Â Å‚ŠK‹‰
+		$mes .= "–¼—_ŠK‹‰‚É‚È‚ê‚éğŒ‚ğ–‚½‚µ‚Ä‚¢‚Ü‚¹‚ñ<br>";
+		&begin;
+		return;
+	}
+
 	$layout = 1;
 	$m{tp} += 10;
 	$mes .= "1¢‘ãŒÀ‚è‚Ì–¼—_E‚ÉA‚«‚Ü‚·<br>";
-	$mes .= "vŒ£’l10000‚ÅŠK‹‰–¼‚ğ©—R‚É•Ï‚¦‚ç‚ê‚Ü‚·<br>";
+	$mes .= "vŒ£’l2560‚ÅŠK‹‰–¼‚ğ©—R‚É•Ï‚¦‚ç‚ê‚Ü‚·<br>";
 	$mes .= "–¼—_E‚É‚È‚è‚Ü‚·‚©?<br>";
 	
 	$mes .= qq|<form method="$method" action="$script">|;
@@ -248,17 +254,12 @@ sub tp_400 {
 sub tp_410 {
 	&error("ŠK‹‰–¼‚ª’·‚·‚¬‚Ü‚·‘SŠp5(”¼Šp10)•¶š‚Ü‚Å‚Å‚·") if length $in{s_rank} > 10;
 	if ($in{s_rank}) {
-		if ($m{rank_exp} < 10000) {
-			$mes .= "vŒ£’l‚ª‘«‚è‚Ü‚¹‚ñ<br>";
-		}
-		else {
-			$m{rank_exp} -= 10000;
-			$m{super_rank} += 1;
-			$in{s_rank} =~ s/š/™/g;
-			$m{rank_name} = $in{s_rank};
-			
-			$mes .= "–¼—_Euš$m{rank_name}v‚É‚È‚è‚Ü‚µ‚½<br>";
-		}
+		$m{rank_exp} -= 2560;
+		$m{super_rank} += 1;
+		$in{s_rank} =~ s/š/™/g;
+		$m{rank_name} = $in{s_rank};
+
+		$mes .= "–¼—_Euš$m{rank_name}v‚É‚È‚è‚Ü‚µ‚½<br>";
 	}
 	&begin;
 }

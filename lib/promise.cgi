@@ -120,8 +120,6 @@ sub exe1 {
 		$m{tp} += 10;
 		$y{country} = $cmd;
 
-		&write_yran("contr_pro_$GWT", 1, 1);
-
 		$mes .= "$_[0]$cs{name}[$y{country}]‚ÉŒü‚©‚¢‚Ü‚µ‚½<br>";
 		$mes .= "Œ‹‰Ê‚Í$GWT•ªŒã‚Å‚·<br>";
 		&wait;
@@ -288,8 +286,6 @@ sub exe2 {
 	
 			$m{tp} += 10;
 			$y{country} = $union;
-
-			&write_yran("contr_pro_$GWT", 1, 1);
 
 			&mes_and_send_news("“¯–¿‘‚Ì$cs{name}[$union]‚É$_[1]‚ğ $m{value} ‘—‚è‚Ü‚µ‚½");
 			$mes .= "$GWT•ª‚É“’…‚·‚é—\\’è‚Å‚·<br>";

@@ -1,3 +1,71 @@
+.mes {
+	width: 98%;
+	padding: 1%;
+}
+.mes ul {
+	margin: 0;
+	padding: 0;
+	padding-left: 1.5em;
+}
+
+.button_login {
+	width: 100%;
+	height: 100%;
+	color: #003;
+	font-size: 14px;
+	font-weight: bold;
+	border: 3px ridge #9CF;
+	background-color: #69C;
+	cursor: hand;
+}
+
+.entry_box_s {
+	width:100%;
+	margin:0 auto;
+	text-align: center;
+}
+.entry_box_s form {
+	display: inline-block;
+	width: 33%;
+	margin:0 auto;
+}
+.entry_box_s form.new_entry {
+	display: inline-block;
+	width: 97%;
+	margin:0 auto;
+}
+.entry_box_s form.button1 {
+	width: 95%;
+	height: 24px;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;
+	border: 2px solid #CCC;
+	background-color: #336;
+	cursor: hand;
+}
+.navi {
+	width:100%;
+	margin:0 auto;
+	text-align: center;
+}
+
+.navi form {
+	display: inline-block;
+	width: 33%;
+}
+
+.navi_button {
+	width: 95%;
+	height: 24px;
+	color: #FFF;
+	font-size: 14px;
+	font-weight: bold;
+	border: 2px solid #CCC;
+	background-color: #336;
+	cursor: hand;
+}
+
 .button2s {
 	display:inline;
 	color: #FFF;
@@ -24,18 +92,6 @@
 	overflow-x:scroll;
 }
 
-.table2 {
-	width:100%;
-	overflow:scroll;
-}
-.table2 th {
-	border: 2px solid #999;
-	background: #336;
-	white-space: nowrap;
-}
-.table2 td {
-	white-space: nowrap;
-}
 
 .cmd_form {
 	display:inline;
