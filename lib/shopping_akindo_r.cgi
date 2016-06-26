@@ -564,7 +564,7 @@ sub begin_goods {
 	$layout = 2;
 	my $shop_list_file = "$logdir/shop_list_$goods_dir.cgi";
 	
-	$m{tp} = int($m{tp} / 100) * 100 + 1 if $m{tp} > 1;
+	$m{tp_r} = int($m{tp_r} / 100) * 100 + 1 if $m{tp_r} > 1;
 	$mes .= "‚Ç‚Ì‚¨“X‚Å”ƒ•¨‚µ‚Ü‚·‚©?<br>";
 	
 	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
@@ -656,7 +656,7 @@ sub disp_goods {
 		
 		$mes .= qq|</table><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		$mes .= qq|<p><input type="submit" value="”ƒ‚¤" class="button1"></p></form>|;
-		$m{tp} = int($m{tp} / 100) * 100 + 10;
+		$m{tp_r} = int($m{tp_r} / 100) * 100 + 10;
 	}
 	else {
 #		$mes .= "y$y{name}z€”õ’†<br>";
