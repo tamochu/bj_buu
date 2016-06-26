@@ -135,6 +135,8 @@ sub generate_manual_tab{
 	print qq|    	<li id="access_data">access_data</li>|; 
 	print qq|    	<li id="admin_add_country">admin_add_country</li>|; 
 	print qq|    	<li id="admin_reset_countries">admin_reset_countries</li>|; 
+	print qq|    	<li id="action_stand_candidate">action_stand_candidate</li>|; 
+	print qq|    	<li id="action_vote">action_vote</li>|; 
 	print qq|    </ul>|; 
 	print qq|  </li>|;
 	print qq|  <li id="world_controller">WorldController|;
