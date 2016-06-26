@@ -19,6 +19,9 @@ sub _load_config{
 
 	require "config.cgi";
 	require "config_game.cgi";
+	
+	#config_test抑制
+	$config_test = 0;
 
 	#&twitter_botを上書きして抑制
 	no warnings 'redefine';

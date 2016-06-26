@@ -93,6 +93,49 @@ sub admin_reset_countries{
 
 }
 
+#立候補する
+sub action_stand_candidate{
+	
+	my $self = shift;
+	my $player_name = shift;
+
+	my $caller_filename = (caller 1)[1];
+	my $caller_num_line = (caller 1)[2];
+	my $error_info = "Error: $caller_filename at line $caller_num_line";
+
+	
+
+	eval{
+		$self->{COUNTRY_ACCESSOR}->action_stand_candidate($player_name);
+	};
+	if($@){
+		die ("$error_info: action_stand_candidate failed\n", $@);
+	}
+
+}
+
+
+#投票する
+sub action_vote{
+	
+	my $self = shift;
+	my ($player_name, $candidate_name) = @_;
+
+	my $caller_filename = (caller 1)[1];
+	my $caller_num_line = (caller 1)[2];
+	my $error_info = "Error: $caller_filename at line $caller_num_line";
+
+	
+
+	eval{
+		$self->{COUNTRY_ACCESSOR}->action_vote($player_name, $candidate_name);
+	};
+	if($@){
+		die ("$error_info: action_vote failed\n", $@);
+	}
+
+}
+
 #国を削除
 #sub remove_country{
 #

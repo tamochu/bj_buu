@@ -243,6 +243,46 @@ $(function(){
    });
 });
 
+//CountryController::action_stand_candidate
+$(function(){
+    $("#action_stand_candidate", "#country_controller").on({
+	"click": function(){ 
+        	$("#menu_input_form").replaceWith(
+			    menu_header 
+			   +make_description("プレイヤー名")
+			   +make_textbox("value1")
+			   +menu_footer
+			   +make_input_file("TestFramework/ScriptsManual/CountryController/action_stand_candidate.pm")
+		);
+	},
+	"mouseover": function(){
+		$("#msg_window").find("p").text("国情報→君主投票→立候補から立候補する");
+
+	}
+   });
+});
+
+//CountryController::action_vote
+$(function(){
+    $("#action_vote", "#country_controller").on({
+	"click": function(){ 
+        	$("#menu_input_form").replaceWith(
+			    menu_header 
+			   +make_description("プレイヤー名")
+			   +make_textbox("value1")
+			   +make_description("候補者名")
+			   +make_textbox("value2")
+			   +menu_footer
+			   +make_input_file("TestFramework/ScriptsManual/CountryController/action_vote.pm")
+		);
+	},
+	"mouseover": function(){
+		$("#msg_window").find("p").text("国情報→君主投票→投票から投票する");
+
+	}
+   });
+});
+
 //WorldController
 $(function(){
     $("#world_controller").hover(function(){ 

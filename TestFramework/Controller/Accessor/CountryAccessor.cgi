@@ -161,10 +161,233 @@ sub reset_countries{
 	Util::fork_sub($enter_admin);
 }
 
+#立候補する
+sub action_stand_candidate{
+
+	my $self = shift;
+	my $name = shift;
+
+	#ブラウザから送られる環境変数の偽装の基礎部分
+	my $make_env = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+		_make_env_base($name);
+
+	};
+	my $env_base = Util::fork_sub($make_env);
+
+	#国情報を開く
+	my $enter_bj = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($name);
+		_is_bound($name);
+
+		$mes = "";
+		#国情報
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=7"; 
+		require "bj.cgi";
+		_read_user($name);
+		die ("in enter_bj false m{lib} : $m{lib}, mes = $mes\n") if ($m{lib} ne "country");
+
+	};
+
+
+	#投票画面へ
+	my $country_info = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=3"; 
+		require "bj.cgi";
+		_read_user($name);
+		die ("country_info failed m{lib} :  $m{lib}, mes = $mes\n") if ($m{lib} ne "country_leader");
+
+	};
+	
+	#立候補するを選ぶ
+	my $select_stand = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=2"; 
+		require "bj.cgi";
+		_read_user($name);
+		die ("select_stand failed : m{tp} = $m{tp} mes = $mes\n") if ($m{tp} ne 210);
+
+	};
+
+	#立候補するを確定
+	my $confirm_stand = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=1"; 
+		require "bj.cgi";
+		_read_user($name);
+		die ("confirm_stand failed : m{tp} = $m{tp} mes = $mes\n") if ($m{tp} ne 1);
+
+	};
+
+	#戻る
+	my $back = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=0"; 
+		require "bj.cgi";
+		_read_user($name);
+		die ("back failed : m{lib} = $m{lib} mes = $mes\n") if ($m{lib} ne "");
+
+	};
+
+	Util::fork_sub($enter_bj);
+	Util::fork_sub($country_info);
+	Util::fork_sub($select_stand);
+	Util::fork_sub($confirm_stand);
+	Util::fork_sub($back);
+}
+
+#投票する
+sub action_vote{
+	my $self = shift;
+	my ($player_name, $candidate_name) = @_;
+
+	#ブラウザから送られる環境変数の偽装の基礎部分
+	my $make_env = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+		_make_env_base($player_name);
+
+	};
+	my $env_base = Util::fork_sub($make_env);
+
+	#国情報を開く
+	my $enter_bj = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($player_name);
+		_is_bound($player_name);
+
+		$mes = "";
+		#国情報
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=7"; 
+		require "bj.cgi";
+		_read_user($player_name);
+		die ("in enter_bj false m{lib} : $m{lib}, mes = $mes\n") if ($m{lib} ne "country");
+
+	};
+
+	#投票画面へ
+	my $country_info = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($player_name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=3"; 
+		require "bj.cgi";
+		_read_user($player_name);
+		die ("country_info failed m{lib} :  $m{lib}, mes = $mes\n") if ($m{lib} ne "country_leader");
+
+	};
+
+	#投票を選ぶ
+	my $select_vote = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($player_name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=1"; 
+		require "bj.cgi";
+		_read_user($player_name);
+		die ("select_vote failed : m{tp} = $m{tp}, mes = $mes\n") if ($m{tp} ne "110");
+
+	};
+
+	#候補者リストを出して支持者を選ぶ
+	my $select_candidate = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($player_name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&vote=$candidate_name"; 
+		require "bj.cgi";
+		_read_user($player_name);
+		die ("select_candidate failed m{tp} :  $m{tp}, mes = $mes\n") if ($m{tp} ne "1");
+
+	};
+
+
+	#戻る
+	my $back = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_load_config();
+		_read_user($player_name);
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=0"; 
+		require "bj.cgi";
+		_read_user($player_name);
+		die ("back failed : m{lib} = $m{lib} mes = $mes\n") if ($m{lib} ne "");
+
+	};
+
+	Util::fork_sub($enter_bj);
+	Util::fork_sub($country_info);
+	Util::fork_sub($select_vote);
+	Util::fork_sub($select_candidate);
+	Util::fork_sub($back);
+}
+
 #国を削除(system_game.cgi::delete_countryが壊れているようなので自作)
 sub remove_country {
 	
-	carp ("CountryAccessor::remove_country() is experimental\n");
+	die ("CountryAccessor::remove_country() is experimental\n");
 
 	my $self = shift;
 	my $country_index_to_remove = shift;
