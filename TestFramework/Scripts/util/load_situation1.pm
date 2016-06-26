@@ -10,6 +10,8 @@ sub run{
 
 	#既存プレイヤー削除
 	require $ControllerConst::controller_helper;
+	require $ControllerConst::player_controller;
+	my $pc = PlayerController->new();
 	my @lines = ControllerHelper::get_all_users();
 	for my $line (@lines){
 		my @vars = split(/<>/, $line);
