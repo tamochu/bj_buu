@@ -1,6 +1,7 @@
 #!/usr/local/bin/perl --
 require 'config.cgi';
 require 'config_game.cgi';
+#use Time::HiRes qw(gettimeofday tv_interval);
 #=================================================
 # 廃人ﾗﾝｷﾝｸﾞ Created by oiiiuiiii
 #=================================================
@@ -90,6 +91,7 @@ sub run {
 # 廃人ﾗﾝｷﾝｸﾞを更新
 #=================================================
 sub update_player_ranking  {
+#	my $t0 = [gettimeofday];
 	my @line = ();
 	my $last_year = $w{year} - 1;
 	push @line, "$last_year\n";
@@ -124,6 +126,8 @@ sub update_player_ranking  {
 			for my $no (0 .. $#rank_status) {
 				my $status = $rank_status[$no][0];
 				next if $ydata{$status} < $rank_status[$no][2];
+				# ﾗﾝｷﾝｸﾞが埋まっていて最下位より小さければﾗﾝｸｲﾝする訳がない
+				next if ($#{$p_ranks[$no]} >= $max_ranking) && ($p_ranks[$no][$#{$p_ranks[$no]}-1][0] > $ydata{$status});
 
 				my $from = '';
 				if ($status eq 'strong') {
@@ -138,6 +142,32 @@ sub update_player_ranking  {
 					$from = " $cs{name}[$strong_c]から最も奪う";
 				}
 
+				# 各ﾌﾟﾚｲﾔｰを挿入ｿｰﾄしながらﾗﾝｸ付けし、ﾗﾝｸ外になった順位は削除
+				my $is_insert = 0; # 挿入しているか
+				my @count = (1, 0); # 総数, 通過数
+				my ($prev_rank, $prev_value) = (0, 0); # 1つ上位の順位と値
+				for my $j (0 .. $#{$p_ranks[$no]}) {
+					# 挿入ｿｰﾄでﾌﾟﾚｲﾔｰを大きい順に並べる
+					# 同時に順位も計算するので挿入は一回のみ
+					if ($ydata{$status} > $p_ranks[$no][$j][0] && !$is_insert) {
+						splice(@{$p_ranks[$no]}, $j, 0, [$ydata{$status}, $player]);
+						$is_insert = 1;
+					}
+	
+					# ﾗﾝｷﾝｸﾞから出たﾌﾟﾚｲﾔｰを除外
+					# 同順位があるので1人ではなく全員削除
+					$count[1] = $prev_value == $p_ranks[$no][$j][0] ? $count[1]+1 : 0;
+					my $rank = $count[0] - $count[1]; # 回数 - ダブり数 = 順位
+					if ($rank > $prev_rank && $prev_rank >= $max_ranking) {
+						splice(@{$p_ranks[$no]}, $j, 1) while $p_ranks[$no][$j][0];
+						last; # 全員削除したので次の要素はない
+					}
+	
+					# 次の要素がﾗﾝｸ外かどうか判定するのに順位と値が必要
+					($prev_rank, $prev_value) = ($rank, $p_ranks[$no][$j][0]);
+					$count[0]++;
+				}
+=pod
 				# ﾗﾝｷﾝｸﾞに自分のﾃﾞｰﾀを挿入ｿｰﾄ、ﾗﾝｸ外に出たﾃﾞｰﾀを削除
 				# 同位の考慮はしなくてもええんでね
 				for my $rank (0 .. $#{$p_ranks[$no]}) {
@@ -147,6 +177,7 @@ sub update_player_ranking  {
 						last;
 					}
 				}
+=cut
 			}
 		}
 		close $fh;
@@ -160,8 +191,12 @@ sub update_player_ranking  {
 		}
 		push @line, "0<><>\n";
 	}
+	undef(@p_ranks);
 
 	open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
 	print $fh @line;
 	close $fh;
+
+#	my $timer = tv_interval($t0);
+#	print "$timer ms<br>";
 }
