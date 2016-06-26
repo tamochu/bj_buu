@@ -10,15 +10,7 @@ sub refresh{
 	my $pc = PlayerController->new();
 	my $cc = CountryController->new();
 
-	#既存プレイヤー削除
-	require $ControllerConst::controller_helper;
-	my @lines = ControllerHelper::get_all_users();
-	for my $line (@lines){
-		my @vars = split(/<>/, $line);
-		$pc->remove_player($vars[1]);
-	}
-
-	#国をデフォルト（6ヵ国、１年目、平和）
+	#国をデフォルトでリセット（6ヵ国、１年目、平和）
 	$cc->admin_reset_countries();
 
 	#プレイヤーキャラクタ

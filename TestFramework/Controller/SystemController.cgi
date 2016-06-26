@@ -97,4 +97,42 @@ sub restore_time{
 	$self->{TIME_TYPE} = TIME_NATURAL;
 }
 
+#データを移動させる
+#移動先に同じフォルダがあればフォルダを削除してから移動する
+sub move_data{
+
+	my $self = shift;
+	my ($src, $dst) = @_;
+	my $caller_filename = (caller 1)[1];
+	my $caller_num_line = (caller 1)[2];
+	my $error_info = "Error: $caller_filename at line $caller_num_line";
+
+	eval{
+		$self->{SYSTEM_ACCESSOR}->move_data($src, $dst);
+	};
+	if($@){
+		die ("$error_info: failed to move data\n", $@);
+	}
+
+}
+
+#データをコピーする
+#移動先に同じフォルダがあればフォルダを削除してからコピーする
+sub move_data{
+
+	my $self = shift;
+	my ($src, $dst) = @_;
+	my $caller_filename = (caller 1)[1];
+	my $caller_num_line = (caller 1)[2];
+	my $error_info = "Error: $caller_filename at line $caller_num_line";
+
+	eval{
+		$self->{SYSTEM_ACCESSOR}->copy_data($src, $dst);
+	};
+	if($@){
+		die ("$error_info: failed to copy data\n", $@);
+	}
+
+}
+
 1;
