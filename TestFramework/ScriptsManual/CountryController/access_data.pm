@@ -2,7 +2,7 @@ sub run{
 
 	my $argvs = shift;
 	require "./TestFramework/Controller/ControllerConst.pm";
-	require $ControllerConst::country_controller;
+	require $ControllerConst::CountryController;
 	
 	my $cc = CountryController->new();
 	if($argvs->{value3} eq "get_value"){

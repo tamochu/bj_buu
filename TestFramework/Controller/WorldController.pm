@@ -8,7 +8,7 @@ use warnings;
 
 package WorldController;
 use TestFramework::Controller::ControllerConst;
-require $ControllerConst::world_accessor;
+require $ControllerConst::WorldController;
 
 sub new{
 

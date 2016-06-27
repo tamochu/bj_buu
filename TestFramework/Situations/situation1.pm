@@ -10,8 +10,8 @@ sub refresh{
 	use TestFramework::Controller::ControllerConst;
 
 	#コントローラー
-	require $ControllerConst::player_controller;
-	require $ControllerConst::country_controller;
+	require $ControllerConst::PlayerController;
+	require $ControllerConst::CountryController;
 	my $pc = PlayerController->new();
 	my $cc = CountryController->new();
 
@@ -56,7 +56,7 @@ sub refresh{
 	}
 
 	#セーブ
-	require  $ControllerConst::situation_loader;
+	require  $ControllerConst::SituationLoader;
 	SituationLoader::save_situation("situation1");
 }
 

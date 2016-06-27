@@ -12,26 +12,26 @@ our $situation_save_dir = "$testframework_root/Situations";
 our $user_dir = "user";
 
 #モジュールのパス
-our $player_accessor = "$accessor_dir/PlayerAccessor.cgi";
-our $player_controller = "$controller_dir/PlayerController.cgi";
-our $country_accessor = "$accessor_dir/CountryAccessor.cgi";
-our $country_controller = "$controller_dir/CountryController.cgi";
-our $world_accessor = "$accessor_dir/WorldAccessor.cgi";
-our $world_controller = "$controller_dir/WorldController.cgi";
-our $system_accessor = "$accessor_dir/SystemAccessor.cgi";
-our $system_controller = "$controller_dir/SystemController.cgi";
-our $war_accessor = "$accessor_dir/WarAccessor.cgi";
-our $war_controller = "$controller_dir/WarController.cgi";
-our $item_accessor = "$accessor_dir/ItemAccessor.cgi";
-our $item_controller = "$controller_dir/ItemController.cgi";
-our $situation_loader = "$controller_dir/SituationLoader.pm";
-our $controller_helper = "$controller_dir/ControllerHelper.pm";
+our $PlayerAccessor = "$accessor_dir/PlayerAccessor.pm";
+our $PlayerController = "$controller_dir/PlayerController.pm";
+our $CountryAccessor = "$accessor_dir/CountryAccessor.pm";
+our $CountryController= "$controller_dir/CountryController.pm";
+our $WorldAccessor = "$accessor_dir/WorldAccessor.pm";
+our $WorldController = "$controller_dir/WorldController.pm";
+our $SystemAccessor = "$accessor_dir/SystemAccessor.pm";
+our $SystemControler = "$controller_dir/SystemController.pm";
+our $WarAccessor = "$accessor_dir/WarAccessor.pm";
+our $WarController = "$controller_dir/WarController.pm";
+our $ItemAccessor = "$accessor_dir/ItemAccessor.pm";
+our $ItemController = "$controller_dir/ItemController.pm";
+our $SimulationLoader = "$controller_dir/SituationLoader.pm";
+our $ControllerHelper = "$controller_dir/ControllerHelper.pm";
 
 #bjのcgiをrequireする際のラッパー
-our $bj_wrapper = "$accessor_dir/BJWrapper.cgi";
+our $bj_wrapper = "$accessor_dir/BJWrapper.pm";
 
 #アクセッサーで使うユーティリティ
-our $accessor_util = "$accessor_dir/Util.cgi";
+our $accessor_util = "$accessor_dir/Util.pm";
 
 ##########################################
 # WarController

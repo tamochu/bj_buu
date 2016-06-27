@@ -8,8 +8,8 @@ sub run{
 	require "$ControllerConst::situation_save_dir/situation1.pm";
 
 	#既存プレイヤー削除
-	require $ControllerConst::controller_helper;
-	require $ControllerConst::player_controller;
+	require $ControllerConst::ControllerHelper;
+	require $ControllerConst::PlayerController;
 	my $pc = PlayerController->new();
 	my @lines = ControllerHelper::get_all_users();
 	for my $line (@lines){

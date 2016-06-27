@@ -6,7 +6,7 @@ package refresh_situation1;
 sub run{
 	use TestFramework::Controller::ControllerConst;
 	
-	require  $ControllerConst::situation_loader;
+	require  $ControllerConst::SituationLoader;
 	SituationLoader::load_situation("situation1");
 }
 1;

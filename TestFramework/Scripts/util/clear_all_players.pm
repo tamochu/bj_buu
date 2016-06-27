@@ -10,7 +10,7 @@ my $userdir = "./user";
 sub run{
 	
 	my @lines = get_all_users();	
-	require "$ControllerConst::player_controller";
+	require $ControllerConst::PlayerController;
 	my $pc = PlayerController->new();
 	for $line (@lines){
 		my @vars = split(/<>/, $line);

@@ -8,7 +8,7 @@ use File::Path qw(make_path rmtree);
 use File::Copy qw(copy);
 use File::Copy::Recursive qw(fcopy dircopy);
 use TestFramework::Controller::ControllerConst;
-require $ControllerConst::system_accessor;
+require $ControllerConst::SystemAccessor;
 
 sub new {
 

@@ -78,7 +78,6 @@ sub get_num_country{
 #国を追加(admin_country.cgi経由)
 sub add_country{
 
-	print "***in CA add_country was called***\n";
 	my $self = shift;
 	my $add_name;
 	my $add_color;
@@ -108,7 +107,6 @@ sub add_country{
 		$admin_pass = "pass";
 		$ENV{REQUEST_METHOD} = "";
  		$ENV{QUERY_STRING} = "mode=add_country&pass=pass&add_name=$add_name&add_color=$add_color";
-		print "***in CA add_country ENV{QUERY_STRING} = $ENV{QUERY_STRING}***\n";
 		require "admin_country.cgi";	
 
 	};

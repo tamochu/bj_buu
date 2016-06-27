@@ -3,7 +3,7 @@ use warnings;
 
 package PlayerController;
 use TestFramework::Controller::ControllerConst;
-require $ControllerConst::player_accessor;
+require $ControllerConst::PlayerAccessor;
 
 sub new{
 	my $class = shift;

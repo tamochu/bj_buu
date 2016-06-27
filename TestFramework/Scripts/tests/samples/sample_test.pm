@@ -13,7 +13,7 @@ sub run{
 	#テストはコントローラーを操作することで行う
 	#まず必要なコントローラーのインスタンスを生成する
 	#国の作成や削除、おまかせ国データ作成などを行うCountryControllerを生成する
-	require "./TestFramework/Controller/CountryController.cgi";
+	require $ControllerConst::CountryController;
 	my $cc = CountryController->new();
 	
 	#おまかせ国データ作成で国をリセットする
@@ -23,7 +23,7 @@ sub run{
 	
 	#次にプレイヤーを作成する
 	#PlayerControllerはプレイヤーの作成や削除、士官等を行う
-	require "./TestFramework/Controller/PlayerController.cgi";
+	require $ControllerConst::PlayerController;
 	my $pc = PlayerController->new();
 	my $player_name = "test2";
 	my $player_passward = "test1a";
@@ -44,7 +44,7 @@ sub run{
 	#今はおまかせ国データ作成を呼んだ直後なので終戦期間のはず
 	#当然戦争に出る関数を呼べば例外をスローするので、まず終戦期間を終わらせる
 	#システムの時刻を偽装して時間を進める方法もあるが、テストの目的ではないため今回は直接reset_timeを書き換える
-	require "./TestFramework/Controller/WorldController.cgi";
+	require $ControllerConst::WorldController;
 	my $wc = WorldController->new();
 	$wc->access_data("reset_time", 0);
 
@@ -59,9 +59,9 @@ sub run{
 	#戦争に出る
 	#戦争はWarControllerから操作する
 	#接頭辞がactionなのでメニューから戦争→規模選択→相手国選択→出発を再現している
-	require "./TestFramework/Controller/WarController.cgi";
+	require $ControllerConst::WarController;
 	my $warc = WarController->new();
-	$warc->action_set_war($player_name, 2, ControllerConst::WAR_SMALL);
+	$warc->action_set_war($player_name, 2, $ControllerConst::WAR_SMALL);
 	
 	#作成したばかりのキャラなので勝利数的に少数しか出られない
 	#長期で出れば失敗する
@@ -85,7 +85,7 @@ sub run{
 	my $last_year = $wc->access_data("year");
 
 	#戦争に出る
-	$warc->action_set_war($player_name, 2, ControllerConst::WAR_SMALL);
+	$warc->action_set_war($player_name, 2, $ControllerConst::WAR_SMALL);
 	$pc->access_data($player_name, "wt", 0);
 	$warc->action_encount($player_name);
 	#action_win_warは対戦相手の兵力を０に、自分の兵力を10000にして戦闘を行い勝利する

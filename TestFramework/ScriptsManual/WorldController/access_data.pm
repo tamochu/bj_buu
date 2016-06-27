@@ -2,7 +2,7 @@ sub run{
 
 	my $argvs = shift;
 	require "./TestFramework/Controller/ControllerConst.pm";
-	require $ControllerConst::world_controller;
+	require $ControllerConst::WorldController;
 	
 	my $wc = WorldController->new();
 	if($argvs->{value2} eq "get_value"){

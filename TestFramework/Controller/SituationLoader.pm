@@ -6,7 +6,7 @@ use TestFramework::Controller::ControllerConst;
 sub save_situation{
 
 	my $situation_name = shift;
-	require $ControllerConst::system_accessor;
+	require $ControllerConst::SystemAccessor;
 	my $sa = SystemAccessor->new();
 	my $dirs = ["log", "user", "html", "data"];
 
@@ -19,7 +19,7 @@ sub save_situation{
 sub load_situation{
 
 	my $situation_name = shift;
-	require $ControllerConst::system_accessor;
+	require $ControllerConst::SystemAccessor;
 	my $sa = SystemAccessor->new();
 	my $dirs = ["log", "user", "html", "data"];
 

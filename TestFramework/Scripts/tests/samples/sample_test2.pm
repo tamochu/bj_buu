@@ -15,11 +15,11 @@ sub run{
 	use TestFramework::Controller::ControllerConst;
 
 	#コントローラー
-	require $ControllerConst::world_controller;
-	require $ControllerConst::player_controller;
-	require $ControllerConst::country_controller;
-	require $ControllerConst::war_controller;
-	require $ControllerConst::item_controller;
+	require $ControllerConst::WorldController;
+	require $ControllerConst::PlayerController;
+	require $ControllerConst::CountryController;
+	require $ControllerConst::WarController;
+	require $ControllerConst::ItemController;
 	$wc = WorldController->new();
 	$pc = PlayerController->new();
 	$cc = CountryController->new();
@@ -30,7 +30,7 @@ sub run{
 	#生成されたシチュエーション（log, user, html, data)をロードする
 	#situation1では６カ国１年目平和、開戦状態
 	#1の国には（s1c1m, s1c2f)、２の国には(s1c2m, s1c2f)のように男女二名ずつ在籍している
-	require $ControllerConst::situation_loader;
+	require $ControllerConst::SituationLoader;
 	SituationLoader::load_situation("situation1");
 	
 

@@ -3,7 +3,7 @@ use warnings;
 
 package ItemController;
 use TestFramework::Controller::ControllerConst;
-require $ControllerConst::item_accessor;
+require $ControllerConst::ItemAccessor;
 
 sub new{
 	my $class = shift;

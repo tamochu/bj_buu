@@ -6,7 +6,8 @@ package TestInterface;
 
 use Carp;
 use File::Path;
-require "./TestFramework/Controller/Accessor/SystemAccessor.cgi";
+use TestFramework::Controller::ControllerConst;
+require $ControllerConst::SystemAccessor;
 require "./TestFramework/Controller/StopStdout.pm";
 
 sub new{

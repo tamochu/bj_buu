@@ -2,7 +2,7 @@ sub run{
 
 	my $argvs = shift;
 	require "./TestFramework/Controller/ControllerConst.pm";
-	require $ControllerConst::player_controller;
+	require $ControllerConst::PlayerController;
 	
 	my $pc = PlayerController->new();
 	if($argvs->{value3} ne "get_value"){
