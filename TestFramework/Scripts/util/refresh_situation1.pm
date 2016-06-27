@@ -17,6 +17,6 @@ sub run{
 		$pc->remove_player($vars[1]);
 	}
 
-	&situation1::refresh();
+	&Situation1::refresh();
 }
 1;
