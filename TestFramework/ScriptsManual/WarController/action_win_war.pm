@@ -5,6 +5,6 @@ sub run{
 	require $ControllerConst::war_controller;
 	
 	my $warc = WarController->new();
-	$warc->action_after_war($argvs->{value1}, $argvs->{value2});
+	$warc->action_win_war($argvs->{value1});
 }
 1;

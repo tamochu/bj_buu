@@ -514,9 +514,9 @@ $(function(){
    });
 });
 
-//WarController::action_after_war
+//WarController::action_after_toitsu
 $(function(){
-    $("#action_after_war", "#war_controller").on({
+    $("#action_after_toitsu", "#war_controller").on({
 	"click": function(){ 
 
         	$("#menu_input_form").replaceWith(
@@ -526,7 +526,7 @@ $(function(){
 			   +make_description("‘I‘ðŽˆ")
 			   +make_textbox("value2")
 			   +menu_footer
-			   +make_input_file("TestFramework/ScriptsManual/WarController/action_after_war.pm")
+			   +make_input_file("TestFramework/ScriptsManual/WarController/action_after_toitsu.pm")
 		);
 	},
 	"mouseover": function(){
