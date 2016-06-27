@@ -407,7 +407,7 @@ sub action_after_toitsu{
 		
 	eval{
 		#統一後の処理を呼ぶ
-		$self->{WAR_ACCESSOR_INTERFACE}->action_acter_toitsu($player_name, $cmd);
+		$self->{WAR_ACCESSOR_INTERFACE}->action_after_toitsu($player_name, $cmd);
 	};
 
 	if($@){
