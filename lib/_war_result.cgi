@@ -259,10 +259,16 @@ sub war_win {
 	$cs{strong}[$m{country}] += ($w{world} eq '13' || $w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3) ? int($v * 0.75):$v;
 	$cs{strong}[$y{country}] -= $v unless ($w{world} eq $#world_states - 5);
 	$cs{strong}[$y{country}] = 0  if $cs{strong}[$y{country}] < 0;
-	&write_yran('strong', $v, 1);
-	&write_yran("strong_$y{country}", $v, 1);
-	&write_yran('win', 1, 1);
-	&write_yran('war', 1, 1);
+	&write_yran2(
+		'strong', $v, 1,
+		"strong_$y{country}", $v, 1,
+		'win', 1, 1,
+		'war', 1, 1
+	);
+#	&write_yran('strong', $v, 1);
+#	&write_yran("strong_$y{country}", $v, 1);
+#	&write_yran('win', 1, 1);
+#	&write_yran('war', 1, 1);
 	
 	if ($w{world} eq $#world_states - 5) {
 		$mes .= "$v‚Ì$e2j{strong}‚ð“¾‚Ü‚µ‚½<br>";

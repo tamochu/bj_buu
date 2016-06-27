@@ -1002,6 +1002,59 @@ sub write_yran {
 	close $fh;
 }
 #================================================
+# 一年ランキングデータ書き込み
+#================================================
+sub write_yran2 {
+	my @data = @_;
+	my $size = 3;
+	my $count = @data / $size - 1;
+
+	my @lines = ();
+	my $new_line = '';
+	if(-e "$userdir/$id/year_ranking.cgi"){
+		open my $fh, "< $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
+		while (my $line = <$fh>) {
+			# 過去3年よりも古いデータは削除
+			if ($line =~ /year;(.*?)<>/ && $1 ne $w{year}) {
+				push @lines, $line if $1 >= $w{year} - 3;
+				next;
+			}
+			$line =~ tr/\x0D\x0A//d;
+			$new_line = $line; # 今年のデータを渡す
+		}
+		close $fh;
+	}
+
+	if ($new_line) { # 今年のデータがある
+		for my $i (0 .. $count) {
+			my ($data_name, $data_value, $is_add) = ($data[$i*$size+0], $data[$i*$size+1], $data[$i*$size+2]);
+			# 対象の要素が存在するなら書き換える
+			if ($new_line =~ /$data_name;(.*?)<>/) {
+				my $value = $is_add
+					? $1 + $data_value # 累計記録
+					: ($1 < $data_value ? $data_value : $1) ; # 最高記録
+				$new_line =~ s/$data_name;.*?<>/$data_name;$value<>/;
+			}
+			# 対象の要素が存在しないなら書き足す
+			else {
+				$new_line .= "$data_name;$data_value<>";
+			}
+		}
+	}
+	else { # 今年のデータがない
+		$new_line = "year;$w{year}<>";
+		for my $i (0 .. $count) {
+			my ($data_name, $data_value) = ($data[$i*$size+0], $data[$i*$size+1]);
+			$new_line .= "$data_name;$data_value<>";
+		}
+	}
+
+	push @lines, "$new_line\n";
+	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
+	print $fh @lines;
+	close $fh;
+}
+#================================================
 # 国貢献集計
 #================================================
 sub summary_contribute {
