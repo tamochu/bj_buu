@@ -69,14 +69,14 @@ sub run{
 	$wc->access_data("year", 69);
 	$wc->access_data("game_lv", 1);
 	$wc->access_data("reset_time", 0);
-	my $old_tou_c = $pc->access_data("s1c3m", "tou_c");
+	my $old_hero_c = $pc->access_data("s1c3m", "hero_c");
 	$warc->action_set_war("s1c3m",1, 1);
 	$pc->access_data("s1c3m", "wt", 0);
 	$warc->action_encount("s1c3m");
 	$warc->action_win_war("s1c3m");
 	$warc->action_after_toitsu("s1c3m", 1);
-	my $new_tou_c = $pc->access_data("s1c3m", "tou_c");
-	($new_tou_c eq ($old_tou_c + 1)) or die "tou_c didn't change";
+	my $new_hero_c = $pc->access_data("s1c3m", "hero_c");
+	($new_hero_c eq ($old_hero_c+ 1)) or die "tou_c didn't change : new_hero_c = $new_hero_c\n";
 
 	######################混乱開始直後の状況をチェックする
 	#君主は解任されているか
