@@ -390,5 +390,28 @@ sub action_draw_war_kaimetu{
 	}
 }
 
+#統一処理後の選択肢を処理
+sub action_after_toitsu{
 
+	my $self = shift;
+	my ($player_name, $cmd) = @_;
+
+	my $caller_filename = (caller 0)[1];
+	my $caller_num_line = (caller 0)[2];
+	my $error_info = "Error: $caller_filename at line $caller_num_line";
+
+	unless (defined $player_name and defined $cmd){
+		die ("$error_info : action_draw_war_kaimetu needs player_name and cmd\n");
+	}
+	
+		
+	eval{
+		#統一後の処理を呼ぶ
+		$self->{WAR_ACCESSOR_INTERFACE}->action_acter_toitsu($player_name, $cmd);
+	};
+
+	if($@){
+		die ("$error_info : action_after_toitsu failed\n", $@);
+	}
+}
 

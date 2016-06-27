@@ -200,6 +200,41 @@ sub step_war{
 }
 
 
+#統一後の選択肢を選ぶ
+sub action_after_toitsu{
+
+	my $self = shift;
+	my ($player_name, $cmd) = @_;
+	
+	#ブラウザから送られる環境変数の偽装の基礎部分
+	my $make_env = sub{
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+		_make_env_base($player_name);
+	};
+	my $env_base = Util::fork_sub($make_env);
+
+	#統一後の選択をする
+	my $select_after_toitsu= sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_before_bj($player_name);
+		_read_user($player_name);
+
+		($m{lib} ne "world") or die "select_after_toitsu failed : m{lib} = $m{lib}\n";
+
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd";
+		require "bj.cgi";
+		_read_user($player_name);
+		die ("select_after_toitsu failed : m{lib} = $m{lib}\n") unless ($m{lib} ne "");
+	};
+
+	Util::fork_sub($select_after_toitsu);
+
+}
 
 
 1;

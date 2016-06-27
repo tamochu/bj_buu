@@ -1,29 +1,103 @@
-#ã‚µãƒ³ãƒ—ãƒ«ãã®ï¼’
-#æ··ä¹±ãŒæ­£å¸¸ã«å‹•ä½œã—ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
+#ƒTƒ“ƒvƒ‹‚»‚Ì‚Q
+#¬—‚ª³í‚É“®ì‚µ‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN‚·‚é
+#ƒ`ƒFƒbƒN€–Ú‚PF¬—’¼‘O‚ÆŠJn’¼Œã‚Ì‚ÌŒNåA“Š•[ó‹µƒ`ƒFƒbƒN
+#ƒ`ƒFƒbƒN€–Ú‚QF¬—’¼‘O‚Ì“Š–ó‹µ‚Ìƒ`ƒFƒbƒN
+#ƒ`ƒFƒbƒN€–Ú‚RFƒVƒƒƒbƒtƒ‹‹Ö~İ’è‚Ìƒ†[ƒU[‚ÍƒVƒƒƒbƒtƒ‹‚³‚ê‚Ä‚¢‚È‚¢‚©
+#ƒTƒ“ƒvƒ‹‚Ì‚½‚ß‚±‚ÌO‚Â‚Ìƒ`ƒFƒbƒN€–Ú‚ğƒeƒXƒg‚ÌğŒ‚Æ‚·‚é
+
 package sample_test2;
 
-#ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã§ä½¿ã†å®šæ•°
-use TestFramework::Controller::ControllerConst;
+&run;
 
-#æ··ä¹±ãŒæ­£å¸¸ã«å‹•ä½œã—ã¦ã„ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒ†ã‚¹ãƒˆ
 sub run{
 
-	#ã‚µãƒ³ãƒ—ãƒ«ãã®ï¼‘ã®ã‚ˆã†ã«è‡ªåˆ†ã§åˆæœŸè¨­å®šã‚’è¡Œã‚ãšã«
-	#ç”Ÿæˆã•ã‚ŒãŸã‚·ãƒãƒ¥ã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ï¼ˆlog, user, html, data)ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
-	#situation1ã§ã¯ï¼–ã‚«å›½ï¼‘å¹´ç›®å¹³å’Œã€é–‹æˆ¦çŠ¶æ…‹
-	#1ã®å›½ã«ã¯ï¼ˆs1c1m, s1c2f)ã€ï¼’ã®å›½ã«ã¯(s1c2m, s1c2f)ã®ã‚ˆã†ã«ç”·å¥³äºŒåãšã¤åœ¨ç±ã—ã¦ã„ã‚‹
+	#ƒRƒ“ƒgƒ[ƒ‰[‚Åg‚¤’è”
+	use TestFramework::Controller::ControllerConst;
+
+	#ƒRƒ“ƒgƒ[ƒ‰[
+	require $ControllerConst::world_controller;
+	require $ControllerConst::player_controller;
+	require $ControllerConst::country_controller;
+	require $ControllerConst::war_controller;
+	require $ControllerConst::item_controller;
+	$wc = WorldController->new();
+	$pc = PlayerController->new();
+	$cc = CountryController->new();
+	$warc = WarController->new();
+	$ic = ItemController->new();
+
+	#ƒTƒ“ƒvƒ‹‚»‚Ì‚P‚Ì‚æ‚¤‚É©•ª‚Å‰Šúİ’è‚ğs‚í‚¸‚É
+	#¶¬‚³‚ê‚½ƒVƒ`ƒ…ƒG[ƒVƒ‡ƒ“ilog, user, html, data)‚ğƒ[ƒh‚·‚é
+	#situation1‚Å‚Í‚UƒJ‘‚P”N–Ú•½˜aAŠJíó‘Ô
+	#1‚Ì‘‚É‚Íis1c1m, s1c2f)A‚Q‚Ì‘‚É‚Í(s1c2m, s1c2f)‚Ì‚æ‚¤‚É’j—“ñ–¼‚¸‚ÂİĞ‚µ‚Ä‚¢‚é
 	require $ControllerConst::SituationLoader;
 	SituationLoader::load_siuation("situation1");
 	
-	#æ··ä¹±ã§ç§»å‹•ã—ãªã„è¨­å®šãŒæ­£å¸¸ã«å‹•ä½œã—ã¦ã„ã‚‹ã‹ãƒ†ã‚¹ãƒˆã™ã‚‹ãŸã‚ã«ã€ã¾ãšä¸–ç•Œè¨­å®šã‚’æ··ä¹±ç›´å‰ã®å¹´åº¦ã«ã™ã‚‹
-	require $ControllerConst::world_controller;
-	$wc = WorldController->new();
+
+	#######################ƒ`ƒFƒbƒN€–Ú‚P
+	#¬—‘OŒã‚ÌŒNå‚Æ“Š•[ó‹µ‚ğŠm”F‚·‚é‚½‚ßA‚P‚Ì‘‚ÅƒvƒŒƒCƒ„[‚ğ—§Œó•â‚³‚¹‚Ä“Š•[‚µŒNå‚ğŒš‚Ä‚é
+	$pc->access_data("s1c1m", "money", 999999);
+	$cc->action_stand_candidate("s1c1m");
+	$cc->action_vote("s1c1f", "s1c1m");
+	my $ceo1 = $cc->access_data(1, "ceo");
+	($ceo ne "s1c1m") or die "failed to elect s1c1m as ceo";
+
+	#######################ƒ`ƒFƒbƒN€–Ú‚Q
+	#‚Q‚Ì‘‚ÌƒvƒŒƒCƒ„[‚ğ“Š–‚µ‚Ä‚İ‚é
+	#ItemController‚©‚çÓ¼Ó‚ğ—^‚¦‚é
+	$mosimo = {type=>3, no=>177, c=>0, lv=>0};
+	$ic->give_item("s1c2m", $mosimo);
+	#Œ»İ‚Ìdepot“à‚ÌÓ¼Ó‚Ìindex
+	my $mosimo_index = $ic->get_item_index("s1c2m", $mosimo);
+	#—a‚èŠ¨ˆø‚«o‚·‚Å‘•”õ‚·‚é
+	$ic->action_draw_item("s1c2m", $mosimo_index);
+	#Ï²Ù°Ñ¨ƒyƒbƒg‚ğg—p
+	$ic->action_use_pet("s1c2m");
+	#‚½‚¾‚ÌÁ”ïÍß¯Ä‚È‚ç‚±‚ê‚ÅI‚í‚è‚¾‚ªÓ¼Ó‚Í‚»‚Ì‚ ‚Æ‚Åƒ†[ƒU[“ü—Í‚ğ—v‹‚³‚ê‚é‚Ì‚Å‚»‚Ìˆ—‚ğ‚·‚é
+	#ƒ†[ƒU[“ü—Í‚ğ—v‹‚·‚é‚»‚ê‚¼‚ê‚ÌÍß¯Ä‚Ìˆø”‚ÍTestFramework/Controller/Accessor/ItemAccessorSpecific/pet*.pm‚ğQÆ
+	#‘‚Ö“Š–‚³‚ê‚Ä‚İ‚é
+	$ic->action_step_pet("s1c2m", 1);
+	($pc->access_data("s1c2m", "lib") eq "prison") or die "failed to imprison s1c2m";
+
+	#######################ƒ`ƒFƒbƒN€–Ú‚Q
+	#‚S‚Ì‘‚ÌƒvƒŒƒCƒ„[‚ÍƒVƒƒƒbƒtƒ‹‹Ö~‚Éİ’è‚µ‚Ä‚¨‚­
+	$pc->access_data("s1c4m", "shuffle", 1);
+	$pc->access_data("s1c4f", "shuffle", 1);
+
+	#¬—ŠJnˆ—‚ğŒÄ‚Ô‚½‚ß‚É¬—‘O”N“x‚É”N“x‚ğ•ÏX‚µƒQ[ƒ€ƒŒƒxƒ‹‚ğ•ÏX‚µ‚ÄA3‚Ì‘‚ÌƒvƒŒƒCƒ„[‚ÉŸ—˜‚³‚¹‚Ä“ˆê‚³‚¹‚é
+	#”O‚Ì‚½‚ß“ˆên—û‚à’²‚×‚é
 	$wc->access_data("year", 39);
-
-	#çµ±ä¸€ãŒç°¡å˜ã«ãªã‚‹ã‚ˆã†ã«ã‚²ãƒ¼ãƒ ãƒ¬ãƒ™ãƒ«ã‚‚ä¸‹ã’ã¦ãŠã
 	$wc->access_data("game_lv", 1);
+	$wc->access_data("reset_time", 0);
+	my $old_tou_c = $pc->access_data("s1c3m", "tou_c");
+	$warc->action_set_war("s1c3m",1);
+	$pc->access_data("s1c3m", "wt", 0);
+	$warc->action_encount("s1c3m");
+	$warc->action_win_war("s1c3m");
+	$warc->action_after_war("s1c3m", 1);
+	my $new_tou_c = $pc->access_data("s1c3m", "tou_c");
+	($new_tou_c eq ($old_tou_c + 1)) or die "tou_c didn't change";
 
-	#æ›´ã«
+	######################¬—ŠJn’¼Œã‚Ìó‹µ‚ğƒ`ƒFƒbƒN‚·‚é
+	#ŒNå‚Í‰ğ”C‚³‚ê‚Ä‚¢‚é‚©
+	for my $i (1 .. 6){
+		($cc->access_data(1, "ceo") eq "") or die "ceo exists in country $i\n";
+	}
+
+	#“Š•[‚Í‰ğœ‚³‚ê‚Ä‚¢‚é‚©
+	for my $player ($Situation1::default_players){
+		($pc->access_data($player->{name}, "vote") eq "") or die "$player->{name}'s vote is not void\n";
+	}
+
+	#ƒVƒƒƒbƒtƒ‹‹Ö~ƒvƒŒƒCƒ„[‚ÍŒ³‚Ì‘‚É‚¢‚é‚©
+	($pc->access_data("s1c4m", "country") eq 4) or die "s1c4m moved\n";
+	($pc->access_data("s1c4f", "country") eq 4) or die "s1c4f moved\n";
+
+	#“Š–‚³‚ê‚½ƒvƒŒƒCƒ„[‚Í•œ‹A‚µ‚Ä‚¢‚é‚©
+	($pc->access_data("s1c2m", "lib") eq "") or die "s1c2m is still in prison";
+
+	#‚±‚ÌŒã¬—’†‚ÉŒNå‚ğŒš‚Ä‚Ä‚©‚ç“ˆê‚·‚é‚È‚Ç‚µ‚Ä¬—Œã‚ÌŒNå“Š•[ó‹µ‚ğƒ`ƒFƒbƒN‚·‚é
+	#ƒTƒ“ƒvƒ‹‚Æ‚µ‚Ä‚Íç’·‚È‚Ì‚Å‚±‚ê‚ÅƒeƒXƒgI—¹‚Æ‚·‚é
 
 }
 1;

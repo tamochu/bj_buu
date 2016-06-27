@@ -171,7 +171,7 @@ $(function(){
 //CountryController
 $(function(){
     $("#country_controller").hover(function(){ 
-            $("#msg_window").find("p").text("国の作成や削除");
+            $("#msg_window").find("p").text("国に関するコントローラー");
         });
 });
 
@@ -513,3 +513,27 @@ $(function(){
 	}
    });
 });
+
+//WarController::action_after_war
+$(function(){
+    $("#action_after_war", "#war_controller").on({
+	"click": function(){ 
+
+        	$("#menu_input_form").replaceWith(
+			    menu_header 
+			   +make_description("プレイヤー名")
+			   +make_textbox("value1")
+			   +make_description("選択肢")
+			   +make_textbox("value2")
+			   +menu_footer
+			   +make_input_file("TestFramework/ScriptsManual/WarController/action_after_war.pm")
+		);
+	},
+	"mouseover": function(){
+		$("#msg_window").find("p").text("統一後に選択肢を処理する");
+
+	}
+   });
+});
+
+

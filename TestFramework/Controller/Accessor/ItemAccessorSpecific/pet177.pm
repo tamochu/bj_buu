@@ -2,7 +2,7 @@ package ItemAccessor;
 use TestFramework::Controller::ControllerConst;
 require "$ControllerConst::accessor_util";
 
-#引数はプレイヤー名、対象の国（０を指定すると
+#引数はプレイヤー名、対象の国
 #オプションでペットを連れていく選択肢が出た時の判断、連れていくペットのdepot内のindex
 *enact = sub{
 

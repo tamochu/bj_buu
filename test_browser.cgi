@@ -155,6 +155,7 @@ sub generate_manual_tab{
 	print qq|    	<li id="action_lose_war">action_lose_war</li>|; 
 	print qq|    	<li id="action_draw_war_turn">action_draw_war_turn</li>|; 
 	print qq|    	<li id="action_draw_war_kaimetu">action_draw_war_kaimetu</li>|; 
+	print qq|    	<li id="action_after_war">action_after_war</li>|; 
 	print qq|    </ul>|; 
 	print qq|  </li>|;
 

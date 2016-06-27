@@ -2,13 +2,13 @@
 #平和情勢で統一する様子をシミュレートする
 package sample_test;
 
-#コントローラーで使う定数
-use TestFramework::Controller::ControllerConst;
-
 #テスト本体は必ずサブルーティンrunの中に書くこと
 &run;
 
 sub run{
+
+	#コントローラーなどの定数
+	use TestFramework::Controller::ControllerConst;
 
 	#テストはコントローラーを操作することで行う
 	#まず必要なコントローラーのインスタンスを生成する
