@@ -244,7 +244,7 @@ sub action_after_toitsu{
 		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd";
 		require "bj.cgi";
 		_read_user($player_name);
-		die ("select_after_toitsu failed : m{lib} = $m{lib}\n") unless ($m{lib} ne "");
+		die ("select_after_toitsu failed : m{lib} = $m{lib}\n") unless ($m{lib} eq "");
 	};
 
 	Util::fork_sub($open_bj);
