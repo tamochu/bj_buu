@@ -519,6 +519,7 @@ $(function(){
     $("#action_after_toitsu", "#war_controller").on({
 	"click": function(){ 
 
+
         	$("#menu_input_form").replaceWith(
 			    menu_header 
 			   +make_description("ƒvƒŒƒCƒ„[–¼")
