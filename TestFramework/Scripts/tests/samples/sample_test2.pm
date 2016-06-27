@@ -31,7 +31,7 @@ sub run{
 	#situation1では６カ国１年目平和、開戦状態
 	#1の国には（s1c1m, s1c2f)、２の国には(s1c2m, s1c2f)のように男女二名ずつ在籍している
 	require $ControllerConst::situation_loader;
-	SituationLoader::load_siuation("situation1");
+	SituationLoader::load_situation("situation1");
 	
 
 	#######################チェック項目１
