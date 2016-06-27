@@ -6,6 +6,8 @@ sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ÌßÛ¸Þ×Ñ´×°ˆÙ
 #================================================
 # $m{value} ‚É‚Í •ºŽm‚Ì”{—¦
 
+$m{war_select_switch} = 0;
+
 # ˆê‹R‘Å‚¿‚ÌŽž‚Ì‘ŠŽè‚Ì¾ØÌBˆê”Ôæ“ª‚¾‚¯‚ª’f‚è—p‚Ì¾ØÌ(‘Œ¸‰Â”\)
 my @answers = ('’f‚é!', '–]‚Þ‚Æ‚±‚ë‚¾!', '•Ô‚è“¢‚¿‚É‚µ‚Ä‚­‚ê‚é!', '‚¢‚´Ÿ•‰!', '‚æ‚©‚ë‚¤!', '‚¢‚¢‚¾‚ë‚¤!', '‘ŠŽè‚É‚È‚ë‚¤!', '‚©‚©‚Á‚Ä‚±‚¢!');
 
