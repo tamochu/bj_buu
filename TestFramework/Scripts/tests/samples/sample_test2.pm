@@ -85,7 +85,7 @@ sub run{
 	}
 
 	#“Š•[‚Í‰ðœ‚³‚ê‚Ä‚¢‚é‚©
-	for my $player ($Situation1::default_players){
+	for my $player ($Situation1::situation1_players){
 		($pc->access_data($player->{name}, "vote") eq "") or die "$player->{name}'s vote is not void\n";
 	}
 
