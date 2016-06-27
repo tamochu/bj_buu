@@ -150,7 +150,7 @@ sub update_player_ranking  {
 					# ‘}“ü¿°Ä‚ÅÌßÚ²Ô°‚ğ‘å‚«‚¢‡‚É•À‚×‚é
 					# “¯‚É‡ˆÊ‚àŒvZ‚·‚é‚Ì‚Å‘}“ü‚Íˆê‰ñ‚Ì‚İ
 					if ($ydata{$status} > $p_ranks[$no][$j][0] && !$is_insert) {
-						splice(@{$p_ranks[$no]}, $j, 0, [$ydata{$status}, $player]);
+						splice(@{$p_ranks[$no]}, $j, 0, [$ydata{$status}, $player.$from]);
 						$is_insert = 1;
 					}
 	
