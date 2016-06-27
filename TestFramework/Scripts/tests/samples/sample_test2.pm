@@ -30,7 +30,7 @@ sub run{
 	#生成されたシチュエーション（log, user, html, data)をロードする
 	#situation1では６カ国１年目平和、開戦状態
 	#1の国には（s1c1m, s1c2f)、２の国には(s1c2m, s1c2f)のように男女二名ずつ在籍している
-	require $ControllerConst::SituationLoader;
+	require $ControllerConst::situation_loader;
 	SituationLoader::load_siuation("situation1");
 	
 
