@@ -61,7 +61,7 @@ sub run{
 	#接頭辞がactionなのでメニューから戦争→規模選択→相手国選択→出発を再現している
 	require $ControllerConst::WarController;
 	my $warc = WarController->new();
-	$warc->action_set_war($player_name, 2, $ControllerConst::WAR_SMALL);
+	$warc->action_set_war($player_name, 2, ControllerConst::WAR_SMALL);
 	
 	#作成したばかりのキャラなので勝利数的に少数しか出られない
 	#長期で出れば失敗する
@@ -85,7 +85,7 @@ sub run{
 	my $last_year = $wc->access_data("year");
 
 	#戦争に出る
-	$warc->action_set_war($player_name, 2, $ControllerConst::WAR_SMALL);
+	$warc->action_set_war($player_name, 2, ControllerConst::WAR_SMALL);
 	$pc->access_data($player_name, "wt", 0);
 	$warc->action_encount($player_name);
 	#action_win_warは対戦相手の兵力を０に、自分の兵力を10000にして戦闘を行い勝利する
