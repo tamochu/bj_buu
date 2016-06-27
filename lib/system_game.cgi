@@ -1020,7 +1020,7 @@ sub write_yran2 {
 				next;
 			}
 			$line =~ tr/\x0D\x0A//d;
-			$new_line = $line; # 今年のデータを渡す
+			$new_line = $line if index($line, "year;$w{year}") > -1;
 		}
 		close $fh;
 	}
