@@ -39,7 +39,6 @@ sub refresh{
 
 	#キャラクタ生成
 	for my $player (@$situation1_players){
-		die "$player->{name}, $player->{passward}, $player->{sex})";
 		$pc->create_player($player->{name}, $player->{passward}, $player->{sex});
 	}
 
