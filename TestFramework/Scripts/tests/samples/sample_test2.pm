@@ -74,7 +74,7 @@ sub run{
 	$pc->access_data("s1c3m", "wt", 0);
 	$warc->action_encount("s1c3m");
 	$warc->action_win_war("s1c3m");
-	$warc->action_after_war("s1c3m", 1);
+	$warc->action_after_toitsu("s1c3m", 1);
 	my $new_tou_c = $pc->access_data("s1c3m", "tou_c");
 	($new_tou_c eq ($old_tou_c + 1)) or die "tou_c didn't change";
 
