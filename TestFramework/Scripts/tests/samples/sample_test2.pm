@@ -66,7 +66,7 @@ sub run{
 
 	#混乱開始処理を呼ぶために混乱前年度に年度を変更しゲームレベルを変更して、3の国のプレイヤーに勝利させて統一させる
 	#念のため統一熟練も調べる
-	$wc->access_data("year", 39);
+	$wc->access_data("year", 69);
 	$wc->access_data("game_lv", 1);
 	$wc->access_data("reset_time", 0);
 	my $old_tou_c = $pc->access_data("s1c3m", "tou_c");
