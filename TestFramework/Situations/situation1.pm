@@ -56,7 +56,7 @@ sub refresh{
 	}
 
 	#セーブ
-	require  $ControllerConst::SituationLoader;
+	require $ControllerConst::SituationLoader;
 	SituationLoader::save_situation("situation1");
 }
 

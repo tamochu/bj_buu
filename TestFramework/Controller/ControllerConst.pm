@@ -24,7 +24,7 @@ our $WarAccessor = "$accessor_dir/WarAccessor.pm";
 our $WarController = "$controller_dir/WarController.pm";
 our $ItemAccessor = "$accessor_dir/ItemAccessor.pm";
 our $ItemController = "$controller_dir/ItemController.pm";
-our $SimulationLoader = "$controller_dir/SituationLoader.pm";
+our $SituationLoader= "$controller_dir/SituationLoader.pm";
 our $ControllerHelper = "$controller_dir/ControllerHelper.pm";
 
 #bjのcgiをrequireする際のラッパー
