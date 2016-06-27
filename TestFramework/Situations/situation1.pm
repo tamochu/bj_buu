@@ -51,7 +51,7 @@ sub refresh{
 	}
 
 	#士官
-	for my $player (@$players){
+	for my $player (@$situation1_players){
 		$pc->action_shikan_player($player->{name}, $player->{country});
 	}
 
