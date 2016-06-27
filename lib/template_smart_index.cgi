@@ -86,21 +86,38 @@ sub index {
 	my $country_html;
 	$country_html .= qq|ﾛｸﾞｲﾝ中 $cs_c{all}人 [<font color="$cs{color}[0]">$cs{name}[0]</font> $cs_c{0}人]<br>|;
 	$country_html .= qq|<table cellpadding="4" class="blog_letter">|; # blog_letter はそのうち table3 に
+	my $c_count = defined $cs_c{0} ? $cs_c{0} : 0;
+	$country_html .= qq|<tr><td colspan="2">$c_count人:$cs_c{"0_member"}</td></tr>\n| if $cs_c{"0_member"};
 	for my $i (1 .. $w{country}) {
 		my $c_count = defined $cs_c{$i} ? $cs_c{$i} : 0;
-		
 		my($country_mes, $country_mark) = split /<>/, $lines[$i];
 		$country_mark = 'non_mark.gif' if $country_mark eq '';
 		$country_html .= qq|<tr><td><img src="$icondir/$country_mark"></td>|;
 		$country_html .= qq|<td style="color: #333; background-color: $cs{color}[$i];width:100%;"><b>$cs{name}[$i]</b> $cs{ceo}[$i]<br>$country_mes</td></tr>\n|;
-		$country_html .= qq|<td colspan="2"">$c_count人:$cs_c{"${i}_member"}</td></tr>\n| if $cs_c{"${i}_member"};
+		$country_html .= qq|<tr><td colspan="2">$c_count人:$cs_c{"${i}_member"}</td></tr>\n| if $cs_c{"${i}_member"};
 	}
 	$country_html .= qq|</table>|;
 
 	print <<"EOM";
+$login_box_html
 <p>
 Chromeのデータセーバーを無効にしないとアクセスできません
 </p>
+<hr>
+$navi_html
+<hr>
+$country_html
+<hr>
+定員[ $w{player}/$max_entry人 ]<br>
+ﾌﾟﾚｲﾔｰ保存期間 $auto_delete_day日(1世代目Lv.1は1日)<br>
+基本拘束時間 $GWT分<br>
+給与 $salary_hour時間毎 君主の任期 $reset_ceo_cycle_year年周期
+<hr>
+<ol>
+<li><a href="reset_player.cgi">ﾘｾｯﾄ処理</a>
+<li><a href="CatasoApp-release-signed.apk">ｶﾀ~ﾉｱﾌﾟﾘ</a>
+</ol>
+<hr>
 <form method="$method" action="login.cgi">
 <div>ﾌﾟﾚｲﾔｰ名:<input type="text" name="login_name" value="$cook_name"></div>
 <div>ﾊﾟｽﾜｰﾄﾞ:<input type="password" name="pass" value="$cook_pass"></div>
@@ -109,6 +126,9 @@ Chromeのデータセーバーを無効にしないとアクセスできません
 <input type="hidden" name="guid" value="ON">
 </form>
 <hr>
+EOM
+}
+=pod
 <ol>
 <li><a href="readme.html">Readme</a>
 <li><a href="http://www13.atwiki.jp/blindjustice/">説明書</a>
@@ -144,30 +164,12 @@ Chromeのデータセーバーを無効にしないとアクセスできません
 給与 $salary_hour時間毎<br>
 君主の任期 $reset_ceo_cycle_year年周期
 <hr>
-ここから下は改装中の見本<br>
-スマホ縦画面：<a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/img-box/img20160620044658.png">img20160620044658.png</a><br>
-スマホ横画面：<a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/img-box/img20160620044721.png">img20160620044721.png</a><br>
-↑みたくなってなかったらとりあえずリロードしたりブラウザの再起動<br>
-それでもダメなら使ってる端末とブラウザを nanamie に手紙で報告
-<hr>
-$login_box_html
-<hr>
-$navi_html
-<hr>
-$country_html
-<hr>
-定員[ $w{player}/$max_entry人 ]<br>
-ﾌﾟﾚｲﾔｰ保存期間 $auto_delete_day日(1世代目Lv.1は1日)<br>
-基本拘束時間 $GWT分<br>
-給与 $salary_hour時間毎 君主の任期 $reset_ceo_cycle_year年周期
-<hr>
-<ol>
-<li><a href="reset_player.cgi">ﾘｾｯﾄ処理</a>
-<li><a href="CatasoApp-release-signed.apk">ｶﾀ~ﾉｱﾌﾟﾘ</a>
-</ol>
-<hr>
-EOM
-}
-
+#ここから下は改装中の見本<br>
+#スマホ縦画面：<a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/img-box/img20160620044658.png">img20160620044658.png</a><br>
+#スマホ横画面：<a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/img-box/img20160620044721.png">img20160620044721.png</a><br>
+#↑みたくなってなかったらとりあえずリロードしたりブラウザの再起動<br>
+#それでもダメなら使ってる端末とブラウザを nanamie に手紙で報告
+#<hr>
+=cut
 
 1; # 削除不可
