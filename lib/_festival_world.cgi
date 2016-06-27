@@ -400,12 +400,6 @@ sub add_festival_country {
 		$cs{state}[$i]    = 0;
 		$cs{capacity}[$i] = $max_c;
 		$cs{is_die}[$i]   = 0;
-		my @lines = &get_countries_mes();
-		if ($w{country} > @lines - $country_num) {
-			open my $fh9, ">> $logdir/countries_mes.cgi";
-			print $fh9 "<>$default_icon<>\n";
-			close $fh9;
-		}
 	}
 
 	for my $i (1 .. $w{country}-$country_num) {
@@ -421,6 +415,13 @@ sub add_festival_country {
 			$w{ "f_${i}_${j}" } = -99;
 			$w{ "p_${i}_${j}" } = 2;
 		}
+	}
+
+	my @lines = &get_countries_mes();
+	if ($w{country} > @lines) {
+		open my $fh9, ">> $logdir/countries_mes.cgi";
+		print $fh9 "<>non_mark.gif<>\n" for 1..$country_num;
+		close $fh9;
 	}
 
 	# バックアップ作成
@@ -445,20 +446,20 @@ sub remove_festival_country {
 	for (my $i = $w{country}; $i > $w{country}-$country_num; $i--) {
 		my $from = "$logdir/$i";
 		my $num = rmtree($from);
-
-		my @lines = ();
-		open my $fh, "+< $logdir/countries_mes.cgi";
-		eval { flock $fh, 2; };
-		while (my $line = <$fh>) {
-			push @lines, $line;
-		}
-		pop @lines while @lines > $w{country} + 1;
-		seek  $fh, 0, 0;
-		truncate $fh, 0;
-		print $fh @lines;
-		close $fh;
 	}
 	$w{country} -= $country_num;
+
+	my @lines = ();
+	open my $fh, "+< $logdir/countries_mes.cgi";
+	eval { flock $fh, 2; };
+	while (my $line = <$fh>) {
+		push @lines, $line;
+	}
+	pop @lines while @lines > $w{country} + 1;
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @lines;
+	close $fh;
 
 	# 国データ復旧
 	for my $i (0 .. $w{country}) {
