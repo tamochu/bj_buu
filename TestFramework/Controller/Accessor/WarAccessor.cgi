@@ -223,9 +223,9 @@ sub action_after_toitsu{
 		_before_bj($player_name);
 		_read_user($player_name);
 
-		($m{lib} eq "world") or die "select_after_toitsu failed : m{lib} = $m{lib}\n";
+		($m{lib} eq "world") or die "open_bj failed : m{lib} = $m{lib}\n";
 		$ENV{REQUEST_METHOD} = "";
-		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd";
+		$ENV{QUERY_STRING} = $env_base;
 		require "bj.cgi";
 
 	};
