@@ -247,6 +247,7 @@ sub action_after_toitsu{
 		die ("select_after_toitsu failed : m{lib} = $m{lib}\n") unless ($m{lib} ne "");
 	};
 
+	Util::fork_sub($open_bj);
 	Util::fork_sub($select_after_toitsu);
 
 }
