@@ -4,8 +4,8 @@ use TestFramework::Controller::ControllerConst;
 
 package WarController;
 
-require $ControllerConst::WarController;
-require $ControllerConst::PlayerController;
+require $ControllerConst::WarAccessor;
+require $ControllerConst::PlayerAccessor;
 
 sub new{
 	my $class = shift;
