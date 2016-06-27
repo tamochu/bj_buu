@@ -70,7 +70,7 @@ sub run{
 	$wc->access_data("game_lv", 1);
 	$wc->access_data("reset_time", 0);
 	my $old_tou_c = $pc->access_data("s1c3m", "tou_c");
-	$warc->action_set_war("s1c3m",1);
+	$warc->action_set_war("s1c3m",1, 1);
 	$pc->access_data("s1c3m", "wt", 0);
 	$warc->action_encount("s1c3m");
 	$warc->action_win_war("s1c3m");
