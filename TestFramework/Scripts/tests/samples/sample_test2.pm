@@ -96,7 +96,7 @@ sub run{
 	#投獄されたプレイヤーも移籍しているか
 	#このチェックは投獄されているプレイヤーが同じ国に移籍する1/6の確率で失敗してしまう
 	#本来は複数人のプレイヤーを投獄してチェックし確率を下げるべき
-	$pc->access_data("s1c2m", "country") ne 2) or die "s1c2m is still in the same country";
+	($pc->access_data("s1c2m", "country") ne 2) or die "s1c2m is still in the same country";
 
 	#この後混乱中に君主を建ててから統一するなどして混乱後の君主投票状況をチェックする
 	#サンプルとしては冗長なのでこれでテスト終了とする
