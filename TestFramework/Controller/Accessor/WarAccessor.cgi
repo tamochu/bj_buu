@@ -214,6 +214,22 @@ sub action_after_toitsu{
 	};
 	my $env_base = Util::fork_sub($make_env);
 
+	#bj.cgiを開く
+	my $open_bj = sub{
+
+		require $ControllerConst::bj_wrapper;
+		package BJWrapper;
+
+		_before_bj($player_name);
+		_read_user($player_name);
+
+		($m{lib} eq "world") or die "select_after_toitsu failed : m{lib} = $m{lib}\n";
+		$ENV{REQUEST_METHOD} = "";
+		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd";
+		require "bj.cgi";
+
+	};
+
 	#統一後の選択をする
 	my $select_after_toitsu= sub{
 
@@ -223,7 +239,6 @@ sub action_after_toitsu{
 		_before_bj($player_name);
 		_read_user($player_name);
 
-		($m{lib} eq "world") or die "select_after_toitsu failed : m{lib} = $m{lib}\n";
 
 		$ENV{REQUEST_METHOD} = "";
 		$ENV{QUERY_STRING} = $env_base."&cmd=$cmd";
