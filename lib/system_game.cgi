@@ -1003,11 +1003,13 @@ sub write_yran {
 }
 #================================================
 # 一年ランキングデータ書き込み
+# write_yran(書き換える要素, 値, モード [, 書き換える要素2, 値2, モード2]);
+# 複数の項目も一度に渡せるけど 項目*3 の引数固定
 #================================================
 sub write_yran2 {
 	my @data = @_;
 	my $size = 3;
-	my $count = @data / $size - 1;
+	my $count = @data / $size;
 
 	my @lines = ();
 	my $new_line = '';
@@ -1025,26 +1027,16 @@ sub write_yran2 {
 		close $fh;
 	}
 
-	if ($new_line) { # 今年のデータがある
-		for my $i (0 .. $count) {
-			my ($data_name, $data_value, $is_add) = ($data[$i*$size+0], $data[$i*$size+1], $data[$i*$size+2]);
-			# 対象の要素が存在するなら書き換える
-			if ($new_line =~ /$data_name;(.*?)<>/) {
-				my $value = $is_add
-					? $1 + $data_value # 累計記録
-					: ($1 < $data_value ? $data_value : $1) ; # 最高記録
-				$new_line =~ s/$data_name;.*?<>/$data_name;$value<>/;
-			}
-			# 対象の要素が存在しないなら書き足す
-			else {
-				$new_line .= "$data_name;$data_value<>";
-			}
+	$new_line = "year;$w{year}<>" unless $new_line;
+	for my $i (1 .. $count) {
+		my ($data_name, $data_value, $is_add) = splice(@data, 0, $size);
+		if ($new_line =~ /$data_name;(.*?)<>/) {
+			my $value = $is_add
+				? $1 + $data_value # 累計記録
+				: ($1 < $data_value ? $data_value : $1) ; # 最高記録
+			$new_line =~ s/$data_name;.*?<>/$data_name;$value<>/;
 		}
-	}
-	else { # 今年のデータがない
-		$new_line = "year;$w{year}<>";
-		for my $i (0 .. $count) {
-			my ($data_name, $data_value) = ($data[$i*$size+0], $data[$i*$size+1]);
+		else {
 			$new_line .= "$data_name;$data_value<>";
 		}
 	}
