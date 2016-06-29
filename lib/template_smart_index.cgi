@@ -100,8 +100,8 @@ sub index {
 
 	print <<"EOM";
 $login_box_html
-<p>
-Chromeのデータセーバーを無効にしないとアクセスできません
+<p style="text-align:center;">
+<a href="#attention">アクセス規制について</a>
 </p>
 <hr>
 $navi_html
@@ -116,6 +116,17 @@ $country_html
 <ol>
 <li><a href="reset_player.cgi">ﾘｾｯﾄ処理</a>
 <li><a href="CatasoApp-release-signed.apk">ｶﾀ~ﾉｱﾌﾟﾘ</a>
+</ol>
+<hr>
+<p>
+<a name="attention">アクセス規制について</a><br>
+複垢作り放題になるためIPアドレスを秘匿する機能\を使ったアクセスは規制しています。以下の例に当てはまる場合には、それぞれの機能\をオフにすることでアクセスできるようになります。
+</p>
+<ol>
+<li>Chrome：データセーバーがオンになっている</li>
+<li>Opera：Turbo(オフロード)モードがオンになっている</li>
+<li>Mercury：圧縮を有効にしている</li>
+<li>Opera Max：使用しているブラウザによるデータ通信を制限している</li>
 </ol>
 <hr>
 <form method="$method" action="login.cgi">
