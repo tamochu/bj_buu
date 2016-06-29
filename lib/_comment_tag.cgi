@@ -26,7 +26,12 @@ sub comment_change {
 
 	# ³‹K•\Œ»‚Æ‚©‚È‚¢Œ¾Œê‚¸‚Á‚Æg‚Á‚Ä‚Ä‚æ‚­•ª‚©‚ç‚ñ‚µ—Í‹Z
 	if (!$is_mobile) {
-		$bcomment =~ s!&amp;img\(([^&]*?)(jpg|png)\)!<p class="img"><a href="./../upbbs/img-box/\1\2"><img src="./../upbbs/img-box/\1\2"></a></p>!g;
+		if ($chat_flag) {
+			$bcomment =~ s!&amp;img\(([^&]*?)(jpg|png)\)!<a href="./../upbbs/img-box/\1\2"><img src="./../upbbs/img-box/\1\2" $pic_size></a>!g
+		}
+		else {
+			$bcomment =~ s!&amp;img\(([^&]*?)(jpg|png)\)!<p class="img"><a href="./../upbbs/img-box/\1\2"><img src="./../upbbs/img-box/\1\2"></a></p>!g;
+		}
 		$bcomment =~ s|&amp;img\((.*?)\)|<a href="./../upbbs/img-box/\1">\1</a>|g;
 	}
 	else {
