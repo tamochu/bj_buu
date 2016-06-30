@@ -485,8 +485,10 @@ sub tp_140 { # ‹­’D
 	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
 	$m{stock} = &seed_bonus('gou', $m{stock});
 	my $v = &exe3('food');
-	&write_yran('gou', $v) if $v > 0;
-	&write_yran('gou_t', $v, 1) if $v > 0;
+	&write_yran('gou', $v, 0,
+					'gou_t', $v, 1) if $v > 0;
+#	&write_yran('gou', $v) if $v > 0;
+#	&write_yran('gou_t', $v, 1) if $v > 0;
 	
 	&mes_and_world_news("$c_y‚ÉŠïPUŒ‚‚ğÀ{B$v‚Ì•º—Æ‚ğ‹­’D‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
@@ -496,8 +498,10 @@ sub tp_240 { # ’³•ñ
 	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
 	$m{stock} = &seed_bonus('cho', $m{stock});
 	my $v = &exe3('money');
-	&write_yran('cho', $v) if $v > 0;
-	&write_yran('cho_t', $v, 1) if $v > 0;
+	&write_yran('cho', $v, 0,
+					'cho_t', $v, 1) if $v > 0;
+#	&write_yran('cho', $v) if $v > 0;
+#	&write_yran('cho_t', $v, 1) if $v > 0;
 	
 	&mes_and_world_news("$c_y‚Ì‘‹à’²’BÙ°Ä‚ğŠh—‚µA$v‚Ì$e2j{money}‚ğ—¬o‚³‚¹‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
@@ -507,8 +511,10 @@ sub tp_340 { # ô”]
 	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
 	$m{stock} = &seed_bonus('sen', $m{stock});
 	my $v = &exe3('soldier');
-	&write_yran('sen', $v) if $v > 0;
-	&write_yran('sen_t', $v, 1) if $v > 0;
+	&write_yran('sen', $v, 0,
+					'sen_t', $v, 1) if $v > 0;
+#	&write_yran('sen', $v) if $v > 0;
+#	&write_yran('sen_t', $v, 1) if $v > 0;
 	
 	&mes_and_world_news("$c_y‚Ì$v‚Ì•º‚ğô”]‚·‚é‚±‚Æ‚É¬Œ÷!$c_m‚Ì•º‚Éæ‚è‚İ‚Ü‚µ‚½");
 }
@@ -518,8 +524,10 @@ sub tp_740 { # ‹­’D
 	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
 	$m{stock} = &seed_bonus('gou', $m{stock});
 	my $v = &exe3('food');
-	&write_yran('gou', $v) if $v > 0;
-	&write_yran('gou_t', $v, 1) if $v > 0;
+	&write_yran('gou', $v, 0,
+					'gou_t', $v, 1) if $v > 0;
+#	&write_yran('gou', $v) if $v > 0;
+#	&write_yran('gou_t', $v, 1) if $v > 0;
 	
 	&mes_and_world_news("$c_y‚ÉŠïPUŒ‚‚ğÀ{B$v‚Ì•º—Æ‚ğ‹­’D‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
@@ -529,8 +537,10 @@ sub tp_840 { # ’³•ñ
 	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
 	$m{stock} = &seed_bonus('cho', $m{stock});
 	my $v = &exe3('money');
-	&write_yran('cho', $v) if $v > 0;
-	&write_yran('cho_t', $v, 1) if $v > 0;
+	&write_yran('cho', $v, 0,
+					'cho_t', $v, 1) if $v > 0;
+#	&write_yran('cho', $v) if $v > 0;
+#	&write_yran('cho_t', $v, 1) if $v > 0;
 	
 	&mes_and_world_news("$c_y‚Ì‘‹à’²’BÙ°Ä‚ğŠh—‚µA$v‚Ì$e2j{money}‚ğ—¬o‚³‚¹‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
@@ -540,8 +550,10 @@ sub tp_940 { # ô”]
 	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
 	$m{stock} = &seed_bonus('sen', $m{stock});
 	my $v = &exe3('soldier');
-	&write_yran('sen', $v) if $v > 0;
-	&write_yran('sen_t', $v, 1) if $v > 0;
+	&write_yran('sen', $v, 0,
+					'sen_t', $v, 1) if $v > 0;
+#	&write_yran('sen', $v) if $v > 0;
+#	&write_yran('sen_t', $v, 1) if $v > 0;
 	
 	&mes_and_world_news("$c_y‚Ì$v‚Ì•º‚ğô”]‚·‚é‚±‚Æ‚É¬Œ÷!$c_m‚Ì•º‚Éæ‚è‚İ‚Ü‚µ‚½");
 }

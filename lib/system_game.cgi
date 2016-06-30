@@ -938,6 +938,7 @@ sub get_most_strong_country {
 	}
 	return $country;
 }
+=pod
 #================================================
 # 一年ランキングデータ書き込み
 #================================================
@@ -1001,12 +1002,13 @@ sub write_yran {
 	print $fh @lines;
 	close $fh;
 }
+=cut
 #================================================
 # 一年ランキングデータ書き込み
 # write_yran(書き換える要素, 値, モード [, 書き換える要素2, 値2, モード2]);
 # 複数の項目も一度に渡せるけど 項目*3 の引数固定
 #================================================
-sub write_yran2 {
+sub write_yran {
 	my @data = @_;
 	my $size = 3;
 	my $count = @data / $size;
@@ -1030,6 +1032,7 @@ sub write_yran2 {
 	$new_line = "year;$w{year}<>" unless $new_line;
 	for my $i (1 .. $count) {
 		my ($data_name, $data_value, $is_add) = splice(@data, 0, $size);
+		next if !$data_name || !$data_value;
 		if ($new_line =~ /$data_name;(.*?)<>/) {
 			my $value = $is_add
 				? $1 + $data_value # 累計記録
@@ -1041,7 +1044,7 @@ sub write_yran2 {
 		}
 	}
 
-	push @lines, "$new_line\n";
+	unshift @lines, "$new_line\n"; # pop だと集計時にループが深くなるので unshift
 	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
 	print $fh @lines;
 	close $fh;

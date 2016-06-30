@@ -177,6 +177,7 @@ sub update_player_ranking  {
 					$ydata{$status} = $ydata{war} > 20 ? 100 * $ydata{$status} / $ydata{war} : 0;
 				}
 				$p_status = $ydata{$status};
+				last;
 			}
 			close $fh;
 			next if $p_status < $rank_min;
