@@ -1044,7 +1044,7 @@ sub write_yran {
 		}
 	}
 
-	unshift @lines, "$new_line\n"; # pop だと集計時にループが深くなるので unshift
+	unshift @lines, "$new_line\n"; # push だと集計時にループが深くなるので unshift
 	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
 	print $fh @lines;
 	close $fh;
