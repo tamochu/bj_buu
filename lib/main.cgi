@@ -47,14 +47,11 @@ sub tp_1 { $cmd ? &b_menu(@menus) : &begin; }
 sub main_system {
 	# Lv up
 	if ($m{exp} >= 100) {
-#		my $l = int($m{exp} / 100);
-#		for my $i (1 .. $l) {
-			if ($m{egg}) {
-				$m{egg_c} += int(rand(6)+10);
-				$m{egg_c} += int(rand(16)+20) if $jobs[$m{job}][1] eq '—‘m';
-			}
-			&lv_up;
-#		}
+		if ($m{egg}) {
+			$m{egg_c} += int(rand(6)+10);
+			$m{egg_c} += int(rand(16)+20) if $jobs[$m{job}][1] eq '—‘m';
+		}
+		&lv_up;
 	}
 	# ÀÏºŞ¬’·
 	elsif (!$m{incubation_switch} && $m{egg} && $m{egg_c} >= $eggs[$m{egg}][2]) {
@@ -310,12 +307,6 @@ sub main_system {
 		$mes .= &check_losscut;
 	}
 	
-	if ($m{name} eq "nanamie") {
-#		for my $i (1 .. 200) {
-#			create_user2(int(rand(10))."".int(rand(10))."".int(rand(10))."".int(rand(10))."".int(rand(10)));
-#		}
-	}
-
 	$m{act} = 0 if $config_test;
 }
 
@@ -374,8 +365,7 @@ sub lv_up {
 	++$m{lv};
 	
 	# ¢‘ãŒğ‘ã
-	my $sedai_max = &seed_bonus('sedai_lv', 100); # ‚»‚à‚»‚à©•ª‚ªƒGƒ‹ƒt‚Ì‚Å‚à•Ô‚è’l‚ª 100
-#	if ($m{lv} >= 100) {
+	my $sedai_max = &seed_bonus('sedai_lv', 100);
 	if ($m{lv} >= $sedai_max) {
 		$m{lv} = 1;
 		&c_up('sedai');
