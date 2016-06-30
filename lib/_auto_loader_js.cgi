@@ -11,7 +11,15 @@ sub auto_loader {
 	my $head_str = '';
 	$head_str .= "<script>\n";
 	$head_str .= "\$(document).ready(function(){\n";
-	$head_str .= "setInterval(function(){auto_load();}, 5000);\n";
+	$head_str .= "var timer_id;\n";
+	$head_str .= "var i = 0;\n";
+	$head_str .= "timer_id = setInterval(function(){\n";
+	$head_str .= "auto_load();\n";
+	$head_str .= "i++;\n";
+	$head_str .= "if (i >= 120) {\n";
+	$head_str .= "clearInterval(timer_id);\n";
+	$head_str .= "}\n";
+	$head_str .= "}, 10000);\n";
 	$head_str .= "});\n";
 	$head_str .= "function auto_load() {\n";
 	$head_str .= "\$.get(\"chat_ajax.cgi\",\n";
