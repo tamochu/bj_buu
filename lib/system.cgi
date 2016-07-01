@@ -440,7 +440,7 @@ sub header {
 sub footer {
 	print qq|<p><a href="#top">▲上</a></p>| if $is_mobile;
 	print qq|<br><div align="right" style="font-size:11px">|;
-	print qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br>|; # 著作表示:削除・非表示 禁止!!
+	print qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br><a href="http://www.game-smartphone.com/simulation/game_387.html">スマートフォンゲームズ</a><br>|; # 著作表示:削除・非表示 禁止!!
 	print qq|$copyright|;
 	print qq|</div></body></html>|;
 }
