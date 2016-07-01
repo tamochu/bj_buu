@@ -15,21 +15,14 @@ sub is_satisfy {
 	elsif (&is_act_satisfy) { # ”æ˜J‚µ‚Ä‚¢‚éê‡‚Ís‚¦‚È‚¢
 		return 0;
 	}
-	elsif ($cs{is_die}[$m{country}] > 1) { # ½‘E•ö‰ó‘‚Ís‚¦‚È‚¢
-		$mes .= '‘¼‘‚É‰e‹¿‚ğ—^‚¦‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>';
-		&refresh;
-		&n_menu;
-		return 0;
-	}
 	elsif ($time < $w{reset_time}) {
 		$mes .= 'IíŠúŠÔ’†‚Íí‘ˆ‚ÆŒR–‚Í‚Å‚«‚Ü‚¹‚ñ<br>';
 		if ($m{value} eq 'military_ambush'){
-		   my @lines = ();
-		   open my $fh, "+< $logdir/$m{country}/patrol.cgi" or &error("$logdir/$m{country}/patrol.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-		   eval { flock $fh, 2; };
-		   seek  $fh, 0, 0;
-		   truncate $fh, 0;
-		   close $fh;
+			open my $fh, "+< $logdir/$m{country}/patrol.cgi" or &error("$logdir/$m{country}/patrol.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			eval { flock $fh, 2; };
+			seek  $fh, 0, 0;
+			truncate $fh, 0;
+			close $fh;
 		}
 		&refresh;
 		&n_menu;
@@ -162,17 +155,12 @@ sub tp_610 {
 		close $fh;
 	}
 
-	if($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1')){
-		my $vm = $m{turn} * 500;
-		$m{money} += $vm;
-		$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $vm G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
-	}
+	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
 	&c_up('mat_c') for 1 .. $m{turn};
 	&military_master_c_up('mat_c');
 	&use_pet('mat') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '32');
 	&tp_1000;
 }
-
 
 #=================================================
 # ŒR–¾¯Ä
@@ -203,7 +191,7 @@ sub exe1 {
 	else {
 		$m{tp} += 10;
 		$y{country} = $cmd;
-		
+
 		# ¢ŠEî¨u–À‘–v
 		if (($w{world} eq '15' || ($w{world} eq '19' && $w{world_sub} eq '15'))) {
 			$y{country} = int(rand($w{country}))+1;
@@ -220,21 +208,13 @@ sub exe1 {
 				$y{country} = &get_most_strong_country if rand(3) < 1 || $cs{is_die}[$y{country}] || $y{country} eq $m{country} || $y{country} eq $union;
 			}
 		}
-		
-		if($m{tp} >= 710 && $m{tp} <= 910){
-			$GWT *= 2.5;
-		}
-		
+
+		$GWT *= 2.5 if $m{tp} >= 710 && $m{tp} <= 910;	
 		$mes .= "$_[0]$cs{name}[$y{country}]‚ÉŒü‚©‚¢‚Ü‚µ‚½<br>";
 		$mes .= "$GWT•ªŒã‚É“’…‚·‚é—\\’è‚Å‚·<br>";
-		
-		if ($y{country} eq $m{renzoku}) {
-			++$m{renzoku_c};
-		}
-		else {
-			$m{renzoku} = $y{country};
-			$m{renzoku_c} = 1;
-		}
+
+		$m{renzoku_c} = $y{country} eq $m{renzoku} ? $m{renzoku_c} + 1 : 1;
+		$m{renzoku} = $y{country};
 
 		&wait;
 	}
@@ -265,7 +245,6 @@ sub form1 {
 #	$m{value} += int(rand(10)+1); merino ‚ÌÁ‚µ–Y‚êH
 }
 
-
 #=================================================
 # Ù°ÌßºÏİÄŞ ¸”s‚·‚é‚©‚â‚ß‚È‚¢ŒÀ‚è‘±‚­(tpŒÅ’è)
 #=================================================
@@ -286,10 +265,6 @@ sub exe2 {
 	if ($cmd eq '0') { # Às
 		if ( $m{value} > rand(110)+35 ) { # ¸”s ’Pƒ‚Érand(100)‚É‚·‚é‚Æ30%‚­‚ç‚¢‚ÅŒ©‚Â‚©‚Á‚Ä‚µ‚Ü‚¤‚Ì‚Å rand(110)+30‚É•ÏX
 			$mes .= "“G•º‚ÉŒ©‚Â‚©‚Á‚Ä‚µ‚Ü‚Á‚½!!<br>";
-			
-			if ($m{tp} == 420) {
-				$m{turn} = $m{turn} > 200 ? $m{turn} - 200 : ($m{turn} > 100 ? $m{turn} - 100 : $m{turn}) ;
-			}
 			$m{tp} = 1900;
 			&n_menu;
 		}
@@ -300,35 +275,23 @@ sub exe2 {
 			if($m{tp} == 420 && $m{turn} < 7){
 				my $tei_sp = rand($m{tei_c} / 500);
 				$m{value} += $tei_sp > 5 ? int(rand(5)+1): int(rand(10-$tei_sp)+1);
-			}else {
-				if($m{unit} eq '17'){
-					$m{value} += int((rand(10)+1)*(0.7+rand(0.3)));
-				}else {
-					$m{value} += int(rand(10)+1);
-				}
+			} else {
+				$m{value} += int( $m{unit} eq '17' ? (rand(10)+1)*(0.7+rand(0.3)) : rand(10)+1 ); # ‰B–§‚Íã¸‹C”z’l0.7`0.9
 			}
-#			$m{value} = 0 if $config_test;
+			$m{value} = 0 if $config_test;
 			&loop_menu;
 			$m{tp} -= 10;
 		}
 	}
 	elsif ($cmd eq '1') { # ‘Ş‹p
 		$mes .= 'ˆø‚«ã‚°‚é‚±‚Æ‚É‚µ‚Ü‚·<br>';
-		
 		if ($m{turn} <= 0) { # ‰½‚à‚µ‚È‚¢‚Åˆø‚«ã‚°
 			&refresh;
 			&n_menu;
 		}
 		elsif ($m{tp} eq '420') { # “à•”’ã@
-			if ($m{turn} == 100 || $m{turn} == 200) { # ‰½‚à‚µ‚È‚¢‚Åˆø‚«ã‚°
-				$m{turn} = $m{turn} == 200 ? $m{turn} - 200 : ($m{turn} == 100 ? $m{turn} - 100 : $m{turn}) ;
-				&refresh;
-				&n_menu;
-			}
-			else {
-				$m{tp} += 20;
-				&{ 'tp_'.$m{tp} };
-			}
+			$m{tp} += 20;
+			&{ 'tp_'.$m{tp} };
 		}
 		else {
 			$m{tp} += 20;
@@ -345,64 +308,38 @@ sub exe2 {
 #=================================================
 # ¬Œ÷
 #=================================================
-sub tp_130 { # ‹­’D¬Œ÷
-	my $v = int( ($m{gou_c} + $m{at}) * $m{turn} * rand(4) );
-	$v  = int(rand(500)+2500) if $v > 3000;
-	$v *= 2 if ($w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5')));
-	if ($cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v *= 2;
-	}
+sub get_mil_success {
+	$mes .= $m{"$_[0]_c"};
+	$mes .= " $m{$_[1]} $_[0] $_[1] $_[2] $_[3]<br>";
+	my $v = int( ($m{"$_[0]_c"} + $m{$_[1]}) * $m{turn} * rand($_[3]) );
+	$v  = int(rand(500)+$_[2]-500) if $v > $_[2];
+	$v *= 2 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
+	$v *= 2 if $cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time;
 	$m{stock} += $v;
-	
-	if ($m{stock} > $cs{food}[$y{country}]) {
-		$mes .= "$c_y‚ÌH—¿‚ªs‚«‚Ü‚µ‚½!<br>";
-		$m{stock} = $cs{food}[$y{country}];
+	return $v;
+}
+sub get_mil_message {
+	if ($m{stock} > $cs{$_[0]}[$y{country}]) {
+		$mes .= "$c_y‚Ì$_[3]";
+		$m{stock} = $cs{$_[0]}[$y{country}];
+	} else {
+		$mes .= "$_[2]";
 	}
-	else {
-		$mes .= "$v‚ÌH—¿‹­’D‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
-	}
-	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ‹­’D $m{stock} ]<br>";
-
+	$mes .= "<br>[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ$_[1] $m{stock} ]<br>";
+}
+sub tp_130 { # ‹­’D¬Œ÷
+	my $v = &get_mil_success('gou', 'at', 3000, 4);
+	&get_mil_message('food', '‹­’D', "$v‚ÌH—¿‹­’D‚É¬Œ÷‚µ‚Ü‚µ‚½!", "H—¿‚ªs‚«‚Ü‚µ‚½!");
 }
 sub tp_230 { # ’³•ñ¬Œ÷
-	my $v = int( ($m{cho_c} + $m{mat}) * $m{turn} * rand(4) );
-	$v  = int(rand(500)+2500) if $v > 3000;
-	$v *= 2 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
-	if ($cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v *= 2;
-	}
-	$m{stock} += $v;
-
-	if ($m{stock} > $cs{money}[$y{country}]) {
-		$mes .= "$c_y‚Ì$e2j{money}‚ªs‚«‚Ü‚µ‚½!<br>";
-		$m{stock} = $cs{money}[$y{country}];
-	}
-	else {
-		$mes .= "$v‚Ì‘‹à—¬o‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
-	}
-	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ’³•ñ $m{stock} ]<br>";
+	my $v = &get_mil_success('cho', 'mat', 3000, 4);
+	&get_mil_message('money', '’³•ñ', "$v‚Ì‘‹à—¬o‚É¬Œ÷‚µ‚Ü‚µ‚½!", "$e2j{money}‚ªs‚«‚Ü‚µ‚½!");
 }
 sub tp_330 { # ô”]¬Œ÷
-	my $v = int( ($m{sen_c} + $m{cha}) * $m{turn} * rand(4) );
-	$v  = int(rand(500)+2000) if $v > 2500;
-	$v *= 2 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
-	if ($cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v *= 2;
-	}
-	$m{stock} += $v;
-
-	if ($m{stock} > $cs{soldier}[$y{country}]) {
-		$mes .= "$c_y‚Ì•ºm‚ª‚à‚¤‚¢‚Ü‚¹‚ñ!<br>";
-		$m{stock} = $cs{soldier}[$y{country}];
-	}
-	else {
-		$mes .= "$vl‚Ì•ºmô”]‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
-	}
-
-	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙô”] $m{stock} ]<br>";
+	my $v = &get_mil_success('sen', 'cha', 2500, 4);
+	&get_mil_message('soldier', 'ô”]', "$vl‚Ì•ºmô”]‚É¬Œ÷‚µ‚Ü‚µ‚½!", "•ºm‚ª‚à‚¤‚¢‚Ü‚¹‚ñ!");
 }
 sub tp_430{ # ’ã@
-
 	$mes .= $m{turn} eq '1' ? "$e2j{food}‚Ìî•ñ‚ğè‚É“ü‚ê‚Ü‚µ‚½!<br>"
 		  : $m{turn} eq '2' ? "$e2j{money}‚Ìî•ñ‚ğè‚É“ü‚ê‚Ü‚µ‚½!<br>"
 		  : $m{turn} eq '3' ? "$e2j{soldier}‚Ìî•ñ‚ğè‚É“ü‚ê‚Ü‚µ‚½!<br>"
@@ -421,145 +358,54 @@ sub tp_530{ # ‹UŒv
 	$mes .= "‰R‚Ìî•ñ‚ğ—¬‚·‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ‹UŒv $v% ]<br>";
 }
 sub tp_730 { # ‹­’D¬Œ÷
-	my $v = int( ($m{gou_c} + $m{at}) * $m{turn} * rand(6) );
-	$v  = int(rand(500)+4000) if $v > 4500;
-	$v *= 2 if ($w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5')));
-	if ($cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v *= 2;
-	}
-	$m{stock} += $v;
-	
-	if ($m{stock} > $cs{food}[$y{country}]) {
-		$mes .= "$c_y‚ÌH—¿‚ªs‚«‚Ü‚µ‚½!<br>";
-		$m{stock} = $cs{food}[$y{country}];
-	}
-	else {
-		$mes .= "$v‚ÌH—¿‹­’D‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
-	}
-	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ‹­’D $m{stock} ]<br>";
+	my $v = &get_mil_success('gou', 'at', 4500, 6);
+	&get_mil_message('food', '‹­’D', "$v‚ÌH—¿‹­’D‚É¬Œ÷‚µ‚Ü‚µ‚½!", "H—¿‚ªs‚«‚Ü‚µ‚½!");
 }
 sub tp_830 { # ’³•ñ¬Œ÷
-	my $v = int( ($m{cho_c} + $m{mat}) * $m{turn} * rand(6) );
-	$v  = int(rand(500)+4000) if $v > 4500;
-	$v *= 2 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
-	if ($cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v *= 2;
-	}
-	$m{stock} += $v;
-
-	if ($m{stock} > $cs{money}[$y{country}]) {
-		$mes .= "$c_y‚Ì$e2j{money}‚ªs‚«‚Ü‚µ‚½!<br>";
-		$m{stock} = $cs{money}[$y{country}];
-	}
-	else {
-		$mes .= "$v‚Ì‘‹à—¬o‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
-	}
-	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ’³•ñ $m{stock} ]<br>";
+	my $v = &get_mil_success('cho', 'mat', 4500, 6);
+	&get_mil_message('money', '’³•ñ', "$v‚Ì‘‹à—¬o‚É¬Œ÷‚µ‚Ü‚µ‚½!", "$e2j{money}‚ªs‚«‚Ü‚µ‚½!");
 }
 sub tp_930 { # ô”]¬Œ÷
-	my $v = int( ($m{sen_c} + $m{cha}) * $m{turn} * rand(6) );
-	$v  = int(rand(500)+3500) if $v > 4000;
-	$v *= 2 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
-	if ($cs{extra}[$m{country}] eq '2' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v *= 2;
-	}
-	$m{stock} += $v;
-
-	if ($m{stock} > $cs{soldier}[$y{country}]) {
-		$mes .= "$c_y‚Ì•ºm‚ª‚à‚¤‚¢‚Ü‚¹‚ñ!<br>";
-		$m{stock} = $cs{soldier}[$y{country}];
-	}
-	else {
-		$mes .= "$vl‚Ì•ºmô”]‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>";
-	}
-
-	$mes .= "[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙô”] $m{stock} ]<br>";
+	my $v = &get_mil_success('sen', 'cha', 4000, 6);
+	&get_mil_message('soldier', 'ô”]', "$vl‚Ì•ºmô”]‚É¬Œ÷‚µ‚Ü‚µ‚½!", "•ºm‚ª‚à‚¤‚¢‚Ü‚¹‚ñ!");
 }
 
 #=================================================
 # ˆø‚«ã‚°
 #=================================================
 sub tp_140 { # ‹­’D
-	&c_up('gou_c') for 1 .. $m{turn};
-	&military_master_c_up('gou_c');
-	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
-	$m{stock} = &seed_bonus('gou', $m{stock});
-	my $v = &exe3('food');
-	&write_yran('gou', $v, 0,
-					'gou_t', $v, 1) if $v > 0;
-#	&write_yran('gou', $v) if $v > 0;
-#	&write_yran('gou_t', $v, 1) if $v > 0;
-	
+	my $v = &exe3('food', 'gou');
 	&mes_and_world_news("$c_y‚ÉŠïPUŒ‚‚ğÀ{B$v‚Ì•º—Æ‚ğ‹­’D‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
 sub tp_240 { # ’³•ñ
-	&c_up('cho_c') for 1 .. $m{turn};
-	&military_master_c_up('cho_c');
-	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
-	$m{stock} = &seed_bonus('cho', $m{stock});
-	my $v = &exe3('money');
-	&write_yran('cho', $v, 0,
-					'cho_t', $v, 1) if $v > 0;
-#	&write_yran('cho', $v) if $v > 0;
-#	&write_yran('cho_t', $v, 1) if $v > 0;
-	
+	my $v = &exe3('money', 'cho');
 	&mes_and_world_news("$c_y‚Ì‘‹à’²’BÙ°Ä‚ğŠh—‚µA$v‚Ì$e2j{money}‚ğ—¬o‚³‚¹‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
 sub tp_340 { # ô”]
-	&c_up('sen_c') for 1 .. $m{turn};
-	&military_master_c_up('sen_c');
-	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
-	$m{stock} = &seed_bonus('sen', $m{stock});
-	my $v = &exe3('soldier');
-	&write_yran('sen', $v, 0,
-					'sen_t', $v, 1) if $v > 0;
-#	&write_yran('sen', $v) if $v > 0;
-#	&write_yran('sen_t', $v, 1) if $v > 0;
-	
+	my $v = &exe3('soldier', 'sen');
 	&mes_and_world_news("$c_y‚Ì$v‚Ì•º‚ğô”]‚·‚é‚±‚Æ‚É¬Œ÷!$c_m‚Ì•º‚Éæ‚è‚İ‚Ü‚µ‚½");
 }
 sub tp_740 { # ‹­’D
-	&c_up('gou_c') for 1 .. $m{turn};
-	&military_master_c_up('gou_c');
-	$m{stock} = &use_pet('gou', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
-	$m{stock} = &seed_bonus('gou', $m{stock});
-	my $v = &exe3('food');
-	&write_yran('gou', $v, 0,
-					'gou_t', $v, 1) if $v > 0;
-#	&write_yran('gou', $v) if $v > 0;
-#	&write_yran('gou_t', $v, 1) if $v > 0;
-	
+	my $v = &exe3('food', 'gou');
 	&mes_and_world_news("$c_y‚ÉŠïPUŒ‚‚ğÀ{B$v‚Ì•º—Æ‚ğ‹­’D‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
 sub tp_840 { # ’³•ñ
-	&c_up('cho_c') for 1 .. $m{turn};
-	&military_master_c_up('cho_c');
-	$m{stock} = &use_pet('cho', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '34');
-	$m{stock} = &seed_bonus('cho', $m{stock});
-	my $v = &exe3('money');
-	&write_yran('cho', $v, 0,
-					'cho_t', $v, 1) if $v > 0;
-#	&write_yran('cho', $v) if $v > 0;
-#	&write_yran('cho_t', $v, 1) if $v > 0;
-	
+	my $v = &exe3('money', 'cho');
 	&mes_and_world_news("$c_y‚Ì‘‹à’²’BÙ°Ä‚ğŠh—‚µA$v‚Ì$e2j{money}‚ğ—¬o‚³‚¹‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
 sub tp_940 { # ô”]
-	&c_up('sen_c') for 1 .. $m{turn};
-	&military_master_c_up('sen_c');
-	$m{stock} = &use_pet('sen', $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '35');
-	$m{stock} = &seed_bonus('sen', $m{stock});
-	my $v = &exe3('soldier');
-	&write_yran('sen', $v, 0,
-					'sen_t', $v, 1) if $v > 0;
-#	&write_yran('sen', $v) if $v > 0;
-#	&write_yran('sen_t', $v, 1) if $v > 0;
-	
+	my $v = &exe3('soldier', 'sen');
 	&mes_and_world_news("$c_y‚Ì$v‚Ì•º‚ğô”]‚·‚é‚±‚Æ‚É¬Œ÷!$c_m‚Ì•º‚Éæ‚è‚İ‚Ü‚µ‚½");
 }
 sub exe3 {
 	my $k = shift;
-	
+	my $l = shift;
+
+	&c_up("${l}_c") for 1 .. $m{turn};
+	&military_master_c_up("${l}_c");
+	$m{stock} = &use_pet($l, $m{stock}) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '33');
+	$m{stock} = &seed_bonus($l, $m{stock});
+
 	# ôm‚Í’DŒR–—Í1.1”{
 	$m{stock} = int($m{stock} * 1.1) if  $cs{mil}[$m{country}] eq $m{name};
 	# ŒNå‚Í’DŒR–—Í1.05”{A–\ŒN‚È‚ç‚Î1.2”{
@@ -581,11 +427,10 @@ sub exe3 {
 	$cs{$k}[$m{country}] += $v;
 	
 	&write_cs;
-	if($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1')){
-		my $vm = int($v * 0.1);
-		$m{money} += $vm;
-		$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $vm G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
-	}
+
+	&special_money(int($v * 0.1)) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
+	&write_yran($l, $v, 0,
+					"${l}_t", $v, 1) if $v > 0;
 	return $v;
 }
 
@@ -603,17 +448,11 @@ sub tp_440 { # ’ã@
 	$m{tp} += 10;
 }	
 sub tp_450 {
-	my $turn = $m{turn};
-	$m{turn} = $turn > 200 ? $turn - 200 : ($turn > 100 ? $turn - 100 : $turn) ;
 	&c_up('tei_c') for 1 .. $m{turn};
 	&military_master_c_up('tei_c');
 	&use_pet('tei') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '36');
-	
-	if($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1')){
-		my $vm = $m{turn} * 500;
-		$m{money} += $vm;
-		$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $vm G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
-	}
+	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
+
 	my $lcomment = "<br>";
 	my $need_count = 7;
 	if ($m{turn} > $need_count) {
@@ -636,9 +475,7 @@ sub tp_450 {
 	# BBS‚É’Ç‹L
 	if ($cmd eq '1') {
 		my $w_name = $m{name};
-		if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
-			$w_name = '–¼–³‚µ';
-		}
+		$w_name = '–¼–³‚µ' if $w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16');
 		my $comment = "y$c_yz";
 		$comment .= "$e2j{food}F$cs{food}[$y{country}]/"       if $m{turn} >= 1;
 		$comment .= "$e2j{money}F$cs{money}[$y{country}]/"     if $m{turn} >= 2;
@@ -724,18 +561,12 @@ sub tp_540 { # ‹UŒv
 		}
 	}
 	
-	if($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1')){
-		my $vm = $m{turn} * 500;
-		$m{money} += $vm;
-		$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $vm G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
-	}
+	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
 	$mes .= "$c_y‚Æ‘¼‘‚Ì—FD“x‚ğ$v%‰º‚°‚é‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½<br>";
 	$m{tp} = 1000;
 	&n_menu;
 	&write_cs;
 }
-
-
 
 #=================================================
 # ¸”s
@@ -760,7 +591,6 @@ sub tp_1900 {
 	$mes .= "$v‚Ì$e2j{exp}‚ğè‚É“ü‚ê‚Ü‚µ‚½<br>";
 	$mes .= "”C–±‚É¸”s‚µ‚½‚½‚ßA$m{name}‚É‘Î‚·‚é•]‰¿‚ª‰º‚ª‚è‚Ü‚µ‚½<br>";
 }
-
 
 #=================================================
 # ¬Œ÷
@@ -844,7 +674,12 @@ sub is_patrol {
 
 sub military_master_c_up {
 	# ‚Ü‚¸–³ğŒ‚É +1 ‚µ‚»‚±‚©‚ç4ÎßÁ–ˆ‚É‚³‚ç‚É +1
-	if ($m{master_c} eq @_[0]) { &c_up(@_[0]) for 0 .. (int($m{turn} / 4)); }
+	if ($m{master_c} eq $_[0]) { &c_up($_[0]) for 0 .. (int($m{turn} / 4)); }
+}
+
+sub special_money {
+	$m{money} += $_[0];
+	$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $_[0] G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
 }
 
 1; # íœ•s‰Â
