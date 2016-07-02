@@ -165,6 +165,88 @@ sub tp_1 {
 sub tp_100 {
 	my $shop_id = unpack 'H*', $y{name};
 	if ($cmd && -f "$userdir/$shop_id/shop.cgi") {
+		my $line = ''; # 買ったアイテム情報が入る
+		my @lines = (); # その他の商品が入る
+		open my $fh, "+< $userdir/$shop_id/shop.cgi" or &error("商品ﾘｽﾄが開けません");
+		eval { flock $fh, 2; };
+		while (my $_line = <$fh>) {
+			if (index($_line, "$cmd<>") == 0) { $line = $_line; }
+			else { push @lines, $_line; }
+		}
+		if ($line) {
+			my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $line;
+			if ($m{money} >= $price) {
+				seek  $fh, 0, 0;
+				truncate $fh, 0;
+				print $fh @lines;
+			}
+			close $fh;
+			if ($m{money} >= $price) {
+				$m{money} -= $price;
+				my $item_name = &get_item_name($kind, $item_no);
+				$mes .= "$item_nameを買いました<br>$item_nameは預かり所に送られました<br>";
+				my $sell_id = int(rand(1000)+1); # 鯖缶権限で見れる取引ID？ send_item では爆発無視フラグとしか使われてない
+				&send_item($m{name}, $kind, $item_no, $item_c, $item_lv, $sell_id);
+				&send_money($y{name}, "【$m{stock}($item_name)】$m{name}", $price, 1);
+				&sale_data_log($kind, $item_no, $item_c, $item_lv, $price, 1);
+
+				# 売上金加算
+				open my $fh2, "+< $userdir/$shop_id/shop_sale.cgi" or &error("売上ﾌｧｲﾙが開けません");
+				eval { flock $fh2, 2; };
+				my $line2 = <$fh2>;
+				my($sale_c, $sale_money, $update_t) = split /<>/, $line2;
+				$sale_c++;
+				$sale_money += $price;
+				seek  $fh2, 0, 0;
+				truncate $fh2, 0;
+				print $fh2 "$sale_c<>$sale_money<>$update_t<>";
+				close $fh2;
+
+				# 売上内訳
+				if(-f "$userdir/$shop_id/shop_sale_detail.cgi"){
+					my @sell_detail = ();
+					open my $fh3, "+< $userdir/$shop_id/shop_sale_detail.cgi" or &error("帳簿ﾌｧｲﾙが開けません");
+					eval { flock $fh3, 2; };
+					while (my $line3 = <$fh3>){
+						last if @sell_detail >= 30;
+						push @sell_detail, $line3;
+					}
+					unshift @sell_detail, "$item_name<>$m{name}<>$time<>\n" if $sell_id; # true にしかならない
+					seek  $fh3, 0, 0;
+					truncate $fh3, 0;
+					print $fh3 @sell_detail;
+					close $fh3;
+				}else{
+					open my $fh3, "> $userdir/$shop_id/shop_sale_detail.cgi" or &error("帳簿ﾌｧｲﾙが開けません");
+					print $fh3 "$item_name<>$m{name}<>$time<>\n" if $sell_id; # true にしかならない
+					close $fh3;
+				}
+
+				# send_itemのロギング機能してない あっちのが総括的なのでそのうち移動
+				# ショッピングをロギング
+				open my $fh4, ">> $logdir/shopping_log.cgi";
+				print $fh4 "$m{name}<>$y{name}<>$item_name<>$price<>$time\n";
+				close $fh4;
+			}
+			else {
+				$mes .= "$y{name}「お金が足りません」<br>";
+			}
+		}
+		else {
+			$mes .= "$y{name}「その商品は、たった今売り切れてしまいました」<br>" ;
+			close $fh;
+		}
+
+		$cmd = $y{name}; # 名前をcmdに入れて&tp_1
+		&tp_1;
+	}
+	else {
+		$mes .= 'やめました<br>';
+		&begin
+	}
+=pod
+	my $shop_id = unpack 'H*', $y{name};
+	if ($cmd && -f "$userdir/$shop_id/shop.cgi") {
 		my $is_find    = 0;
 		my $is_rewrite = 0;
 		my @lines = ();
@@ -250,6 +332,7 @@ sub tp_100 {
 		$mes .= 'やめました<br>';
 		&begin
 	}
+=cut
 }
 
 
