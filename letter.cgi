@@ -27,13 +27,13 @@ sub letter_box_get {
 	    }
 	    close $fh;
 
-		&send_letter($in{name}, $in{is_save_log}) if $in{name} ne $admin_name || $rflag == 0;
-		print qq|<p>$in{name} に手紙を送りました</p>|;
+		&send_letter($in{send_name}, $in{is_save_log}) if $in{send_name} ne $admin_name || $rflag == 0;
+		print qq|<p>$in{send_name} に手紙を送りました</p>|;
 
 		# プライバシーを考慮し、誰が誰に送信したかだけをロギング
 		my $ltime = time();
 		open my $fh, ">> $logdir/letter_log.cgi";
-		print $fh "$m{name}<>$in{name}<>$ltime\n";
+		print $fh "$m{name}<>$in{send_name}<>$ltime\n";
 		close $fh;
 	}
 
@@ -97,7 +97,7 @@ sub letter_box_get {
 	print qq|<form method="$method" action="letter.cgi">|;
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	print qq|<input type="hidden" name="mode" value="write"><input type="hidden" name="no" value="$in{no}">|;
-	print qq|送り先名 <input type="text" name="name" class="text_box1" value="$in{send_name}"><br>|;
+	print qq|送り先名 <input type="text" name="send_name" class="text_box1" value="$in{send_name}"><br>|;
 	print qq|<textarea name="comment" cols="60" rows="$rows" class="textarea1"></textarea><br>|;
 	print qq|<input type="submit" value="手紙を送る" class="button_s">|;
 	print qq|　 <input type="checkbox" name="is_save_log" value="1" checked>送信箱に保存</form><br>|;

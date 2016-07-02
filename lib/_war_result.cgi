@@ -209,31 +209,37 @@ sub war_win {
 	# 暗黒側カウンターの基本奪国力（少数やｳﾛﾎﾞ用）
 	# 統一期限切れそうになると封印側が有利になるのは、
 	# 統一期限切れた時に暗黒生きてても負け扱いだしどうせならちゃんと封印しろっていう仕様かと思われる
-	$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
+	$npc_v = int(rand(300)+300) if $w{world} eq $#world_states;
 
 	# 奪国力上限
 	if ($v !~ /^(\d)\1+$/) { # ｿﾞﾛ目(ｳﾛﾎﾞﾛｽ使用時など)
 		if ($m{value} < 1) { # 少数精鋭
-			$v = $v > 200 ? int(rand(50)+150) : int($v);
+			$v = $v > 200 ? int(rand(100)+100) : int($v);
+#			$v = $v > 200 ? int(rand(50)+150) : int($v);
 		}
 		else { # 通常・長期
 			if($m{unit} eq '18'){
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
-					$v = $v > 2000 ? int(rand(250)+1750) : int($v);
+					$v = $v > 2000 ? int(rand(500)+1500) : int($v);
+#					$v = $v > 2000 ? int(rand(250)+1750) : int($v);
 				}
 				else {
-					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
+					$v = $v > 1500 ? int(rand(500)+1000) : int($v);
+#					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
 					# 暗黒側カウンターの奪国力
-					$npc_v = int(rand(525)+975) if $w{world} eq $#world_states;
+					$npc_v = int(rand(750)+750) if $w{world} eq $#world_states && $v > 1500;
+#					$npc_v = int(rand(525)+975) if $w{world} eq $#world_states;
 				}
 			}else{
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
-					$v = $v > 1500 ? int(rand(250)+1250) : int($v);
+					$v = $v > 1500 ? int(rand(500)+1000) : int($v);
+#					$v = $v > 1500 ? int(rand(250)+1250) : int($v);
 				}
 				else {
-					$v = $v > 1000  ? int(rand(200)+800) : int($v);
+					$v = $v > 600  ? int(rand(200)+400) : int($v);
+#					$v = $v > 1000  ? int(rand(200)+800) : int($v);
 					# 暗黒側カウンターの奪国力
-					$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
+#					$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
 				}
 			}
 			# 統一期限が近づいてきたらﾌﾟﾗｽ
@@ -259,10 +265,16 @@ sub war_win {
 	$cs{strong}[$m{country}] += ($w{world} eq '13' || $w{world} eq $#world_states - 2 || $w{world} eq $#world_states - 3) ? int($v * 0.75):$v;
 	$cs{strong}[$y{country}] -= $v unless ($w{world} eq $#world_states - 5);
 	$cs{strong}[$y{country}] = 0  if $cs{strong}[$y{country}] < 0;
-	&write_yran('strong', $v, 1);
-	&write_yran("strong_$y{country}", $v, 1);
-	&write_yran('win', 1, 1);
-	&write_yran('war', 1, 1);
+	&write_yran(
+		'strong', $v, 1,
+		"strong_$y{country}", $v, 1,
+		'win', 1, 1,
+		'war', 1, 1
+	);
+#	&write_yran('strong', $v, 1);
+#	&write_yran("strong_$y{country}", $v, 1);
+#	&write_yran('win', 1, 1);
+#	&write_yran('war', 1, 1);
 	
 	if ($w{world} eq $#world_states - 5) {
 		$mes .= "$vの$e2j{strong}を得ました<br>";

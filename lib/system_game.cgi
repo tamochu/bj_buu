@@ -938,6 +938,7 @@ sub get_most_strong_country {
 	}
 	return $country;
 }
+=pod
 #================================================
 # 一年ランキングデータ書き込み
 #================================================
@@ -997,6 +998,53 @@ sub write_yran {
 	}
 	push @lines, "$new_line\n";
 	
+	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
+	print $fh @lines;
+	close $fh;
+}
+=cut
+#================================================
+# 一年ランキングデータ書き込み
+# write_yran(書き換える要素, 値, モード [, 書き換える要素2, 値2, モード2]);
+# 複数の項目も一度に渡せるけど 項目*3 の引数固定
+#================================================
+sub write_yran {
+	my @data = @_;
+	my $size = 3;
+	my $count = @data / $size;
+
+	my @lines = ();
+	my $new_line = '';
+	if(-e "$userdir/$id/year_ranking.cgi"){
+		open my $fh, "< $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
+		while (my $line = <$fh>) {
+			# 過去3年よりも古いデータは削除
+			if ($line =~ /year;(.*?)<>/ && $1 ne $w{year}) {
+				push @lines, $line if $1 >= $w{year} - 3;
+				next;
+			}
+			$line =~ tr/\x0D\x0A//d;
+			$new_line = $line if index($line, "year;$w{year}") > -1;
+		}
+		close $fh;
+	}
+
+	$new_line = "year;$w{year}<>" unless $new_line;
+	for my $i (1 .. $count) {
+		my ($data_name, $data_value, $is_add) = splice(@data, 0, $size);
+		next if !$data_name || !$data_value;
+		if ($new_line =~ /$data_name;(.*?)<>/) {
+			my $value = $is_add
+				? $1 + $data_value # 累計記録
+				: ($1 < $data_value ? $data_value : $1) ; # 最高記録
+			$new_line =~ s/$data_name;.*?<>/$data_name;$value<>/;
+		}
+		else {
+			$new_line .= "$data_name;$data_value<>";
+		}
+	}
+
+	unshift @lines, "$new_line\n"; # push だと集計時にループが深くなるので unshift
 	open my $fh, "> $userdir/$id/year_ranking.cgi" or &error("ﾌｧｲﾙが開けません");
 	print $fh @lines;
 	close $fh;
