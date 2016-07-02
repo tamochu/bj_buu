@@ -6,7 +6,11 @@ require 'lib/_write_tag.cgi';
 require './lib/_auto_loader_js.cgi';
 require "$datadir/casino.cgi";
 
-&get_data;
+&decode;
+&header1;
+&read_user;
+&access_check;
+&read_cs;
 
 if(defined $in{no}){
 	$m{c_type} = int($in{no});
@@ -41,7 +45,7 @@ $limit_member_time = 60;
 # ©“®ØÛ°ÄŞŠÔ
 @reload_times = (0, 30, 60, 90, 120);
 
-sub header {
+sub header1 {
 	print qq|Content-type: text/html; charset=shift_jis\n\n|;
 	print qq|<html><head>|;
 	print qq|<meta http-equiv="Cache-Control" content="no-cache">|;

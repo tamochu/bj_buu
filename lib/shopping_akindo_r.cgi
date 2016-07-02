@@ -567,7 +567,7 @@ sub begin_goods {
 	$m{tp_r} = int($m{tp_r} / 100) * 100 + 1 if $m{tp_r} > 1;
 	$mes .= "‚Ç‚Ì‚¨“X‚Å”ƒ•¨‚µ‚Ü‚·‚©?<br>";
 	
-	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+	$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="" checked>‚â‚ß‚é<br>|;
 	$mes .= qq|<table class="table1"><tr><th>“X–¼</th><th>“X’·</th><th>Ğ‰î•¶<br></th></tr>| unless $is_mobile;
 
 	open my $fh, "< $shop_list_file" or &error("$shop_list_file Ì§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
@@ -596,7 +596,7 @@ sub disp_goods {
 	my $shop_list_file = "$logdir/shop_list_$goods_dir.cgi";
 	$y{name} = $cmd;
 	if ($cmd eq '') {
-		&begin_goods($goods_dir, $goods_type, $goods_name);
+		&begin;
 		return;
 	}
 	
@@ -778,7 +778,7 @@ sub tp_601 {
 }
 
 sub tp_610 {
-	&disp_goods('picture', 'img', 'ŠG');
+	&buy_goods('picture', 'img', 'ŠG');
 }
 
 1; # íœ•s‰Â

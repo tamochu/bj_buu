@@ -9,7 +9,7 @@ require 'config_game.cgi';
 
 if ($m{wt} > 0) { # S‘©ŽžŠÔ
 	require './lib/shopping_akindo_r.cgi';
-	if ($m{tp_r} eq '1' && $cmd eq '0' || $m{tp_r} > 410) { # beginÒÆ­°‚Å0(‚â‚ß‚é)‚ð‘I‘ðŽž·¬Ý¾Ù
+	if ($m{tp_r} eq '1' && $cmd eq '0' || $m{tp_r} > 610) { # beginÒÆ­°‚Å0(‚â‚ß‚é)‚ð‘I‘ðŽž·¬Ý¾Ù
 			$mes .= '‚â‚ß‚Ü‚µ‚½<br>';
 			$m{tp_r} = 0;
 	}
