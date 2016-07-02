@@ -142,7 +142,6 @@ sub tp_100 {
 					print $fh "$m{name}<>$y{name}<>$item_name<>$price<>$ltime\n";
 					close $fh;
 
-					
 					# îÑè„ã‡â¡éZ
 					open my $fh2, "+< $userdir/$shop_id/shop_sale.cgi" or &error("îÑè„Ãß≤ŸÇ™äJÇØÇ‹ÇπÇÒ");
 					eval { flock $fh2, 2; };
