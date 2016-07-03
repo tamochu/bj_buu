@@ -309,8 +309,6 @@ sub exe2 {
 # ê¨å˜
 #=================================================
 sub get_mil_success {
-	$mes .= $m{"$_[0]_c"};
-	$mes .= " $m{$_[1]} $_[0] $_[1] $_[2] $_[3]<br>";
 	my $v = int( ($m{"$_[0]_c"} + $m{$_[1]}) * $m{turn} * rand($_[3]) );
 	$v  = int(rand(500)+$_[2]-500) if $v > $_[2];
 	$v *= 2 if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
