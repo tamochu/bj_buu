@@ -36,7 +36,7 @@ for my $i (0 .. $w{country}) {
 	}
 }
 
-my $chart_time = (stat "./html/char_img.html")[9];
+my $chart_time = (stat "./html/chart_img.html")[9];
 if($chart_time < $time - 3600){
 	&chart_backup;
 }
@@ -483,10 +483,9 @@ sub footer_players_html {
 	$html .= qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br>|;  # 著作表示:削除・非表示 禁止!!
 	$html .= qq|$copyright|;
 	$html .= qq|</div></body></html>|;
-	
+
 	return $html;
 }
-
 
 # ﾊﾞｯｸｱｯﾌﾟよりﾃﾞｰﾀを取得
 sub create_world_chart {
