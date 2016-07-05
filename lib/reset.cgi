@@ -93,12 +93,12 @@ sub reset {
 	my $sleep_num = 0;
 	for my $i (1 .. $w{country}) {
 		$cs{strong}[$i] = 8000;
-		$sleep_num++ if $cs{is_die}[$i] > 2;
+#		$sleep_num++ if $cs{is_die}[$i] > 2;
 	}
 
 	# dŠ¯‚Å‚«‚él”
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
-	$country -= $sleep_num if $sleep_num > 0;
+#	$country -= $sleep_num if $sleep_num > 0;
 	my $ave_c = int($w{player} / $country);
 	$ave_c = $ave_c < 2 ? 2 : $ave_c;
 #	$ave_c = $config_test ? 11 : $ave_c;
@@ -117,14 +117,14 @@ sub reset {
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
 		$cs{modify_pro}[$i]   = 0;
-		if ($cs{is_die}[$i] > 2) {
-			$cs{strong}[$i]   = 0;
-			$cs{capacity}[$i] = 0;
-		}
-		else {
+#		if ($cs{is_die}[$i] > 2) {
+#			$cs{strong}[$i]   = 0;
+#			$cs{capacity}[$i] = 0;
+#		}
+#		else {
 			$cs{is_die}[$i]   = 0;
 			$cs{capacity}[$i] = $ave_c;
-		}
+#		}
 		
 		for my $j ($i+1 .. $w{country}) {
 			$w{ "f_${i}_${j}" } = int(rand(40));
