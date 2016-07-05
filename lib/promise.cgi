@@ -19,12 +19,6 @@ sub is_satisfy {
 	elsif (&is_act_satisfy) { # ”æ˜J‚µ‚Ä‚¢‚éê‡‚Ís‚¦‚È‚¢
 		return 0;
 	}
-	elsif ($cs{is_die}[$m{country}] > 1) { # ½‘E•ö‰ó‘‚Ís‚¦‚È‚¢
-		$mes .= '‘¼‘‚É‰e‹¿‚ğ—^‚¦‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>';
-		&refresh;
-		&n_menu;
-		return 0;
-	}
 	return 1;
 }
 
@@ -83,7 +77,7 @@ sub tp_1 {
 		$mes .= qq|<form method="$method" action="$script">|;
 		$mes .= qq|<input type="text" name="value" value="0" class="text_box1" style="text-align: right">|;
 		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= qq|<p><input type="submit" value="‘—‚é"></p></form>|;
+		$mes .= qq|<p><input type="submit" value="‘—‚é" class="button_s"></p></form>|;
 		&n_menu;
 	}
 	else {
