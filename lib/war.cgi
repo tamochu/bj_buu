@@ -16,7 +16,7 @@ my @war_forms = ('UŒ‚wŒ`','–hŒäwŒ`','“ËŒ‚wŒ`');
 
 # V‹K‚Ìƒ{[ƒiƒXƒ^ƒCƒ€(í‘ˆŸ—˜”)ƒŠƒ~ƒbƒg
 my $new_entry_war_c = 100;
-
+=pod
 # ƒ‰ƒ“ƒ_ƒ€ƒZƒŒƒNƒg—pƒRƒ}ƒ“ƒh‘Ş”ğ
 my $m_cmd = $cmd;
 if (!$m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
@@ -36,18 +36,12 @@ if (!$m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
 		}
 	}
 }
-
+=cut
 #================================================
 # —˜—pğŒ
 #================================================
 sub is_satisfy {
-	if ($cs{is_die}[$m{country}] > 1) { # ½‘E•ö‰ó‘‚Ís‚¦‚È‚¢
-		$mes .= '‘¼‘‚É‰e‹¿‚ğ—^‚¦‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>';
-		&refresh;
-		&n_menu;
-		return 0;
-	}
-	elsif ($time < $w{reset_time}) {
+	if ($time < $w{reset_time}) {
 		$mes .= 'IíŠúŠÔ‚È‚Ì‚Åí‘ˆ‚ğ’†~‚µ‚Ü‚·<br>';
 		&refresh;
 		&n_menu;
@@ -148,7 +142,7 @@ sub tp_100 {
 		$m{sol} += $v;
 		$mes .= "‚È‚ñ‚ÆA$cs{name}[$union]‚©‚ç$v•º‚Ì‰‡ŒR‚ª‹ì‚¯‚Â‚¯‚½!<br>";
 	}
-	
+=pod
 	# ”z”v
 	if ($m{war_select_switch}) {
 		$m{rest_a} = 0;
@@ -212,7 +206,7 @@ sub tp_100 {
 		$y{rest_b} = $m{turn};
 		$y{rest_c} = $m{turn};
 	}
-	
+=cut
 	if ($config_test) {
 		$y{sol} /= 10;
 	}
@@ -229,8 +223,8 @@ sub tp_110 {
 	$mes .= "¡‰ñ‚Ììí‚ÌŒÀŠEÀ°İ‚Í $m{turn} À°İ‚Å‚·<br>";
 	$mes .= "$m{name}ŒR $m{sol}l VS $y{name}ŒR $y{sol}l<br>";
 	$mes .= 'U‚ß‚ŞwŒ`‚ğ‘I‚ñ‚Å‚­‚¾‚³‚¢<br>';
-	$mes .= "©•ª $war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
-	$mes .= "‘Šè $war_forms[0]:$y{rest_a}‰ñ $war_forms[1]:$y{rest_b}‰ñ $war_forms[2]:$y{rest_c}‰ñ<br>";
+#	$mes .= "©•ª $war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
+#	$mes .= "‘Šè $war_forms[0]:$y{rest_a}‰ñ $war_forms[1]:$y{rest_b}‰ñ $war_forms[2]:$y{rest_c}‰ñ<br>";
 	&menu(@war_forms,'‘Ş‹p');
 	
 	$m{tp} += 10;
@@ -267,11 +261,11 @@ sub loop_menu {
 	$mes .= "c‚è$m{turn} À°İ<br>";
 	$mes .= "$m{name}ŒR $m{sol}l VS $y{name}ŒR $y{sol}l<br>";
 	$mes .= 'U‚ß‚ŞwŒ`‚ğ‘I‚ñ‚Å‚­‚¾‚³‚¢<br>';
-	$mes .= "©•ª $war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
-	$mes .= "‘Šè $war_forms[0]:$y{rest_a}‰ñ $war_forms[1]:$y{rest_b}‰ñ $war_forms[2]:$y{rest_c}‰ñ<br>";
+#	$mes .= "©•ª $war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
+#	$mes .= "‘Šè $war_forms[0]:$y{rest_a}‰ñ $war_forms[1]:$y{rest_b}‰ñ $war_forms[2]:$y{rest_c}‰ñ<br>";
 	&menu(@war_forms);
 }
-
+=pod
 sub _rest_check {
 	if ($m{rest_a} + $m{rest_b} + $m{rest_c} > 0) {
 		if ($m_cmd eq '0' && $m{rest_a} <= 0) {
@@ -289,10 +283,12 @@ sub _rest_check {
 	}
 	return 1;
 }
-
+=cut
 sub tp_190 {
-	if ($m_cmd >= 0 && $m_cmd <= 2 && &_rest_check) {
+#	if ($m_cmd >= 0 && $m_cmd <= 2 && &_rest_check) {
+	if ($m_cmd >= 0 && $m_cmd <= 2) {
 		--$m{turn};
+=pod
 		if ($m_cmd eq '0') {
 			$m{rest_a}--;
 		}
@@ -302,6 +298,7 @@ sub tp_190 {
 		if ($m_cmd eq '2') {
 			$m{rest_c}--;
 		}
+=cut
 		$mes .= "c‚è$m{turn}À°İ<br>";
 		&_crash;
 		
@@ -338,9 +335,9 @@ sub tp_190 {
 		}
 		else {
 			$mes .= 'U‚ß‚ŞwŒ`‚ğ‘I‚ñ‚Å‚­‚¾‚³‚¢<br>';
-			$mes .= "©•ª $war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
-			$mes .= "‘Šè $war_forms[0]:$y{rest_a}‰ñ $war_forms[1]:$y{rest_b}‰ñ $war_forms[2]:$y{rest_c}‰ñ<br>";
-			
+#			$mes .= "©•ª $war_forms[0]:$m{rest_a}‰ñ $war_forms[1]:$m{rest_b}‰ñ $war_forms[2]:$m{rest_c}‰ñ<br>";
+#			$mes .= "‘Šè $war_forms[0]:$y{rest_a}‰ñ $war_forms[1]:$y{rest_b}‰ñ $war_forms[2]:$y{rest_c}‰ñ<br>";
+
 			# ˆê‹R‘Å‚¿oŒ»Šm—§
 			if ($y{wea} eq 'no_single') {
 				&menu(@war_forms,'‘Ş‹p');
@@ -361,7 +358,7 @@ sub tp_190 {
 	}
 	elsif ($m_cmd eq '3' && $m{tp} eq '120') {
 		$m_mes = '‘SŒR‘Ş‹p!!';
-		
+
 		if ($m{turn} < 5) {
 			$mes .= '“GŒR‚É“¦‘–‘Ş˜H‚ğÇ‚ª‚êA‚à‚Í‚â“P‘Ş‚Í•s‰Â”\\‚Å‚·<br>';
 			$m{tp} = 190;
@@ -411,6 +408,7 @@ sub tp_190 {
 #================================================
 # wŒ`íŒ‹‰Ê
 #================================================
+=pod
 sub _ai {
 	my @y_cmds = (0, 1, 2);
 	my $y_cmd;
@@ -458,8 +456,9 @@ sub _ai {
 	}
 	return $y_cmd;
 }
-
+=cut
 sub _crash {
+=pod
 	my $y_cmd = &_ai;
 	if ($y_cmd eq '0') {
 		$y{rest_a}--;
@@ -473,21 +472,29 @@ sub _crash {
 	
 	$m_mes = $war_forms[$m_cmd];
 	$y_mes = $war_forms[$y_cmd];
-	
+=cut
+	my $y_cmd = int(rand(3));
+
+	$m_mes = $war_forms[$cmd];
+	$y_mes = $war_forms[$y_cmd];
+
 	my $result = 'lose';
-	if ($m_cmd eq '0') {
+#	if ($m_cmd eq '0') {
+	if ($cmd eq '0') {
 		$result = $y_cmd eq '1' ? 'win'
 				: $y_cmd eq '2' ? 'lose'
 				:				  'draw'
 				;
 	}
-	elsif ($m_cmd eq '1') {
+#	elsif ($m_cmd eq '1') {
+	elsif ($cmd eq '1') {
 		$result = $y_cmd eq '2' ? 'win'
 				: $y_cmd eq '0' ? 'lose'
 				:				  'draw'
 				;
 	}
-	elsif ($m_cmd eq '2') {
+#	elsif ($m_cmd eq '2') {
+	elsif ($cmd eq '2') {
 		$result = $y_cmd eq '0' ? 'win'
 				: $y_cmd eq '1' ? 'lose'
 				:				  'draw'
@@ -545,7 +552,6 @@ sub _crash {
 	$y_lea += $y_wea_modify;
 	$y_lea -= 100 unless $y{wea};
 	$y_lea =  0 if ($y_lea < 0);
-	
 	
 	my $m_attack = ($m{sol}*0.1 + $m_lea*2) * $m{sol_lv} * 0.01 * $units[$m{unit}][4] * $units[$y{unit}][5];
 	my $y_attack = ($y{sol}*0.1 + $y_lea*2) * $y{sol_lv} * 0.01 * $units[$y{unit}][4] * $units[$m{unit}][5];
