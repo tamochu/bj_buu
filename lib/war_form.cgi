@@ -31,12 +31,6 @@ sub is_satisfy {
 	elsif (&is_act_satisfy) { # 疲労している場合は行えない
 		return 0;
 	}
-	elsif ($cs{is_die}[$m{country}] > 1) { # 鎖国・崩壊国は行えない
-		$mes .= '他国に影響を与えることはできません<br>';
-		&refresh;
-		&n_menu;
-		return 0;
-	}
 	elsif ($time < $w{reset_time}) {
 		$mes .= '終戦期間中は戦争と軍事はできません<br>';
 		&refresh;

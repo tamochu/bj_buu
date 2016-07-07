@@ -194,7 +194,11 @@ sub war_win {
 	if($m{unit} eq '18'){
 		$v = $v * 1.5;
 		$v = &use_pet('war_result', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) || $m{pet} eq '12');
-	}else{
+	}
+	elsif ($m{unit} eq '7' || $m{unit} eq '8') {
+		$v = &use_pet('war_result', $v) unless ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17') || ($m{pet} eq '12' && ($time + 2 * 24 * 3600 < $w{limit_time})) );
+	}
+	else{
 		$v = &use_pet('war_result', $v) unless ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'));
 	}
 	
@@ -209,13 +213,13 @@ sub war_win {
 	# 暗黒側カウンターの基本奪国力（少数やｳﾛﾎﾞ用）
 	# 統一期限切れそうになると封印側が有利になるのは、
 	# 統一期限切れた時に暗黒生きてても負け扱いだしどうせならちゃんと封印しろっていう仕様かと思われる
-	$npc_v = int(rand(300)+300) if $w{world} eq $#world_states;
+	$npc_v = int(rand(350)+450) if $w{world} eq $#world_states;
 
 	# 奪国力上限
 	if ($v !~ /^(\d)\1+$/) { # ｿﾞﾛ目(ｳﾛﾎﾞﾛｽ使用時など)
 		if ($m{value} < 1) { # 少数精鋭
-			$v = $v > 200 ? int(rand(100)+100) : int($v);
 #			$v = $v > 200 ? int(rand(50)+150) : int($v);
+			$v = $v > 200 ? int(rand(80)+120) : int($v);
 		}
 		else { # 通常・長期
 			if($m{unit} eq '18'){
@@ -236,8 +240,8 @@ sub war_win {
 #					$v = $v > 1500 ? int(rand(250)+1250) : int($v);
 				}
 				else {
-					$v = $v > 600  ? int(rand(200)+400) : int($v);
-#					$v = $v > 1000  ? int(rand(200)+800) : int($v);
+#					$v = $v > 600  ? int(rand(200)+400) : int($v);
+					$v = $v > 800  ? int(rand(200)+600) : int($v);
 					# 暗黒側カウンターの奪国力
 #					$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
 				}
