@@ -286,7 +286,7 @@ sub _rest_check {
 =cut
 sub tp_190 {
 #	if ($m_cmd >= 0 && $m_cmd <= 2 && &_rest_check) {
-	if ($m_cmd >= 0 && $m_cmd <= 2) {
+	if ($cmd >= 0 && $cmd <= 2) {
 		--$m{turn};
 =pod
 		if ($m_cmd eq '0') {
@@ -356,7 +356,8 @@ sub tp_190 {
 			}
 		}
 	}
-	elsif ($m_cmd eq '3' && $m{tp} eq '120') {
+#	elsif ($m_cmd eq '3' && $m{tp} eq '120') {
+	elsif ($cmd eq '3' && $m{tp} eq '120') {
 		$m_mes = '‘SŒR‘Þ‹p!!';
 
 		if ($m{turn} < 5) {
@@ -380,7 +381,8 @@ sub tp_190 {
 			&loop_menu;
 		}
 	}
-	elsif ($m_cmd eq '3' && $m{tp} eq '130') {
+#	elsif ($m_cmd eq '3' && $m{tp} eq '130') {
+	elsif ($cmd eq '3' && $m{tp} eq '130') {
 		$m_mes = "$y{name}‚Æˆê‹R‘Å‚¿Šè‚¢‚½‚¢!";
 
 		my $v = int(rand(@answers));
