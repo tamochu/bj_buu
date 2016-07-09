@@ -3,7 +3,7 @@ my $this_file = "$userdir/$id/super.cgi";
 # ‰p—Y
 #=================================================
 # —â‹pŠúŠÔ
-$coolhour = 6;
+$coolhour = $config_test ? 0 : 6;
 $cooldown_time = $coolhour * 3600;
 # ƒgƒŠƒK[
 @triggers = (
@@ -31,13 +31,42 @@ $cooldown_time = $coolhour * 3600;
 	[20,	'–\”­',			'random',		1,		0,			100],
 );
 
+=pod
+# ƒgƒŠƒK[
+@triggers = (
+#	[0]No	[1]–¼‘O			[2]type			[3]”{—¦	[4]‘I‘ð‰Â”\	[5]”­“®—¦(%)
+	[0,		'Ï²Ù°Ñ',		'myroom',		0.1,	1,			100],
+	[1,		'í‘ˆŸ—˜',		'war',			0.5,	1,			20],
+	[2,		'ŒRŽ–¬Œ÷',		'military',		0.4,	1,			15],
+	[3,		'‹UŒvŒˆ—ô',		'breakdown',	1,		0,			100],
+	[4,		'ŠOŒð¬Œ÷',		'promise',		0.4,	1,			12],
+	[5,		'éí•z',		'declaration',	0.8,	0,			30], # ’âí‚Æˆá‚Á‚Ä”\“®“I‚É•z‚Å‚«‚é‚©‚ç’á‚ß ‚à‚Á‚Æ’á‚­‚Ä‚à—Ç‚³‚»‚¤‚¾‚¯‚Ç“K“–‚Å“–‚½‚é‚©‚ç
+	[6,		'’âíð–ñ',		'cessation',	0.6,	0,			60], # •z‚Æˆá‚Á‚ÄŽó“®“I‚¾‚©‚ç•z‚æ‚è‚‚ß
+	[7,		'“à­',			'domestic',		0.4,	1,			10],
+	[8,		'í“¬Ÿ—˜',		'battle',		0.3,	0,			20],
+	[9,		'Cs',			'training',		0.4,	0,			30],
+	[10,	'“¢”°',			'hunting',		0.4,	0,			30],
+	[11,	'“¬‹Zê',		'colosseum',	0.4,	0,			80],
+	[12,	'ˆê‹R‘Å‚¿',		'single',		1,		0,			100],
+	[13,	'¶¼ÞÉ',			'casino',		0.2,	0,			1],
+	[14,	'”­Œ¾',			'voice',		0.2,	0,			10],
+	[15,	'›z‰»',			'incubation',	0.3,	0,			100],
+	[16,	'’E–',			'prison',		0.5,	0,			100],
+	[17,	'‹~o',			'rescue',		0.7,	0,			70],
+	[18,	'“¬‹Zê—DŸ',	'colosseum_top',1,		0,			100],
+	[19,	'ƒ{ƒX“¢”°',		'boss',			1,		0,			100],
+	[20,	'–\”­',			'random',		1,		0,			100],
+);
+=cut
+
 # ƒ^ƒCƒ~ƒ“ƒO
 @timings = (
 #	[0]No	[1]–¼‘O							[2]ðŒ		[3]”{—¦		[4]‘I‘ð‰Â”\
 	[0,		'”CˆÓ',							sub{ return 1; },	0.1,	1],
 	[1,		'–Å–SŽž',						sub{ return $cs{is_die}[$m{country}]; },	0.5,	1],
+	[1,		'‚Ú‚Á‚¿‚ÌŽž',						sub{ return !$union; },	0.12,	1], # ‚Ú‚Á‚¿‘‚Í‰„X‘S‘–¯‚ª‰¶ŒbŽó‚¯‚é–ó‚¾‚©‚ç”{—¦‚‚­‚·‚é‚Æ‚½‚Ô‚ñ‹t‚Éˆê•û“I—L—˜‚É‚È‚è‚·‚¬‚é
 	[2,		'‘—Íƒgƒbƒv',					sub{ for my $i (1..$w{country}) { if ($cs{strong}[$i] > $cs{strong}[$m{country}]) { return 0; } } return 1; },	0.7,	0],
-	[3,		'Ž‘Œ¹‚ª‚·‚×‚Ä10000–¢–ž‚ÌŽž',	sub{ return ($cs{food}[$m{country}] < 10000 && $cs{money}[$m{country}] < 10000 && $cs{soldier}[$m{country}] < 10000); },	0.4,	1],
+	[3,		'Ž‘Œ¹‚ª‚·‚×‚Ä100000–¢–ž‚ÌŽž',	sub{ return ($cs{food}[$m{country}] < 100000 && $cs{money}[$m{country}] < 100000 && $cs{soldier}[$m{country}] < 100000); },	0.4,	1],
 	[4,		'•ºŽm‚ª20000–¢–ž‚ÌŽž',			sub{ return $cs{soldier}[$m{country}] < 20000; },	0.6,	0],
 	[5,		'•ºŽm‚ª999999‚ÌŽž',				sub{ return $cs{soldier}[$m{country}] >= 999999; },	0.8,	0],
 	[6,		'‘ã•\‚ÌŽž',						sub{ return &is_daihyo; },	0.3,	1],
