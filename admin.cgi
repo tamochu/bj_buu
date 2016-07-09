@@ -36,6 +36,7 @@ elsif ($in{mode} eq 'admin_get_depot_data')   { &admin_get_depot_data; }
 elsif ($in{mode} eq 'admin_get_akindo_data')   { &admin_get_akindo_data; }
 elsif ($in{mode} eq 'admin_refresh')     { &admin_refresh; }
 elsif ($in{mode} eq 'admin_go_neverland')     { &admin_go_neverland; }
+elsif ($in{mode} eq 'admin_violate')   { &admin_violate; }
 elsif ($in{mode} eq 'admin_repaire')     { &admin_repaire; }
 elsif ($in{mode} eq 'junk_sub')          { &junk_sub($in{j_del}); }
 elsif ($in{mode} eq 'junk_show')          { &junk_show; }
@@ -133,8 +134,9 @@ sub top {
 					print qq|</td>|;
 					print qq|<td>$pname</td>|;
 					print qq|<td>$pid</td>|;
-					print qq|<td><input type="button" class="button_s" value="Ø¾¯Ä" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$pid&country=$in{country}&sort=$in{sort}';"></td>|;
-					print qq|<td><input type="button" class="button_s" value="–³Š‘®‚Ö" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$pid&country=$in{country}&sort=$in{sort}';"></td>|;
+					print qq|<td><input type="button" class="button_s" value="Ø¾¯Ä" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
+					print qq|<td><input type="button" class="button_s" value="–³Š‘®‚Ö" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
+					print qq|<td><input type="button" class="button_s" value="’Ç•ú" onClick="location.href='?mode=admin_violate&pass=$in{pass}&id=$pid&country=$pcountry&name=$pname';"></td>|;
 					print qq|<td>$cs{name}[$pcountry]</td>|;
 					print qq|<td>$paddr</td>|;
 					print qq|<td>$phost</td>|;
@@ -168,6 +170,7 @@ sub top {
 			print qq|<td>$id</td>|;
 			print qq|<td><input type="button" class="button_s" value="Ø¾¯Ä" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
 			print qq|<td><input type="button" class="button_s" value="–³Š‘®‚Ö" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
+			print qq|<td><input type="button" class="button_s" value="’Ç•ú" onClick="location.href='?mode=admin_violate&pass=$in{pass}&id=$id&country=$in{country}&name=$name';"></td>|;
 			print qq|<td>$cs{name}[$country]</td>|;
 			print qq|<td>$addr</td>|;
 			print qq|<td>$host</td>|;
@@ -178,7 +181,7 @@ sub top {
 		
 		$pre_line = $line;
 	}
-	print qq|</table><br><input type="checkbox" name="is_add_deny" value="1" checked>“o˜^‹Ö~IP/UA‚É’Ç‰Á|;
+	print qq|</table><br><input type="checkbox" name="is_add_deny" value="0" checked>“o˜^‹Ö~IP/UA‚É’Ç‰Ái‚»‚Ì‚¤‚¿’Ç•ú‚Æ‚Ìƒ‰ƒWƒIƒ{ƒbƒNƒX‚É•ÏXj|;
 	print qq|<p style="color: #F00">ƒvƒŒƒCƒ„[‚ğíœ‚·‚é<br><input type="submit" value="íœ" class="button_s"></p></form>|;
 
 	print qq|<a name="util"></a>|;
@@ -469,7 +472,7 @@ sub admin_refresh {
 #=================================================
 sub admin_go_neverland {
 	return unless $in{id};
-	
+
 	require './lib/move_player.cgi';
 	local %m = &get_you_datas($in{id}, 1);
 	$m{lib} = '';
@@ -1092,18 +1095,6 @@ sub admin_all_pet_check {
 # —Õˆ—(‚¨‚»‚ç‚­ˆê“x‚¾‚¯‚Ìˆ—‚Ìê‡‚»‚Ì“s“x‚±‚±‚Åˆ—)
 #=================================================
 sub admin_expendable {
-
-	opendir my $dh, "$userdir" or &error("Õ°»Ş°ÃŞ¨Ú¸ÄØ‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	while (my $pid = readdir $dh) {
-		next if $pid =~ /\./;
-		next if $pid =~ /backup/;
-		next unless -f "$userdir/$pid/user.cgi";
-		my %you_datas = &get_you_datas($pid, 1);
-
-		$mes .= "$you_datas{name} $you_datas{wt_c} $you_datas{wt_c_latest}<br>";
-	}
-	closedir $dh;
-
 }
 
 #=================================================
@@ -1338,4 +1329,28 @@ sub admin_get_akindo_data {
 	}
 	close $fh2;
 	$mes .= qq|</table>|;
+}
+
+#=================================================
+# IŠÊŒ ŒÀ‚Ì’Ç•ú
+#=================================================
+sub admin_violate {
+	return unless $in{name};
+	return unless -f "$userdir/$in{id}/user.cgi";
+	$in{country} = $in{country} < 0 ? 0 : $in{country};
+
+	require './lib/move_player.cgi';
+	&move_player($in{name}, $in{country}, 0);
+
+	my @data = (
+		['wt', 3 * 24 * 3600],
+		['country', 0],
+		['lib', ''],
+		['tp', 0],
+		['vote', ''],
+	);
+	&regist_you_array($in{name}, @data);
+
+#	&write_world_news("‚Ì•]‹c‚É‚æ‚èA$violator‚ª‘ŠO’Ç•ú‚Æ‚È‚è‚Ü‚µ‚½", 1, $violator);
+	$mes .= "$in{name}‚ğ’Ç•ú‚µ‚Ü‚µ‚½<br>";
 }
