@@ -6,7 +6,7 @@ use File::Path;
 
 # “ˆê“ïˆÕ“xF[“ï‚µ‚¢ 60 ` 40 ŠÈ’P]
 #my $game_lv = $config_test ? int(rand(6) + 55) : int( rand(11) + 40 );
-my $game_lv = $config_test ? int( rand(11) + 45 ) : int( rand(11) + 45 );
+my $game_lv = $config_test ? int( rand(11) + 45 ) : int( rand(6) + 45 );
 
 # “ˆêŠúŒÀ(“ú)
 my $limit_touitu_day = int( rand(6)+5 );
