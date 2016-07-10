@@ -649,6 +649,7 @@ sub get_player_name_list {
 # ‘æ“ñˆø”‚ª 1 ‚Å mes_and_world_news ƒ‰ƒCƒN
 #================================================
 sub send_twitter {
+	return if $config_test;
 	my $message = shift;
 	my $flag = shift;
 
