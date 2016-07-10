@@ -488,26 +488,14 @@ sub _rescue {
 	my $is_rescue = 0;
 	my @lines = ();
 	my $count = 0;
+	my @y_names = ();
 	open my $fh, "+< $logdir/$y{country}/prisoner.cgi" or &error("$logdir/$y{country}/prisoner.cgi ‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		my($name,$country,$flag) = split /<>/, $line;
 		if ($flag == 0 && $count < $max_rescue && ($country eq $m{country} || $union eq $country) && $country ne '0' ) {
-			my $mname = $m{name};
-			if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
-				$mname = '–¼–³‚µ';
-			}
-			$mes .= "$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚ğ‹~o‚µ‚Ü‚µ‚½<br>";
 			$is_rescue = 1;
-			&write_world_news("$c_m‚Ì$mname‚ª$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚Ì‹~o‚É¬Œ÷‚µ‚Ü‚µ‚½");
-			&write_yran('res', 1, 1);
-			
-			# Ú½·­°Ì×¸Şì¬
-			my $y_id = unpack 'H*', $name;
-			if (-d "$userdir/$y_id") {
-				open my $fh2, "> $userdir/$y_id/rescue_flag.cgi" or &error("$userdir/$y_id/rescue_flag.cgiÌ§²Ù‚ªì‚ê‚Ü‚¹‚ñ");
-				close $fh2;
-			}
+			push @y_names, $name;
 			++$count;
 		}
 		else {
@@ -518,15 +506,35 @@ sub _rescue {
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
 		print $fh @lines;
-		&c_up('res_c');
-		&use_pet('rescue');
-		
-		if ($w{world} eq $#world_states-4) {
-			require './lib/fate.cgi';
-			&super_attack('rescue');
-		}
 	}
 	close $fh;
+
+	# ª‚Å‚Ü‚¸Ì§²ÙÊİÄŞÙ•Â‚¶‚Ä‚©‚ç”X‚Ìˆ—
+	if ($is_rescue) {
+		&write_yran('res', $count, 1);
+		my $mname = $m{name};
+		$mname = '–¼–³‚µ' if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16'));
+		for my $i (1 .. $count) {
+			my $name = $y_names[$i-1];
+			$mes .= "$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚ğ‹~o‚µ‚Ü‚µ‚½<br>";
+			&write_world_news("$c_m‚Ì$mname‚ª$c_y‚É•ß‚ç‚¦‚ç‚ê‚Ä‚¢‚½$name‚Ì‹~o‚É¬Œ÷‚µ‚Ü‚µ‚½");
+		
+			# Ú½·­°Ì×¸Şì¬
+			my $y_id = unpack 'H*', $name;
+			if (-d "$userdir/$y_id") {
+				open my $fh2, "> $userdir/$y_id/rescue_flag.cgi" or &error("$userdir/$y_id/rescue_flag.cgiÌ§²Ù‚ªì‚ê‚Ü‚¹‚ñ");
+				close $fh2;
+			}
+
+			&c_up('res_c');
+			&use_pet('rescue');
+
+			if ($w{world} eq $#world_states-4) {
+				require './lib/fate.cgi';
+				&super_attack('rescue');
+			}
+		}
+	}
 }
 
 #=================================================
