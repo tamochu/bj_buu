@@ -136,7 +136,6 @@ sub top {
 					print qq|<td>$pid</td>|;
 					print qq|<td><input type="button" class="button_s" value="ﾘｾｯﾄ" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
 					print qq|<td><input type="button" class="button_s" value="無所属へ" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
-					print qq|<td><input type="button" class="button_s" value="追放" onClick="location.href='?mode=admin_violate&pass=$in{pass}&id=$pid&country=$pcountry&name=$pname';"></td>|;
 					print qq|<td>$cs{name}[$pcountry]</td>|;
 					print qq|<td>$paddr</td>|;
 					print qq|<td>$phost</td>|;
@@ -170,7 +169,6 @@ sub top {
 			print qq|<td>$id</td>|;
 			print qq|<td><input type="button" class="button_s" value="ﾘｾｯﾄ" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
 			print qq|<td><input type="button" class="button_s" value="無所属へ" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
-			print qq|<td><input type="button" class="button_s" value="追放" onClick="location.href='?mode=admin_violate&pass=$in{pass}&id=$id&country=$in{country}&name=$name';"></td>|;
 			print qq|<td>$cs{name}[$country]</td>|;
 			print qq|<td>$addr</td>|;
 			print qq|<td>$host</td>|;
@@ -181,8 +179,11 @@ sub top {
 		
 		$pre_line = $line;
 	}
-	print qq|</table><br><input type="checkbox" name="is_add_deny" value="0" checked>登録禁止IP/UAに追加（そのうち追放とのラジオボックスに変更）|;
-	print qq|<p style="color: #F00">プレイヤーを削除する<br><input type="submit" value="削除" class="button_s"></p></form>|;
+	print qq|</table><br>|;
+	print qq|<input type="radio" name="is_delete" value="delete">削除|;
+	print qq| <input type="checkbox" name="is_add_deny" value="1">登録禁止IP/UAに追加<br>|;
+	print qq|<input type="radio" name="is_delete" value="exile" checked="checked">国外追放(3日拘束)|;
+	print qq|<p style="color: #F00">プレイヤーを削除/追放する<br><input type="submit" value="処理" class="button_s"></p></form>|;
 
 	print qq|<a name="util"></a>|;
 	print qq|<br><br><br>|;
@@ -420,37 +421,54 @@ sub top {
 }
 
 #=================================================
-# 削除処理
+# 削除・追放処理
 #=================================================
 sub admin_delete_user {
 	return unless @delfiles;
 
-	my $count = 0;
+	require './lib/move_player.cgi';
 	for my $delfile (@delfiles) {
 		my %datas = &get_you_datas($delfile, 1);
 
-		&move_player($datas{name}, $datas{country}, 'del');
-		$mes .= "$datas{name}を削除しました<br>";
-		
-		# 違反者リストに追加
-		if ($in{is_add_deny}) {
-			open my $fh, ">> $logdir/deny_addr.cgi" or &error("$logdir/deny_addr.cgiﾌｧｲﾙが開けません");
-			print $fh $datas{agent} =~ /DoCoMo/ || $datas{agent} =~ /KDDI|UP\.Browser/
-				|| $datas{agent} =~ /J-PHONE|Vodafone|SoftBank/ ? "$datas{agent}\n" : "$datas{addr}\n";
-			if(-f "$userdir/$id/access_log.cgi"){
-				open my $fh2, "< $userdir/$id/access_log.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません");
-				while (my $line_info_add = <$fh2>){
-					($d{addr}, $d{host}, $d{agent}) = split /<>/, $line_info_add;
-					print $fh ($d{agent} =~ /DoCoMo/ ||
-						$d{agent} =~ /KDDI|UP\.Browser/ ||
-						$d{agent} =~ /J-PHONE|Vodafone|SoftBank/) ? "$d{agent}\n" : "$d{addr}\n";
+		if ($in{is_delete} eq 'exile') { # 追放
+			my $id = unpack 'H*', $datas{name};
+			return unless -f "$userdir/$id/user.cgi";
+
+			&move_player($datas{name}, $datas{country}, 0);
+			$mes .= "$datas{name}を追放しました<br>";
+
+			my @data = (
+				['wt', 3 * 24 * 3600],
+				['country', 0],
+				['lib', ''],
+				['tp', 0],
+				['vote', ''],
+			);
+			&regist_you_array($datas{name}, @data);
+		}
+		elsif ($in{is_delete} eq 'delete') {
+			&move_player($datas{name}, $datas{country}, 'del');
+			$mes .= "$datas{name}を削除しました<br>";
+
+			# 違反者リストに追加
+			if ($in{is_add_deny}) {
+				open my $fh, ">> $logdir/deny_addr.cgi" or &error("$logdir/deny_addr.cgiﾌｧｲﾙが開けません");
+				print $fh $datas{agent} =~ /DoCoMo/ || $datas{agent} =~ /KDDI|UP\.Browser/
+					|| $datas{agent} =~ /J-PHONE|Vodafone|SoftBank/ ? "$datas{agent}\n" : "$datas{addr}\n";
+				if(-f "$userdir/$id/access_log.cgi"){
+					open my $fh2, "< $userdir/$id/access_log.cgi" or &error("そのようなﾌﾟﾚｲﾔｰは存在しません");
+					while (my $line_info_add = <$fh2>){
+						($d{addr}, $d{host}, $d{agent}) = split /<>/, $line_info_add;
+						print $fh ($d{agent} =~ /DoCoMo/ ||
+							$d{agent} =~ /KDDI|UP\.Browser/ ||
+							$d{agent} =~ /J-PHONE|Vodafone|SoftBank/) ? "$d{agent}\n" : "$d{addr}\n";
+					}
 				}
+				close $fh;
 			}
-			close $fh;
 		}
 	}
 }
-
 
 #=================================================
 # ﾘｾｯﾄ処理：画面真っ黒　ハマった場合に使用(何かしらの異常ｴﾗｰ)
@@ -1329,28 +1347,4 @@ sub admin_get_akindo_data {
 	}
 	close $fh2;
 	$mes .= qq|</table>|;
-}
-
-#=================================================
-# 鯖缶権限の追放
-#=================================================
-sub admin_violate {
-	return unless $in{name};
-	return unless -f "$userdir/$in{id}/user.cgi";
-	$in{country} = $in{country} < 0 ? 0 : $in{country};
-
-	require './lib/move_player.cgi';
-	&move_player($in{name}, $in{country}, 0);
-
-	my @data = (
-		['wt', 3 * 24 * 3600],
-		['country', 0],
-		['lib', ''],
-		['tp', 0],
-		['vote', ''],
-	);
-	&regist_you_array($in{name}, @data);
-
-#	&write_world_news("の評議により、$violatorが国外追放となりました", 1, $violator);
-	$mes .= "$in{name}を追放しました<br>";
 }
