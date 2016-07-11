@@ -61,7 +61,41 @@ sub move_player {
 
 	if ($to_country eq 'del') {
 		&delete_user($p_id, %datas) if -d "$userdir/$p_id";
-	
+
+		&write_entry_news("$name‚Æ‚¢‚¤Ò‚ª‹‚è‚Ü‚µ‚½");
+	}
+	elsif ($to_country eq 'trash') {
+		mkdir "${userdir}_trash/$p_id" or &error("ºŞĞ” ‚É“¯–¼ÌßÚ²Ô°‚ÌÌ§²Ù‚ª‘¶İ‚µ‚Ü‚·");
+		opendir my $dh, "$userdir/$p_id";
+		while (my $file_name = readdir $dh) {
+			next if $file_name =~ /^\./;
+
+			if (-d "$userdir/$p_id/$file_name") {
+				unless (-d "${userdir}_trash/$p_id/$file_name") {
+					mkdir "${userdir}_trash/$p_id/$file_name" or &error("ºŞĞ” ‚ÌÃŞ¨Ú¸ÄØì¬‚É¸”s‚µ‚Ü‚µ‚½");
+				}
+				opendir my $dh2, "$userdir/$p_id/$file_name";
+				while (my $file_name2 = readdir $dh2) {
+					next if $file_name2 =~ /^\./;
+					rename "$userdir/$p_id/$file_name/$file_name2", "${userdir}_trash/$p_id/$file_name/$file_name2" or &error("Õ°»Ş°ÃŞ°À‚ÌˆÚ“®‚É¸”s‚µ‚Ü‚µ‚½");
+				}
+				closedir $dh2;
+
+				rmdir "$userdir/$p_id/$file_name";
+			}
+			else {
+				rename "$userdir/$p_id/$file_name", "${userdir}_trash/$p_id/$file_name" or &error("Õ°»Ş°ÃŞ°À‚ÌˆÚ“®‚É¸”s‚µ‚Ü‚µ‚½");
+			}
+		}
+		closedir $dh;
+		rmdir "$userdir/$p_id";
+		--$w{player};
+		
+		# ©ì±²ºİíœ
+		if ($datas{icon} ne $default_icon && -f "$icondir/$datas{icon}") {
+			rename "$icondir/$datas{icon}", "${userdir}_trash/$p_id/picture/$datas{icon}" or &error("±²ºİÃŞ°À‚ÌˆÚ“®‚É¸”s‚µ‚Ü‚µ‚½");
+		}
+
 		&write_entry_news("$name‚Æ‚¢‚¤Ò‚ª‹‚è‚Ü‚µ‚½");
 	}
 	else {

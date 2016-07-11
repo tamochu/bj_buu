@@ -20,9 +20,10 @@ my $is_ceo_delete = 1;
 
 # 削除権限ありの場合。必要経過日数
 my $non_new_commer_date = 30;
+my $is_delete = $config_test ? 1 : $m{start_time} + $non_new_commer_date * 24 * 3600 < $time;
 
 # 削除権限ありの場合。必要票
-my @need_vote_violator = (2, 4, 6);
+my @need_vote_violator = (2, 4, 5);
 
 #=================================================
 &vote;
@@ -68,7 +69,7 @@ sub print_vote {
 sub vote {
 	return unless &is_ceo;
 
-	if ($m{start_time} + $non_new_commer_date * 24 * 3600 > $time) {
+	unless ($is_delete) {
 		return;
 	}
 	if (!$in{answer} || $in{answer} =~ /[^12]/) {
@@ -146,7 +147,7 @@ sub vote {
 								|| $datas{agent} =~ /J-PHONE|Vodafone|SoftBank/ ? "$datas{agent}\n" : "$datas{addr}\n";
 							close $fh2;
 						}
-						&move_player($violator, $datas{country}, 'del');
+						&move_player($violator, $datas{country}, 'trash');
 					} else {
 						my %datas = &get_you_datas($v_id, 1);
 						&move_player($violator, $datas{country}, 0);

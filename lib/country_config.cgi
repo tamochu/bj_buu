@@ -11,10 +11,11 @@ my $valid_investment = 1;
 my $is_ceo_delete = 1;
 
 # 削除権限ありの場合。必要票
-my @need_vote_violator = (2, 4, 6);
+my @need_vote_violator = (2, 4, 5);
 
 # 削除権限ありの場合。必要経過日数
 my $non_new_commer_date = 30;
+my $is_delete = $config_test ? 1 : $m{start_time} + $non_new_commer_date * 24 * 3600 < $time;
 
 my @violate = ('島流し', '斬首', '永久追放');
 
@@ -478,11 +479,8 @@ sub tp_610 {
 # 流刑者議決
 #================================================
 sub tp_700 {
-	unless ($is_ceo_delete) {
-		&begin;
-		return;
-	}
-	if ($m{start_time} + $non_new_commer_date * 24 * 3600 > $time) {
+	unless ($is_ceo_delete && $is_delete) {
+		$mes .= "参入直後のﾌﾟﾚｲﾔｰには決議権がありません<br>";
 		&begin;
 		return;
 	}
@@ -522,11 +520,8 @@ sub tp_700 {
 }
 
 sub tp_710 {
-	unless ($is_ceo_delete) {
-		&begin;
-		return;
-	}
-	if ($m{start_time} + $non_new_commer_date * 24 * 3600 > $time) {
+	unless ($is_ceo_delete && $is_delete) {
+		$mes .= "参入直後のﾌﾟﾚｲﾔｰには決議権がありません<br>";
 		&begin;
 		return;
 	}
@@ -611,7 +606,7 @@ sub tp_710 {
 								|| $datas{agent} =~ /J-PHONE|Vodafone|SoftBank/ ? "$datas{agent}\n" : "$datas{addr}\n";
 							close $fh2;
 						}
-						&move_player($violator, $datas{country}, 'del');
+						&move_player($violator, $datas{country}, 'trash');
 					} else {
 						my %datas = &get_you_datas($v_id, 1);
 						&move_player($violator, $datas{country}, 0);
@@ -660,11 +655,8 @@ sub tp_710 {
 # 流刑者申請
 #================================================
 sub tp_800 {
-	unless ($is_ceo_delete) {
-		&begin;
-		return;
-	}
-	if ($m{start_time} + $non_new_commer_date * 24 * 3600 > $time) {
+	unless ($is_ceo_delete && $is_delete) {
+		$mes .= "参入直後のﾌﾟﾚｲﾔｰには申\請権がありません<br>";
 		&begin;
 		return;
 	}
@@ -684,11 +676,8 @@ sub tp_800 {
 	&n_menu;
 }
 sub tp_810 {
-	unless ($is_ceo_delete) {
-		&begin;
-		return;
-	}
-	if ($m{start_time} + $non_new_commer_date * 24 * 3600 > $time) {
+	unless ($is_ceo_delete && $is_delete) {
+		$mes .= "参入直後のﾌﾟﾚｲﾔｰには申\請権がありません<br>";
 		&begin;
 		return;
 	}
