@@ -139,8 +139,16 @@ sub reset {
 				close $fh;
 			}
 			$cs{ceo}[$i] = '';
-			
-			open my $fh, "> $logdir/$i/leader.cgi";
+
+			open my $fh, "+< $logdir/$i/leader.cgi" or &error("‘Ø°ÀÞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			eval { flock $fh, 2; };
+			while (my $line = <$fh>) {
+				my ($name, $vote) = split /<>/, $line;
+				&regist_you_data($name, 'vote', '');
+			}
+			seek  $fh, 0, 0;
+			truncate $fh, 0;
+			print $fh '';
 			close $fh;
 		}
 		
