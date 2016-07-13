@@ -12,7 +12,7 @@ my @war_marchs = (
 #	[0]–¼‘O,[1]iŒRŠÔ•ºm‚Ì”{—¦,[2]Œo”ï‚Ì”{—¦,[3]•K—vğŒ
 	['­”¸‰s',	0.5,	$needs[0],	sub{ $pets[$m{pet}][2] ne 'speed_down' }],
 	['’Êíí‘ˆ',	1.0,	$needs[1],	sub{ $m{win_c} >= 1  }],
-	['’·Šú‰“ª',	1.5,	$needs[2],	sub{ $m{win_c} >= 10 && $m{win_c} > $m{lose_c} }]
+	['’·Šú‰“ª',	1.5,	$needs[2],	sub{ $m{unit} ne '11' && $m{win_c} >= 10 && $m{win_c} > $m{lose_c} }]
 );
 if($m{value} < 0 || $m{value} >= @war_marchs){$m{value} = $#war_marchs;}
 my $need_costs = $rank_sols[$m{rank}] * $war_marchs[$m{value}][2];
@@ -50,13 +50,13 @@ sub is_satisfy {
 sub begin {
 	if ($m{tp} > 1) {
 		$m{tp} = 1;
-		$mes .= '‚Ç‚Ì‚æ‚¤‚ÉU‚ß‚İ‚Ü‚·‚©?<br>';
+		$mes .= '‚Ç‚Ì‚æ‚¤‚ÉU‚ß‚İ‚Ü‚·‚©?<hr>';
 	}
 	else {
 		$mes .= "‘¼‘‚ÖU‚ß‚İ$e2j{strong}‚ğ’D‚¢‚Ü‚·<br>";
 		$mes .= "‚Ç‚Ì‚æ‚¤‚ÉU‚ß‚İ‚Ü‚·‚©?<hr>";
 	}
-	
+
 	my @menus = ('‚â‚ß‚é');
 	for my $war_march (@war_marchs) {
 		if (&{ $war_march->[3] }) {
@@ -69,8 +69,7 @@ sub begin {
 			push @menus, '';
 		}
 	}
-	
-	
+
 	&menu(@menus);
 }
 
@@ -78,19 +77,16 @@ sub begin {
 # ‘‘I‘ğ
 #================================================
 sub tp_1 {
-	if (&is_ng_cmd(1..$#war_marchs+1)){
-		&begin;
-		return;
-	}
+	return if &is_ng_cmd(1..$#war_marchs+1);
 	--$cmd;
 
-	if (!&{$war_marchs[$cmd][3]}) {
-		$mes .= "$war_marchs[$cmd][0]‚ÅiŒR‚·‚éğŒ‚ğ–‚½‚µ‚Ä‚¢‚Ü‚¹‚ñ<br>";
+	# ˆÃE•”‘à‚Í’·Šú‰“ª‹Ö~
+	if ($m{unit} eq '11' && $cmd eq '2') {
+		$mes .= "$units[$m{unit}][1]‚Í$war_marchs[$cmd][0]‚ÅiŒR‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ<br>";
 		&begin;
 	}
-	# ˆÃE•”‘à‚Í’·Šú‰“ª‹Ö~
-	elsif ($m{unit} eq '11' && $cmd eq '2') {
-		$mes .= "$units[$m{unit}][1]‚Í$war_marchs[$cmd][0]‚ÅiŒR‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚¹‚ñ<br>";
+	elsif (!&{$war_marchs[$cmd][3]}) {
+		$mes .= "$war_marchs[$cmd][0]‚ÅiŒR‚·‚éğŒ‚ğ–‚½‚µ‚Ä‚¢‚Ü‚¹‚ñ<br>";
 		&begin;
 	}
 	elsif (defined $war_marchs[$cmd]) {

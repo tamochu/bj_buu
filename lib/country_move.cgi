@@ -45,6 +45,8 @@ sub is_satisfy {
 
 #=================================================
 sub begin {
+	$m{tp} = 1 if $m{tp} > 1;
+
 	if ($m{country}) {
 		$mes .= "仕官する手続きとして$GWT分かかります<br>";
 		$mes .= "他の国に仕官すると代表\者ﾎﾟｲﾝﾄと階級が下がります<br>";
@@ -77,70 +79,54 @@ sub tp_1 {
 }
 
 sub tp_200 {
-	if (&is_ng_cmd(1 .. $w{country}+1)){
-		&refresh;
-		return;
+	return if (&is_ng_cmd(1 .. $w{country}+1));
+
+	if($cmd <= $w{country}){ # 仕官
+		if ($m{country}) { return unless &is_move_from_country; } # 国から国へ仕官できるかどうか
+		else { return unless &is_move_from_neverland; } # ﾈﾊﾞﾗﾝから国へ仕官できるかどうか
+
+		if ($w{world} >= $#world_states-3 && $w{world} < $#world_states) {
+			# 混乱・紅白・三国志だとﾈﾊﾞﾗﾝから仕官する時に国のﾙｰﾙ表示でどこの国に行くのか分かる
+			# つまり、ﾙｰﾙを見てｷｬﾝｾﾙすれば実質行きたい国に行けてしまう
+			$mes .= "本当に仕官しますか？";
+		}
+		else {
+			my $line = &get_countries_mes($cmd);
+			my($country_mes, $country_mark, $country_rule) = split /<>/, $line;
+			$mes .= $country_rule;
+			$mes .= "本当に$cs{name}[$cmd]に仕官しますか？";
+		}
+
+		&menu('やめる','仕官');
 	}
-	if($cmd <= $w{country}){
-		my $line = &get_countries_mes($cmd);
-		my($country_mes, $country_mark, $country_rule) = split /<>/, $line;
-		$mes .= $country_rule;
+	else { # 放浪・適当仕官
+		if ($m{country}) {
+			return unless &is_move_from_country; # 国から放浪できるかどうか
+			$mes .= '本当に放浪しますか？';
+			&menu('やめる','放浪');
+		}
+		else { # 基本として適当仕官に制限はないので is_move_from_neverland は要らない
+			$mes .= '本当に適当仕官しますか？';
+			&menu('やめる','仕官');
+		}
 	}
-	$mes .= '本当に仕官しますか？';
 	$m{value} = $cmd;
-	&menu('やめる','仕官');
 	$m{tp} = 300;
 }
 
 sub tp_300 {
-	if (&is_ng_cmd(1)){
-		#&refresh;
-		#&n_menu();
-		$mes = 'やめました<br>';
-		$m{tp} = 1;
-		&begin;
-		return;
-	}
-	
+	return if &is_ng_cmd(1 .. $w{country}+1);
+
 	$cmd = $m{value};
-	if (&is_ng_cmd(1 .. $w{country}+1)){
-		&refresh;
-		return;
-	}
-	
-	if ($cmd eq $m{country}) {
-		$mes .= "自国に仕官はできません<br>";
-	}
-	elsif ($cs{is_die}[$cmd] eq '2') {
-		$mes .= "その国は入国禁止となっています<br>";
-	}
-	elsif ($cs{is_die}[$cmd] eq '3') {
-		$mes .= "その国は人が住める環境ではありません<br>";
-	}
-	elsif ($cmd == $w{country} + 1) {
-		if ($m{country}) { # 国→放浪
-			&country_to_neverland;
-		}
-		else { # ﾈﾊﾞﾗﾝ→適当仕官
-			&neverland_to_random;
-		}
-		return;
-	}
-	elsif ($cs{member}[$cmd] >= $cs{capacity}[$cmd]) {
-		$mes .= "$cs{name}[$cmd]は定員がいっぱいです<br>";
+
+	if ($cmd == $w{country} + 1) {
+		if ($m{country}) { &country_to_neverland; } # 国→放浪
+		else { &neverland_to_random; } # ﾈﾊﾞﾗﾝ→適当仕官
 	}
 	elsif (defined $cs{name}[$cmd]) { # 国が存在する
-		if ($m{country}) { # 国→他の国
-			&country_to_country;
-		}
-		else { # 無所属→国
-			&neverland_to_country;
-		}
-		return;
+		if ($m{country}) { &country_to_country; } # 国→他の国
+		else { &neverland_to_country; } # ﾈﾊﾞﾗﾝ→国
 	}
-
-	$m{tp} = 1;
-	&begin;
 }
 
 sub tp_100 {
@@ -209,7 +195,6 @@ sub tp_120 {
 sub country_to_neverland {
 	return unless &is_move_from_country;
 
-	#&summary_contribute;
 	&move_player($m{name}, $m{country}, 0);
 	$m{country} = 0;
 	$m{rank} = 0;
@@ -232,9 +217,7 @@ sub country_to_neverland {
 # ﾈﾊﾞﾗﾝから適当仕官
 #=================================================
 sub neverland_to_random {
-	#do {
 	$cmd = int(rand($w{country}) + 1);
-	#} while ($cs{is_die}[$cmd] > 1);
 	return unless &is_move_from_neverland;
 
 	$m{random_migrate} = $w{year};
@@ -269,7 +252,6 @@ sub country_to_country {
 			$m{$k.'_c'} = int($m{$k.'_c'} * 0.5);
 		}
 	}
-	#&summary_contribute;
 
 	$mes .= "移籍の手続きに$GWT分かかります<br>" ;
 	&wait;
@@ -306,8 +288,16 @@ sub move_to_country {
 # 国から仕官できるか できる 1 できない 0
 #=================================================
 sub is_move_from_country {
+	# 自国仕官
+	if ($cmd eq $m{country}) {
+		$mes .= "自国に仕官はできません<br>";
+	}
+	# 定員
+	elsif ($cmd <= $w{country} && $cs{member}[$cmd] >= $cs{capacity}[$cmd]) {
+		$mes .= "$cs{name}[$cmd]は定員がいっぱいです<br>";
+	}
 	# 君主
-	if ($m{name} eq $cs{ceo}[$m{country}]) {
+	elsif ($m{name} eq $cs{ceo}[$m{country}]) {
 		$mes .= "$c_mの$e2j{ceo}を辞任する必要があります<br>";
 	}
 	# 立候補者
@@ -331,6 +321,9 @@ sub is_move_from_country {
 				return 1;
 			}
 		}
+		else {
+			return 1;
+		}
 	}
 	# 混乱・紅白・三国志・拙速
 	elsif($w{world} eq $#world_states-1 || $w{world} eq $#world_states-2 || $w{world} eq $#world_states-3 || $w{world} eq $#world_states-5){
@@ -342,7 +335,6 @@ sub is_move_from_country {
 	else {
 		return 1;
 	}
-	$m{tp} = 1;
 	&begin;
 	return;
 }
@@ -352,18 +344,31 @@ sub is_move_from_country {
 # 仕官できる場合には $cmd に適当な行き先が入っている
 #=================================================
 sub is_move_from_neverland {
+	if ($w{world} eq $#world_states-1) { # 混乱
+		$cmd = int(rand($w{country}) + 1);
+	}
+	elsif ($w{world} eq $#world_states-2) { # 紅白
+		$cmd = $w{country} - int(rand(2));
+	}
+	elsif ($w{world} eq $#world_states-3) { # 三国志
+		$cmd = $w{country} - int(rand(3));
+	}
+	# 適当仕官じゃなければ定員制限にかかる
+	elsif ($m{value} < $m{country}+1 && $cs{member}[$cmd] >= $cs{capacity}[$cmd]) {
+		$mes .= "$cs{name}[$cmd]は定員がいっぱいです<br>";
+		&begin;
+		return;
+	}
 	# 暗黒
-	if ($w{world} eq $#world_states) {
+	elsif ($w{world} eq $#world_states) {
 		if ($cmd eq $w{country}) {
 			require './lib/vs_npc.cgi';
 			if ($need_money_npc > $m{money}) {
 				$mes .= "悪魔と契約するには $need_money_npc G必要です<br>";
-				$m{tp} = 1;
 				&begin;
 				return;
 			}
 			elsif (!&is_move_npc_country) {
-				$m{tp} = 1;
 				&begin;
 				return;
 			}
@@ -376,15 +381,6 @@ sub is_move_from_neverland {
 			$mes .= "移籍の手続きに$GWT分かかります<br>" ;
 			&wait;
 		}
-	}
-	elsif ($w{world} eq $#world_states-1) {
-		$cmd = int(rand($w{country}) + 1);
-	}
-	elsif ($w{world} eq $#world_states-2) {
-		$cmd = $w{country} - int(rand(2));
-	}
-	elsif ($w{world} eq $#world_states-3) {
-		$cmd = $w{country} - int(rand(3));
 	}
 
 	return 1;
