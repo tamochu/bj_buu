@@ -257,7 +257,7 @@ sub war_win {
 	# –Å–S‘‚Ìê‡”±‘¥
 	if ($cs{is_die}[$y{country}]) {
 		$v = int($v * 0.5);
-		&_penalty
+		&_penalty;
 	}
 	else {
 		$cs{soldier}[$m{country}] += $m{sol};
@@ -637,28 +637,7 @@ sub _metubou {
 sub _penalty {
 	# ĞŠQ
 	if ( (($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12')) && rand(3) < 1) || rand(12) < 1 ) {
-		&disaster( ($w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') )); # –ï”N or “ä(–ï”N)‚Ì‚İ’Ç‰ÁÍßÅÙÃ¨
-
-=pod
-		#1› 2~ 3› 4~ 5› 6› 7› 8~ 9› 10›
-		if ($w{year} !~ /6$/ && $w{year} !~ /0$/ && $cs{strong}[$y{country}] < 5000) { # “Áêî¨‚Å‚È‚­‚©‚Â‘—Í5000–¢–iÉ±ÊŞØ±‚Ì½‘‰ñ”ğj‚Ì‚İ½‘”­“®
-			# ½‘ó‘Ôæ“¾
-			my $sleep_num = 0;
-			for my $i (1 .. $w{country}) {
-				$sleep_num++ if $cs{die}[$i] == 2;
-			}
-			unless ($sleep_num) { # ‚Ç‚±‚à½‘‚µ‚Ä‚È‚¢‚È‚ç½‘
-				$cs{is_die}[$y{country}] = 2;
-				$w{game_lv} -= int(rand(3)+4) unless $w{world} eq '15' || $w{world} eq '17'; # ”’•º‚Æ–À‘–‚Í“ˆê“ïˆÕ“x’á‚·‚¬‚é‚Ì‚Å‚»‚êˆÈã‰º‚°‚¸‘¼‚Ìî¨‚È‚ç‰º‚°‚é
-
-				# ½‘‚µ‚Ä‚¢‚é‘‚É“¯–¿‚ª‚ ‚ê‚ÎØ‚é
-				for my $i (1 .. $w{country}) {
-					my $c_c = &union($y{country}, $i);
-					$w{"p_$c_c"} = 0 if $w{"p_$c_c"} == 1;
-				}
-			}
-		}
-=cut
+		&disaster( $w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') ); # –ï”N or “ä(–ï”N)‚Ì‚İ’Ç‰ÁÍßÅÙÃ¨
 	}
 }
 

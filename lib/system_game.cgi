@@ -1231,7 +1231,7 @@ sub alltime_event {
 	if ($w{world} eq '20') {
 		my ($sec,$min,$hour,$mday,$month,$year,$wday,$stime) = localtime($time); 
 		if ($hour >= 6 && $hour <= 18) {
-			if (rand(100000) < 1) {
+			if (rand(50000) < 1) {
 				for my $i (1..$w{country}) {
 					for my $j ($i+1..$w{country}) {
 						$w{"f_${i}_${j}"} = int(rand(20));
@@ -1242,7 +1242,7 @@ sub alltime_event {
 				&write_world_news("<b>¢ŠE’†‚Éè¦Î‚ª~‚è’‚¢‚Å‚«‚½</b>");
 			}
 		} else {
-			if (rand(10000) < 1) {
+			if (rand(5000) < 1) {
 				for my $i (1..$w{country}) {
 					for my $j ($i+1..$w{country}) {
 						unless ($w{"p_${i}_${j}"} == 1) {
@@ -1256,7 +1256,7 @@ sub alltime_event {
 			}
 		}
 	}
-	if (($w{world} eq '12') || ($w{world_sub} eq '12')) {
+	if ( $w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') ) {
 		if (rand(2500) < 1) {
 			&disaster(1);
 			&write_cs;
