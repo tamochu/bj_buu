@@ -78,12 +78,15 @@ sub end_festival_world {
 		&run_kouhaku(0);
 	} elsif ($w{year} % 40 == 20) { # 三国志
 		&run_sangokusi(0);
-	} elsif ($w{year} % 40 == 10) { # 拙速
-		&run_sessoku(0);
-	} else { # 混乱
+	} else {
+		if ($w{year} % 40 == 10) { # 拙速
+			&run_sessoku(0);
+		} else { # 混乱
+			&run_konran(0);
+		}
 		# 紅白・三国志は開始時に初期化さえすれば済むが、
-		# 混乱中の君主データなどがあるので終了時にも初期化
-		for my $i (0 .. $w{country}) {
+		# 拙速・混乱中の君主データなどがあるので終了時にも初期化
+		for my $i (1 .. $w{country}) {
 			$cs{ceo}[$i] = '';
 			for my $key (qw/war dom mil pro/) {
 				$cs{$key}[$i] = '';
@@ -95,9 +98,6 @@ sub end_festival_world {
 			open my $fh2, "> $logdir/$i/leader.cgi" or &error("$logdir/$i/leader.cgiﾌｧｲﾙが開けません");
 			close $fh2;
 		}
-		&write_cs;
-
-		&run_konran(0);
 	}
 }
 
@@ -231,16 +231,14 @@ sub run_sessoku {
 		require "./lib/move_player.cgi";
 		# 1位国には統一ボーナスと祭り報酬
 		# (int(国数/2)+1)位には統一ボーナス
-		# ビリは崩壊
 		my @strong_rank = &get_strong_ranking;
-
-		&write_world_news("<b>$world_name大陸を全土にわたる国力競争は$cs{name}[$strong_rank[0]]の勝利になりました</b>");
-		&write_legend('touitu', "$world_name大陸を全土にわたる国力競争は$cs{name}[$strong_rank[0]]の勝利になりました");
-
 		$w{win_countries} = "$strong_rank[0],$strong_rank[1]";
 
-		$cs{strong}[$strong_rank[2]] = 0;
-		$cs{is_die}[$strong_rank[2]] = 3;
+		&write_world_news("<b>$world_name大陸を全土にわたる国力競争は$cs{name}[$strong_rank[0]]と$cs{name}[$strong_rank[1]]の勝利になりました</b>");
+		&write_legend('touitu', "$world_name大陸を全土にわたる国力競争は$cs{name}[$strong_rank[0]]と$cs{name}[$strong_rank[1]]の勝利になりました");
+
+#		$cs{strong}[$strong_rank[2]] = 0;
+#		$cs{is_die}[$strong_rank[2]] = 3;
 
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
@@ -265,14 +263,17 @@ sub run_sessoku {
 			}
 
 			# ネバラン送り
-			&move_player($p{name}, $p{country}, 0);
+			&move_player2($p{name}, 0);
 			if ($p{name} eq $m{name}){
 				$m{country} = 0;
-				$y{country} = 0;
+				$m{vote} = '';
 				&write_user;
 			} else {
-				&regist_you_data($p{name}, 'country', 0);
-				&regist_you_data($p{name}, 'y_country', 0);
+				my @data = (
+					['country', 0],
+					['vote', '']
+				);
+				&regist_you_array($you_datas{name}, @data);
 			}
 
 			# 封鎖で使うので残しておいてくだちい
@@ -313,6 +314,7 @@ sub run_konran {
 			next if $pid =~ /backup/;
 			next unless -f "$userdir/$pid/user.cgi";
 			my %you_datas = &get_you_datas($pid, 1);
+
 			&move_player2($you_datas{name}, 0);
 			if ($you_datas{name} eq $m{name}) { # 対象が自キャラならば
 				$m{country} = 0; # 所属国の書き換え
@@ -540,8 +542,8 @@ sub player_shuffle {
 			&move_player2($you_datas{name}, $you_datas{country});
 			if ($you_datas{country}) { # 仕官していたなら
 				$country_num{$you_datas{country}}++;
+				next;
 			}
-			next;
 #			my $c_find = 0;
 #			if ($you_datas{country}) { # 仕官しているなら
 #				for my $c (@countries) {
