@@ -59,7 +59,15 @@ my @morning_glory_height = (
 # 利用条件
 #=================================================
 sub is_satisfy {
-	return &on_summer;
+	if (&on_summer) {
+		return 1;
+	}
+	else {
+		$mes .= '楽しいはずの夏休みは終わったんだね…<br>';
+		&refresh;
+		&n_menu;
+		return 0;
+	}
 }
 #================================================
 sub begin {
@@ -319,6 +327,10 @@ sub tp_300 {
 	return if &is_ng_cmd(1);
 	
 	if ($m{money} >= $lot_money) {
+		unless(-f "$this_lot_file"){
+			open my $fh, "> $this_lot_file" or &error('宝くじﾌｧｲﾙが読み込めません');
+			close $fh;
+		}
 		open my $fh, "+< $this_lot_file" or &error('宝くじﾌｧｲﾙが読み込めません');
 		eval { flock $fh, 2 };
 		$line = <$fh>;
