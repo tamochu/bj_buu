@@ -367,6 +367,7 @@ sub tp_400 {
 	my ($sec,$min,$hour,$mday,$month,$year,$wday,$stime) = localtime($time); 
 	if ($hour eq '6') {
 		if ($m{radio_time} + 23 * 3600 < $time) {
+			mkdir "$this_radio_dir" or &error("$this_radio_dir ﾌｫﾙﾀﾞが作れませんでした") unless -d "$this_radio_dir";
 			$mes .= '運動したよ、はぁいい汗かいたね!';
 			open my $fh, ">> $this_radio_dir/$mday.cgi" or &error('ラジオ体操ﾌｧｲﾙが読み込めません');
 			print $fh "$m{name}<>$time<>\n";
@@ -401,7 +402,7 @@ sub tp_500 {
 	my ($sec,$min,$hour,$mday,$month,$year,$wday,$stime) = localtime($time); 
 	if ($wday eq '0') {
 		$mes .= qq|今週の日記大賞を決めよう!<br>|;
-		
+
 		my $index = 0;
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $user_id = readdir $dh) {
@@ -416,7 +417,7 @@ sub tp_500 {
 						$bcomment = join "<br>", @bcomment_arr;
 						if ($is_mobile) {
 							if ($index >= $m{stock} && $index < $m{stock} + 20) {
-								$mes .= qq|<hr>$baddr<br>|;
+								$mes .= qq|<hr>『$baddr』$bnameの日記<br>$bcomment|;
 								$mes .= qq|<form method="$method" action="$script">|;
 								$mes .= qq|<input type="hidden" name="cmd" value="$user_id:$btime:"><input type="submit" value="この日記に投票" class="button1">|;
 								$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -426,7 +427,7 @@ sub tp_500 {
 						}
 						else {
 							$mes .= qq|<table class="table1" cellpadding="5" width="440">|;
-							$mes .= qq|<tr><td>$baddr<br></td>|;
+							$mes .= qq|<tr><td>『$baddr』$bnameの日記$bcomment</td>|;
 							$mes .= qq|<td><form method="$method" action="$script">|;
 							$mes .= qq|<input type="hidden" name="cmd" value="$user_id:$btime:"><input type="submit" value="この日記に投票" class="button1">|;
 							$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -455,6 +456,10 @@ sub tp_500 {
 		&n_menu;
 	} else {
 		my $is_find = 0;
+		unless(-f "$this_blog_vote_result_file"){
+			open my $fh, "> $this_blog_vote_result_file" or &error('日記投票結果ファイルが開けません');
+			close $fh;
+		}
 		open my $fh, "+< $this_blog_vote_result_file" or &error('日記投票結果ファイルが開けません');
 		eval { flock $fh, 2 };
 		while (my $line = <$fh>) {
@@ -464,6 +469,10 @@ sub tp_500 {
 			}
 
 			push @lines, "$name<>$date<>\n";
+		}
+		unless(-f "$this_blog_vote_file"){
+			open my $vfh, "> $this_blog_vote_file" or &error('日記投票ファイルが開けません');
+			close $vfh;
 		}
 		unless ($is_find) {
 			%votes = ();
@@ -520,12 +529,16 @@ sub tp_510 {
 			}
 			close $bfh;
 			unless ($blog_find) {
-			$mes .= 'huga';
+				$mes .= 'huga';
 				&begin;
 				return;
 			}
 			my @lines = ();
 			my $is_find = 0;
+			unless(-f "$this_blog_vote_file"){
+				open my $fh, "> $this_blog_vote_file" or &error('日記投票ファイルが開けません');
+				close $fh;
+			}
 			open my $fh, "+< $this_blog_vote_file" or &error('日記投票ファイルが開けません');
 			eval { flock $fh, 2 };
 			while (my $line = <$fh>) {

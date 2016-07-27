@@ -1,5 +1,6 @@
 #!/usr/local/bin/perl --
 require './config.cgi';
+require './config_game.cgi';
 require "$datadir/header_myroom.cgi";
 #================================================
 # ŽèŽ† Created by Merino

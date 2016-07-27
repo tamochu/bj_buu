@@ -160,7 +160,19 @@ sub write_user {
 	print $fh "$line\n";
 	print $fh "$addr<>$host<>$agent<>\n";
 	close $fh;
-	
+
+	if (&on_summer) {
+		my @keys2 = (qw/radio_time pop_vote blog_time morning_glory morning_glory_time summer_blog dummy/);
+		my $line2;
+		for my $k (@keys2) {
+			$line2 .= "$k;$m{$k}<>";
+		}
+
+		open my $fh, "> $userdir/$id/summer.cgi";
+		print $fh "$line2\n";
+		close $fh;
+	}
+
 	&alltime_event;
 }
 #================================================
@@ -788,7 +800,24 @@ sub get_you_datas {
 		
 		$you_datas{$k} = $v;
 	}
-	
+
+	# ‰ÄÕ‚è—p
+	if (&on_summer) {
+		unless (-f "$userdir/$y_id/summer.cgi") {
+			open my $fh, "> $userdir/$y_id/summer.cgi";
+			close $fh;
+		}
+		open my $fh, "< $userdir/$y_id/summer.cgi" or &error("‚»‚Ì‚æ‚¤‚È–¼‘O‚ÌÌßÚ²Ô°‚ª‘¶Ý‚µ‚Ü‚¹‚ñ");
+		my $line = <$fh>;
+		close $fh;
+
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$you_datas{$k} = $v;
+		}
+		$you_datas{dummy} = 1;
+	}
+
 	return %you_datas;
 }
 #================================================
