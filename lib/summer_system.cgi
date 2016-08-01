@@ -23,6 +23,6 @@ sub read_summer { # Get %s
 		my($k, $v) = split /;/, $hash;
 		$m{$k} = $v; # $s
 	}
-	$m{dummy} = 1; # $s
+	$m{dummy} = 0; # $s
 }
 1; # íœ•s‰Â
