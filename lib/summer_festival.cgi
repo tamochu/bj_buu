@@ -320,9 +320,19 @@ sub tp_210 {
 			$mes .= 'まずはその連れているﾍﾟｯﾄを置いてきな！<br>';
 		}
 		else {
-			$m{pet} = $pets[-1][0];
-			$m{pet_c} = $pets[-1][5];
-			$mes .= 'よく似合ってるぜ！！<br>';
+			my $money = $shop_list[$cmd-1][2];
+			if ($m{money} >= $money) {
+				$m{money} -= $money;
+				$m{pet} = $pets[-1][0];
+				$m{pet_c} = $pets[-1][5];
+				$mes .= 'よく似合ってるぜ！！<br>';
+				my $v = int(rand(100) + 1);
+				$m{pop_vote} += $v;
+				$mes .= "投票権を$v枚もらったよ";
+			}
+			else {
+				$mes .= 'よく見てみろ！　ゼニが足りねぇぜ！！<br>';
+			}
 		}
 	}
 	else {
