@@ -66,7 +66,7 @@ sub myself_blog {
 		
 		&write_blog_news(qq|Åw$in{title}Åx<a href="blog.cgi?id=$in{id}&country=$m{country}&title=Blog">$m{name}ÇÃì˙ãL</a>|) if $is_ok && !$in{is_secret};
 		
-		if (&on_summer && &time_to_date($time) ne &time_to_date($m{blog_time})) {
+		if (&on_summer && &time_to_date($time) ne &time_to_date($m{blog_time}) && !$m{icon}) {
 			$m{blog_time} = $time;
 			$m{summer_blog}++;
 			$m{icon} = $icon_temp;
