@@ -1,4 +1,5 @@
 require './lib/system.cgi';
+require './lib/summer_system_game.cgi';
 #================================================
 $VERSION = '2.71';
 # Šî–{İ’è Created by Merino
