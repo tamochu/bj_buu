@@ -164,7 +164,7 @@ sub tp_200 {
 	my @menus = ('‚â‚ß‚é');
 	push @menus, $m{wea} ? $weas[$m{wea}][1] : '';
 	push @menus, $m{egg} ? $eggs[$m{egg}][1] : '';
-	push @menus, $m{pet} ? $pets[$m{pet}][1] : '';
+	push @menus, $m{pet} > 0 ? $pets[$m{pet}][1] : '';
 	push @menus, $m{gua} ? $guas[$m{gua}][1] : '';
 	
 	&menu(@menus);
@@ -200,7 +200,7 @@ sub tp_210 {
 		$line = "$cmd<>$m{egg}<>$m{egg_c}<>0<>\n";
 		$sub_line = "$cmd<>$m{egg}<>$m{egg_c}<>0<>$m{name}<>1<>\n";
 	}
-	elsif ($cmd eq '3' && $m{pet}) {
+	elsif ($cmd eq '3' && $m{pet} > 0) {
 		$line = "$cmd<>$m{pet}<>$m{pet_c}<>0<>\n";
 		$sub_line = "$cmd<>$m{pet}<>$m{pet_c}<>0<>$m{name}<>1<>\n";
 	}

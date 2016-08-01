@@ -237,6 +237,14 @@ sub form1 {
 	$m{value} = int(rand(20))+5;#$config_test ? 0 : int(rand(20))+5;
 	$m{value} += int(rand(10)+1);#$config_test ? 0 : int(rand(10)+1); # ゲームバランスを考えて初期値ﾌﾞｰｽﾄはそのまま
 	$m{value} += 30 if $y{country} && ($pets[$m{pet}][2] ne 'no_ambush' || ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) && &is_patrol($_[0]);
+	if ($m{pet} == -1) { # ﾕｰﾚｲの埋め込み処理
+		$m{pet_c}--;
+		if ($m{pet_c} <= 0) {
+			$m{pet} = 0;
+			$m{pet_c} = 0;
+		}
+	}
+
 	$m{stock} = 0;
 	$m{turn} = 0;
 	$mes .= "敵兵の気配【 $m{value}% 】<br>";
@@ -278,7 +286,7 @@ sub exe2 {
 			} else {
 				$m{value} += int( $m{unit} eq '17' ? (rand(10)+1)*(0.7+rand(0.3)) : rand(10)+1 ); # 隠密は上昇気配値0.7～0.9
 			}
-			$m{value} = 0 if $config_test;
+			$m{value} = 200 if $config_test;
 			&loop_menu;
 			$m{tp} -= 10;
 		}

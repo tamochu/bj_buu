@@ -50,9 +50,9 @@ sub begin {
 				&write_comp_legend($kind) if $count eq ($#eggs - 1);
 			}
 			elsif ($kind eq '3') {
-				$comp_par = int($count / ($#pets - 3) * 100);
+				$comp_par = int($count / ($#pets - 4) * 100);
 				$comp_par = 100 if $comp_par > 100;
-				&write_comp_legend($kind) if $count eq ($#pets - 3);
+				&write_comp_legend($kind) if $count eq ($#pets - 4);
 			}
 		}
 		

@@ -247,7 +247,8 @@ sub status_html {
 	$main_screen .= qq|<table width="100%" border="0"><tr><td width="60%" valign="top" align="left"><tt>$head_mes|;
 	$main_screen .= qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;">| if $m{icon};
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
-	my $pet_c = $m{pet} ? "š$m{pet_c}":'';
+#	my $pet_c = $m{pet} ? "š$m{pet_c}":'';
+	my $pet_c = $m{pet} > 0 ? "š$m{pet_c}": ($m{pet} < 0 ? "(<b>$m{pet_c}</b>/<b>$pets[$m{pet}][5]</b>)" : '');
 	my $act_d = $m{act} > 100 ? 100 : $m{act}; 
 	my $exp_d = $m{exp} > 100 ? 100 : $m{exp}; 
 	$main_screen .=<<"EOM";

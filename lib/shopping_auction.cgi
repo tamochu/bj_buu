@@ -181,7 +181,7 @@ sub tp_200 {
 	$mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 	$mes .= qq|<input type="radio" id="no_1" name="cmd" value="1"><label for="no_1">$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c})</label><br>| if $m{wea};
 	$mes .= qq|<input type="radio" id="no_2" name="cmd" value="2"><label for="no_2">$eggs[$m{egg}][1]($m{egg_c})</label><br>| if $m{egg};
-	$mes .= qq|<input type="radio" id="no_3" name="cmd" value="3"><label for="no_3">$pets[$m{pet}][1]š$m{pet_c}</label><br>| if $m{pet};
+	$mes .= qq|<input type="radio" id="no_3" name="cmd" value="3"><label for="no_3">$pets[$m{pet}][1]š$m{pet_c}</label><br>| if $m{pet} > 0;
 	$mes .= qq|<input type="radio" id="no_4" name="cmd" value="4"><label for="no_4">$guas[$m{gua}][1]</label><br>| if $m{gua};
 	$mes .= qq|“üDŠúŒÀ<br>|;
 	$mes .= qq|<input type="radio" id="no_5" name="tlimit" value="0" checked><label for="no_5">•’Ê</label><br>|;

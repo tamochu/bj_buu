@@ -657,8 +657,13 @@ require './lib/system_game.cgi';
  	[199,	'ｳﾘｴﾙ',	'change_seed',	sub{},'やっと4柱そろいました'], # main.cgiのsub lv_upに直接埋め込み処理
  	[200,	'ｹｯﾄｳ',	'keep_seed',	sub{},'決闘（デュエル）!'], # main.cgiのsub lv_upに直接埋め込み処理
  	[201,	'ﾎｰﾘｴ',	'myself',	sub{},'回転回転回転回転ライブドアオート'],# trick.cgiに埋め込み処理
+
+	# ｲﾍﾞﾝﾄ時専用のﾍﾟｯﾄは上に追加していく
+	# 追加する度に profile.cgi の collection_pars関数 や myself_collection.cgi を書き換えないとｺﾚｸｼｮﾝとしてｶｳﾝﾄされてしまうので注意
+ 	#[0]No,	[1]名前,	[2]発動,		[3]処理,	[4]誕生セリフ	[5]使用回数
+# 	[-2,		'ﾕｰﾚｲ',	'no_ambush',	sub{},'ねないこだれだ'], # war.cgiに埋め込み処理
+ 	[-1,		'ﾕｰﾚｲ',	'no_ambush',	sub{},'ねないこだれだ', 5], # war.cgiに埋め込み処理
  );
- 
  
  
  #=================================================
@@ -668,6 +673,13 @@ require './lib/system_game.cgi';
  	my($k, $v) = @_;
  	if ( $pets[$m{pet}][2] eq $k ) {
  		my($return_value, $is_return) = $pets[$m{pet}][3]->($v);
+ 		if ($m{pet} < 0) {
+ 			$m{pet_c}--;
+ 			if ($m{pet_c} <= 0) {
+ 				$m{pet} = 0;
+ 				$m{pet_c} = 0;
+ 			}
+ 		}
  		return $is_return ? int($return_value) : $v;
  	}
  	return $v;

@@ -43,7 +43,8 @@ elsif ($m{wt} > 0) {
 	&promise_table_html;
 }
 elsif ($m{lib} =~ /(domestic|hunting|military|promise|training|war_form)/ && $m{tp} eq '1') {
-	print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>| if $m{pet};
+	if ($m{pet} > 0) { print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>|; }
+	elsif ($m{pet} < 0) { print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1](<b>$m{pet_c}</b>/<b>$pets[$m{pet}][5]</b>)</font><br>|; }
 	print qq|<font color="#99CC99">ÀÏºŞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
 }
 #================================================
@@ -465,7 +466,8 @@ sub status_html {
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 	print qq|<font color="#9999CC">•Ší:[$weas[$m{wea}][2]]$wnameš<b>$m{wea_lv}</b>(<b>$m{wea_c}</b>/<b>$weas[$m{wea}][4]</b>)</font><br>| if $m{wea};
 	print qq|<font color="#9999CC">–h‹ï:[$guas[$m{gua}][2]]$guas[$m{gua}][1]</font><br>| if $m{gua};
-	print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>| if $m{pet};
+	if ($m{pet} > 0) { print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}</font><br>|; }
+	elsif ($m{pet} < 0) { print qq|<font color="#99CCCC">Íß¯Ä:$pets[$m{pet}][1](<b>$m{pet_c}</b>/<b>$pets[$m{pet}][5]</b>)</font><br>|; }
 	print qq|<font color="#99CC99">ÀÏºŞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
 	print qq|<font color="#CCCC99">’  :$m{insect_name}</font><br>| if $m{insect_name};
 #	print qq|<hr>|;

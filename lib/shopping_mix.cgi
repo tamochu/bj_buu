@@ -1,4 +1,5 @@
 my $depot_file = "$userdir/$id/depot.cgi";
+my $this_lock_file = "$userdir/$id/depot_lock.cgi";
 #================================================
 # 賽銭箱
 #=================================================
@@ -37,7 +38,11 @@ sub tp_1 {
 	if ($cmd ne '4') {
 		if($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]){
 			$mes .= "$shogos[1][0]は合成できない。残念<br>";
-			$m{tp}
+			&begin;
+			return;
+		}
+		if ($m{pet} < 0) {
+			$mes .= "借りたﾍﾟｯﾄをキメラ化するなんてとんでもない！<br>";
 			&begin;
 			return;
 		}
@@ -58,12 +63,13 @@ sub tp_1 {
 		$mes .= "どれと合成しますか?<br>";
 		$mes .= qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">やめる</label><br>|;
 	
+		my %lock = &get_lock_item;
 		open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 		my $count = 0;
 		while (my $line = <$fh>) {
 			++$count;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			if($kind eq '3' ){
+			if($kind eq '3' && $lock{"$kind<>$item_no<>"} < 1){
 				$mes .= qq|<input type="radio" id="$count" name="cmd" value="$count">|;
 				$mes .= qq|<label for="$count">| unless $is_mobile;
 				$mes .= qq|[ぺ]$pets[$item_no][1]★$item_c|;
@@ -95,12 +101,13 @@ sub tp_1 {
 		$mes .= "どれと合成しますか?<br>";
 		$mes .= qq|<form method="$method" action="$script">|;
 	
+		my %lock = &get_lock_item;
 		open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 		my $count = 0;
 		while (my $line = <$fh>) {
 			++$count;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			if($kind eq '3' ){
+			if($kind eq '3' && $lock{"$kind<>$item_no<>"} < 1){
 				my $checked = '';
 				if ($cmd eq '3' && $item_no == 126) {
 					$checked = ' checked';
@@ -151,7 +158,7 @@ sub tp_100 {
 		close $fh;
 		
 	}
-	&begin;	
+	&begin;
 }
 
 #=================================================
@@ -177,12 +184,6 @@ sub tp_200 {
 		&begin;
 		return;
 	}
-# ファイル開く前に確認すればスマート
-#	unless ($pets[$m{pet}][5]) {
-#		$mes .= "君が今持ってるﾍﾟｯﾄは合成できないんだ。ごめんね<br>";
-#		&begin;
-#		return;
-#	}
 	
 	$count = 0;
 	my @lines = ();
@@ -254,4 +255,20 @@ sub fib{
 	my @fib_rets = (1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 2000, 5000, 10000, 20000, 50000, 100000);
 	return $fib_rets[$x];
 }
+
+#=================================================
+# ロックアイテムの取得
+#=================================================
+sub get_lock_item {
+	my %lock = ();
+	open my $lfh, "< $this_lock_file" or &error("$this_lock_fileが開けません");
+	while (my $line = <$lfh>){
+		chomp $line;
+		$lock{$line}++;
+	}
+	close $lfh;
+
+	return %lock;
+}
+
 1; # 削除不可

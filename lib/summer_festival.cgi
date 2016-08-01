@@ -13,6 +13,7 @@ $this_radio_dir = "$logdir/summer_radio";
 @shop_list = (
 #    cmd, 商品, 金額
 	[1, '食べ物', 100000],
+	[2, 'ｵﾊﾞｹｾｯﾄ', 100000],
 );
 
 # 夜店で買えるもの
@@ -277,7 +278,7 @@ sub tp_200 {
 }
 
 sub tp_210 {
-	if ($cmd) {
+	if ($cmd == 1) {
 		$index = 1;
 		for my $items_arr (@shop_items) {
 			if ($index == $cmd) {
@@ -312,6 +313,16 @@ sub tp_210 {
 				}
 			}
 			$index++;
+		}
+	}
+	elsif ($cmd == 2) {
+		if ($m{pet} ne 0) {
+			$mes .= 'まずはその連れているﾍﾟｯﾄを置いてきな！<br>';
+		}
+		else {
+			$m{pet} = $pets[-1][0];
+			$m{pet_c} = $pets[-1][5];
+			$mes .= 'よく似合ってるぜ！！<br>';
 		}
 	}
 	else {
@@ -413,7 +424,7 @@ sub tp_500 {
 				while (my $line = <$fh>) {
 					$line =~ tr/\x0D\x0A//d;
 					my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
-					if ($btime > &date_to_time(&time_to_date($time - 7 * 24 * 3600))) {
+					if ($btime > &date_to_time(&time_to_date($time - 7 * 24 * 3600)) && !$bicon) {
 						$bcomment = join "<br>", @bcomment_arr;
 						if ($is_mobile) {
 							if ($index >= $m{stock} && $index < $m{stock} + 20) {
@@ -776,7 +787,7 @@ sub tp_810 {
 			$m{egg} = 0;
 			$m{morning_glory} *= 2;
 		}
-		if ($cmd eq '2' && $m{pet}) {
+		if ($cmd eq '2' && $m{pet} > 0) {
 			$mes .= $pets[$m{pet}][1] . 'を朝顔にあげるよ';
 			$m{tp} += 10;
 			&menu('いいえ', 'はい');
@@ -787,7 +798,7 @@ sub tp_810 {
 }
 
 sub tp_820 {
-	if ($cmd && $m{pet}) {
+	if ($cmd && $m{pet} > 0) {
 		$mes .= $pets[$m{pet}][1] . 'を朝顔にあげたよ';
 		$m{pet} = 0;
 		$m{morning_glory} += 5;

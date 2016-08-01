@@ -19,7 +19,7 @@ sub add_collection {
 	if ($temp{egg} == 53) {
 		$temp{egg} = 42;
 	}
-	$temp{pet} = $m{pet};
+	$temp{pet} = $m{pet} < 0 ? 0 : $m{pet};
 	if ($temp{pet} == 180) {
 		$temp{pet} = 76;
 	}

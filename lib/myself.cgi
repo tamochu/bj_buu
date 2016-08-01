@@ -235,8 +235,9 @@ sub my_status_mobile {
 	}
 	
 	if ($m{pet}) {
+		my $pet_c = $m{pet} > 0 ? "š$m{pet_c}" : "($m{pet_c}/$pets[$m{pet}][5])";
 		$mes .= qq|yÍß¯Äî•ñz<br><ul>|;
-		$mes .= qq|<li>–¼‘O:$pets[$m{pet}][1]š$m{pet_c}|;
+		$mes .= qq|<li>–¼‘O:$pets[$m{pet}][1]$pet_c|;
 		$mes .= qq|<li>Œø‰Ê:$pet_effects[$m{pet}]|;
 		if($pet_sub_effects[$m{pet}]){
 			$mes .= qq|<li>’Ç‰ÁŒø‰Ê:$pet_sub_effects[$m{pet}]|;
@@ -334,9 +335,10 @@ sub my_status_pc {
 	}
 	
 	if ($m{pet}) {
+		my $pet_c = $m{pet} > 0 ? "š$m{pet_c}" : "($m{pet_c}/$pets[$m{pet}][5])";
 		$mes .= qq|yÍß¯Äî•ñz<br>|;
 		$mes .= qq|<table class="table1" cellpadding="3">|;
-		$mes .= qq|<tr><th>–¼‘O</th><td>$pets[$m{pet}][1]š$m{pet_c}</td>|;
+		$mes .= qq|<tr><th>–¼‘O</th><td>$pets[$m{pet}][1]$pet_c</td>|;
 		$mes .= qq|<th>Œø‰Ê</th><td>$pet_effects[$m{pet}]</td></tr>|;
 		if($pet_sub_effects[$m{pet}]){
 			$mes .= qq|<tr><th>’Ç‰ÁŒø‰Ê</th><td colspan="3">$pet_sub_effects[$m{pet}]</td></tr>|;

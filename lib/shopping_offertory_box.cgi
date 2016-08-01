@@ -106,7 +106,7 @@ sub tp_1 {
 		$mes .= qq|<input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
 		$mes .= qq|<input type="radio" name="cmd" value="1">[$weas[$m{wea}][2]]$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c}/$weas[$m{wea}][4])<br>| if $m{wea};
 		$mes .= qq|<input type="radio" name="cmd" value="2">[—‘]$eggs[$m{egg}][1]($m{egg_c}/$eggs[$m{egg}][2])<br>| if $m{egg};
-		$mes .= qq|<input type="radio" name="cmd" value="3">[ƒy]$pets[$m{pet}][1]š$m{pet_c}<br>| if $m{pet};
+		$mes .= qq|<input type="radio" name="cmd" value="3">[ƒy]$pets[$m{pet}][1]š$m{pet_c}<br>| if $m{pet} > 0;
 		$mes .= qq|<input type="radio" name="cmd" value="4">[$guas[$m{gua}][2]]$guas[$m{gua}][1]<br>| if $m{gua};
 		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		$mes .= qq|<p><input type="submit" value="‚¨‹Ÿ‚¦‚·‚é" class="button1"></p></form>|;

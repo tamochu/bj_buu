@@ -61,6 +61,7 @@ sub tp_100 {
 	$mes .= "$c_y‚É’…‚«‚Ü‚µ‚½<br>";
 	
 	my $is_ambush = &_get_war_you_data; # ‘Ò‚¿•š‚¹‚³‚ê‚Ä‚½ê‡–ß‚è’l‚ ‚è
+
 	$y{hp} = $y{max_hp};
 	$y{mp} = $y{max_mp};
 
@@ -130,6 +131,13 @@ sub tp_100 {
 	else {
 		$m{sol_lv} = 80;
 		$mes .= "$c_y‚©‚ç$y{name}—¦‚¢‚é$y{sol}‚Ì•º‚ªo‚Ä‚«‚Ü‚µ‚½<br>";
+	}
+	if ($m{pet} == -1) { # Õ°Ú²‚Ì–„‚ß‚İˆ—
+		$m{pet_c}--;
+		if ($m{pet_c} <= 0) {
+			$m{pet} = 0;
+			$m{pet_c} = 0;
+		}
 	}
 
 	# ‰‡ŒRŒnÍß¯Ä

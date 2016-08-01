@@ -66,7 +66,7 @@ sub status_mobile {
 	print qq|Lv.<b>$m{lv}</b>|;
 	print qq|‘‹à <b>$m{money}</b> G<br>|;
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
-	my $pet_c = $m{pet} ? "š$m{pet_c}":'';
+	my $pet_c = $m{pet} > 0 ? "š$m{pet_c}": ($m{pet} < 0 ? "($m{pet_c}/$pets[$m{pet}][5])" : '');
 	my $petname = "$pets[$m{pet}][1]$pet_c";
 	if($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24'){
 		if($m{boch_pet}){
@@ -167,7 +167,7 @@ sub status_pc {
 
 	my $m_st = &m_st;
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
-	my $pet_c = $m{pet} ? "š$m{pet_c}":'';
+	my $pet_c = $m{pet} > 0 ? "š$m{pet_c}": ($m{pet} < 0 ? "($m{pet_c}/$pets[$m{pet}][5])" : '');
 	my $petname = "$pets[$m{pet}][1]$pet_c";
 	if($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24'){
 		if($m{boch_pet} && $m{pet}){
@@ -379,7 +379,7 @@ sub collection_pars { # ±²ÃÑ
 			$pars{$kind} = int(@nos / ($#eggs - 1) * 100);
 		}
 		elsif ($kind eq '3') {
-			$pars{$kind} = int(@nos / ($#pets - 3) * 100);
+			$pars{$kind} = int(@nos / ($#pets - 4) * 100);
 		}
 		$pars{$kind} = 100 if $pars{$kind} > 100;
 		++$kind;

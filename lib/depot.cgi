@@ -110,7 +110,7 @@ sub tp_110 {
 					$add_line = "$kind<>$m{egg}<>$m{egg_c}<>0<>\n";
 					$mes .= "$eggs[$m{egg}][1]‚ğ—a‚¯";
 				}
-				elsif($kind eq '3' && $m{pet}) {
+				elsif($kind eq '3' && $m{pet} > 0) {
 					$add_line = "$kind<>$m{pet}<>$m{pet_c}<>0<>\n";
 					$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğ—a‚¯";
 				}
@@ -187,7 +187,7 @@ sub tp_200 {
 	my @menus = ('‚â‚ß‚é');
 	push @menus, $m{wea} ? $weas[$m{wea}][1] : '';
 	push @menus, $m{egg} ? $eggs[$m{egg}][1] : '';
-	push @menus, $m{pet} ? $pets[$m{pet}][1] : '';
+	push @menus, $m{pet} > 0 ? $pets[$m{pet}][1] : '';
 	push @menus, $m{gua} ? $guas[$m{gua}][1] : '';
 	
 	&menu(@menus);
@@ -329,7 +329,7 @@ sub tp_400 {
 	$mes .= qq|<input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
 	$mes .= qq|<input type="radio" name="cmd" value="1">[$weas[$m{wea}][2]]$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c}/$weas[$m{wea}][4])<br>| if $m{wea};
 	$mes .= qq|<input type="radio" name="cmd" value="2">[—‘]$eggs[$m{egg}][1]($m{egg_c}/$eggs[$m{egg}][2])<br>| if $m{egg};
-	$mes .= qq|<input type="radio" name="cmd" value="3">[ƒy]$pets[$m{pet}][1]š$m{pet_c}<br>| if $m{pet};
+	$mes .= qq|<input type="radio" name="cmd" value="3">[ƒy]$pets[$m{pet}][1]š$m{pet_c}<br>| if $m{pet} > 0;
 	$mes .= qq|<input type="radio" name="cmd" value="4">[$guas[$m{gua}][2]]$guas[$m{gua}][1]<br>| if $m{gua};
 	$mes .= qq|<input type="radio" name="cmd" value="5">‚¨‹à<input type="text" name="send_money" value="0" class="text_box1" style="text-align:right">G<br>| if $m{money} > 0;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;

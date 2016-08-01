@@ -83,7 +83,7 @@ sub tp_1 {
 		my @menus = ('‚â‚ß‚é');
 		push @menus, $m{wea} ? $weas[$m{wea}][1] : '';
 		push @menus, $m{egg} ? $eggs[$m{egg}][1] : '';
-		push @menus, $m{pet} ? "$pets[$m{pet}][1]š$m{pet_c}" : '';
+		push @menus, $m{pet} > 0 ? "$pets[$m{pet}][1]š$m{pet_c}" : '';
 		push @menus, $m{gua} ? $guas[$m{gua}][1] : '';
 		&menu(@menus);
 	}
@@ -174,7 +174,7 @@ sub tp_100 {
 sub tp_200 {
 	if (    ($cmd eq '1' && $m{wea})
 		 || ($cmd eq '2' && $m{egg})
-		 || ($cmd eq '3' && $m{pet})
+		 || ($cmd eq '3' && $m{pet} > 0)
 		 || ($cmd eq '4' && $m{gua}) ) {
 			my $line;
 			if ($cmd eq '1') {
