@@ -316,10 +316,7 @@ sub tp_210 {
 		}
 	}
 	elsif ($cmd == 2) {
-		if ($m{pet} ne 0) {
-			$mes .= 'まずはその連れているﾍﾟｯﾄを置いてきな！<br>';
-		}
-		else {
+		if ($m{pet} == 0) {
 			my $money = $shop_list[$cmd-1][2];
 			if ($m{money} >= $money) {
 				$m{money} -= $money;
@@ -333,6 +330,9 @@ sub tp_210 {
 			else {
 				$mes .= 'よく見てみろ！　ゼニが足りねぇぜ！！<br>';
 			}
+		}
+		else {
+			$mes .= 'まずはその連れているﾍﾟｯﾄを置いてきな！<br>';
 		}
 	}
 	else {
