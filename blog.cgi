@@ -33,6 +33,8 @@ if ($in{id} && $in{pass}) {
 	else                            { &myself_blog; } # 自分用
 }
 elsif ($in{mode} eq 'comment_form') { &header_profile; &comment_form; } # ｺﾒﾝﾄ追加ﾌｫｰﾑ
+elsif ($in{mode} eq 'good') { &header_profile; &good_exe; } # いいね
+elsif ($in{mode} eq 'bad') { &header_profile; &bad_exe; } # わるいね
 elsif (-s "$this_file.cgi")         { &header_profile; &view_blog; } # 他人用
 else                                { &header_profile; } # 記事/ﾌﾟﾚｲﾔｰが存在しない
 &footer;
@@ -95,9 +97,14 @@ sub myself_blog {
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが読み込めません");
 	while (my $line = <$fh>) {
 		$line =~ tr/\x0D\x0A//d;
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
+		my ($line1, $line2) = split /<<>>/, $line;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line1;
+		my ($bcomment_c,$bgood,$bbad) = split /<>/, $line2;
 		my $secret_mark = $bicon ? '【ﾋﾐﾂ】' : '';
 		$bname .= "[$bshogo]" if $bshogo;
+		$bcomment_c = 0 unless $bcomment_c;
+		$bgood = 0 unless $bgood;
+		$bbad = 0 unless $bbad;
 
 		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
 
@@ -105,7 +112,10 @@ sub myself_blog {
 			print qq|<br><input type="checkbox" name="delete" value="$btime"> $bdate|;
 			print qq|<hr>$baddr $secret_mark|;
 			print qq|<hr>$bcomment<br>|;
-			print qq|<hr>ｺﾒﾝﾄ<br>@bcomments| if $is_comment && @bcomments;
+			if ($is_comment) {
+				print qq|<hr>ｺﾒﾝﾄ($bcomment_c) ｲｲ!($bgood) ｲｸﾅｲ!($bbad)|;
+				print qq|<br>@bcomments| if @bcomments;
+			}
 			print qq|<hr><br>|;
 		}
 		else {
@@ -113,7 +123,11 @@ sub myself_blog {
 			print qq|<table class="blog_letter" cellpadding="5">|;
 			print qq|<tr><th align="left"><input type="checkbox" name="delete" value="$btime"> $baddr <font size="1">($bdate)</font> $secret_mark<br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
-			print qq|<tr><td>ｺﾒﾝﾄ<br>@bcomments</td></tr>| if $is_comment && @bcomments;
+			if ($is_comment) {
+				print qq|<tr><td>ｺﾒﾝﾄ($bcomment_c) ｲｲ!($bgood) ｲｸﾅｲ!($bbad)|;
+				print qq|<br>@bcomments| if @bcomments;
+				print qq|</td></tr>|;
+			}
 			print qq|</table><br>|;
 		}
 		++$count;
@@ -155,9 +169,14 @@ sub view_blog {
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが読み込めません");
 	while (my $line = <$fh>) {
 		$line =~ tr/\x0D\x0A//d;
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
+		my ($line1, $line2) = split /<<>>/, $line;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line1;
+		my ($bcomment_c,$bgood,$bbad) = split /<>/, $line2;
 		next if $bicon;
 		$bname .= "[$bshogo]" if $bshogo;
+		$bcomment_c = 0 unless $bcomment_c;
+		$bgood = 0 unless $bgood;
+		$bbad = 0 unless $bbad;
 		# 行数は増えるが三項演算子は重いイメージがあるので分割
 #		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
 		if ($is_mobile) {
@@ -176,7 +195,9 @@ sub view_blog {
 			print qq|<table class="blog_letter" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
-			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く</a><br>@bcomments</td></tr>| if $is_comment;
+			print qq|<tr><td><a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=comment_form">ｺﾒﾝﾄを書く($bcomment_c)</a> <a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=good">ｲｲ!($bgood)</a> <a href="?id=$in{id}&country=$in{country}&kiji=$btime&mode=bad">ｲｸﾅｲ!($bbad)</a>|;
+			print qq|<br>@bcomments| if $is_comment;
+			print qq|</td></tr>|;
 			print qq|</table><br>|;
 #			print qq|</div>| if $is_smart; # iPhoneはダメ
 		}
@@ -196,7 +217,8 @@ sub comment_form {
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが読み込めません");
 	while (my $line = <$fh>) {
 		$line =~ tr/\x0D\x0A//d;
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
+		my ($line1, $line2) = split /<<>>/, $line;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line1;
 		next if $bicon;
 		if ($in{kiji} eq $btime) {
 			$cline = $line;
@@ -207,14 +229,20 @@ sub comment_form {
 
 	if ($cline) {
 		print '以下の記事にｺﾒﾝﾄします<hr>';
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $cline;
+		my ($line1, $line2) = split /<<>>/, $cline;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line1;
+		my ($bcomment_c,$bgood,$bbad) = split /<>/, $line2;
 		$bname .= "[$bshogo]" if $bshogo;
+		$bcomment_c = 0 unless $bcomment_c;
+		$bgood = 0 unless $bgood;
+		$bbad = 0 unless $bbad;
 		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
 		if ($is_mobile) {
 			print qq|<br>$bdate|;
 			print qq|<hr>$baddr|;
 			print qq|<hr>$bcomment<br>|;
-			print qq|<hr>ｺﾒﾝﾄ<br>@bcomments| if @bcomments;
+			print qq|<hr>ｺﾒﾝﾄ($bcomment_c) ｲｲ!($bgood) ｲｸﾅｲ!($bbad)|;
+			print qq|<br>@bcomments| if @bcomments;
 			print qq|<hr><br>|;
 		}
 		else {
@@ -222,7 +250,8 @@ sub comment_form {
 			print qq|<table class="blog_letter" cellpadding="5">|;
 			print qq|<tr><th align="left">$baddr <font size="1">($bdate)</font><br></th></tr>|;
 			print qq|<tr><td>$bcomment<br></td></tr>|;
-			print qq|<tr><td>ｺﾒﾝﾄ<br>@bcomments</td></tr>| if @bcomments;
+			print qq|<tr><td>ｺﾒﾝﾄ($bcomment_c) ｲｲ!($bgood) ｲｸﾅｲ!($bbad)|;
+			print qq|<br>@bcomments</td></tr>| if @bcomments;
 			print qq|</table><br>|;
 		}
 	
@@ -278,11 +307,17 @@ sub comment_exe {
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		$line =~ tr/\x0D\x0A//d;
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line;
+		my ($line1, $line2) = split /<<>>/, $line;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line1;
+		my ($bcomment_c,$bgood,$bbad) = split /<>/, $line2;
+		$bcomment_c = 0 unless $bcomment_c;
+		$bgood = 0 unless $bgood;
+		$bbad = 0 unless $bbad;
 		if (!$bicon && $in{kiji} eq $btime) {
 			$is_rewrite = 1;
+			$bcomment_c++;
 			push @bcomments, qq|<><b>$m{name}</b>『$in{comment}』<font size="1">($date)</font><br>|;
-			$line = "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>@bcomments<>";
+			$line = "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>@bcomments<<>>$bcomment_c<>$bgood<>$bbad<>";
 
 			unless ($send_name eq $m{name}) {
 				# ｺﾒﾝﾄ手紙を送る 
@@ -364,4 +399,62 @@ sub delete_kiji {
 	close $fh;
 }
 
+#================================================
+# いいね わるいね
+#================================================
+sub good_bad {
+	my $good_bad = shift;
+	if ($in{id} eq '' || $in{kiji} eq '') {
+		print "やめました<br>";
+		return;
+	}
 
+	my $is_rewrite = 0;
+	my @lines = ();
+	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgiﾌｧｲﾙが開けません");
+	eval { flock $fh, 2; };
+	while (my $line = <$fh>) {
+		$line =~ tr/\x0D\x0A//d;
+		my ($line1,$line2)  = split /<<>>/, $line;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,@bcomments) = split /<>/, $line1;
+		my($bcomment_c,$bgood, $bbad) = split /<>/, $line2;
+		$bcomment_c = 0 unless $bcomment_c;
+		$bgood = 0 unless $bgood;
+		$bbad = 0 unless $bbad;
+		if (!$bicon && $in{kiji} eq $btime) {
+			$is_rewrite = 1;
+			if ($good_bad) {
+				$bgood++;
+			}
+			else {
+				$bbad++;
+			}
+			$line = "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>@bcomments<<>>$bcomment_c<>$bgood<>$bbad<>";
+		}
+		push @lines, "$line\n";
+	}
+	if ($is_rewrite) {
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh @lines;
+		close $fh;
+		if ($good_bad) {
+			print "ｲｲ!しました";
+		}
+		else {
+			print "ｲｸﾅｲ!しました";
+		}
+		&view_blog;
+	}
+	else {
+		close $fh;
+		close $lfh;
+		print "該当記事が見つかりません<br>";
+	}
+}
+sub good_exe {
+	&good_bad(1);
+}
+sub bad_exe {
+	&good_bad(0);
+}
