@@ -1286,7 +1286,7 @@ sub alltime_event {
 		}
 	}
 	if ( $w{world} eq '12' || ($w{world} eq '19' && $w{world_sub} eq '12') ) {
-		if (rand(2500) < 1) {
+		if (rand(5000) < 1) {
 			&disaster(1);
 			&write_cs;
 		}
