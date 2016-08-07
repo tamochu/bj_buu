@@ -236,6 +236,27 @@ sub neverland_to_random {
 #=================================================
 sub country_to_country {
 	return unless &is_move_from_country;
+	# 暗黒
+	if ($w{world} eq $#world_states) {
+		if ($m{country} eq $w{country}) {
+			$mes .= "$cs{name}[$m{country}]から抜け出すことは許されません<br>";
+			&begin;
+			return;
+		}
+		elsif ($cmd eq $w{country}) {
+			require './lib/vs_npc.cgi';
+			if ($need_money_npc > $m{money}) {
+				$mes .= "悪魔と契約するには $need_money_npc G必要です<br>";
+				&begin;
+				return;
+			}
+			elsif (!&is_move_npc_country) {
+				&begin;
+				return;
+			}
+			$need_money = $need_money_npc;
+		}
+	}
 
 	$m{money} -= $need_money;
 	$cs{money}[$m{country}] += $need_money;
@@ -256,7 +277,7 @@ sub country_to_country {
 	$mes .= "移籍の手続きに$GWT分かかります<br>" ;
 	&wait;
 
-	&mes_and_world_news("$cs{name}[$cmd]に仕官しました",1);
+	&mes_and_world_news("$cs{name}[$cmd]に仕官しました",1) unless $w{world} eq $#world_states;
 	&move_to_country;
 }
 
@@ -265,10 +286,33 @@ sub country_to_country {
 #=================================================
 sub neverland_to_country {
 	return unless &is_move_from_neverland;
+	# 暗黒
+	if ($w{world} eq $#world_states) {
+		if ($cmd eq $w{country}) {
+			require './lib/vs_npc.cgi';
+			if ($need_money_npc > $m{money}) {
+				$mes .= "悪魔と契約するには $need_money_npc G必要です<br>";
+				&begin;
+				return;
+			}
+			elsif (!&is_move_npc_country) {
+				&begin;
+				return;
+			}
+			$need_money = $need_money_npc;
+			$m{money} -= $need_money;
+			$mes .= "移籍料として $need_money G支払いました<br>";
+			$m{rank} = 1 if $m{rank} < 1;
+			my $rank_name = &get_rank_name($m{rank}, $m{name});
+			$mes .= "階級が$rank_nameになりました<br>";
+			$mes .= "移籍の手続きに$GWT分かかります<br>" ;
+			&wait;
+		}
+	}
 
 	&n_menu;
 
-	&mes_and_world_news("$cs{name}[$cmd]に仕官しました",1);
+	&mes_and_world_news("$cs{name}[$cmd]に仕官しました",1) unless $w{world} eq $#world_states;
 	&move_to_country;
 }
 
@@ -304,27 +348,6 @@ sub is_move_from_country {
 	elsif ($m{name} eq $m{vote}) {
 		$mes .= "$c_mの$e2j{ceo}の立候補を辞任する必要があります<br>";
 	}
-	# 暗黒
-	elsif ($w{world} eq $#world_states) {
-		if ($m{country} eq $w{country}) {
-			$mes .= "$cs{name}[$m{country}]から抜け出すことは許されません<br>";
-		}
-		elsif ($cmd eq $w{country}) {
-			require './lib/vs_npc.cgi';
-			if ($need_money_npc > $m{money}) {
-				$mes .= "悪魔と契約するには $need_money_npc G必要です<br>";
-			}
-			elsif (!&is_move_npc_country) {
-			}
-			else {
-				$need_money = $need_money_npc;
-				return 1;
-			}
-		}
-		else {
-			return 1;
-		}
-	}
 	# 混乱・紅白・三国志・拙速
 	elsif($w{world} eq $#world_states-1 || $w{world} eq $#world_states-2 || $w{world} eq $#world_states-3 || $w{world} eq $#world_states-5){
 		$mes .= $cmd == ($w{country} + 1) ? "国を離れることはできません<br>" : "国を裏切ることはできません<br>";
@@ -358,29 +381,6 @@ sub is_move_from_neverland {
 		$mes .= "$cs{name}[$cmd]は定員がいっぱいです<br>";
 		&begin;
 		return;
-	}
-	# 暗黒
-	elsif ($w{world} eq $#world_states) {
-		if ($cmd eq $w{country}) {
-			require './lib/vs_npc.cgi';
-			if ($need_money_npc > $m{money}) {
-				$mes .= "悪魔と契約するには $need_money_npc G必要です<br>";
-				&begin;
-				return;
-			}
-			elsif (!&is_move_npc_country) {
-				&begin;
-				return;
-			}
-			$need_money = $need_money_npc;
-			$m{money} -= $need_money;
-			$mes .= "移籍料として $need_money G支払いました<br>";
-			$m{rank} = 1 if $m{rank} < 1;
-			my $rank_name = &get_rank_name($m{rank}, $m{name});
-			$mes .= "階級が$rank_nameになりました<br>";
-			$mes .= "移籍の手続きに$GWT分かかります<br>" ;
-			&wait;
-		}
 	}
 
 	return 1;
