@@ -14,6 +14,7 @@ $this_radio_dir = "$logdir/summer_radio";
 #    cmd, ¤•i, ‹àŠz
 	[1, 'H‚×•¨', 100000],
 	[2, 'µÊŞ¹¾¯Ä', 100000],
+	[3, '¾Ğ', 50000],
 );
 
 # –é“X‚Å”ƒ‚¦‚é‚à‚Ì
@@ -315,15 +316,16 @@ sub tp_210 {
 			$index++;
 		}
 	}
-	elsif ($cmd == 2) {
+	elsif ($cmd > 1) {
 		if ($m{pet} == 0) {
 			my $money = $shop_list[$cmd-1][2];
 			if ($m{money} >= $money) {
+				my $pet_index = $cmd*-1+1;
 				$m{money} -= $money;
-				$m{pet} = $pets[-1][0];
-				$m{pet_c} = $pets[-1][5];
+				$m{pet} = $pets[$pet_index][0];
+				$m{pet_c} = $pets[$pet_index][5];
 				$mes .= '‚æ‚­—‡‚Á‚Ä‚é‚ºII<br>';
-				my $v = int(rand(100) + 1);
+				my $v = int(rand($money*0.001) + 1);
 				$m{pop_vote} += $v;
 				$mes .= "“Š•[Œ ‚ğ$v–‡‚à‚ç‚Á‚½‚æ";
 			}

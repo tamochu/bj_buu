@@ -662,8 +662,10 @@ require './lib/system_game.cgi';
 	# 追加する度に profile.cgi の collection_pars関数 や myself_collection.cgi を書き換えないとｺﾚｸｼｮﾝとしてｶｳﾝﾄされてしまうので注意
  	#[0]No,	[1]名前,	[2]発動,		[3]処理,	[4]誕生セリフ	[5]使用回数
 # 	[-2,		'ﾕｰﾚｲ',	'no_ambush',	sub{},'ねないこだれだ'], # war.cgiに埋め込み処理
- 	[-1,		'ﾕｰﾚｲ',	'no_ambush',	sub{},'ねないこだれだ', 5], # war.cgiに埋め込み処理
+ 	[-2,		'ｾﾐ',	'myself',	sub{ $m{cicada_sound} = int( $time + 3600 * 3 ); },'', 1], # war.cgiに埋め込み処理
+ 	[-1,		'ﾕｰﾚｲ',	'no_ambush',	sub{},'', 5], # war.cgiに埋め込み処理
  );
+	$m{next_salary} = int( $time + 3600 * $salary_hour );
  
  
  #=================================================

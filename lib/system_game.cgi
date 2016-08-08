@@ -162,7 +162,7 @@ sub write_user {
 	close $fh;
 
 	if (&on_summer) {
-		my @keys2 = (qw/radio_time pop_vote blog_time morning_glory morning_glory_time summer_blog dummy/);
+		my @keys2 = (qw/radio_time pop_vote blog_time morning_glory morning_glory_time summer_blog cicada_sound dummy/);
 		my $line2;
 		for my $k (@keys2) {
 			$line2 .= "$k;$m{$k}<>";
@@ -565,8 +565,12 @@ sub mes_and_send_news {
 #sub write_world_news     { &_write_news('world_news', @_) }
 sub write_world_news     {
 	my($message, $is_memory, $memory_name) = @_;
+	if ($m{cicada_sound} > $time) {
+		my @cicada_sounds = ('ﾐｰｰｰｰｰﾝﾐﾝﾐﾝﾐﾝﾐﾝﾐｰｰｰｰｰｰｰｰｰﾝﾐｰｰｰｰｰﾝﾐﾝﾐﾝﾐﾝﾐﾝﾐｰｰｰｰｰｰｰｰｰﾝ', 'ｼﾞ…ｼﾞ…ｼﾞーーーーーーーーーｼﾞーーーーーーーーーｼﾞーーーーーーーーー','ﾂｸﾂｸﾎﾞｫｵｵｰｰｰｰｼｯ　ﾂｸﾂｸﾎﾞｫｵｵｰｰｰｰｼｯ　ﾂｸﾂｸｳｨーﾖー-ｯ　ﾂｸｳｨーﾖー-ｯ　ﾂｸｳｨーﾖー-ｯ　ﾂｸｳｨーﾖー-ｯ　ｳｨｨｨｲｲｲｲｲｲｨｨｨｨｨｨーーーーー……………');
+		$message = $cicada_sounds[int(rand(@cicada_sounds))];
+	}
 	if ($w{world} ne '10' || $message =~ /^</) { # ”世界情勢【沈黙】以外”または大きな出来事
-		&_write_news('world_news', @_);
+		&_write_news('world_news', ($message, $is_memory, $memory_name));
 	}
 	elsif ($is_memory) { # 世界情勢【沈黙】で戦歴フラグがあった場合
 		$message = &coloration_country($message);
