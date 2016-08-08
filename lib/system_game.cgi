@@ -119,7 +119,7 @@ sub write_user {
 	# -------------------
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可(login_time以外))
 	my @keys = (qw/
-		login_time ldate start_time name pass lib tp wt act sex shogo sedai vote
+		login_time ldate start_time name pass lib tp wt act sex shogo sedai vote vote_year
 		country job seed lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
 		max_hp hp max_mp mp at df mat mdf ag cha lea wea wea_c wea_lv wea_name gua egg egg_c pet pet_c shuffle master master_c boch_pet
 		marriage lot is_full next_salary icon mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time

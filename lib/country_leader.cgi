@@ -24,6 +24,11 @@ sub is_satisfy {
 
 #=================================================
 sub begin {
+	if ( $m{vote_year} && $w{year} ne $m{vote_year} && (abs($w{year} - $m{vote_year}) >= $reset_ceo_cycle_year || $w{year} % $reset_ceo_cycle_year <= $m{vote_year} % $reset_ceo_cycle_year) ) {
+		$m{vote} = '';
+		$m{vote_year} = $w{year};
+	}
+
 	if ($m{tp} > 1) {
 		$mes .= "他に何か行いますか?<br>";
 		$m{tp} = 1;
@@ -49,6 +54,7 @@ sub tp_100 {
 	if (!-s $this_file) {
 		$mes .= '立候補者がいません<br>';
 		$m{vote} = '';
+		$m{vote_year} = $w{year};
 		&begin;
 		return;
 	}
@@ -70,6 +76,7 @@ sub tp_100 {
 	# 国データ上で立候補していないかつ個人データ上で立候補していた場合には立候補を取り消す
 	if (!$is_find2 && $m{name} eq $m{vote}) {
 		$m{vote} = '';
+		$m{vote_year} = $w{year};
 	}
 	$mes .= qq|$m{vote} を支持しています<br>| if $is_find;
 	$mes .= qq|<form method="$method" action="$script">|;
@@ -137,6 +144,7 @@ sub tp_110 {
 	}
 	
 	$m{vote} = $in{vote};
+	$m{vote_year} = $w{year};
 	$mes .= $in{vote} ? "$m{vote}を支持します<br>" : '支持するのをやめました<br>';
 	
 	&begin;
@@ -190,6 +198,7 @@ sub tp_210 {
 	$mes .= "$e2j{ceo}に立候補しました<br>";
 	&write_world_news("<b>$m{name}が$c_mの$e2j{ceo}に立候補しました</b>",1);
 	$m{vote} = $m{name};
+	$m{vote_year} = $w{year};
 	$m{money} -= $need_money;
 	&begin;
 }
@@ -225,6 +234,7 @@ sub tp_310 {
 	close $fh;
 	$mes .= '立候補から辞任しました<br>';
 	$m{vote} = '';
+	$m{vote_year} = $w{year};
 
 	# 代表者が辞任
 	if ($cs{ceo}[$m{country}] eq $m{name}) {
