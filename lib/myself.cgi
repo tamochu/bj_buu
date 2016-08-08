@@ -167,7 +167,12 @@ sub tp_1 {
 			}
 			if($use_flag){
 				&{ $pets[$m{pet}][3] };
-				$mes .= "役目を終えた $pets[$m{pet}][1]★$m{pet_c} は光の彼方へ消えていった…<br>$pets[$m{pet}][1]★$m{pet_c}　ﾉｼ<br>";
+				if ($m{pet} > 0) {
+					$mes .= "役目を終えた $pets[$m{pet}][1]★$m{pet_c} は光の彼方へ消えていった…<br>$pets[$m{pet}][1]★$m{pet_c}　ﾉｼ<br>";
+				}
+				else {
+					$mes .= "役目を終えた $pets[$m{pet}][1] は光の彼方へ消えていった…<br>$pets[$m{pet}][1]　ﾉｼ<br>";
+				}
 				$m{pet} = 0;
 			}
 		}
