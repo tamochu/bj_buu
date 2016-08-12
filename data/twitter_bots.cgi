@@ -1,3 +1,5 @@
+use POSIX qw(ceil);
+
 @twitter_bots = (
 	sub {
 		# ‚à‚µ‚àbot
@@ -67,6 +69,7 @@
 	sub {
 		# à–¾‘bot
 		@strs = (
+			"Ÿ‚Ì“Áêî¨‚Í",
 			"Œo‰cÒ‚ÌŠ‹à‚ªƒ}ƒCƒiƒXA‘—a‹àŠz‚ª100–œG–¢–AŒÚ‹q‚Ì—a‚¯‚½‰ñ”‚ª5‰ñ–¢–‚Å‹âs‚ª’×‚ê‚Ü‚·",
 			"Îß¯Îß‚ğŒNå‚ª‚Â‚Æ“ÁêŒø‰Ê‚ğ”­“®‚Å‚«‚é‚æ‚¤‚É‚È‚è‚Ü‚·",
 			"ÀŞ°¸×ËŞ¯Ä‚Íš‚ğã‚°‚é‚ÆÁ–Å‚·‚éŠm—¦‚ª‰º‚ª‚è‚Ü‚·",
@@ -80,7 +83,22 @@
 			"Šv–½‚Í’D‘—Í‚ªÅ‘å7.5”{‚É‚à‚È‚è‚Ü‚·",
 			"”’•º‚Í’D‘—Í‚ª1.2”{‚É‚È‚è‚Ü‚·",
 			);
-		return $strs[int(rand(@strs))];
+		my $i = int(rand(@strs));
+		if ($i == 0) {
+			if ($w{year} - int($w{year}*0.1)*10 > 5) {
+				my @festival_world = ("g”’", 24, "Ù‘¬", 21, "O‘u", 23, "¬—", 25);
+				my $year = ceil(($w{year}+0.5)*0.1)*10;
+				my $world = $year%40*0.1*2;
+				$strs[$i] .= "$year”N‚Ì <a href=\"world_summaries.cgi?id=$id&pass=$pass&world=$festival_world[$world+1]\" class=\"clickable_name\"><b>$festival_world[$world]</b></a> ‚Å‚·";
+			}
+			else {
+				my $year = int($w{year}*0.1)*10+6;
+				$strs[$i] .= ($year =~ /16$/ || $w{year} =~ /36$/ || $year =~ /56$/ || $year =~ /76$/ || $year =~ /96$/) ?
+					"$year”N‚Ì <a href=\"world_summaries.cgi?id=$id&pass=$pass&world=26\" class=\"clickable_name\"><b>ˆÃ•</b></a> ‚Å‚·" :
+					"$year”N‚Ì <a href=\"world_summaries.cgi?id=$id&pass=$pass&world=22\" class=\"clickable_name\"><b>‰p—Y</b></a> ‚Å‚·";
+			}
+		}
+		return $strs[$i];
 	},
 	sub {
 		# •½‹Ï‘Šêbot
