@@ -188,7 +188,7 @@ sub tp_200 {
 }
 sub tp_210 {
 	return if &is_ng_cmd(1..4);
-	if ($m{wea_name}) {
+	if ($cmd eq '1' && $m{wea_name}) {
 		$mes .= "—Bˆê–³“ñ‚Ì•Ší‚ğ—a‚¯‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
 		&begin;
 		return;
