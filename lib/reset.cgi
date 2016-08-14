@@ -226,28 +226,32 @@ sub is_festival_world {
 #================================================
 sub choice_unique_world {
 	my @new_worlds = @_;
-	open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
-	my $line = <$fh>;
-	close $fh;
-	my @old_worlds = split /<>/, $line;
-	my @next_worlds = ();
-	for my $new_v (@new_worlds){
-		my $old_year = 0;
-		my $old_flag = 0;
-		for my $o (@old_worlds){
-			last if $old_year > 10;
-			if ($new_v == $o){
-				$old_flag = 1;
-				last;
-			}
-			$old_year++;
-		}
-		push @next_worlds, $new_v unless $old_flag;
+	if ($#new_worlds == 0 && $new_worlds[$#new_worlds] == 0) {
+		return ( 0, int(rand($#world_states-5)) );
 	}
-
-	# 重複するものばかりだった場合には「平和」になるようになっていたが「謎」の方が適当かと
-	return ( $next_worlds[int(rand(@next_worlds))], int(rand($#world_states-5)) ) if @next_worlds;
-	return ( 19, int(rand($#world_states-5)) );
+	else {
+		open my $fh, "< $logdir/world_log.cgi" or &error("$logdir/world_log.cgiが開けません");
+		my $line = <$fh>;
+		close $fh;
+		my @old_worlds = split /<>/, $line;
+		my @next_worlds = ();
+		for my $new_v (@new_worlds){
+			my $old_year = 0;
+			my $old_flag = 0;
+			for my $o (@old_worlds){
+				last if $old_year > 10;
+				if ($new_v == $o){
+					$old_flag = 1;
+					last;
+				}
+				$old_year++;
+			}
+			push @next_worlds, $new_v unless $old_flag;
+		}
+		# 重複するものばかりだった場合には「平和」になるようになっていたが「謎」の方が適当かと
+		return ( $next_worlds[int(rand(@next_worlds))], int(rand($#world_states-5)) ) if $#next_worlds > -1;
+		return ( 19, int(rand($#world_states-5)) );
+	}
 }
 
 #================================================
