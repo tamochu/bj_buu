@@ -164,6 +164,12 @@ sub framework {
 #================================================
 sub status_html {
 	my $head_mes = '';
+	if (-f "$userdir/$id/emergency.cgi") {
+		open my $fh, "< $userdir/$id/emergency.cgi";
+		my $line = <$fh>;
+		close $fh;
+		$head_mes .= qq|<font color="#FF0000">$line</font><br>|;
+	}
 	if (-f "$userdir/$id/letter_flag.cgi") {
 		open my $fh, "< $userdir/$id/letter_flag.cgi";
 		my $line = <$fh>;

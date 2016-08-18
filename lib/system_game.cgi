@@ -1869,4 +1869,31 @@ sub twitter_bot {
 #	&write_cs;
 }
 
+#================================================
+# ‹Ù‹}Ò¯¾°¼Ş
+#================================================
+sub createEmergency {
+	my ($p_name, $e_mes) = @_;
+	my $p_id = unpack 'H*', $p_name;
+	&error("$p_name‚Æ‚¢‚¤ÌßÚ²Ô°‚ª‘¶İ‚µ‚Ü‚¹‚ñ") unless -f "$userdir/$p_id/user.cgi";
+
+	my $emergency_file = "$userdir/$p_id/emergency";
+
+	# ´Ï°¼Şªİ¼°Ì×¸Ş‚ğ—§‚Ä‚é
+	open my $fh, "> $emergency_file.cgi";
+	print $fh $e_mes;
+	close $fh;
+}
+sub deleteEmergency {
+	my $p_name = shift;
+	my $p_id = unpack 'H*', $p_name;
+	&error("$p_name‚Æ‚¢‚¤ÌßÚ²Ô°‚ª‘¶İ‚µ‚Ü‚¹‚ñ") unless -f "$userdir/$p_id/user.cgi";
+
+	my $emergency_file = "$userdir/$p_id/emergency";
+	if (-f "$emergency_file.cgi") {
+		unlink "$emergency_file.cgi";
+	}
+}
+
+
 1; # íœ•s‰Â

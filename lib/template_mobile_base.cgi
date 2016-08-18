@@ -110,6 +110,12 @@ sub status_html {
 # è†A‰×•¨Áª¯¸
 #================================================
 sub check_flag {
+	if (-f "$userdir/$id/emergency.cgi") {
+		open my $fh, "< $userdir/$id/emergency.cgi";
+		my $line = <$fh>;
+		close $fh;
+		print qq|<hr><font color="#FF0000">$line</font><br>|;
+	}
 	if (-f "$userdir/$id/letter_flag.cgi") {
 		open my $fh, "< $userdir/$id/letter_flag.cgi";
 		my $line = <$fh>;
