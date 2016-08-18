@@ -1,4 +1,5 @@
 my $this_file = "$userdir/$id/depot.cgi";
+my $this_log = "$userdir/$id/depot_log.cgi";
 my $this_lock_file = "$userdir/$id/depot_lock.cgi";
 #=================================================
 # —a‚©‚èŠ Created by Merino
@@ -52,10 +53,10 @@ sub begin {
 		$mes .= "‚Ç‚¤‚µ‚Ü‚·‚©?<br>";
 	}
 	&depot_common;
-	&menu('‚â‚ß‚é', 'ˆøo‚·', '—a‚¯‚é', '®—‚·‚é', '‘Šè‚É‘—‚é', 'ˆêŠ‡”„‹p', 'Ì‚Ä‚é', 'ƒƒbƒN‚ğ‚©‚¯‚é');
+	&menu('‚â‚ß‚é', 'ˆøo‚·', '—a‚¯‚é', '®—‚·‚é', '‘Šè‚É‘—‚é', 'ˆêŠ‡”„‹p', 'Ì‚Ä‚é', 'ƒƒbƒN‚ğ‚©‚¯‚é', '—š—ğ');
 }
 sub tp_1 {
-	return if &is_ng_cmd(1..7);
+	return if &is_ng_cmd(1..8);
 	
 	$m{tp} = $cmd * 100;
 	&{ 'tp_'. $m{tp} };
@@ -84,6 +85,7 @@ sub tp_110 {
 		my $add_line = '';
 		my $depot_line = '';
 		my @lines = ();
+		my $l_mes = "";
 		open my $fh, "+< $this_file" or &error("$this_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
@@ -101,22 +103,21 @@ sub tp_110 {
 						$m{wea_lv} = 0;
 						$mes .= "‚¿å‚Ìè‚ğ—£‚ê‚½“r’[$m{wea_name}‚Í‚½‚¾‚Ì$weas[$m{wea}][1]‚É‚È‚Á‚Ä‚µ‚Ü‚Á‚½<br>";
 						$m{wea_name} = "";
-
 					}
 					$add_line = "$kind<>$m{wea}<>$m{wea_c}<>$m{wea_lv}<>\n";
-					$mes .= "$weas[$m{wea}][1]‚ğ—a‚¯";
+					$mes .= $l_mes = "$weas[$m{wea}][1]‚ğ—a‚¯";
 				}
 				elsif ($kind eq '2' && $m{egg}) {
 					$add_line = "$kind<>$m{egg}<>$m{egg_c}<>0<>\n";
-					$mes .= "$eggs[$m{egg}][1]‚ğ—a‚¯";
+					$mes .= $l_mes = "$eggs[$m{egg}][1]‚ğ—a‚¯";
 				}
 				elsif($kind eq '3' && $m{pet} > 0) {
 					$add_line = "$kind<>$m{pet}<>$m{pet_c}<>0<>\n";
-					$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğ—a‚¯";
+					$mes .= $l_mes = "$pets[$m{pet}][1]š$m{pet_c}‚ğ—a‚¯";
 				}
 				elsif($kind eq '4' && $m{gua}) {
 					$add_line = "$kind<>$m{gua}<>0<>0<>\n";
-					$mes .= "$guas[$m{gua}][1]‚ğ—a‚¯";
+					$mes .= $l_mes = "$guas[$m{gua}][1]‚ğ—a‚¯";
 				}
 			}
 			else {
@@ -137,35 +138,36 @@ sub tp_110 {
 				$m{wea_c}  = $item_c;
 				$m{wea_lv} = $item_lv;
 				$mes .= "$weas[$m{wea}][1]‚ğˆøo‚µ‚Ü‚µ‚½<br>";
-				$s_mes = "$weas[$m{wea}][1]ˆøo‚µ";
+				$l_mes .= $s_mes = "$weas[$m{wea}][1]";
 			}
 			elsif ($kind eq '2') {
 				$m{egg}    = $item_no;
 				$m{egg_c}  = $item_c;
 				$mes .= "$eggs[$m{egg}][1]‚ğˆøo‚µ‚Ü‚µ‚½<br>";
-				$s_mes = "$eggs[$m{egg}][1]ˆøo‚µ";
+				$l_mes .= $s_mes = "$eggs[$m{egg}][1]";
 			}
 			elsif ($kind eq '3') {
 				$m{pet}    = $item_no;
 				$m{pet_c}  = $item_c;
 				$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğˆøo‚µ‚Ü‚µ‚½<br>";
-				$s_mes = "$pets[$m{pet}][1]š$m{pet_c}ˆøo‚µ";
+				$l_mes .= $s_mes = "$pets[$m{pet}][1]š$m{pet_c}";
 			}
 			elsif ($kind eq '4') {
 				$m{gua}    = $item_no;
 				$mes .= "$guas[$m{gua}][1]‚ğˆøo‚µ‚Ü‚µ‚½<br>";
-				$s_mes = "$guas[$m{gua}][1]ˆøo‚µ";
+				$l_mes .= $s_mes = "$guas[$m{gua}][1]";
 			}
 			my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..4];
 			$tdate = sprintf("%d/%d %02d:%02d", $tmon+1,$tmday,$thour,$tmin);
-			$s_mes .= " ($tdate)";
-			
+			$s_mes .= "ˆøo‚µ ($tdate)";
 			if(-f "$userdir/$id/depot_watch.cgi"){
 				open my $wfh, ">> $userdir/$id/depot_watch.cgi";
 				print $wfh "$s_mes<>$depot_line\n";
 				close $wfh;
 			}
 			&penalty_depot($count);
+
+			&add_log("ˆøo", $l_mes);
 
 			# ˆøo‚·À²Ğİ¸Ş‚ÅV‚µ‚¢±²ÃÑ‚ª‚ ‚ê‚ÎºÚ¸¼®İ‚É’Ç‰Á
 			require './lib/add_collection.cgi';
@@ -227,6 +229,7 @@ sub tp_210 {
 		$m{is_full} = 1;
 	}
 	else {
+		my $l_mes = "";
 		push @lines, $line;
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
@@ -240,22 +243,28 @@ sub tp_210 {
 				$m{wea_name} = "";
 			}
 			$mes .= "$weas[$m{wea}][1]‚ğ—a‚¯‚Ü‚µ‚½<br>";
+			$l_mes = "$weas[$m{wea}][1]";
 			$m{wea} = $m{wea_c} = $m{wea_lv} = 0;
 		}
 		elsif ($cmd eq '2') {
 			$mes .= "$eggs[$m{egg}][1]‚ğ—a‚¯‚Ü‚µ‚½<br>";
+			$l_mes = "$eggs[$m{egg}][1]";
 			$m{egg} = $m{egg_c} = 0;
 		}
 		elsif ($cmd eq '3') {
 			$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğ—a‚¯‚Ü‚µ‚½<br>";
+			$l_mes = "$pets[$m{pet}][1]š$m{pet_c}";
 			$m{pet} = 0;
 		}
 		elsif ($cmd eq '4') {
 			$mes .= "$guas[$m{gua}][1]‚ğ—a‚¯‚Ü‚µ‚½<br>";
+			$l_mes = "$guas[$m{gua}][1]";
 			$m{gua} = 0;
 		}
 		
 		$m{is_full} = 1 if @lines >= $max_depot;
+
+		&add_log("—a“ü", $l_mes);
 	}
 	&begin;
 }
@@ -466,6 +475,7 @@ sub tp_510 {
 	my $is_rewrite = 0;
 	my @junk = ();
 	my @junk_log = ();
+	my @depot_log = ();
 	my %lock = &get_lock_item;
 	open my $fh, "+< $this_file" or &error("$this_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
@@ -477,9 +487,11 @@ sub tp_510 {
 				push @lines, $line;
 			} else {
 				$is_rewrite = 1;
-				
+
 				# Íß¯Ä‚¾‚¯šî•ñ’Ç‹L ‘¼‚Í–¼‘O‚¾‚¯
-				$mes .= &get_item_name($kind, $item_no, $item_c)."‚ğ”„‚è‚Ü‚µ‚½<br>";
+				my $l_mes = &get_item_name($kind, $item_no, $item_c);
+				push @depot_log, "$l_mes";
+				$mes .= "$l_mes‚ğ”„‚è‚Ü‚µ‚½<br>";
 				$item_c = 0 if $kind eq '3'; # ¼Ş¬İ¸‚ÉÍß¯Ä‚ğ—¬‚·‚ÍƒŒƒxƒ‹‚ğ‰Šú‰»
 				$m{money} += $sall_price;
 
@@ -512,6 +524,7 @@ sub tp_510 {
 		close $fh3;
 	}
 	close $fh;
+	&add_log("”„‹p", @depot_log) if $is_rewrite;
 	&begin;
 }
 
@@ -534,6 +547,7 @@ sub tp_610 {
 	my $count = 0;
 	my $is_rewrite = 0;
 	my %lock = &get_lock_item;
+	my $l_mes = "";
 	open my $fh, "+< $this_file" or &error("$this_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
@@ -546,7 +560,8 @@ sub tp_610 {
 				$is_rewrite = 1;
 
 				# Íß¯Ä‚¾‚¯šî•ñ’Ç‹L ‘¼‚Í–¼‘O‚¾‚¯
-				$mes .= &get_item_name($kind, $item_no, $item_c)."‚ğÌ‚Ä‚Ü‚µ‚½<br>";
+				$l_mes = &get_item_name($kind, $item_no, $item_c);
+				$mes .= "$l_mes‚ğÌ‚Ä‚Ü‚µ‚½<br>";
 			}
 		}
 		else {
@@ -559,6 +574,7 @@ sub tp_610 {
 		print $fh @lines;
 	}
 	close $fh;
+	&add_log("”jŠü", $l_mes) if $is_rewrite;
 	&begin;
 }
 
@@ -600,6 +616,21 @@ sub tp_710 {
 		}
 	}
 	close $lfh;
+	&begin;
+}
+
+#=================================================
+# —š—ğ
+#=================================================
+sub tp_800 {
+	if (-f "$this_log") {
+		my @lines = ();
+		open my $fh, "< $this_log" or &error("$this_log‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		while (my $line = <$fh>){
+			$mes .= "$line<br>";
+		}
+		close $fh;
+	}
 	&begin;
 }
 
@@ -762,4 +793,46 @@ sub depot_common {
 	}
 	close $fh;
 }
+
+#=================================================
+# ‘qŒÉÛ¸Ş
+# add_log("”„‚è‚Ü‚µ‚½", "item1"[, "item2", "item3"])
+#=================================================
+sub add_log {
+	my $type = shift;
+	my @items = @_;
+
+	my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..4];
+	$tdate = sprintf("%d/%d %02d:%02d", $tmon+1,$tmday,$thour,$tmin);
+	my $s_mes = "";
+	for my $item (@items) {
+		$s_mes .= "$item";
+		$s_mes .= "," if @items > 1;
+	}
+	$s_mes = substr($s_mes, 0,  -1) if @items > 1;
+	$s_mes .= "‚ğ$type($tdate)";
+
+	if (-f $this_log) {
+		open my $wfh, "+< $this_log";
+		eval { flock $wfh, 2; };
+		my @log_lines = ();
+		my $log_count = 0;
+		while (my $log_line = <$wfh>){ 
+			push @log_lines, $log_line;
+			$log_count++;
+			last if $log_count > 30;
+		}
+		unshift @log_lines, "$s_mes\n";
+		seek  $wfh, 0, 0;
+		truncate $wfh, 0;
+		print $wfh @log_lines;
+		close $wfh;
+	}
+	else {
+		open my $wfh, "> $this_log";
+		print $wfh "$s_mes\n";
+		close $wfh;
+	}
+}
+
 1; # íœ•s‰Â
