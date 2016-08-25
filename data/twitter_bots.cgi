@@ -89,13 +89,13 @@ use POSIX qw(ceil);
 				my @festival_world = ("g”’", 24, "Ù‘¬", 21, "O‘u", 23, "¬—", 25);
 				my $year = ceil(($w{year}+0.5)*0.1)*10;
 				my $world = $year%40*0.1*2;
-				$strs[$i] .= "$year”N‚Ì <a href=\"world_summaries.cgi?id=$id&pass=$pass&world=$festival_world[$world+1]\" class=\"clickable_name\"><b>$festival_world[$world]</b></a> ‚Å‚·";
+				$strs[$i] .= "$year”N‚Ì$festival_world[$world]‚Å‚·";
 			}
 			else {
 				my $year = int($w{year}*0.1)*10+6;
 				$strs[$i] .= ($year =~ /16$/ || $w{year} =~ /36$/ || $year =~ /56$/ || $year =~ /76$/ || $year =~ /96$/) ?
-					"$year”N‚Ì <a href=\"world_summaries.cgi?id=$id&pass=$pass&world=26\" class=\"clickable_name\"><b>ˆÃ•</b></a> ‚Å‚·" :
-					"$year”N‚Ì <a href=\"world_summaries.cgi?id=$id&pass=$pass&world=22\" class=\"clickable_name\"><b>‰p—Y</b></a> ‚Å‚·";
+					"$year”N‚ÌˆÃ•‚Å‚·" :
+					"$year”N‚Ì‰p—Y‚Å‚·";
 			}
 		}
 		return $strs[$i];
