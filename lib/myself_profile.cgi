@@ -30,6 +30,7 @@ sub begin {
 		my $boch_pet = $m{sex} eq '1' ? '脳内嫁' : 'ﾏｽｺｯﾄｷｬﾗ';
 		$mes .= qq|<hr>$boch_pet<br><input type="text" name="boch_pet" value="$m{boch_pet}" class="text_box_b"><br>|; 
 	}
+	$mes .= qq|<hr>メールアドレス（手紙の受信通知に利用）<br><input type="text" name="mail_address" value="$m{mail_address}" class="text_box_b"><br>|; 
 #	if ($w{world} eq $#world_states-4) {
 #		require './lib/fate.cgi';
 #		$mes .= &regist_mes(0);
@@ -89,6 +90,19 @@ sub tp_1 {
 			}
 			$m{boch_pet} = $in{boch_pet};
 			$mes .= $m{sex} eq '1' ? '脳内嫁に名前を付けました<br>':'ﾏｽｺｯﾄｷｬﾗに名前を付けました<br>';
+		}
+		unless ($in{mail_address} eq $m{mail_address}) {
+			if ($in{mail_address} =~ /^[^@]+@[^.]+\..+/) {
+				$m{mail_address} = $in{mail_address};
+				$mes .= 'メールアドレスを設定しました<br>';
+			}
+			elsif ($in{mail_address} eq '') {
+				$m{mail_address} = '';
+				$mes .= 'メールアドレスを削除しました<br>';
+			}
+			else {
+				&error("入力されたメールアドレスが正しくありません");
+			}
 		}
 	}
 	else {

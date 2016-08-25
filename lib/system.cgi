@@ -5,6 +5,8 @@ use Time::Local;
 use LWP::UserAgent;
 use lib q(./lib);
 use FlockWrapper(flock => 'mkdir', dir => './lock');
+use MIME::Base64;
+use Encode;
 
 #================================================
 # ﾒｲﾝでよく使う処理 Created by Merino
@@ -186,6 +188,46 @@ sub send_letter {
 		my $line = <$fh>;
 		($letters) = split /<>/, $line;
 		close $fh;
+	}
+	else {
+		my %you_datas = &get_you_datas($send_id, 1);
+		if ($you_datas{mail_address} =~ /^[^@]+@[^.]+\..+/) {
+			my $sendmail = '/usr/sbin/sendmail';
+			my $from = 'Blind Justice にゃあ鯖';
+			my $to = $you_datas{mail_address};
+			my $cc = '';
+			my $subject = '手紙が届きました';
+			my $msg = <<"EOS";
+$nameさん宛てに手紙が届いています。
+----------------------------------------
+Blind Justice にゃあ鯖
+http://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi
+
+※このメールは手紙の受信通知です。返信しても相手ユーザーには届きません。
+※このメールに心当たりがない場合は、お手数ですがこのメールへの返信にてお問い合わせください。
+また、今後このメールを受け取らない場合は、ログイン→マイルーム→自己紹介の「メールアドレス（手紙の受信通知に利用）」の項目を空に変更してください。
+----------------------------------------
+EOS
+
+			$subject = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $subject));
+			$subject = encode_base64($subject, '');
+			$subject = "=?ISO-2022-JP?B?$subject?=";
+			$from = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $from));
+			$from = encode_base64($from, '');
+			$from = "=?ISO-2022-JP?B?$from?= <nyaa\@pandora.nu>";
+			$msg = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $msg));
+			
+			open(SDML,"| $sendmail -i -f nyaa\@pandora.nu $to") || die 'sendmail error';
+			print SDML "From: $from\n";
+			print SDML "To: nyaa\@pandora.nu\n";
+			print SDML "Cc: $cc\n";
+			print SDML "Subject: $subject\n";
+			print SDML "MIME-Version: 1.0\n";
+			print SDML "Content-Type: text/plain; charset=ISO-2022-JP\n";
+			print SDML "Content-Transfer-Encoding: 7bit\n\n";
+			print SDML "$msg";
+			close(SDML);
+		}
 	}
 	$letters++;
 	
