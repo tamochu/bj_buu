@@ -13,7 +13,7 @@ require 'config_game.cgi';
 my $this_vote_file = "$logdir/pop_vote.cgi";
 my $this_file = "$logdir/pop_vote_result_middle.cgi";
 
-my $end_time = &date_to_time('2015-09-01');
+my $end_time = &date_to_time('2016-09-01');
 if ($time > $end_time && (stat $this_file)[9] < $end_time) {
 	&update_pop_ranking;
 }

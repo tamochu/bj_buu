@@ -13,10 +13,11 @@ require 'config_game.cgi';
 my $this_vote_file = "$logdir/pop_vote2.cgi";
 my $this_file = "$logdir/pop_vote2_result.cgi";
 
-my $end_time = &date_to_time('2015-09-01');
+my $end_time = &date_to_time('2016-09-01');
 if (!(-f "$this_file") || ($time > $end_time && (stat $this_file)[9] < $end_time)) {
 	&update_pop_ranking;
 }
+#	&update_pop_ranking;
 
 if ($time > $end_time) {
 	&run;
@@ -84,8 +85,9 @@ sub update_pop_ranking  {
 	for my $name (keys(%ranks)) {
 		my $p_id = unpack 'H*', $name;
 		my %p = &get_you_datas($p_id, 1);
-		my $rank_name = &get_rank_name($p{rank}, $name);
-		push @lines, "$name<>$rank_name<>$p{country}<>\n";
+#		my $rank_name = &get_rank_name($p{rank}, $name);
+#		push @lines, "$name<>$rank_name<>$p{country}<>\n";
+		push @lines, "$name<>$ranks{$name}<>$p{country}<>\n";
 	}
 	# •[‚ª‘½‚¢‡‚É•À‚Ñ‘Ö‚¦
 	@lines = map { $_->[0] } sort { $b->[2] <=> $a->[2]  } map { [$_, split/<>/] } @lines;

@@ -50,8 +50,8 @@ sub index {
 		['主力表\2', 'main_player2.cgi'],
 		['一年ﾗﾝｷﾝｸﾞ', 'year_player_ranking.cgi'],
 		['国別ﾗﾝｷﾝｸﾞ', 'year_player_ranking_country.cgi'],
-#		['人気ﾗﾝｷﾝｸﾞ(金)', 'pop_ranking_gold.cgi'], # データなし
-#		['人気ﾗﾝｷﾝｸﾞ(銀)', 'pop_ranking_middle.cgi'], # データなし
+		['人気ﾗﾝｷﾝｸﾞ(金)', 'pop_ranking_gold.cgi'], # データなし
+		['人気ﾗﾝｷﾝｸﾞ(銀)', 'pop_ranking_middle.cgi'], # データなし
 		['図書館', 'library.cgi'],
 		['相場', 'shop_big_data.cgi'],
 		['画像掲示板', '../upbbs/imgboard.cgi'],
