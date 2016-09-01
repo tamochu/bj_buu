@@ -619,7 +619,7 @@ sub modify_country {
 		for my $i (1..$w{country}) {
 			$cs{color}[$i] = $in{"color_" . $i};
 			$cs{name}[$i] = $in{"name_" . $i};
-			for my $k (qw/strong food money soldier tax state/) {
+			for my $k (qw/strong food money soldier tax state is_die/) {
 				$cs{$k}[$i] = $in{$k . "_" . $i};
 				if ($cs{$k}[$i] =~ /[^0-9]/ || $cs{$k}[$i] < 0) {
 					$cs{$k}[$i] = 0;
@@ -666,6 +666,18 @@ EOM
 			my $selected = $cs{state}[$i] eq $j ? ' selected' : '';
 			print qq|<option value="$j"$selected>$country_states[$j]</option>|;
 		}
+		print qq|</select>|;
+		print qq|</td>|;
+	}
+	print qq|</tr>\n|;
+
+	print qq|<tr><th>–Å–S</th>|;
+	for my $i (1 .. $w{country}) {
+		print qq|<td align="right">|;
+		print qq|<select name="is_die_${i}">|;
+		my $selected = $cs{is_die}[$i] eq 1 ? ' selected' : '';
+		print qq|<option value="0"$selected>•œ‹»</option>|;
+		print qq|<option value="1"$selected>–Å–S</option>|;
 		print qq|</select>|;
 		print qq|</td>|;
 	}
