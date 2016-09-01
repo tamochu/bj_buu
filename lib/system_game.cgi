@@ -107,11 +107,14 @@ sub write_user {
 	}
 	$m{money}  = int($m{money});
 	my $money_limit = 4999999;
-	if ($m{money_overflow}) {
-		if ($money_limit < $m{money_limit}) {
+	if ($m{money_overflow}) { # ŠŽ‹àãŒÀ“Ë”j‚È‚ç
+		if ($money_limit >= $m{money}) { # •W€‚ÌãŒÀˆÈ‰º‚È‚ç
+			$m{money_overflow} = 0; # ãŒÀ“Ë”jƒ_ƒ
+			$m{money_limit} = $money_limit;
+		}
+		else { # ãŒÀ“Ë”j‚©‚Â•W€‚ÌãŒÀ‚ð’´‚¦‚Ä‚é‚È‚ç
+			$m{money_limit} = $m{money} if $m{money_limit} > $m{money}; # Œ¸‚Á‚½‚çŒ¸‚Á‚½‚¾‚¯“Vˆä‰º‚°‚Ä‚­
 			$money_limit = $m{money_limit};
-		} else {
-			$m{money_overflow} = 0;
 		}
 	}
 	$m{money}  = $money_limit if $m{money} > $money_limit;
