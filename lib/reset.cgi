@@ -85,6 +85,7 @@ sub reset {
 
 	# set world
 	$w{year}++;
+	$w{year}-- if ($config_test && $w{year} == 67);
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 12;
 	$w{limit_time} = $config_test ? $time + 3600 * 36 : $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
@@ -179,6 +180,7 @@ sub reset {
 			else { # ‰p—YŠJn
 				$w{world} = $#world_states-4;
 				$w{game_lv} += 20;
+				$w{game_lv} += int(rand(3)+1) if $w{game_lv} =~ /5$/; # ŠJ–‹“ˆê“ïˆÕ“x‚ª 5 ‚Ì”{”‚ÅğŒ–‚½‚·‚Æ–Ê“|
 				for my $i (1 .. $w{country}) {
 					$cs{strong}[$i]     = int(rand(15) + 25) * 1000;
 				}
