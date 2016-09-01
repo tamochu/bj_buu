@@ -912,8 +912,24 @@ sub admin_summer_end {
 	while (my $id = readdir $dh) {
 		next if $id =~ /\./;
 		next if $id =~ /backup/;
+
 		my %m = &get_you_datas($id, 1);
-		
+
+		# 夏祭り用
+		unless (-f "$userdir/$id/summer.cgi") {
+			open my $fh, "> $userdir/$id/summer.cgi";
+			close $fh;
+		}
+		open my $fh, "< $userdir/$id/summer.cgi" or &error("そのような名前のﾌﾟﾚｲﾔｰが存在しません");
+		my $line = <$fh>;
+		close $fh;
+
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$m{$k} = $v;
+		}
+		$m{dummy} = 0;
+
 		if ($m{summer_blog} > 30) {
 			&regist_you_data($m{name}, "shogo", '★★ｴﾆｯｷﾏｽﾀｰ');
 			&send_money($m{name}, '絵日記優秀賞', 2000000);
@@ -1000,7 +1016,7 @@ sub admin_summer_end {
 		&send_god_item($v, $name) for (1..$vv);
 		$rank++;
 	}
-	
+
 	my @lot_num = ();
 	my $max_lot = 0;
 	open my $fhn, "< $logdir/event_lot_name.cgi" or &error('宝くじﾌｧｲﾙが読み込めません');
@@ -1034,6 +1050,8 @@ sub admin_summer_lot_list_up {
 		next if $pid =~ /backup/;
 		
 		my %m = &get_you_datas($pid, 1);
+		# 関数が定義されていない
+		# read_summer にﾛﾄ番号も読み込むようにすれば良いがﾌｧｲﾙｵｰﾌﾟﾝが一回増えるのでﾛﾄ番号だけを読み込む関数にしてしまった方がスマート
 		my %s = &get_summer_datas($pid);
 		my @lots = split /,/, $m{event_lot};
 		if ($lots[0] ne '') {
