@@ -101,8 +101,8 @@ sub read_user { # Get %m %y
 	
 	# S‘©ŽžŠÔ‚ª‚ ‚éê‡AŒo‰ßŽžŠÔ•ªŒ¸‚ç‚·
 	$m{wt} -= ($time - $m{ltime}) if $m{wt} > 0;
-	
-	$m{money_limit} = $m{money};
+
+#	$m{money_limit} = $m{money};
 	
 	$m{cha_org} = $m{cha};
 	

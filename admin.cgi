@@ -1033,6 +1033,8 @@ sub admin_summer_end {
 		&write_world_big_news(qq|サマージャンボの当選者は $name さんでした|);
 		&regist_you_data($name, "shogo", '★ｻﾏｰｼﾞｬﾝﾎﾞ★');
 		&regist_you_data($name, "money_overflow", 1);
+		my %p = &get_you_datas($lot_id, 1);
+		&regist_you_data($name, 'money_limit',$p{money} + 300000000);
 		&send_money($name, 'ｻﾏｰｼﾞｬﾝﾎﾞ当選金', 300000000);
 	}
 	
@@ -1131,6 +1133,46 @@ sub admin_all_pet_check {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
+=pod
+	# 夏祭り用 簡易ｱｻｶﾞｵﾗﾝｷﾝｸﾞ
+	my @morning_glory = ();
+
+	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
+	while (my $id = readdir $dh) {
+		next if $id =~ /\./;
+		next if $id =~ /backup/;
+
+		my %m = &get_you_datas($id, 1);
+
+		# 夏祭り用
+		unless (-f "$userdir/$id/summer.cgi") {
+			open my $fh, "> $userdir/$id/summer.cgi";
+			close $fh;
+		}
+		open my $fh, "< $userdir/$id/summer.cgi" or &error("そのような名前のﾌﾟﾚｲﾔｰが存在しません");
+		my $line = <$fh>;
+		close $fh;
+
+		for my $hash (split /<>/, $line) {
+			my($k, $v) = split /;/, $hash;
+			$m{$k} = $v;
+		}
+		$m{dummy} = 0;
+
+		push @morning_glory, "$m{name}<>$m{morning_glory}<>\n";
+	}
+	closedir $dh;
+	
+	@morning_glory = map { $_->[0] } sort {$b->[2] <=> $a->[2]} map { [$_, split /<>/] } @morning_glory;
+	my $rank = 1;
+	for my $line (@morning_glory) {
+		my ($name, $height) = split /<>/, $line;
+		my $v = 11 - $rank;
+		my $vv = $rank > 7 ? $rank - 7 : 1;
+		$mes .= "$rank位 $name ${height}mm<br>" if $height;
+		$rank++;
+	}
+=cut
 }
 
 #=================================================
