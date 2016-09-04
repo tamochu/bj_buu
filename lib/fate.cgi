@@ -2,12 +2,18 @@ use List::Util;
 my $this_file = "$userdir/$id/super.cgi";
 #=================================================
 # ‰p—Y
+# ˆê”ÔŽ—‚Ä‚¢‚éÙ‘¬î¨‚Æ‚Ì‘å‚«‚Èˆá‚¢‚ÍAÍß¯ÄŒø‰Ê‚ª”­“®‚·‚é‚Ü‚Å•ª‚©‚ç‚È‚¢‚©A”­“®‚·‚é‘O‚É•ª‚©‚Á‚Ä‚¢‚é‚©‚Ìˆá‚¢
+# Ù‘¬‚Æ¬‚º‚¿‚á‚¦‚Î‚ÆŽv‚¤‹CŽ‚¿‚ð—}‚¦‚Ä–Ê”’‚³‚ðŒ©o‚·‚Ì‚È‚ç‚ÎA
+# ŠeÌßÚ²Ô°‚Å‚»‚ê‚¼‚ê˜b‚µ‡‚¢‹Z‚ðŒˆ‚ß‚ÄŠÈ’P‚¾‚¯‚ÇŽã‚¢•KŽE‹Z‚©‚ç“ï‚µ‚¢‚¯‚Ç‹­‚¢•KŽE‹Z‚Ö‚Æ‚¤‚Ü‚­Œq‚ª‚ê‚Î–Ê”’‚¢‚©‚È‚Ý‚½‚¢‚È
+# ˆêÄ“Ê‚ÍW’cí‘ˆ‚¾‚¯‚ÇA‚»‚ê‚Ì•KŽE‹Z”Å‚Ý‚½‚¢‚È‚Ì‚É‚È‚ê‚Î—Ç‚¢‚È‚ÆŽv‚Á‚ÄŽÀ‘•‚µ‚Ä‚¢‚é
 #=================================================
 # —â‹pŠúŠÔ
 # 6ŽžŠÔ‚©‚ç3ŽžŠÔ‚É’Zk ‹ó‘Å‚¿‚ÌŽžŠÔ‚¾‚¯‚ð’Zk‚µ‚½‚è 0 ‚É‚·‚é‚Ì‚Í”­“®‚µ‚Ä‚È‚¢‰]X”²‚«‚É‰B‚µ•KŽE‹Z‘_‚¢‚â‚·‚­‚È‚é‚¾‚¯
 # ’Pƒ‚ÉŠÔŠu’Z‚­‚µ‚½•û‚ª‚Ü‚¾ƒ}ƒV ‘S‘Ì“I‚É•KŽE‹Z‚ª‘ål‚µ‚­‚È‚Á‚½‹C‚ª‚µ‚È‚¢‚Å‚à‚È‚¢‚Ì‚Å”{Œ‚‚Ä‚Ä‚à–â‘è‚È‚¢‹C‚à‚·‚é‚Ì‚Å”¼•ª‚É
 $coolhour = $config_test ? 0 : 3;
 $cooldown_time = $coolhour * 3600;
+=pod
+•“ØŽI‚ÌŽd—l
 # ƒgƒŠƒK[
 @triggers = (
 #	[0]No	[1]–¼‘O			[2]type			[3]”{—¦	[4]‘I‘ð‰Â”\	[5]”­“®—¦(%)
@@ -29,6 +35,34 @@ $cooldown_time = $coolhour * 3600;
 	[15,	'›z‰»',			'incubation',	0.3,	0,			100],
 	[16,	'’E–',			'prison',		0.5,	0,			100],
 	[17,	'‹~o',			'rescue',		0.7,	0,			70],
+	[18,	'“¬‹Zê—DŸ',	'colosseum_top',1,		0,			100],
+	[19,	'ƒ{ƒX“¢”°',		'boss',			1,		0,			100],
+	[20,	'–\”­',			'random',		1,		0,			100],
+);
+=cut
+
+# ‚¿‚å‚Á‚Æ’êã‚°
+# ƒgƒŠƒK[
+@triggers = (
+#	[0]No	[1]–¼‘O			[2]type			[3]”{—¦	[4]‘I‘ð‰Â”\	[5]”­“®—¦(%)
+	[0,		'Ï²Ù°Ñ',		'myroom',		0.15,	1,			100],
+	[1,		'í‘ˆŸ—˜',		'war',			0.7,	1,			100],
+	[2,		'ŒRŽ–¬Œ÷',		'military',		0.6,	1,			60],
+	[3,		'‹UŒvŒˆ—ô',		'breakdown',	1.3,		0,			100],
+	[4,		'ŠOŒð¬Œ÷',		'promise',		0.5,	1,			60],
+	[5,		'éí•z',		'declaration',	0.9,	0,			80],
+	[6,		'’âíð–ñ',		'cessation',	0.8,	0,			80],
+	[7,		'“à­',			'domestic',		0.5,	1,			50],
+	[8,		'í“¬Ÿ—˜',		'battle',		0.3,	0,			20],
+	[9,		'Cs',			'training',		0.4,	0,			30],
+	[10,	'“¢”°',			'hunting',		0.4,	0,			30],
+	[11,	'“¬‹Zê',		'colosseum',	0.4,	0,			80],
+	[12,	'ˆê‹R‘Å‚¿',		'single',		1,		0,			100],
+	[13,	'¶¼ÞÉ',			'casino',		0.2,	0,			1],
+	[14,	'”­Œ¾',			'voice',		0.2,	0,			10],
+	[15,	'›z‰»',			'incubation',	0.3,	0,			100],
+	[16,	'’E–',			'prison',		0.75,	0,			100], # Ó¼Ó‚Å“Š–‚³‚ê‚é‚¯‚ÇˆêŽü–Ú‚Å’E–‚Å‚«‚é‚Æ‚ÍŒÀ‚ç‚È‚¢‚µŒø—¦‚ÅŒ¾‚¦‚Îí‘ˆ‚Ì‚ª‚Ü‚¾”­¶ŠÈ’P‚»‚¤‚¾‚¯‚Ç‚±‚Á‚¿‚Í•¨Ž‘Á”ï‚È‚µ ‚Æ‚Í‚¢‚¦’N‚Å‚àÓ¼ÓŽ‚Á‚Ä‚é–ó‚¶‚á‚È‚¢‚µí‘ˆ‚æ‚è‚¿‚å‚Á‚Æ‚‚ß‚É
+	[17,	'‹~o',			'rescue',		1,	0,			100], # Ó¼Ó‚Å“Š–‚³‚¹‚Ä‹~o‚Å”­“®‚¾‚¯‚Ç“ñl•ª‚ÌS‘©‚ª•K—v‚É‚È‚é‚µ”­¶—¦100%‚É‚µ‚ÄŒø‰Ê—Ê‚àã‚°‚éií‘ˆ2‰ñ‚É‚Í—ò‚é‚¯‚Çí‘ˆ‚ÉŽQ‰Á‚Å‚«‚È‚¢l‚ðÓ¼Ós‚©‚¹‚Äí‘ˆ‚Å‹~o‚Ý‚½‚¢‚Èj
 	[18,	'“¬‹Zê—DŸ',	'colosseum_top',1,		0,			100],
 	[19,	'ƒ{ƒX“¢”°',		'boss',			1,		0,			100],
 	[20,	'–\”­',			'random',		1,		0,			100],
@@ -81,16 +115,20 @@ $cooldown_time = $coolhour * 3600;
 =pod
 ‘S‘Ì“I‚ÉI”Õ“DÀ‰»‚µ‚»‚¤‚È‹C‚ª‚·‚é
 
+Šî–{‚Æ‚µ‚Ä‘ã•\‚ÍŠe‘Å’á4l“™‚µ‚­‘¶Ý‚µ‚Ä‚¨‚èAˆêÄ“Ê‚Å‘ã•\‚ª•z‚ðŒ‚‚Â‚æ‚¤‚É‘ã•\ðŒ‚ÅŽn‚Ü‚è‘¼‚ÌðŒ‚ÉŒq‚°‚Ä‚¢‚­‚Ì‚ª—‘z‚ÆŽv‚Á‚Ä‚¢‚é
+‘ã•\‚ÌŽž´¸½¶ØÊß°¨–Å–SŽž¨
+
+
 ƒVƒiƒW[
 “¯–¿‘g‚Þ¨“¯–¿‘‚ª‚ ‚éŽž
 ´¸½¶ØÊß°(É±)¨–Å–SŽž
-‘—Í0–Å–S¨–Å–SŽžE‘—Í0Žž¨´¸½¶ØÊß°(‘—Í+1)¨‘—Í1Žž
+‘—Í0–Å–S¨–Å–SŽžE‘—Í0Žž¨´¸½¶ØÊß°(‘—Í+1)¨‘—Í1ŽžE‘—Í¿ÞÛ–ÚŽž
 ‘—Í0–Å–S¨–Å–SŽžE‘—Í0Žž¨³ÛÎÞŠoÁ’…’eEÍß¯Ä‚Ì³ÛÎÞ¨‘—Í¿ÞÛ–ÚŽž
-‘—Í0–Å–S¨–Å–SŽžE‘—Í0Žž¨²°½À°¨‘—Í¿ÞÛ–ÚŽži‘—Í+0`100‚È‚Ì‚Å11E22E33E44E55E66E77E88E99‚ª“–‚½‚é‚©‚à‚µ‚ê‚È‚¢j
+‘—Í0–Å–S¨–Å–SŽžE‘—Í0Žž¨²°½À°¨‘—Í¿ÞÛ–ÚŽži‘—Í+0`100‚È‚Ì‚Å1E11E22E33E44E55E66E77E88E99‚ª“–‚½‚é‚©‚à‚µ‚ê‚È‚¢B“–‚½‚ç‚È‚­‚Ä‚à´¸½¶ØÊß°‘—Í+1‚Å”÷’²®‚Å‚«‚éBÌªÝØÙ–WŠQ‚ ‚é‚¯‚Çj
 ³ÛÎÞ¨³ÛÎÞŠoÁ’†
-´¸½¶ØÊß°(‘—Í+1)¨‘—Í%5E‘—Í¿ÞÛ–Ú
+´¸½¶ØÊß°(‘—Í+1)¨‘—Í%50E‘—Í¿ÞÛ–Ú
 ´¸½¶ØÊß°(“ïˆÕ“x+1)¨““ï%5
-¾Þ³½¨‘—Í%3E“‘%4
+¾Þ³½¨‘—Í%12E“‘%3
 ÌªÝØÙ¨‘—Í%3
 ÊÞÙÑÝ¸¨‘OŠú“ˆêŽž
 ÛÌßÄ(•¨Ž‘Œ¸­)¨FMS<10–œ
@@ -106,14 +144,14 @@ $cooldown_time = $coolhour * 3600;
 ‘—Í1				2			‘I‘ð‰Â		‘—Í1‚ª‹@”\‚µ‚·‚¬‚é‚ÆŽO‘Žu‚Ý‚½‚¢‚É“DÀ‚É‚È‚è‚»‚¤‚È—\Š´‚ª‚·‚é‚Ì‚Å”{—¦3‚©‚ç2‚ÉŒ¸‚ç‚µ‚½
 ‚Ú‚Á‚¿			1.25		‘I‘ð•s‰Â
 ƒEƒƒ{			1.2		‘I‘ð‰Â		³ÛÎÞŽ©‘Ì‚ª‹­‚¢‚©‚ç‚³‚ç‚ÉðŒ‚É‰Á‚¦‚é‚Æ‹¥ˆ«H
-‰ñ”>20			1.02		‘I‘ð•s‰Â
+‰ñ”>20			1.02		‘I‘ð•s‰Â		íœ—\’è
 ‘—Í0				1			‘I‘ð•s‰Â
 ƒgƒbƒv			0.7		‘I‘ð•s‰Â
-‰ñ”%11			0.62		‘I‘ð‰Â		‚±‚±‚ç•Ó‚Ì”{—¦‚Å‚à‘I‘ð‰Â‚ª—~‚µ‚¢‚ÆŽv‚Á‚Ä”ñŒø—¦‚ÈŠ´‚¶‚Å’è‹` ‘OŠú‚©‚ç˜A‘±‚ð—­‚ß‚Ä‚¨‚¯‚é‚ª‚»‚ñ‚®‚ç‚¢—Ç‚¢‚©
+‰ñ”%11			0.62		‘I‘ð‰Â		‰ñ”%3‚Æ“ü‚ê‘Ö‚¦ ‚±‚±‚ç•Ó‚Ì”{—¦‚Å‚à‘I‘ð‰Â‚ª—~‚µ‚¢‚ÆŽv‚Á‚Ä”ñŒø—¦‚ÈŠ´‚¶‚Å’è‹` ‘OŠú‚©‚ç˜A‘±‚ð—­‚ß‚Ä‚¨‚¯‚é‚ª‚»‚ñ‚®‚ç‚¢—Ç‚¢‚©
 SOL<2–œ			0.6		‘I‘ð•s‰Â
 SOL–ž				0.6		‘I‘ð•s‰Â
 “‘%3			0.6		‘I‘ð•s‰Â
-‰ñ”>9			0.56		‘I‘ð•s‰Â
+‰ñ”>9			0.56		‘I‘ð•s‰Â		íœ—\’è
 ““ï%5			0.43		‘I‘ð‰Â
 FMS<10–œ			0.4		‘I‘ð‰Â
 ‘OŠú“ˆê			0.38		‘I‘ð•s‰Â
@@ -125,7 +163,8 @@ FMS<10–œ			0.4		‘I‘ð‰Â
 “ÆgŽž			0.27		‘I‘ð‰Â
 –\E•s			0.26		‘I‘ð‰Â
 ‘—Í%12			0.25		‘I‘ð‰Â
-‰ñ”%3			0.22		‘I‘ð•s‰Â
+ÚÍÞÙ%7			0.25		‘I‘ð‰Â
+‰ñ”%3			0.22		‘I‘ð•s‰Â		‰ñ”%4‚É•ÏX‚µ‚Ä‰ñ”%11‚Æ“ü‚ê‘Ö‚¦
 “¯–¿Žž			0.212		‘I‘ð‰Â
 =cut
 
@@ -136,32 +175,33 @@ $timing_base = 0; # 0.2 # –³ðŒ‚Å”­¶‚È‚ç 0 ‚ð’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ðŒ”­“®Žž
 @timings = (
 #	[0]No	[1]–¼‘O							[2]ðŒ		[3]”{—¦		[4]‘I‘ð‰Â”\
 #	[0,		'”CˆÓ',							sub{ return 0.1; },	0.1,	1],
-	[0,		'–Å–SŽž',						sub{ return $cs{is_die}[$m{country}] ? 0.35 : $timing_base; },	0.5,	1],
-	[1,		'“¯–¿‘‚ª‚ ‚éŽž',						sub{ return $union ? 0.212 : $timing_base; },	0.12,	1], # ‚Ú‚Á‚¿‚Æ“¯–¿‘‚ÌŽd—l‹t‚³‚Ü‚É‚µ‚½ ‰½‚à‚µ‚È‚¢‚ÅÏ‚Þu“¯–¿‚ð‘g‚Ü‚È‚¢v‚ÉŒü‚¯‚é‚æ‚è‚àu“¯–¿‘g‚à‚¤v‚ÉƒoƒCƒAƒXŠ|‚¯‚é
+	[0,		'–Å–SŽž',							sub{ return $cs{is_die}[$m{country}] ? 0.35 : $timing_base; },	0.5,	1],
+	[1,		'“¯–¿‘‚ª‚ ‚éŽž',					sub{ return $union ? 0.212 : $timing_base; },	0.12,	1], # ‚Ú‚Á‚¿‚Æ“¯–¿‘‚ÌŽd—l‹t‚³‚Ü‚É‚µ‚½ ‰½‚à‚µ‚È‚¢‚ÅÏ‚Þu“¯–¿‚ð‘g‚Ü‚È‚¢v‚ÉŒü‚¯‚é‚æ‚è‚àu“¯–¿‘g‚à‚¤v‚ÉƒoƒCƒAƒXŠ|‚¯‚é
 	[2,		'‚Ú‚Á‚¿‚ÌŽž',						sub{ return !$union ? 1.25 : $timing_base; },	0.12,	0], # Œ³‚Í‘I‘ð‰Â‚Ì0.212‚¾‚Á‚½‚¯‚Ç‰B‚µ‚É‚µ‚ÄŒø‰Ê‚‚­
 	[3,		'‘—ÍÄ¯Ìß‚ÌŽž',					sub{ for my $i (1..$w{country}) { if ($cs{strong}[$i] > $cs{strong}[$m{country}]) { return $timing_base; } } return 0.7; },	0.7,	0], # “¯–¿—L–³‚ÌðŒ‚Æ“¯‚¶‚Å‹t‚³‚Ü‚É‚µ‚½•û‚ª—Ç‚¢‚©‚àH ÌªÝØÙ‚ÍŽ©‘H‚ç‚í‚È‚¢‚µƒgƒbƒv‘¤‚ÍˆÛŽŠÈ’P‚¾‚ë‚¤‚©‚çƒgƒbƒv2”­ÌªÝØÙH‚ç‚¤‚Åƒoƒ‰ƒ“ƒXŽæ‚Á‚Ä‚é‚ÆŽv‚í‚ê‚é
-	[4,		'‘—ÍËÞØ‚ÌŽž',					sub{ for my $i (1..$w{country}) { if ($cs{strong}[$i] < $cs{strong}[$m{country}]) { return $timing_base; } } return 0.34; },	0.7,	0], # ƒrƒŠ–ÚŽw‚µ‚Äí‘ˆ‚µ‚È‚¢‚æ‚è‚àƒgƒbƒv–ÚŽw‚µ‚Äí‘ˆ‚·‚é•û‚ªŒ’‘S‚Á‚Û
+	[4,		'‘—ÍËÞØ‚ÌŽž',						sub{ for my $i (1..$w{country}) { if ($cs{strong}[$i] < $cs{strong}[$m{country}]) { return $timing_base; } } return 0.34; },	0.7,	0], # ƒrƒŠ–ÚŽw‚µ‚Äí‘ˆ‚µ‚È‚¢‚æ‚è‚àƒgƒbƒv–ÚŽw‚µ‚Äí‘ˆ‚·‚é•û‚ªŒ’‘S‚Á‚Û
 	[5,		'‘—Í¿ÞÛ–Ú‚ÌŽž',					sub{ return ($cs{strong}[$m{country}] > 1 && $cs{strong}[$m{country}] =~ /^(\d)\1+$/) ? 3 : $timing_base; },	0.7,	0],
-	[6,		'‘—Í1‚ÌŽž',					sub{ return ($cs{strong}[$m{country}] == 1) ? 2 : $timing_base; },	0.7,	1],
-	[7,		'‘—Í0‚ÌŽž',					sub{ return ($cs{strong}[$m{country}] == 0) ? 1 : $timing_base; },	0.7,	0],
-	[8,		'‘—Í‚ª 12 ‚Ì”{”‚ÌŽž',					sub{ return $cs{strong}[$m{country}] > 0 && (($cs{strong}[$m{country}] % 12) == 0) ? 0.25 : $timing_base; },	0.7,	1],
-	[9,		'‘—Í‚ª 50 ‚Ì”{”‚ÌŽž',					sub{ return $cs{strong}[$m{country}] > 0 && (($cs{strong}[$m{country}] % 50) == 0) ? 0.35 : $timing_base; },	0.7,	0], # ‰Šú‘—Í‚ª•K‚¸ 50 ‚Ì”{”‚È‚Ì‚Å‰B‚µ‚É
+	[6,		'‘—Í1‚ÌŽž',						sub{ return ($cs{strong}[$m{country}] == 1) ? 2 : $timing_base; },	0.7,	1],
+	[7,		'‘—Í0‚ÌŽž',						sub{ return ($cs{strong}[$m{country}] == 0) ? 1 : $timing_base; },	0.7,	0],
+	[8,		'‘—Í‚ª 12 ‚Ì”{”‚ÌŽž',			sub{ return $cs{strong}[$m{country}] > 0 && (($cs{strong}[$m{country}] % 12) == 0) ? 0.25 : $timing_base; },	0.7,	1],
+	[9,		'‘—Í‚ª 50 ‚Ì”{”‚ÌŽž',			sub{ return $cs{strong}[$m{country}] > 0 && (($cs{strong}[$m{country}] % 50) == 0) ? 0.35 : $timing_base; },	0.7,	0], # ‰Šú‘—Í‚ª•K‚¸ 50 ‚Ì”{”‚È‚Ì‚Å‰B‚µ‚É
 	[10,		'–\•—E•s‹µ‚ÌŽž',					sub{ return ($cs{state}[$m{country}] == 3 || $cs{state}[$m{country}] == 4) ? 0.26 : $timing_base; },	0.7,	1],
 	[11,		'³ÛÎÞÛ½ŠoÁ’†',					sub{ return ($cs{extra}[$m{country}] > 0 && $cs{extra_limit}[$m{country}] >= $time) ? 1.2 : $timing_base; },	0.7,	1],
 	[12,		'Ž‘Œ¹‚ª‚·‚×‚Ä100000–¢–ž‚ÌŽž',	sub{ return ($cs{food}[$m{country}] < 100000 && $cs{money}[$m{country}] < 100000 && $cs{soldier}[$m{country}] < 100000) ? 0.4 : $timing_base; },	0.4,	1],
 	[13,		'•ºŽm‚ª20000–¢–ž‚ÌŽž',			sub{ return $cs{soldier}[$m{country}] < 20000 ? 0.6 : $timing_base; },	0.6,	0],
 	[14,		'•ºŽm‚ª999999‚ÌŽž',				sub{ return $cs{soldier}[$m{country}] >= 999999 ? 0.6 : $timing_base; },	0.8,	0],
-	[15,		'‘ã•\‚ÌŽž',						sub{ return &is_daihyo ? 0.32 : $timing_base; },	0.3,	1],
-	[16,		'“Æg‚ÌŽž',						sub{ return $m{marriage} ? $timing_base : 0.27; },	0.3,	1],
-	[17,		'˜A‘±‰ñ”‚ª 3 ‚Ì”{”‚ÌŽž',						sub{ return ($m{renzoku_c} > 0 && ($m{renzoku_c} % 2) == 0) ? 0.22 : $timing_base; },	0.3,	0],
-	[18,		'˜A‘±5‰ñˆÈã‚ÌŽž',						sub{ if ($m{renzoku_c} > 4) { $m{renzoku_c} = 0; return 0.28; } else { return $timing_base; } },	0.3,	1],
-	[19,		'˜A‘±10‰ñˆÈã‚ÌŽž',						sub{ if ($m{renzoku_c} > 9) { $m{renzoku_c} = 0; return 0.56; } else { return $timing_base; } },	0.3,	0],
-	[20,		'˜A‘±20‰ñˆÈã‚ÌŽž',						sub{ if ($m{renzoku_c} > 29) { $m{renzoku_c} = 0; return 1.12; } else { return $timing_base; } },	0.3,	0],
-	[21,		'˜A‘±”‚ª 11 ‚Ì”{”‚ÌŽž',						sub{ if ($m{renzoku_c} > 0 && (($m{renzoku_c} % 11) == 0)) { $m{renzoku_c} = 0; return 0.62; } else { return $timing_base; } },	0.3,	1],
-	[22,		'“ˆê‘—Í‚ª 3 ‚Ì”{”‚ÌŽž',						sub{ return ($touitu_strong % 3) == 0 ? 0.6 : $timing_base; },	0.3,	0], # 3 ‚¾‚Æ“–‚½‚è‚â‚·‰ß‚¬H 4 ‚Æ‚© 6 ‚®‚ç‚¢‚É‚µ‚Ä‚à‚»‚à‚»‚àÌªÝØÙE¾Þ³½‚ÅƒKƒNƒKƒN“®‚­ ”÷–­
-	[23,		'“ˆê‘—Í‚ª¿ÞÛ–Ú‚ÌŽž',					sub{ return ($touitu_strong > 1 && $touitu_strong =~ /^(\d)\1+$/) ? 4 : $timing_base; },	0.7,	1],
-	[24,		'“ˆê“ïˆÕ“x‚ª 5 ‚Ì”{”‚ÌŽž',						sub{ return ($w{game_lv} % 5) == 0 ? 0.43 : $timing_base; },	0.3,	1],
-	[25,		'‘OŠú“ˆê‘‚ÌŽž',						sub{ my($c1, $c2) = split /,/, $w{win_countries}; return ($c1 == $m{country} || $c2 == $m{country}) ? 0.38 : $timing_base; },	0.3,	0],
+	[15,		'‘ã•\‚ÌŽž',							sub{ return &is_daihyo ? 0.32 : $timing_base; },	0.3,	1],
+	[16,		'“Æg‚ÌŽž',							sub{ return $m{marriage} ? $timing_base : 0.27; },	0.3,	1],
+	[17,		'˜A‘±‰ñ”‚ª 3 ‚Ì”{”‚ÌŽž',		sub{ return ($m{renzoku_c} > 0 && ($m{renzoku_c} % 2) == 0) ? 0.22 : $timing_base; },	0.3,	0], # 4‚Ì”{”‚É‚µ‚Ä 11 ‚Ì‚â‚Â‚Æ“ü‚ê‘Ö‚¦
+	[18,		'˜A‘±5‰ñˆÈã‚ÌŽž',				sub{ if ($m{renzoku_c} > 4) { $m{renzoku_c} = 0; return 0.28; } else { return $timing_base; } },	0.3,	1],
+	[19,		'˜A‘±10‰ñˆÈã‚ÌŽž',				sub{ if ($m{renzoku_c} > 9) { $m{renzoku_c} = 0; return 0.56; } else { return $timing_base; } },	0.3,	0], # íœ—\’è
+	[20,		'˜A‘±20‰ñˆÈã‚ÌŽž',				sub{ if ($m{renzoku_c} > 29) { $m{renzoku_c} = 0; return 1.12; } else { return $timing_base; } },	0.3,	0], # íœ—\’è
+	[21,		'˜A‘±‰ñ”‚ª 11 ‚Ì”{”‚ÌŽž',	sub{ if ($m{renzoku_c} > 0 && (($m{renzoku_c} % 11) == 0)) { $m{renzoku_c} = 0; return 0.62; } else { return $timing_base; } },	0.3,	1],
+	[22,		'“ˆê‘—Í‚ª 3 ‚Ì”{”‚ÌŽž',		sub{ return ($touitu_strong % 3) == 0 ? 0.6 : $timing_base; },	0.3,	0], # 3 ‚¾‚Æ“–‚½‚è‚â‚·‰ß‚¬H 4 ‚Æ‚© 6 ‚®‚ç‚¢‚É‚µ‚Ä‚à‚»‚à‚»‚àÌªÝØÙE¾Þ³½‚ÅƒKƒNƒKƒN“®‚­ ”÷–­
+	[23,		'“ˆê‘—Í‚ª¿ÞÛ–Ú‚ÌŽž',			sub{ return ($touitu_strong > 1 && $touitu_strong =~ /^(\d)\1+$/) ? 4 : $timing_base; },	0.7,	1],
+	[24,		'“ˆê“ïˆÕ“x‚ª 5 ‚Ì”{”‚ÌŽž',	sub{ return ($w{game_lv} % 5) == 0 ? 0.43 : $timing_base; },	0.3,	1],
+	[25,		'‘OŠú“ˆê‘‚ÌŽž',					sub{ my($c1, $c2) = split /,/, $w{win_countries}; return ($c1 == $m{country} || $c2 == $m{country}) ? 0.38 : $timing_base; },	0.3,	0],
+	[26,		'ÚÍÞÙ‚ª 7 ‚Ì”{”‚ÌŽž',			sub{ return $m{lv} % 7 == 0 ? 0.25 : $timing_base; },	0.3,	1],
 
 # •Ï“®‚µ‚Ã‚ç‚¢‚Ì‚ÅƒCƒ}ƒCƒ`
 #	[16,		'ŽdŠ¯”ƒgƒbƒv',					sub{ for my $i (1..$w{country}) { if ($cs{member}[$i] > $cs{member}[$m{country}]) { return 0.2; } } return 0.5; },	0.7,	1],
@@ -178,15 +218,15 @@ $timing_base = 0; # 0.2 # –³ðŒ‚Å”­¶‚È‚ç 0 ‚ð’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ðŒ”­“®Žž
 Œø‰Ê—Ê
 ¢‘ãŒð‘ã		3
 Íß¯ÄÚÍÞÙ		Œø‰Ê—Ê‚ÍƒR[ƒh				š7‚Ô‚¿ž‚ñ‚Å2.6
-‹‹—¿			2.3
+‹‹—¿			2.3							+24ŽžŠÔ‚ÅÝ’è‚µ‚Ä‚½‚¯‚Ç‚Æ‚ñ‚Å‚à‚È‚­Žg‚¢‚É‚­‚©‚Á‚½ +6ŽžŠÔ‚Å‰„X‹‹—¿ŽžŠÔL‚Ñ‚é‚¯‚ÇÄÞ×³ÌßÆÙ‚Å‹‹—¿ŽžŠÔƒ`ƒƒƒ‰‚É‚È‚é‰Â”\«‚ ‚é
 no1n—û		2.2							Œ¸‚Á‚Ä‘‚¦‚Ä‚à‚Ù‚Æ‚ñ‚Ç–â‘è‚ª‚È‚¢ã‚Éã‚ª‚è‚É‚­‚¢n—û‚È‚Ì‚Å‚¤‚Á‚Ä‚Â‚¯
 ½ÃÀÞ³Ý		2								9‚Â‚ ‚éƒXƒe‚Ì1‚Â‚ª-0`19‚¾‚µ‘å‚µ‚½‚±‚Æ‚È‚¢ “–‚½‚è
 —£¥			1.6							‚±‚ê‚àÃÞÒØ¯Ä‚¶‚á‚È‚­‚È‚é‰Â”\«‚à‚ ‚é‚¯‚Ç‘å‚µ‚½‚±‚Æ‚È‚¢‚©H
 •ŠíÚÍÞÙ		1.6							ÃÞÒØ¯Ä‚¶‚á‚È‚¢‚Æ‚àŒ¾‚¦‚é‚µ¼Þ¬Ý¸‚ÅƒSƒ~•Ší”ƒ‚Á‚Ä’b‚¦‚ÄŽg‚Á‚Ä‚ª‚¤‚Ü‚¢‚¯‚Ç“–‚½‚è‚Á‚Ä‚±‚Æ‚Å
 ŒMÍ			1.2							10ŒÂÁ”ï¨5ŒÂÁ”ï¨3ŒÂÁ”ï‚É•ÏX ½¶Ú‚à‚ ‚é‚µ5ŒÂ‚ª—Ç‚¢‚©‚àH
-›z‰»’l		1.2
+›z‰»’l		1.2							›z‰»’l-100‚¾‚¯‚ÇÄÞ×³ÌßÆÙ‚Å›z‰»’l+500ˆø‚¯‚é‚µˆç‚Ä‰®‚Å—a‚¯‚Á‚Ï‚È‚µ‚Å–Y‚ê‚Ä‚½‚Ì‚Æ‚©ƒfƒƒŠƒbƒg‚È‚µ‚ÉŽg‚¦‚é
 S‘©			1
-vŒ£’l		1
+vŒ£’l		1								ÌßÚ²Ô°‚É‚Æ‚Á‚Ä‚Í’É‚­‚àáy‚­‚à‚È‚¢ ŽžŠÔ‚Æ‚¢‚¤â‘Î“I‰¿’l‚Æ’Þ‚è‡‚¤‚à‚Ì‚Å‚Í‚È‚¢‚¯‚Ç“–‚½‚è‚Æ‚µ‚Ä
 ŠŽ‹à		0.75`3.249H				ŠŽ‹à‘½‚¢‚Ù‚Çƒu[ƒXƒg
 ŠŽ‹à2		0.7
 º²Ý			0.65`1.9H					º²Ý‘½‚¢‚Ù‚Çƒu[ƒXƒg
@@ -545,7 +585,7 @@ $demerit_base = 0.5; # –³ðŒ‚Å”­¶‚È‚ç 0 ‚ð’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ðŒ”­“®Žž‚Ìƒ
 		}
 
 		return "“H‚éŒb‚Ý‚É$cs{name}[$m{country}]‚Ì‘–¯‚ª‹¶Šì—•‘‚·‚é";
-	},	1,	"$cs{name}[$c]‚É¹Œ•‚ð•ú‚Á‚½"],
+	},	0,	"$cs{name}[$c]‚É¹Œ•‚ð•ú‚Á‚½"],
 );
 #=================================================
 # “o˜^ƒƒbƒZ[ƒW
