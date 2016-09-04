@@ -1299,7 +1299,7 @@ sub alltime_event {
 		}
 	}
 	if ($w{world} eq $#world_states-4) {
-		if (rand(1000) < 1) {
+		if (rand(500) < 1) { # 元は1000 ﾌﾟﾚｲﾔｰ全体による発生ではなく暴発が条件のﾌﾟﾚｲﾔｰ単体による発生なので個人個人で1000は若干高い気がする 技ファイルの読み込みが起きるのが問題か
 			require './lib/fate.cgi';
 			&super_attack('random');
 		}
