@@ -486,7 +486,7 @@ $demerit_base = 0.5; # –³ğŒ‚Å”­¶‚È‚ç 0 ‚ğ’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ğŒ”­“®‚Ìƒ
 		&write_cs;
 		return "‘S‘‚ª•œ‹»‚µ‚Ü‚µ‚½";
 	},	1,	'‘S‘‚ª•œ‹»‚µ‚Ü‚µ‚½'],
-	[13,	'Ø³Ş§²±»İ',				sub{
+	[17,	'Ø³Ş§²±»İ',				sub{
 		$v = shift;
 		$c = &get_most_strong_country;
 		my ($attack_name, $attack_value) = get_attack_level(2000);
@@ -499,8 +499,8 @@ $demerit_base = 0.5; # –³ğŒ‚Å”­¶‚È‚ç 0 ‚ğ’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ğŒ”­“®‚Ìƒ
 		$cs{strong}[$m{country}] += int($vv / 3);
 		&write_cs;
 		return "$v”{$attack_nameØ³Ş§²±»İ‚É‚æ‚Á‚Ä$cs{name}[$c]‚Ì‘—Í‚ğ’D‚Á‚½";
-	},	0,	"$cs{name}[$c]‚Ì‘—Í‚ğ’D‚Á‚½"], # 0
-	[14,	'´¸½¶ØÊŞ°',				sub{
+	},	1,	"$cs{name}[$c]‚Ì‘—Í‚ğ’D‚Á‚½"], # 0
+	[13,	'´¸½¶ØÊŞ°',				sub{
 		$v = shift;
 		# ˆê‘‚ªÌªİØÙW’†–C‰Î‚³‚ê‚é•KE‹Z
 		# ‚»‚Ì‘ÎÛ‘‚Ì‘—Í‚É‚æ‚Á‚ÄÌªİØÙ‰½\”­•ª‚É‚à‚È‚Á‚Ä“ˆê‘—Í‚ªŒƒŒ¸
@@ -520,7 +520,7 @@ $demerit_base = 0.5; # –³ğŒ‚Å”­¶‚È‚ç 0 ‚ğ’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ğŒ”­“®‚Ìƒ
 		&write_cs;
 		return "$cs{name}[$c]‚É¹Œ•‚ğ•ú‚Á‚½";
 	},	0,	"$cs{name}[$c]‚É¹Œ•‚ğ•ú‚Á‚½"], # 0
-	[15,	'´¸½¶ØÊß°',				sub{
+	[14,	'´¸½¶ØÊß°',				sub{
 		$v = shift;
 		# ‹U´¸½¶ØÊŞ°A´¸½¶ØÊŞ°‚©‚çÌªİØÙŒø‰Ê‚ğœ‚¢‚Ä‚İ‚½‚ª‚±‚ê‚¾‚Æ—v‚Í“G‘‚ÉÉ±‚ğ’£‚éŒø‰Ê‚É‚È‚Á‚Ä‚µ‚Ü‚¤i‚³‚ç‚É–Å–SğŒ‚à–‚½‚³‚¹‚éj
 		# ‚à‚¤‚¿‚å‚Á‚Æ©‘‚É—L—˜‚É‚È‚é‚æ‚¤‚ÉŠm—¦‚ÅÉ±‚ğ’£‚è‚Â‚Â–Å–SğŒ‚à–‚½‚·‚æ‚¤‚É•ÏX
@@ -530,24 +530,25 @@ $demerit_base = 0.5; # –³ğŒ‚Å”­¶‚È‚ç 0 ‚ğ’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ğŒ”­“®‚Ìƒ
 		$c = rand(100) < 60 ? $m{country} : # Šî–{©‘Œø‰Ê‚¾‚ª©•ª‚Å‘I‚×‚é•KE‹Z‚Åg‚¢Ÿè—Ç‚·‚¬‚é‚Ì‚ÅA
 				int(rand($w{country})+1); # “G‘‚ÉŒø‰Ê‚ğ—^‚¦‚éƒfƒƒŠƒbƒg‚É‚È‚é‚±‚Æ‚à‚ ‚é‚æ‚¤‚É
 
+		my $is_die = $cs{is_die}[$c];
 		$cs{is_die}[$c] = 1;# (int(rand(3)) < 1); # 1/3 ‚ÌŠm—¦‚ÅÉ±Œø‰Ê
 
 		++$cs{strong}[$m{country}]; # ‘—Í+1 ‘—Í0‚Å–Å–S‚µ‚½‚ÉŒ‚‚¿•Ô‚¹‚Î‘—Í1ğŒ‚ğ–‚½‚¹‚é ‰^‚ª—Ç‚¯‚ê‚Î‘—Íƒ]ƒ–Ú‚à—L‚è“¾‚é
 
 		# •K‚¸ã‚ª‚é‚¾‚Æ“ïˆÕ“x‚ª‚¤‚È‚¬ã‚è‚¾‚ë‚¤‚©‚ç50%‚®‚ç‚¢‚Å •¡”‚ÌğŒ‚É—‚Ş‹Z‚¾‚µ
 		# •K‚¸É±Œø‰Ê‚ª”­¶‚·‚é–ó‚¶‚á‚È‚¢‚Ì‚Å‚Ü‚¾ã‚ª‚è‚·‚¬‚©‚à
-		++$w{game_lv} if $cs{is_die}[$c] && int(rand(2)) < 1;
+		++$w{game_lv} if $is_die == 0 && int(rand(2)) < 1;
 		&write_cs;
 		return "$cs{name}[$c]‚ªá¿‚¢Œõ‚É•ï‚Ü‚ê‚½";
 	},	1,	"$cs{name}[$c]‚É¹Œ•‚ğ•ú‚Á‚½"],
-	[16,	'ÊŞÙÑİ¸',				sub{
+	[15,	'ÊŞÙÑİ¸',				sub{
 		$v = shift;
 		# ‘OŠú“ˆê‘‚ğ©‘‚É‚·‚é•KE‹Z ‹‹—¿”ü–¡‚µ‚¢‚Å‚·I ›z‰»’l”ü–¡‚µ‚¢‚Å‚·I ‘OŠú“ˆêğŒ‚ğ–‚½‚·
 		$w{win_countries} = $m{country};
 		&write_cs;
 		return "$cs{name}[$m{country}]‚ªà•ó‚ğ“Æ‚èè‚ß‚É‚·‚é";
 	},	0,	"$cs{name}[$c]‚É¹Œ•‚ğ•ú‚Á‚½"],
-	[17,	'ÄŞ×³ÌßÆÙ',				sub{
+	[16,	'ÄŞ×³ÌßÆÙ',				sub{
 		$v = shift;
 		# ©‘–¯‚Ì”æ˜J‰ñ•œ or ‹‹—¿ŠÔ’Zk
 		# ÊŞÙÑİ¸Œ‚‚Á‚Æ‚¯‚Î‹‹—¿”ü–¡‚µ‚¢‚Å‚·I ›z‰»’l”ü–¡‚µ‚¢‚Å‚·I ‹‹—¿+6ŠÔƒfƒƒŠƒbƒg‚Ì‘Å‚¿Á‚µ
@@ -744,26 +745,26 @@ sub regist_attack {
 			$max_count = $max_counts_s[int(rand(@max_counts_s))];
 		}
 		
-		my @effects_s = ();
-		if (rand(3) < 1) {
-			for my $i (0..$#effects) {
-				if ($effects[$i][3]) {
-					push @effects_s, $i if int(rand(100)) < 70;
-				}
-				else {
-					push @effects_s, $i;
-				}
-			}
-			$effect = $effects_s[int(rand(@effects_s))];
-#			$effect = int(rand(@effects));
-		} else {
-			for my $i (0..$#effects) {
-				if ($effects[$i][3]) {
-					push @effects_s, $i;
-				}
-			}
-			$effect = $effects_s[int(rand(@effects_s))];
-		}
+#		my @effects_s = ();
+#		if (rand(3) < 1) {
+#			for my $i (0..$#effects) {
+#				if ($effects[$i][3]) {
+#					push @effects_s, $i if int(rand(100)) < 70;
+#				}
+#				else {
+#					push @effects_s, $i;
+#				}
+#			}
+#			$effect = $effects_s[int(rand(@effects_s))];
+			$effect = int(rand(@effects));
+#		} else {
+#			for my $i (0..$#effects) {
+#				if ($effects[$i][3]) {
+#					push @effects_s, $i;
+#				}
+#			}
+#			$effect = $effects_s[int(rand(@effects_s))];
+#		}
 	} else {
 		if (!$triggers[$trigger][4]) {
 			return 0;
