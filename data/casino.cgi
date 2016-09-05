@@ -20,6 +20,7 @@
 	['テスト',	'nobo',		'_nobo', 1],
 	['テスト2',	'cataso',		'_cataso', 0],
 	['ニムト',	'nimmt',		'_nimmt', 0],
+	['10秒当て',	'tenminutes',		'_tenminutes', 0],
 );
 
 1; # 削除不可
