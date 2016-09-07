@@ -353,7 +353,7 @@ sub add_festival_country {
 	my $max_c = int($w{player} / $country_num) + 3;
 	for my $i ($w{country}-($country_num-1)..$w{country}){
 		mkdir "$logdir/$i" or &error("$logdir/$i Ì«ÙÀŞ‚ªì‚ê‚Ü‚¹‚ñ‚Å‚µ‚½") unless -d "$logdir/$i";
-		for my $file_name (qw/bbs bbs_log bbs_member depot_log patrol prison prison_member prisoner violator old_member leader member/) {
+		for my $file_name (qw/bbs bbs_log bbs_member depot_log patrol prison prison_member prisoner violator leader member/) {
 			my $output_file = "$logdir/$i/$file_name.cgi";
 #			next if -f $output_file;
 			open my $fh, "> $output_file" or &error("$output_file Ì§²Ù‚ªì‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");

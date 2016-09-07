@@ -1389,7 +1389,7 @@ sub create_country {
 	
 	my $num = rmtree("$logdir/$w{country}");
 	mkdir "$logdir/$w{country}" or &error("$logdir/$w{country} Ì«ÙÀŞ‚ªì‚ê‚Ü‚¹‚ñ‚Å‚µ‚½") unless -d "$logdir/$w{country}";
-	for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator old_member/) {
+	for my $file_name (qw/bbs bbs_log bbs_member depot depot_log patrol prison prison_member prisoner violator/) {
 		my $output_file = "$logdir/$w{country}/$file_name.cgi";
 		next if -f $output_file;
 		open my $fh, "> $output_file" or &error("$output_file Ì§²Ù‚ªì‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
