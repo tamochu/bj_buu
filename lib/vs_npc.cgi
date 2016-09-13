@@ -324,7 +324,7 @@ sub npc_use_pet_meteo { # ÒÃµ
 	$w{game_lv} -= 2 if $w{game_lv} > 85;
 	for my $i (1..$w{country}) {
 		for my $j ($i+1..$w{country}) {
-			next if($w{"p_${i}_${j}"} == 1 && $j eq $w{country});
+#			next if($w{"p_${i}_${j}"} == 1 && $j eq $w{country});
 			$w{"f_${i}_${j}"}=int(rand(20));
 			$w{"p_${i}_${j}"}=2;
 		}

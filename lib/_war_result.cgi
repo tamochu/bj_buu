@@ -213,7 +213,8 @@ sub war_win {
 	# 暗黒側カウンターの基本奪国力（少数やｳﾛﾎﾞ用）
 	# 統一期限切れそうになると封印側が有利になるのは、
 	# 統一期限切れた時に暗黒生きてても負け扱いだしどうせならちゃんと封印しろっていう仕様かと思われる
-	$npc_v = int(rand(350)+450) if $w{world} eq $#world_states;
+	# 狡知の奪国力を考慮し常に狡知に合わせたカウンターにすると暗黒側狡知でゴリゴリ削れそう とりあえず封印時と暗黒時で奪国力が変わる仕様にしてしまう
+	$npc_v = int(rand(400)+400) if $w{world} eq $#world_states;
 
 	# 奪国力上限
 	if ($v !~ /^(\d)\1+$/) { # ｿﾞﾛ目(ｳﾛﾎﾞﾛｽ使用時など)
@@ -223,6 +224,7 @@ sub war_win {
 		}
 		else { # 通常・長期
 			if($m{unit} eq '18'){
+				$npc_v = int(rand(750)+750) if $w{world} eq $#world_states && ($m{country} ne $w{country} && $union ne $w{country}) ; # 封印側狡知のみ狡知の奪国力に合わせたカウンター量
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
 					$v = $v > 2000 ? int(rand(500)+1500) : int($v);
 #					$v = $v > 2000 ? int(rand(250)+1750) : int($v);
@@ -231,7 +233,7 @@ sub war_win {
 					$v = $v > 1500 ? int(rand(500)+1000) : int($v);
 #					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
 					# 暗黒側カウンターの奪国力
-					$npc_v = int(rand(750)+750) if $w{world} eq $#world_states && $v > 1500;
+#					$npc_v = int(rand(750)+750) if $w{world} eq $#world_states && $v > 1500;
 #					$npc_v = int(rand(525)+975) if $w{world} eq $#world_states;
 				}
 			}else{

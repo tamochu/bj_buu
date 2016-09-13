@@ -445,7 +445,7 @@ sub remove_festival_country {
 	my $festival_name = shift;
 	my $country_num = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[0];
 	# ‘ƒtƒHƒ‹ƒ_íœ
-	for (my $i = $w{country}; $i > $w{country}-$country_num; $i--) {
+	for (my $i = $w{country}; $i > $w{country}+1-$country_num; $i--) { # Šù‘¶‘+ˆÃ•-Õ‚è‘
 		my $from = "$logdir/$i";
 		my $num = rmtree($from);
 	}
