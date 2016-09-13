@@ -80,6 +80,9 @@ sub run {
 		close $fh;
 	}
 	if ($ENV{REQUEST_METHOD} eq "POST") {
+		if ($in{comment} =~ /10.00ïb/) {
+			$in{comment} .= " Ç∑Ç≤Ç¢ÅI";
+		}
 		&write_comment if ($in{mode} eq "write") && $in{comment};
 	}
 
