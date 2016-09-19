@@ -665,7 +665,6 @@ require './lib/system_game.cgi';
  	[-2,		'¾Ğ',	'myself',	sub{ $m{cicada_sound} = int( $time + 3600 * 3 ); },'', 1], # war.cgi‚É–„‚ß‚İˆ—
  	[-1,		'Õ°Ú²',	'no_ambush',	sub{},'', 5], # war.cgi‚É–„‚ß‚İˆ—
  );
-	$m{next_salary} = int( $time + 3600 * $salary_hour );
  
  
  #=================================================
