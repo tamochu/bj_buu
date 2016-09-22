@@ -59,6 +59,19 @@ sub write_comment {
 	if ( ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) && $in{comment} !~ "<hr>亂愰揱尵斅傊偺儗僗亃") {
 		$mname = "柤柍偟";
 	}
+#	elsif (($this_file =~ /chat/ || $this_file =~ /bbs/) && $seeds{$m{seed}}[0] eq '都资咻擂') {
+	elsif ($seeds{$m{seed}}[0] eq '都资咻擂') {
+		# 摻柤偠傖側偔庬懓偑都资咻擂側傜搳峞撪梕傪奺峴偵暘夝偟嬻峴埲奜偺暥枛偵乽偐偟傜乿傪捛壛
+		# 偳偆峫偊偰傕惓婯昞尰偱偱偒偦偆偩偗偳側傫偩偐僄儔乕偵側傞偟挷傋傞偺柺搢偩偐傜偙傟偱偲傝偁偊偢丂仸搳峞撪梕偺乽夵峴乿偼乽<br>乿
+		my @data = split('<hr>', $in{comment}); # 擔婰搳峞傗愰揱偱偺庤巻儗僗偼峴枛偵偦傟偧傟偺僨乕僞偑擖傞偺偱偦傟懳嶔
+		my @comments = split('<br>', $data[0]);
+		$in{comment} = '';
+		for my $i (0 .. $#comments) {
+			$in{comment} .= "$comments[$i]偐偟傜" if $comments[$i] ne '';
+			$in{comment} .= '<br>' if $i < $#comments;
+		}
+		$in{comment} .= "<hr>$data[1]" if $#data > 0;
+	}
 
 	my %bbs_config = ();
 	$bbs_config{shogo_limit} = 16;

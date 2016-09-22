@@ -14,7 +14,7 @@ sub comment_change {
 	# if index ‚ÅU‚è•ª‚¯‚Ä‚©‚ç‚Ì‚ª‘¬‚¢‚©‚Ç‚¤‚©‚Í•ª‚©‚ç‚ñ
 	if (index($bcomment, '&amp;') > -1) {
 		$bcomment =~ s|&amp;big\((.*?)\)|<font size="+1">\1</font>|g;
-	#	$bcomment =~ s|&amp;big(\d+)\((.*?)\)|<font size="+\1">\2</font>|g;
+		$bcomment =~ s|&amp;big(\d+)\((.*?)\)|<font size="+\1">\2</font>|g;
 		$bcomment =~ s|&amp;small\((.*?)\)|<font size="-1">\1</font>|g;
 		$bcomment =~ s|&amp;small(\d+)\((.*?)\)|<font size="-\1">\2</font>|g;
 		$bcomment =~ s|&amp;color([0-9A-Fa-f]{6})\((.*?)\)|<font color="#\1">\2</font>|g;

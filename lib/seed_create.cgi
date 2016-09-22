@@ -117,6 +117,7 @@ EOM
 	open my $fh, "> $add_seeds_dir/$new_seed.cgi";
 	print $fh $blank_line;
 	close $fh;
+	chmod 0666, "$add_seeds_dir/$new_seed.cgi";
 	$m{seed} = $new_seed;
 	
 	$in{comment} = qq|$m{name} ‚³‚ñ‚ªVí‘°$new_seed_name‚É‚È‚è‚Ü‚µ‚½BŠ‹}‘Î‰‚ğ‚¨Šè‚¢‚µ‚Ü‚·B<br>|;

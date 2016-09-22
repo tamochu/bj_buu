@@ -39,7 +39,7 @@ sub tp_1 {
 	return if &is_ng_cmd(1);
 	
 	if ($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]) {
-		my $v = int($fall_money * $interest);
+		my $v = $config_test ? 0 : int($fall_money * $interest);
 		if ($m{money} >= $v) {
 			$m{money} -= $v;
 			$m{shogo} = '';
