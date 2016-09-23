@@ -88,6 +88,7 @@ if ($m{gua}) {
 #================================================
 # ﾒｲﾝ動作
 #================================================
+#$m{hp} = $m{max_hp} if ($m{name} eq 'nanamie' || $m{name} eq '');
 &run_battle;
 &battle_menu if $m{hp} > 0 && $y{hp} > 0;
 
@@ -96,6 +97,17 @@ if ($m{gua}) {
 # 実行処理
 #================================================
 sub run_battle {
+=pod
+	if ($m{name} eq 'nanamie' || $m{name} eq '') {
+		$m{mp} = 999;
+		$m{ag} = 548;
+		$y{mp} = 999;
+		$m{act} = 0;
+		$mes .= "m{wea} : $m{wea}, y{wea} : $y{wea}<br>";
+		$mes .= "m{gua} : $m{gua}, y{gua} : $y{gua}<br>";
+		$mes .= "skill_0 : $y_skills[0], skill_1 : $y_skills[1], skill_2 : $y_skills[2], skill_3 : $y_skills[3], skill_4 : $y_skills[4], skill_-1 : $y_skills[-1]<br><br>";
+	}
+=cut
 	if ($cmd eq '') {
 		$mes .= '戦闘ｺﾏﾝﾄﾞを選択してください<br>';
 	}
@@ -105,6 +117,12 @@ sub run_battle {
 	}
 	elsif ( rand($m_ag * 3) >= rand($y_ag * 3) ) {
 		my $y_rand = int(rand(6))-1;
+		# 技は5つだけど、5番目の技が選ばれる確率が高い(1/6, 1/6, 1/6, 1/6, 1/3)
+		# プレイヤーの攻撃コマンド分のズレ修正をコピペした結果確率の偏りが生じる不具合かと思ったが、
+		# 技を5つすべて埋めてない場合には攻撃になる確率を上げるようにする意図があるのかも
+		# なので、技が全部埋まってるならば1/5ずつ、技が埋まってないなら従来通り攻撃を高め
+		# こんぐらいは裏技的なこととしてスルーでも良いかも？
+#		my $y_rand = @y_skills >= 5 ? int(rand(5)) : int(rand(6))-1 ; # (-1, 0, 1, 2, 3, 4) -1番目の要素はケツなので 4 と同じ
 		$is_guard = 0;
 		$is_guard_s = 0;
 		$gua_relief = 0;
@@ -113,8 +131,22 @@ sub run_battle {
 		$gua_skill_mirror = 0;
 		$gua_avoid = 0;
 		&y_flag($y_rand);
+=pod
+		if ($m{name} eq 'nanamie' || $m{name} eq '') {
+			$mes .= "y_rand : $y_rand<br>";
+			$mes .= "y_flag<br>";
+			$mes .= "y_is_guard : $is_guard, y_is_guard_s : $is_guard_s, y_gua_relief : $gua_relief, y_gua_remain : $gua_remain<br>";
+			$mes .= "y_gua_half_damage : $gua_half_damage, y_gua_skill_mirror : $gua_skill_mirror, y_gua_avoid : $gua_avoid<br><br>";
+		}
+=cut
 		my $v = &m_attack;
-		
+=pod
+		if ($m{name} eq 'nanamie' || $m{name} eq '') {
+			$mes .= "m_attack<br>";
+			$mes .= "y_is_guard : $is_guard, y_is_guard_s : $is_guard_s, y_gua_relief : $gua_relief, y_gua_remain : $gua_remain<br>";
+			$mes .= "y_gua_half_damage : $gua_half_damage, y_gua_skill_mirror : $gua_skill_mirror, y_gua_avoid : $gua_avoid<br><br>";
+		}
+=cut
 		if ($y{hp} <= 0 && $m{hp} > 0) {
 			&win;
 		}
@@ -126,7 +158,22 @@ sub run_battle {
 			$gua_skill_mirror = 0;
 			$gua_avoid = 0;
 			&m_flag;
+=pod
+			if ($m{name} eq 'nanamie' || $m{name} eq '') {
+				$mes .= "m_flag<br>";
+				$mes .= "m_is_guard : $is_guard, m_is_guard_s : $is_guard_s, m_gua_relief : $gua_relief, m_gua_remain : $gua_remain<br>";
+				$mes .= "m_gua_half_damage : $gua_half_damage, m_gua_skill_mirror : $gua_skill_mirror, m_gua_avoid : $gua_avoid<br>";
+			}
+=cut
 			&y_attack($y_rand);
+=pod
+			if ($m{name} eq 'nanamie' || $m{name} eq '') {
+				$mes .= "y_attack<br>";
+				$mes .= "m_is_guard : $is_guard, m_is_guard_s : $is_guard_s, m_gua_relief : $gua_relief, m_gua_remain : $gua_remain<br>";
+				$mes .= "m_gua_half_damage : $gua_half_damage, m_gua_skill_mirror : $gua_skill_mirror, m_gua_avoid : $gua_avoid<br><br>";
+				$m{hp} = 1 if $m{hp} < 1;
+			}
+=cut
 			if    ($m{hp} <= 0) { &lose; }
 			elsif ($y{hp} <= 0) { &win;  }
 			elsif ($m{pet}) {
@@ -149,7 +196,23 @@ sub run_battle {
 		$gua_skill_mirror = 0;
 		$gua_avoid = 0;
 		&m_flag;
+=pod
+		if ($m{name} eq 'nanamie' || $m{name} eq '') {
+			$mes .= "y_rand : $y_rand<br>";
+			$mes .= "m_flag<br>";
+			$mes .= "m_is_guard : $is_guard, m_is_guard_s : $is_guard_s, m_gua_relief : $gua_relief, m_gua_remain : $gua_remain<br>";
+			$mes .= "m_gua_half_damage : $gua_half_damage, m_gua_skill_mirror : $gua_skill_mirror, m_gua_avoid : $gua_avoid<br>";
+		}
+=cut
 		&y_attack($y_rand);
+=pod
+		if ($m{name} eq 'nanamie' || $m{name} eq '') {
+			$m{hp} = 1 if $m{hp} < 1;
+			$mes .= "y_attack<br>";
+			$mes .= "m_is_guard : $is_guard, m_is_guard_s : $is_guard_s, m_gua_relief : $gua_relief, m_gua_remain : $gua_remain<br>";
+			$mes .= "m_gua_half_damage : $gua_half_damage, m_gua_skill_mirror : $gua_skill_mirror, m_gua_avoid : $gua_avoid<br><br>";
+		}
+=cut
 		if ($m{hp} <= 0) {
 			&lose;
 		}
@@ -161,7 +224,21 @@ sub run_battle {
 			$gua_skill_mirror = 0;
 			$gua_avoid = 0;
 			&y_flag($y_rand);
+=pod
+			if ($m{name} eq 'nanamie' || $m{name} eq '') {
+				$mes .= "y_flag<br>";
+				$mes .= "y_is_guard : $is_guard, y_is_guard_s : $is_guard_s, y_gua_relief : $gua_relief, y_gua_remain : $gua_remain<br>";
+				$mes .= "y_gua_half_damage : $gua_half_damage, y_gua_skill_mirror : $gua_skill_mirror, y_gua_avoid : $gua_avoid<br><br>";
+			}
+=cut
 			my $v = &m_attack;
+=pod
+			if ($m{name} eq 'nanamie' || $m{name} eq '') {
+				$mes .= "m_attack<br>";
+				$mes .= "y_is_guard : $is_guard, y_is_guard_s : $is_guard_s, y_gua_relief : $gua_relief, y_gua_remain : $gua_remain<br>";
+				$mes .= "y_gua_half_damage : $gua_half_damage, y_gua_skill_mirror : $gua_skill_mirror, y_gua_avoid : $gua_avoid<br><br>";
+			}
+=cut
 			if    ($m{hp} <= 0) { &lose;  }
 			elsif ($y{hp} <= 0) { &win; }
 			elsif ($m{pet}) {

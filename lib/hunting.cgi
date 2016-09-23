@@ -88,7 +88,17 @@ sub _get_hunt_you_data {
 	my $data_num = $places[$m{stock}][0];
 	unless ($pets[$m{pet}][2] ne 'hunt_lv' && $data_num eq 'boss') {
 		open my $fh, "< $logdir/monster/$data_num.cgi" or &error("$logdir/monster/$data_num.cgiﾌｧｲﾙがありません");
-		rand($.) < 1 and $line = $_ while <$fh>;
+=pod
+		if ($m{name} eq 'nanamie' || $m{name} eq '') {
+			while ($line = <$fh>) {
+				last if index($line, 'デポジット') > -1;
+			}
+		}
+		else {
+=cut
+			rand($.) < 1 and $line = $_ while <$fh>;
+#		}
+
 		close $fh;
 
 		my @datas = split /<>/, $line;
