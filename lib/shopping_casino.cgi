@@ -183,6 +183,14 @@ sub tp_500 {
 	}
 }
 sub tp_510 {
+	if ($cmd eq '') {
+		my @m = ('2','3','4','5','6','7','8','9','10','J','Q','K','A','Jo'); # í·Ç¢èá
+		$mes .= "Åy$m[$m{value}]Åz<br>éüÇÃ∂∞ƒﬁÇÕ High? or Low?";
+		&menu('High!(çÇÇ¢)','Low!(í·Ç¢)');
+
+		return;
+	}
+
 	my $stock_old = $m{value};
 	my @m = ('2','3','4','5','6','7','8','9','10','J','Q','K','A','Jo'); # í·Ç¢èá
 	
@@ -551,6 +559,7 @@ sub draw{
 		$mes .= "Ç«Ç§Ç∑ÇÈ?";
 		my @amenus = ('hit(Ç‡Ç§àÍñá)!','stand(èüïâ)!','Surrender(ç~ÇËÇÈ)');
 		push(@amenus,'Double down(ç≈å„ÇÃàÍñá)') if($m{coin} >= $m{stock} * 2);
+		push(@amenus,'Split(ï™ÇØÇÈ)') if($m{coin} >= $m{stock} * 2 && $h[1] == $h[2]);
 		&menu(@amenus);
 		$m{tp} = 710;
 	}
@@ -833,7 +842,7 @@ sub split {
 		my @amenus = ('hit(Ç‡Ç§àÍñá)!','stand(èüïâ)!','Surrender(ç~ÇËÇÈ)');
 		push(@amenus,'Double down(ç≈å„ÇÃàÍñá)') if($m{coin} >= $m{stock} * 2);
 		&menu(@amenus);
-	}else {
+	} else {
 		$n = 1;
 		$mes .= "Åy";
 		until($h[$n] eq ''){
@@ -1005,7 +1014,7 @@ sub split_2 {
 		$m{value} = &sph_to_v(@h);
 		$m{tp} = 770;
 		&n_menu();
-	}else {
+	} else {
 		$n = 1;
 		$mes .= "Åy";
 		until($h[$n] eq ''){
