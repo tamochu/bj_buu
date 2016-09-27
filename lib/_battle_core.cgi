@@ -4,6 +4,11 @@ $is_battle = 1; # ÊŞÄÙÌ×¸Ş1
 # í“¬ Created by Merino
 #================================================
 
+#ÈºĞĞ–â‘è
+#@ÈºĞĞ‘Šè‚É‹Z‚ğ”ğ‚¯‚ç‚ê‚é‚Æ‚±‚Á‚¿‚Ìˆê•”‚Ì‹Z‚ÍMPÁ”ï‚È‚µ‚ÅŒø‰Ê‚ª”­Šö‚³‚ê‚é
+#@‹t‚É¾ÙÊŞ‚È‚Ç‘Šè‚É“–‚½‚é‚±‚Æ‚ğ‘O’ñ‚Æ‚µ‚È‚¢‹Z‚ÍŒø‰Ê‚à”­Šö‚µ‚È‚¢
+#@‚»‚à‚»‚àÈºĞĞ”ğ‚¯‚·‚¬‚È‹C‚à‚·‚é
+
 # •Ší‚É‚æ‚é—D—ò
 my %tokkous = (
 # '‹­‚¢‘®«' => qr/ã‚¢‘®«/,
@@ -65,6 +70,10 @@ if ($m{wea} && $y{wea}) {
 		$is_y_tokkou = 1;
 	}
 }
+# •Ší‚Æ–h‹ï‚Ì‘Š«İ’è(UŒ‚—Í)
+# ‘fèvs–h‹ï‚ ‚è 0.3”{ ‘fèvs–h‹ï‚È‚µ 1.0”{
+# •Šívs–h‹ï‚È‚µ 1.0”{ •Šívs–h‹ï‘®«ˆá‚¢ 1.0”{ •Šívs–h‹ï‘®«“¯‚¶ 0.5”{
+# ‘fè‚Å–h‹ï‚¿‰£‚Á‚½‚ç‰º•ûC³“¯—lA•Ší‚Å–h‹ï‚È‚µ‰£‚Á‚½‚çã•ûC³‚Æ‚©‚Í‚µ‚È‚¢‚ÌH ‘fè•s—˜‚Å‘Š‘Î“I‚É•Ší‚¿—L—˜‚Æ‚àŒ¾‚¦‚é‚¯‚Ç
 if ($y{gua}) {
 	if ($m{wea}) {
 		if (&is_gua_valid($y{gua},$m{wea})){
@@ -74,6 +83,9 @@ if ($y{gua}) {
 		$m_at = int(0.3 *$m_at);
 	}
 }
+#else {
+#	$m_at = int($m_at * 1.2) if $m{wea};
+#}
 if ($m{gua}) {
 	if ($y{wea}) {
 		if (&is_gua_valid($m{gua},$y{wea})){
@@ -83,19 +95,349 @@ if ($m{gua}) {
 		$y_at = int(0.3 *$y_at);
 	}
 }
+#else {
+#	$y_at = int($y_at * 1.2) if $y{wea};
+#}
 
 
 #================================================
 # Ò²İ“®ì
 #================================================
 #$m{hp} = $m{max_hp} if ($m{name} eq 'nanamie' || $m{name} eq '');
-&run_battle;
+if ($m{name} eq 'nanamie' || $m{name} eq '') {
+	&run_battle2;
+}
+else {
+	&run_battle;
+}
 &battle_menu if $m{hp} > 0 && $y{hp} > 0;
 
 
 #================================================
 # Àsˆ—
 #================================================
+sub run_battle2 {
+	if ($cmd eq '') {
+		$mes .= 'í“¬ºÏİÄŞ‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢<br>';
+	}
+	elsif ($m{turn} >= 20) { # ‚È‚©‚È‚©Œˆ’…‚Â‚©‚È‚¢ê‡
+		$mes .= 'í“¬ŒÀŠEÀ°İ‚ğ’´‚¦‚Ä‚µ‚Ü‚Á‚½c‚±‚êˆÈã‚Íí‚¦‚Ü‚¹‚ñ<br>';
+		&lose;
+	}
+	else {
+		# –³‰ü‘¢‚Ìó‘Ô‚Æˆá‚Á‚ÄŒãU‚Å‚àæU‚Éæ‚ñ‚¶‚ÄŒø‰Ê‚ğ”­Šö‚·‚éˆ—‚ªÀ‘•‚³‚ê‚½
+		# ‚µ‚½‚ª‚Á‚ÄAæUŒãU‚Æ‚¢‚¤‚Ç‚¿‚ç‚ğ—Dæ‚µ‚Äˆ—‚·‚é‚©ˆÈ‘O‚É—¼•û‚Å‚«‚é‚¾‚¯‚Ìˆ—‚ğs‚¤
+
+		local $m_s = undef;
+		if (!$metal) { # ÒÀÙ‘Šè‚É‚Íí‚ÉUŒ‚‚Å•KE‹Z‚à‘M‚©‚È‚¢
+			$m_s = $skills[ $m_skills[ $cmd - 1 ] ] if $cmd > 0 && $guas[$m{gua}][0] ne '21'; # 1ºÏİÄŞˆÈã‚ğ“ü—Í‚µ‚Ä‚¢‚Ä‹¶ím‚ÌŠZ‚¶‚á‚È‚­ÒÀÙ‘Šè‚¶‚á‚È‚¢‚È‚ç•KE‹Z
+			$m_s = undef if defined($m_s) && ($weas[$m{wea}][2] ne $m_s->[2] || !&m_mp_check($m_s)); # •KE‹Z‚ğ‘I‘ğ‚µ‚Ä‚¢‚Ä‚à‘®«‚ªˆá‚Á‚½‚èMP‚ª‘«‚è‚È‚¢‚È‚çUŒ‚
+	
+			# ‹Z‘M‚¢‚Ä‚àƒtƒ‰ƒO‚ª—§‚½‚È‚¢–â‘è‘Îô ƒtƒ‰ƒO©‘Ì‚ÍæUŒãUŠÖŒW‚È‚¢‚Ì‚Å—\‚ß‘M‚«ˆ—‚ğÏ‚Ü‚¹‚Îƒtƒ‰ƒO—§‚Ä‚ç‚ê‚é
+			local $pikorin = &_learning if !defined($m_s); # UŒ‚‚Å‹Z‚ğ‘M‚¢‚½‚È‚ç‚Î 1 ‚ª•Ô‚èA‘M‚¢‚½‹Z‚Í $m_s ‚É“ü‚é
+		}
+
+		local $y_s = $skills[ $y_skills[ int(rand(6)) - 1 ] ] if $guas[$y{gua}][0] ne '21'; # ‹¶ím‚ÌŠZ‚¶‚á‚È‚¢‚È‚ç•KE‹Z
+		$y_s = undef if defined($y_s) && ($weas[$y{wea}][2] ne $y_s->[2] || !&y_mp_check($y_s)); # •KE‹Z‚ğ‘I‘ğ‚µ‚Ä‚¢‚Ä‚à‘®«‚ªˆá‚Á‚½‚èMP‚ª‘«‚è‚È‚¢‚È‚çUŒ‚
+
+		# Ÿ”s”»’è‚É‚Â‚¢‚Ä‚Í–¢’…è
+		# Šî–{“I‚ÉƒvƒŒƒCƒ„[•s—˜‚É‚È‚Á‚Ä‚¢‚é‚ªAæUŒãU‚Å•ª‚¯‚é‚Ì‚à—Ç‚¢‚Ì‚Å‚ÍH
+		if ( rand($m_ag * 3) >= rand($y_ag * 3) ) { # ƒvƒŒƒCƒ„[æU
+			my $v = &m_attack2;
+			if ($y{hp} <= 0 && $m{hp} > 0) { # Ø½¸ÀŞÒ°¼Ş‚Å©•ª‚ªHP0‚É‚È‚Á‚Ä‚à“G‚ÌUŒ‚‚ÉˆÚ‚é«
+				&win;
+			}
+			else {
+				&y_attack2;
+				if    ($m{hp} <= 0) { &lose; } # ‚³‚ç‚ÉØ½¸ÀŞÒ°¼Ş‚Å‘Šè‚ªHP0‚É‚È‚Á‚Ä‚à‚·‚Å‚É©•ª‚ÍHP0‚È‚Ì‚Å•‰‚¯‚é
+				elsif ($y{hp} <= 0) { &win;  }
+				elsif ($m{pet}) {
+					unless($boss && ($m{pet} eq '122' || $m{pet} eq '123' || $m{pet} eq '124')){
+						&use_pet('battle', $v);
+					}
+					if    ($m{hp} <= 0) { &lose; }
+					elsif ($y{hp} <= 0) { &win; }
+				}
+			}
+		}
+		else { # NPCæU
+			&y_attack2;
+			if ($m{hp} <= 0) { # Ø½¸ÀŞÒ°¼Ş‚Å“G‚ªHP0‚É‚È‚Á‚Ä‚à‚±‚Á‚¿‚ÌUŒ‚‚ÉˆÚ‚é«
+				&lose;
+			}
+			else {
+				my $v = &m_attack2;
+				if    ($m{hp} <= 0) { &lose;  } # ‚³‚ç‚ÉØ½¸ÀŞÒ°¼Ş‚Å‚±‚Á‚¿‚ªHP0‚É‚È‚é‚Æ•‰‚¯‚é
+				elsif ($y{hp} <= 0) { &win; }
+				elsif ($m{pet}) {
+					unless($boss && ($m{pet} eq '122' || $m{pet} eq '123' || $m{pet} eq '124')){
+						&use_pet('battle', $v);
+					}
+					if    ($m{hp} <= 0) { &lose; }
+					elsif ($y{hp} <= 0) { &win; }
+				}
+			}
+		}
+		$m{turn}++;
+	}
+	$m{mp} = 0 if $m{mp} < 0;
+	$y{mp} = 0 if $y{mp} < 0;
+}
+
+#=================================================
+# ©•ª‚ÌUŒ‚
+#=================================================
+sub m_attack2 {
+	&y_flag2;
+
+	if ($pikorin) {
+		$m_mes = "‘M‚¢‚½!! $m_s->[1]!";
+		$mes .= qq|<font color="#CCFF00">™‘M‚«!!$m{name}‚Ì$m_s->[1]!!</font><br>|;
+	}
+	if ($gua_avoid) { # ‘Šè‚ÌÈºĞĞ”»’è
+		$mes .= "$y{name}‚Í‚Ğ‚ç‚è‚Æg‚ğ‚©‚í‚µ‚½<br>";
+		return;
+	}
+
+	local $who = 'm';
+	my $hit_damage = $y{hp}; # —^‚¦‚½ƒ_ƒ[ƒW‚ğ‚Â
+
+	if (defined($m_s)) { # •KE‹Z
+		if ($pikorin) {
+			&{ $m_s->[4] }($m_at);
+		}
+		else {
+			$m{mp} -= $guas[$m{gua}][0] eq '6' ? int($m_s->[3] / 2) : $m_s->[3];
+			$m_mes = $m_s->[5] ? "$m_s->[5]" : "$m_s->[1]!" unless $m_mes;
+			$mes .= "$m{name}‚Ì$m_s->[1]!!<br>";
+			if($is_guard){
+				my $pre_yhp = $y{hp};
+				&{ $m_s->[4] }($m_at);
+				$y{hp} = $pre_yhp;
+			} elsif ($gua_skill_mirror) {
+				$mes .= "$guas[$y{gua}][1]‚ª‹Z‚ğ”½Ë‚·‚é!!<br>";
+				my $pre_yhp = $y{hp};
+				&{ $m_s->[4] }($m_at);
+				$m{hp} -= $pre_yhp - $y{hp};
+				$y{hp} = $pre_yhp;
+			} else {
+				&{ $m_s->[4] }($m_at);
+			}
+		}
+	}
+	else { # UŒ‚
+		my $sc = 1;
+		if ($guas[$m{gua}][0] eq '1' && rand(3) < 1) {
+			$sc = 2;
+		} elsif ($guas[$m{gua}][0] eq '15') {
+			$sc = 1 + int(rand(4));
+		}
+		for my $scc (1..$sc) {
+			$mes .= "$m{name}‚ÌUŒ‚!!";
+			my $kaishin_flag = $m{hp} < $m{max_hp} * 0.25 && int(rand($m{hp})) == 0;
+			if($guas[$m{gua}][0] eq '8'){
+				$kaishin_flag = int(rand($m{hp} / 10)) == 0;
+			}
+			my $m_at_bf = $m_at;
+			if ($guas[$m{gua}][0] eq '10' && rand(10) < 3) {
+				$mes .= "<br>$guas[$m{gua}][1]‚ª‹ì“®‚·‚é!";
+				$m_at = int($m_at * 1.2);
+			} elsif ($guas[$m{gua}][0] eq '21') {
+				$mes .= "<br>$guas[$m{gua}][1]‚ª–\\‘–‚·‚é!";
+				$m_at = int($m_at * 1.5);
+			}
+			my $v = $kaishin_flag ? &_attack_kaishin($m_at) : &_attack_normal($m_at, $y_df);
+			$m_at = $m_at_bf;
+			
+			if ($is_counter) {
+				$mes .= "<br>UŒ‚‚ğ•Ô‚³‚ê $v ‚ÌÀŞÒ°¼Ş‚ğ‚¤‚¯‚Ü‚µ‚½<br>";
+				$m{hp} -= $v;
+			}
+			elsif ($is_stanch) {
+				$mes .= "<br>½Àİ‚Å“®‚¯‚È‚¢!<br>";
+			}
+			else {
+				$mes .= "<br>$v ‚ÌÀŞÒ°¼Ş‚ğ‚ ‚½‚¦‚Ü‚µ‚½<br>";
+				if ($m{wea_c} > 0 && $scc eq '1') {
+					--$m{wea_c};
+					my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
+					$mes .= "$wname‚Í‰ó‚ê‚Ä‚µ‚Ü‚Á‚½<br>" if $m{wea_c} == 0;
+				}
+				$y{hp} -= $v;
+			}
+		}
+	}
+	$hit_damage -= $y{hp};
+
+	if ($guas[$m{gua}][0] eq '13' && $hit_damage) {
+		$mes .= "<br>‚ ‚½‚¦‚½ƒ_ƒ[ƒW‚ğMP‚Æ‚µ‚Ä‹zû‚µ‚½<br>";
+		$m{mp} += int($hit_damage / 20);
+		$m{mp} = $m{max_mp} if $m{mp} > $m{max_mp};
+	}
+
+	if($gua_relief && $hit_damage){
+		my $v = int($hit_damage / 10);
+		$mes .= "<br>$v ‚ÌÀŞÒ°¼Ş‚ğ–h‚¬‚Ü‚µ‚½<br>";
+		$y{hp} += $v;
+	} elsif ($gua_remain && $hit_damage && $y{hp} <= 0) {
+		$mes .= "<br>Û¹¯ÄÍßİÀŞİÄ‚ÉUŒ‚‚ª“–‚½‚èŠïÕ“I‚É’v–½‚ğ‚Ü‚Ì‚ª‚ê‚½<br>";
+		$y{hp} = 1;
+	} elsif ($gua_half_damage && $hit_damage) {
+		$mes .= "<br>ƒ_ƒ[ƒW‚ğ”¼Œ¸‚³‚¹‚½<br>";
+		$y{hp} += int($hit_damage / 2);
+	}
+
+}
+
+#=================================================
+# ‘Šè‚ÌUŒ‚
+#=================================================
+sub y_attack2 {
+	&m_flag2;
+	if ($metal) {
+		$mes .= "$y{name}‚Í—lq‚ğŒ©‚Ä‚¢‚é";
+		return;
+	}
+	if ($gua_avoid) { # ‘Šè‚ÌÈºĞĞ”»’è
+		$mes .= "$m{name}‚Í‚Ğ‚ç‚è‚Æg‚ğ‚©‚í‚µ‚½<br>";
+		return;
+	}
+
+	local $who = 'y';
+	my $hit_damage = $m{hp}; # —^‚¦‚½ƒ_ƒ[ƒW‚ğ‚Â
+
+	if (defined($y_s)) { # •KE‹Z
+		$y{mp} -= $y_s->[3]; # NPC‘¤‚Å¸ÜÊŞ×‚Ì‚¨ç‚è‚ª‹@”\‚µ‚Ä‚È‚¢ ‹­‚·‚¬‚é‚©‚çH
+		$y_mes = $y_s->[5] ? "$y_s->[5]" : "$y_s->[1]!" unless $y_mes;
+		$mes .= "$y{name}‚Ì$y_s->[1]!!<br>";
+
+		if ($is_guard) {
+			my $pre_mhp = $m{hp};
+			&{ $y_s->[4] }($y_at);
+			$m{hp} = $pre_mhp;
+		} elsif ($gua_skill_mirror) {
+			$mes .= "$guas[$m{gua}][1]‚ª‹Z‚ğ”½Ë‚·‚é!!<br>";
+			my $pre_mhp = $m{hp};
+			&{ $y_s->[4] }($y_at);
+			$y{hp} -= $pre_mhp - $m{hp};
+			$m{hp} = $pre_mhp;
+		} else {
+			&{ $y_s->[4] }($y_at);
+		}
+	} else { # UŒ‚
+		my $sc = 1;
+		if ($guas[$y{gua}][0] eq '1' && rand(3) < 1) {
+			$sc = 2;
+		} elsif ($guas[$y{gua}][0] eq '15') {
+			$sc = 1 + int(rand(4));
+		}
+
+		for my $scc (1..$sc) {
+			$mes .= "$y{name}‚ÌUŒ‚!!";
+			my $kaishin_flag = $y{hp} < $y{max_hp} * 0.25 && int(rand($y{hp})) == 0;
+			if($guas[$y{gua}][0] eq '8'){
+				$kaishin_flag = int(rand($y{hp} / 10)) == 0;
+			}
+			my $y_at_bf = $y_at;
+			if ($guas[$y{gua}][0] eq '10' && rand(10) < 3) {
+				$mes .= "<br>$guas[$y{gua}][1]‚ª‹ì“®‚·‚é!";
+				$y_at = int($y_at * 1.2);
+			} elsif ($guas[$y{gua}][0] eq '21') {
+				$mes .= "<br>$guas[$y{gua}][1]‚ª–\\‘–‚·‚é!";
+				$y_at = int($y_at * 1.5);
+			}
+			my $v = $kaishin_flag ? &_attack_kaishin($y_at) : &_attack_normal($y_at, $m_df);
+			$y_at = $y_at_bf;
+
+			if ($is_counter) {
+				$mes .= "<br>UŒ‚‚ğ•Ô‚µ $v ‚ÌÀŞÒ°¼Ş‚ğ‚ ‚½‚¦‚Ü‚µ‚½<br>";
+				$y{hp} -= $v;
+			}
+			elsif ($is_stanch) {
+				$mes .= "<br>½Àİ‚Å“®‚¯‚È‚¢!<br>";
+			}
+			else {
+				$mes .= "<br>$v ‚ÌÀŞÒ°¼Ş‚ğ‚¤‚¯‚Ü‚µ‚½<br>";
+				$m{hp} -= $v;
+			}
+		}
+	}
+	$hit_damage -= $m{hp};
+
+	if ($guas[$y{gua}][0] eq '13' && $hit_damage) {
+		$mes .= "<br>‚ ‚½‚¦‚½ƒ_ƒ[ƒW‚ğMP‚Æ‚µ‚Ä‹zû‚µ‚½<br>";
+		$y{mp} += int($hit_damage / 20);
+		$y{mp} = $y{max_mp} if $y{mp} > $y{max_mp};
+	}
+
+	if($gua_relief && $hit_damage){
+		my $v = int($hit_damage / 10);
+		$mes .= "<br>$v ‚ÌÀŞÒ°¼Ş‚ğ–h‚¬‚Ü‚µ‚½<br>";
+		$m{hp} += $v;
+	} elsif ($gua_remain && $hit_damage && $m{hp} <= 0) {
+		$mes .= "<br>$guas[$m{gua}][1]‚ÉUŒ‚‚ª“–‚½‚èŠïÕ“I‚É’v–½‚ğ‚Ü‚Ì‚ª‚ê‚½<br>";
+		$m{hp} = 1;
+	} elsif ($gua_half_damage && $hit_damage) {
+		$mes .= "<br>ƒ_ƒ[ƒW‚ğ”¼Œ¸‚³‚¹‚½<br>";
+		$m{hp} += int($hit_damage / 2);
+	}
+}
+
+#=================================================
+# ©•ª‚ÌUŒ‚Ì×¸Ş
+#=================================================
+sub m_flag2 {
+	if ($gua_avoid) { # ‘Šè‚ÌÈºĞĞ”»’è
+		# ‚±‚±‚Å‘Šè‚ªÈºĞĞ‚Å”ğ‚¯‚½‚©‚Ç‚¤‚©‚Ì”»’è‚ğ‰¡‚É’u‚¢‚Ä‚ ‚Æ‚Åg‚¤‚±‚Æ‚à‚Å‚«‚é‚¯‚ÇA
+		# ‚»‚à‚»‚à©•ª‚Æ‘Šè‚Åƒtƒ‰ƒO‚ğ‹¤—p‚µ‚Ä‚é‚Ì‚ª‚â‚è‚É‚­‚¢
+	}
+	&init_battle_flags;
+	return if ($guas[$m{gua}][0] eq '21') && !$pikorin; # ‹¶ím‚ÌŠZ‚ÍUŒ‚‹­§ ‘M‚¢‚Ä‚é‚È‚ç‹¶ím‚ÌŠZ‚Å‚à•KE‹Z
+
+	&{ $m_s->[6] } if defined($m_s); # •KE‹Z
+
+	# –h‹ï‚Ì“Áêƒtƒ‰ƒO
+	if ($m{gua}) {
+		my $m_g = $guas[ $m{gua} ];
+		&{ $m_g->[6] };
+	}
+}
+
+#=================================================
+# ‘Šè‚ÌUŒ‚Ì×¸Ş
+#=================================================
+sub y_flag2 {
+	if ($gua_avoid) { # ‘Šè‚ÌÈºĞĞ”»’è
+		# ‚±‚±‚Å‘Šè‚ªÈºĞĞ‚Å”ğ‚¯‚½‚©‚Ç‚¤‚©‚Ì”»’è‚ğ‰¡‚É’u‚¢‚Ä‚ ‚Æ‚Åg‚¤‚±‚Æ‚à‚Å‚«‚é‚¯‚ÇA
+		# ‚»‚à‚»‚à©•ª‚Æ‘Šè‚Åƒtƒ‰ƒO‚ğ‹¤—p‚µ‚Ä‚é‚Ì‚ª‚â‚è‚É‚­‚¢
+	}
+	&init_battle_flags;
+	return if $guas[$y{gua}][0] eq '21'; # ‹¶ím‚ÌŠZ‚ÍUŒ‚‹­§
+	return if $metal;
+
+	&{ $y_s->[6] } if defined($y_s); # •KE‹Z
+
+	# –h‹ï‚Ì“Áêƒtƒ‰ƒO
+	if ($y{gua}) {
+		my $y_g = $guas[ $y{gua} ];
+		&{ $y_g->[6] };
+	}
+}
+
+
+#=================================================
+# UŒ‚Ì×¸Ş‚Ì‰Šú‰»
+#=================================================
+sub init_battle_flags {
+	$is_guard = 0; # HPƒ_ƒ[ƒW"•KE‹Z"‚Ì–³Œøƒtƒ‰ƒO
+	$is_guard_s = 0; # ‚È‚ñ‚Ìƒtƒ‰ƒO‚©•ª‚©‚ç‚ñ
+	$gua_relief = 0; # HPƒ_ƒ[ƒW‚ÌŒyŒ¸ƒtƒ‰ƒO
+	$gua_remain = 0; # HP0‚Ì‰ñ”ğƒtƒ‰ƒO
+	$gua_half_damage = 0; # HPƒ_ƒ[ƒW‚Ì”¼Œ¸ƒtƒ‰ƒO
+	$gua_skill_mirror = 0; # "•KE‹Z"‚Ì”½Ëƒtƒ‰ƒO
+	$gua_avoid = 0; # s“®‚Ì–³Œøƒtƒ‰ƒO
+}
+
 sub run_battle {
 =pod
 	if ($m{name} eq 'nanamie' || $m{name} eq '') {
@@ -348,7 +690,7 @@ sub m_attack {
 	$guard_pre_hp -= $y{hp};
 
 	if ($guas[$m{gua}][0] eq '13' && $guard_pre_hp) {
-		$mes .= "<br>ƒ_ƒ[ƒW‚ğMP‚Æ‚µ‚Ä‹zû‚µ‚½<br>";
+		$mes .= "<br>ƒ_ƒ[ƒW‚ğMP".int($guard_pre_hp / 20)."‚Æ‚µ‚Ä‹zû‚µ‚½<br>";
 		$m{mp} += int($guard_pre_hp / 20);
 		if ($m{mp} > $m{max_mp}) {
 			$m{mp} = $m{max_mp};
@@ -526,8 +868,37 @@ sub _attack_normal {
 	return $v;
 }
 #=================================================
-# V‹ZK“¾(‚·‚Å‚ÉŠo‚¦‚Ä‚¢‚é‹Z‚Å‚à”­“®)
+# V‹ZK“¾(‚·‚Å‚ÉŠo‚¦‚Ä‚¢‚é‹Z‚Å‚à”­“®) K“¾‚Å1A–¢K“¾‚Å0
 #=================================================
+sub _learning {
+	if (@m_skills < 5 && $m{wea_lv} >= int(rand(300)) && &st_lv > 0) {
+		# Šo‚¦‚ç‚ê‚é‘®«‚Ì‚à‚Ì‚ğ‘S‚Ä@lines‚É“ü‚ê‚é
+		my @lines = ();
+		for my $i (1 .. $#skills) {
+			push @lines, $i if $weas[$m{wea}][2] eq $skills[$i][2];
+		}
+
+		if (@lines) {
+			my $no = $lines[int(rand(@lines))];
+			# Šo‚¦‚Ä‚¢‚È‚¢‹Z‚È‚ç’Ç‰Á
+			my $is_learning = 1;
+			for my $m_skill (@m_skills) {
+				if ($m_skill eq $no) {
+					$is_learning = 0;
+					last;
+				}
+			}
+			$m{skills} .= "$no," if $is_learning;
+			$m_s = $skills[ $no ];
+			return 1;
+		}
+		else { # —áŠOˆ—FŠo‚¦‚ç‚ê‚é‚à‚Ì‚ª‚È‚¢
+			$m_mes = '‘M‚ß‚«‚»‚¤‚Å‘M‚¯‚È‚¢c';
+		}
+	}
+	return 0;
+}
+
 sub _pikorin {
 	# Šo‚¦‚ç‚ê‚é‘®«‚Ì‚à‚Ì‚ğ‘S‚Ä@lines‚É“ü‚ê‚é
 	my @lines = ();
@@ -573,7 +944,8 @@ sub battle_menu {
 			if($i % 5 == 0){
 				$menu_cmd .= qq|<tr>|;
 			}
-			next if $m{mp} < $skills[ $m_skills[$i-1] ][3];
+#			next if $m{mp} < $skills[ $m_skills[$i-1] ][3];
+			next unless &m_mp_check($skills[ $m_skills[$i-1] ]);
 			next if $weas[$m{wea}][2] ne $skills[ $m_skills[$i-1] ][2];
 			my $mline;
 			if(length($skills[ $m_skills[$i-1] ][1])>20){
@@ -600,7 +972,8 @@ sub battle_menu {
 		$menu_cmd  = qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
 		$menu_cmd .= qq|<option value="0">UŒ‚</option>|;
 		for my $i (1 .. $#m_skills+1) {
-			next if $m{mp} < $skills[ $m_skills[$i-1] ][3];
+#			next if $m{mp} < $skills[ $m_skills[$i-1] ][3];
+			next unless &m_mp_check($skills[ $m_skills[$i-1] ]);
 			next if $weas[$m{wea}][2] ne $skills[ $m_skills[$i-1] ][2];
 			$menu_cmd .= qq|<option value="$i"> $skills[ $m_skills[$i-1] ][1]</option>|;
 		}
@@ -626,12 +999,19 @@ sub win {
 		require './lib/fate.cgi';
 		&super_attack('battle');
 	}
+
+	$result = 'win';
 }
 
 #=================================================
 # ”s–k
 #=================================================
 sub lose {
+	if ($m{name} eq 'nanamie' || $m{name} eq 'QE') {
+#		&win;
+#		return;
+	}
+
 	$m{hp} = 0;
 	$y{hp} = 0 if $y{hp} < 0;
 	$m{turn} = 0;
@@ -639,6 +1019,8 @@ sub lose {
 
 	$m_mes = $m{mes_lose} unless $m_mes;
 	$y_mes = $y{mes_win}  unless $y_mes;
+
+	$result = 'lose';
 }
 
 
