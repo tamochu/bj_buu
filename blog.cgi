@@ -288,6 +288,17 @@ sub comment_exe {
 	# ↑自分が存在するかのチェック後に読んでたブログIDを戻さないと、
 	# コメント投稿直後に表示されるブログの「ｺﾒﾝﾄを書く」先が自分の日記になってしまう
 	$in{id} = $blog_uid;
+	if ($seeds{$m{seed}}[0] eq 'ｶｼﾗﾊﾟﾝﾀﾞ') {
+		# 匿名じゃなく種族がｶｼﾗﾊﾟﾝﾀﾞなら投稿内容を各行に分解し空行以外の文末に「かしら」を追加
+		# どう考えても正規表現でできそうだけどなんだかエラーになるし調べるの面倒だからこれでとりあえず　※投稿内容の「改行」は「<br>」
+		my @comments = split('<br>', $in{comment});
+		$in{comment} = '';
+		for my $i (0 .. $#comments) {
+			$in{comment} .= "$comments[$i]かしら" if $comments[$i] ne '';
+			$in{comment} .= '<br>' if $i < $#comments;
+		}
+		&error("文字数ｵｰﾊﾞｰ全角300(半角600)文字までです") if length $in{comment} > 600;
+	}
 
 	if (-f "$userdir/$blog_uid/blacklist.cgi") {
 		open my $fh, "< $userdir/$blog_uid/blacklist.cgi" or &error("$userdir/$blog_uid/blacklist.cgiﾌｧｲﾙが開けません");
