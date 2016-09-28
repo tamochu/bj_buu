@@ -174,6 +174,7 @@ sub status_pc {
 			$petname = $m{boch_pet};
 		}
 	}
+	my $pet_icon = qq|<p><img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;"></p>| if $m{icon_pet};
 	print <<"EOM";
 		<font color="$cs{color}[$m{country}]">$cs{name}[$m{country}]</font> $rank_name<br>
 		$units[$m{unit}][1]
@@ -181,7 +182,7 @@ sub status_pc {
 			<font color="#9999CC">武器：[$weas[$m{wea}][2]]$wname★<b>$m{wea_lv}</b></font><br>
 			<font color="#9999CC">防具：[$guas[$m{gua}][2]]$guas[$m{gua}][1]</font><br>
 			<font color="#99CCCC">ﾍﾟｯﾄ：$petname</font><br>
-			<font color="#99CC99">ﾀﾏｺﾞ：$eggs[$m{egg}][1]</font>
+			<font color="#99CC99">ﾀﾏｺﾞ：$eggs[$m{egg}][1]</font><br>
 		</tt></td><td valign="top" align="left"><tt>
 			<b>$m{sedai}</b>世代目 $sexes[ $m{sex} ]<br>
 			Lv.<b>$m{lv}</b> [$jobs[$m{job}][1]][$seeds{$m{seed}}[0]]<br>
@@ -191,6 +192,7 @@ sub status_pc {
 			勲　章　<b>$m{medal}</b>個<br>
 			ｶｼﾞﾉｺｲﾝ <b>$m{coin}</b>枚<br>
 			<p>更新日時 $m{ldate}</p>
+			$pet_icon
 		</tt></td></tr></table>
 		<tt>
 

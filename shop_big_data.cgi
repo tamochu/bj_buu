@@ -70,7 +70,7 @@ sub run {
 	print qq|<form action="$this_script">|;
 	print qq|<select name="item">|;
 	for $i (1..$#pets) {
-		if ($i ne '180' && $i ne '181') {
+		if ($i ne '180' && $i ne '181' && $pets[$i][0] > 0) {
 			print qq|<option value="3_$i">$pets[$i][1]</option>|;
 		}
 	}

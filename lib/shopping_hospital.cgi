@@ -22,6 +22,7 @@ my @menus = (
 	['性転換手術',	$base_price * 50],
 	['ﾛﾎﾞﾄﾐｰ手術',	500000],
 	['整形手術',	1000], # ｱｲｺﾝを使わない場合はこの行と sub tp_400以降を削除してOK
+	['首輪交換',	1000], # ｱｲｺﾝを使わない場合はこの行と sub tp_400以降を削除してOK
 	['符牒更新',	10000], # ｱｲｺﾝを使わない場合はこの行と sub tp_400以降を削除してOK
 );
 
@@ -397,16 +398,176 @@ sub tp_420 {
 }
 
 #================================================
-# 符牒更新
+# 首輪
 #================================================
 sub tp_500 {
+	if ($default_icon eq '') {
+		$mes .= 'ごめんなさぁい。この病院には獣医がいないのぉ<br>';
+		&begin;
+		return;
+	}
+	elsif ($pets[$m{pet}][0] == 0) {
+		$mes .= 'ごめんなさぁい。まずはﾍﾟｯﾄを連れてきてね<br>';
+		&begin;
+		return;
+	}
+	elsif ($pets[$m{pet}][0] < 0) {
+		$mes .= 'ごめんなさぁい。そのﾍﾟｯﾄには首輪は似合わないわぁ<br>';
+		&begin;
+		return;
+	}
+	$mes .= "$menus[5][0]は、貴方のﾍﾟｯﾄの個性をチョイアゲ↑しちゃうわよぉ<br>";
+	$mes .= "首輪を交換するには、$menus[5][1] Gかかりますけどぉ<br>";
+	$mes .= "どぉするぅ？<br>";
+	$m{tp} += 10;
+	&menu("やめる", "$menus[5][0]する");
+}
+sub tp_510 {
+	return if &is_ng_cmd(1);
+	if ($default_icon eq '') {
+		&begin;
+		return;
+	}
+	
+	$layout = 2;
+	$mes .= 'どのような首輪にしますぅ?<br>ｶﾀﾛｸﾞからお選びくださぁい<br>';
+
+	$mes .= qq|<form method="$method" action="$script">|;
+	$mes .= qq|<input type="radio" name="icon" value="0" checked> やめる<hr>|;
+
+	$mes .= qq|<input type="radio" name="icon" value="1">首輪を外す<hr>|;
+
+	if($cmd eq '1'){
+		opendir my $dh, "$icondir/pet" or &error('ﾍﾟｯﾄﾌｫﾙﾀﾞが開けません');
+		while (my $file_name = readdir $dh) {
+			next if $file_name =~ /^\./;
+			next if $file_name =~ /\.html$/;
+			next unless $file_name =~ /^$m{pet}_/;
+
+			my $checked = " checked=\"checked\"" if $file_name eq $m{icon_pet};
+
+			# ちょっと行き当たりばったりの強引
+			my $name = $file_name;
+			$name =~ s/^\d+_//;
+			my $file_title = &get_goods_title($name);
+			$file_title =~ s/.*?\s//;
+			$mes .= qq|<input type="radio" name="icon" value="$file_name"$checked><img src="$icondir/pet/$file_name" $mobile_icon_size> $file_title<hr>|;
+		}
+		closedir $dh;
+	}
+
+	if($cmd eq '2'){
+		my %add_num = ();
+		open my $fh, "< $logdir/add_icon_number.cgi" or &error('ｱｲｺﾝﾘｽﾄが開けません');
+		while (my $line = <$fh>) {
+			my($i_name, $number) = split /<>/, $line;
+			$add_num{$i_name} = $number;
+		}
+		close $fh;
+
+		my $icon_no;
+		$icon_no = 0;
+		opendir my $dh_d, "$icondir" or &error('ﾃﾞﾌｫﾙﾄﾋﾟｸﾁｬが開けません');
+		while (my $file_name_d = readdir $dh_d) {
+			next if $file_name_d =~ /^\./;
+			next if $file_name_d =~ /\.html$/;
+
+			if ($file_name_d =~ /^_add/){
+				my $file_title_d = "No.$icon_no";
+				$file_title_d .= ":$add_num{$file_name_d}人";
+				$mes .= qq|<input type="radio" name="icon" value="$file_name_d"><img src="$icondir/$file_name_d" $mobile_icon_size> $file_title_d<hr>|;
+				$icon_no++;
+			}
+		}
+		closedir $dh_d;
+	}
+
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<input type="submit" value="決定" class="button1"></form>|;
+
+	$m{tp} += 10;
+	&n_menu;
+}
+sub tp_520 {
+	if ($default_icon eq '') {
+		&begin;
+		return;
+	}
+
+	if ($in{icon} && ($in{icon} == 1)) {
+		$m{icon_pet} = '';
+		$mes .= '外した首輪はこっちで回収しておくわね<br>';
+		&refresh;
+		&n_menu;
+	}
+	elsif ($in{icon} && ($in{icon} eq $m{icon_pet})) {
+		$mes .= 'やめました<br>';
+		&begin;
+	}
+	elsif ($in{icon} && (-f "$icondir/pet/$in{icon}") ) {
+		if ($m{money} >= $menus[5][1]) {
+			$m{pet_icon} = '';
+
+			$m{icon_pet} = $in{icon};
+
+			$mes .= 'これであなたのﾍﾟｯﾄもイケイケ↑よぉ<br>';
+
+			$m{money} -= $menus[5][1];
+
+			# ちょっと行き当たりばったりの強引
+			my $file_name = $in{icon};
+			$file_name =~ s/^\d+_//;
+			my $name = &get_goods_title($file_name);
+			$name =~ s/.*作://; # 作者名
+			&send_money($name,'印税収入として黒十字病院',$menus[5][1]*0.3);
+
+			my $id = unpack 'H*', $m{name};
+			my $this_file = "$userdir/$id/pet_icon.cgi";
+			if (-f "$this_file") {
+				open my $fh, "+< $this_file" or &error("$this_file ﾌｧｲﾙが開けません");
+				eval { flock $fh, 2; };
+				my $line = <$fh>;
+				if(index($line, "<>$m{pet}_") >= 0){
+					$line =~ s/<>($m{pet}_).*?<>/<>$1$m{icon_pet}<>/;
+				}else{
+					$line = $line . "$m{icon_pet}<>";
+				}
+				seek  $fh, 0, 0;
+				truncate $fh, 0;
+				print $fh $line;
+				close $fh;
+			}
+			else {
+				open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
+				print $fh "<>$m{icon_pet}<>";
+				close $fh;
+			}
+
+			&refresh;
+			&n_menu;
+		}
+		else {
+			$mes .= 'あらぁ、お金が足りませんわぁ<br>';
+			&begin;
+		}
+	}
+	else {
+		$mes .= 'やめました<br>';
+		&begin;
+	}
+}
+
+#================================================
+# 符牒更新
+#================================================
+sub tp_600 {
 	$mes .= "$menus[5][0]をするとぉ、貴方のﾊﾟｽﾜｰﾄﾞを変えることができるわぁ<br>";
 	$mes .= "変更をするには、$menus[5][1] G必要よぉ<br>";
 	$mes .= "どぉするぅ？<br>";
 	$m{tp} += 10;
 	&menu("やめる", "$menus[5][0]する");
 }
-sub tp_510 {
+sub tp_610 {
 	return if &is_ng_cmd(1);
 
 	$mes .= qq|それでわぁ、新しいお名前とﾊﾟｽﾜｰﾄﾞを教えてね<br>|;
@@ -417,7 +578,7 @@ sub tp_510 {
 	$m{tp} += 10;
 	&n_menu;
 }
-sub tp_520 {
+sub tp_620 {
 	if ($m{money} < $menus[5][1]) {
 		$mes .= 'あらぁ、お金が足りませんわぁ<br>';
 		&begin;

@@ -71,8 +71,18 @@ sub tp_100 {
 	$mes .= qq|<font color="#FF0000">※一度つけたﾀｲﾄﾙは変更することができません</font><br>|;
 	$mes .= qq|$sub_mes<hr>|;
 	$mes .= qq|ﾀｲﾄﾙ[全角8(半角16)文字まで]<br><input type="text" name="title" class="text_box1"><br>|;
-	$mes .= qq|<input type="checkbox" name="is_ad" value="1">$goods_nameを宣伝する($need_ad_money G)<br>|;
-	$mes .= qq|<input type="checkbox" name="is_send_public" value="1">$goods_nameをデフォルトアイコンに追加する<br>| if $goods_type eq 'img';
+		$mes .= qq|<input type="checkbox" name="is_ad" value="1">$goods_nameを宣伝する($need_ad_money G)<br>|;
+	if ($goods_type eq 'img') {
+		$mes .= qq|<input type="radio" name="is_send_public" value="1">$goods_nameをデフォルトアイコンに追加する<br>|;
+		$mes .= qq|<input type="radio" name="is_send_public" value="2">$goods_nameをペットアイコンに追加する<br>|;
+		$mes .= qq|<select name="pet">|;
+		for $i (1..$#pets) {
+			if ($pets[$i][0] > 0) {
+				$mes .= qq|<option value="$i">$pets[$i][1]</option>\n|;
+			}
+		}
+		$mes .= qq|</select>|;
+	}
 	$mes .= qq|<input type="checkbox" name="is_send_library" value="1">$goods_nameを図書館に寄贈する<br>| if $goods_type eq 'html';
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="ﾀｲﾄﾙをつける" class="button1"></p></form>|;
@@ -108,7 +118,7 @@ sub tp_110 {
 				elsif ($goods_dir eq 'book')    { &write_book_news(qq|$cs{name}[$m{country}]の$m{name}が『$in{title}』という作品を発表\しました|); }
 				$mes .= "作品を発表\しました<br>";
 				$m{money} -= $need_ad_money;
-			}elsif($in{is_send_public}){
+			}elsif($in{is_send_public} == 1){ # ﾃﾞﾌｫﾙﾄｱｲｺﾝ
 				my $def_file_title = unpack 'H*', "$time 作:$m{name}";
 				$def_file_title .= $goods_type eq 'img'  ? '.jpeg'
 					 : $goods_type eq 'html' ? '.html'
@@ -116,6 +126,14 @@ sub tp_110 {
 					 ;
 				rename "$this_path_dir/$file_title", "$icondir/_add_$def_file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
 				$mes .= "デフォルトアイコンに追加しました<br>";
+			}elsif($in{is_send_public} == 2){ # ﾍﾟｯﾄｱｲｺﾝ
+				my $def_file_title = unpack 'H*', "$time 作:$m{name}";
+				$def_file_title .= $goods_type eq 'img'  ? '.jpeg'
+					 : $goods_type eq 'html' ? '.html'
+					 :                         '.cgi'
+					 ;
+				rename "$this_path_dir/$file_title", "$icondir/pet/$in{pet}_$def_file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
+				$mes .= "[ぺ]$pets[$in{pet}][1]のアイコンに追加しました<br>";
 			}elsif($in{is_send_library}){
 				rename "$this_path_dir/$file_title", "$logdir/library/book/$file_title" or &error("ﾘﾈｰﾑ処理に失敗しました");
 				$mes .= "図書館に寄贈しました<br>";

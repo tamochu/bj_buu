@@ -138,6 +138,19 @@ sub tp_110 {
 					$m{pet}    = $item_no;
 					$m{pet_c}  = $item_c;
 					$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğˆøo‚µ‚Ü‚µ‚½<br>";
+
+					if (-f "$userdir/$id/pet_icon.cgi") {
+						open my $ifh, "< $userdir/$id/pet_icon.cgi";
+						my $line = <$ifh>;
+						close $ifh;
+						if (index($line, "<>$m{pet}_") >= 0) {
+							$line =~ s/.*<>($m{pet}_.*?)<>.*/$1/;
+							$m{icon_pet} = $line;
+						}
+						else {
+							$m{icon_pet} = '';
+						}
+					}
 				}
 				elsif ($kind eq '4') {
 					$m{gua}    = $item_no;
@@ -263,6 +276,7 @@ sub tp_210 {
 		elsif ($cmd eq '3') {
 			$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğ—a‚¯‚Ü‚µ‚½<br>";
 			$m{pet} = 0;
+			$m{icon_pet} = '';
 		}
 		elsif ($cmd eq '4') {
 			$mes .= "$guas[$m{gua}][1]‚ğ—a‚¯‚Ü‚µ‚½<br>";
