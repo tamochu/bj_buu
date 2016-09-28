@@ -143,13 +143,15 @@ sub battle_html {
 
 	my $m_tokkou = $is_m_tokkou ? '<font color="#FFFF00">š</font>' : '';
 	my $y_tokkou = $is_y_tokkou ? '<font color="#FFFF00">š</font>' : '';
+	my $m_tokkou2 = $is_m_tokkou2 ? '<font color="#FFFF00">š</font>' : '';
+	my $y_tokkou2 = $is_y_tokkou2 ? '<font color="#FFFF00">š</font>' : '';
 
 	print "$m_icon$m{name}$m_mes<br>";
 	print "$e2j{hp}(<b>$m{hp}</b>/<b>$m{max_hp}</b>)/$e2j{mp}(<b>$m{mp}</b>/<b>$m{max_mp}</b>)<br>";
 	print "UŒ‚[<b>$m_at</b>]/–hŒä[<b>$m_df</b>]/‘f‘[<b>$m_ag</b>]<br>";
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 	print "$m_tokkou•Ší:[$weas[$m{wea}][2]]$wnameš$m{wea_lv}($m{wea_c})<br>" if $m{wea};
-	print "–h‹ï:[$guas[$m{gua}][2]]$guas[$m{gua}][1]<br>" if $m{gua};
+	print "$m_tokkou2–h‹ï:[$guas[$m{gua}][2]]$guas[$m{gua}][1]<br>" if $m{gua};
 	print "Íß¯Ä:$pets[$m{pet}][1]š$m{pet_c}<br>" if $pets[$m{pet}][2] eq 'battle';
 	print "Lv.<b>$m{lv}</b> Exp[$m{exp}/100]<br>";
 	print "”æ˜J“x <b>$m{act}</b>%<br>";
@@ -160,7 +162,7 @@ sub battle_html {
 	print "$e2j{hp}(<b>$y{hp}</b>/<b>$y{max_hp}</b>)/$e2j{mp}(<b>$y{mp}</b>/<b>$y{max_mp}</b>)<br>";
 	print "UŒ‚[<b>$y_at</b>]/–hŒä[<b>$y_df</b>]/‘f‘[<b>$y_ag</b>]<br>";
 	print "$y_tokkou•Ší:[$weas[$y{wea}][2]]$ywname<br>" if $y{wea};
-	print "–h‹ï:[$guas[$y{gua}][2]]$guas[$y{gua}][1]<br>" if $y{gua};
+	print "$y_tokkou2–h‹ï:[$guas[$y{gua}][2]]$guas[$y{gua}][1]<br>" if $y{gua};
 }
 
 #================================================

@@ -250,6 +250,7 @@ sub status_html {
 		$rank_name .= $m{rank_name};
 	}
 
+#	my $pet_icon = qq|<p><img src="$icondir/pet.png" style="vertical-align: middle;"></p>|;
 	$main_screen .= qq|<table width="100%" border="0"><tr><td width="60%" valign="top" align="left"><tt>$head_mes|;
 	$main_screen .= qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;">| if $m{icon};
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
@@ -292,7 +293,7 @@ sub status_html {
 		ŒM@Í@<b>$m{medal}</b>ŒÂ<br>
 		¶¼ŞÉº²İ <b>$m{coin}</b>–‡<br>
 		•ó ¸ ¼Şy$m{lot}z<br>
-		
+		$pet_icon
 	</tt></td></tr></table>
 EOM
 }
@@ -317,6 +318,8 @@ sub battle_html {
 
 	my $m_tokkou = $is_m_tokkou ? '<font color="#FFFF00">š</font>' : '';
 	my $y_tokkou = $is_y_tokkou ? '<font color="#FFFF00">š</font>' : '';
+	my $m_tokkou2 = $is_m_tokkou2 ? '<font color="#FFFF00">š</font>' : '';
+	my $y_tokkou2 = $is_y_tokkou2 ? '<font color="#FFFF00">š</font>' : '';
 
 	$main_screen .= qq|$m_icon $m{name} $m_mes<br>|;
 	$main_screen .= qq|<table border="0">|;
@@ -325,7 +328,7 @@ sub battle_html {
 	$main_screen .= qq|<tr><td colspan="3">UŒ‚—Í [ <b>$m_at</b> ] / –hŒä—Í [ <b>$m_df</b> ] / ‘f‘‚³[ <b>$m_ag</b> ]<br></td></tr>|;
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 	$main_screen .= qq|<tr><td colspan="3">$m_tokkou•ŠíF[$weas[$m{wea}][2]] $wnameš$m{wea_lv} ($m{wea_c})<br></td></tr>| if $m{wea};
-	$main_screen .= qq|<tr><td colspan="3">–h‹ïF[$guas[$m{gua}][2]] $guas[$m{gua}][1]<br></td></tr>| if $m{gua};
+	$main_screen .= qq|<tr><td colspan="3">$m_tokkou2–h‹ïF[$guas[$m{gua}][2]] $guas[$m{gua}][1]<br></td></tr>| if $m{gua};
 	$main_screen .= qq|<tr><td colspan="3">Íß¯ÄF$pets[$m{pet}][1]š$m{pet_c}<br></td></tr>| if $pets[$m{pet}][2] eq 'battle';
 	my $act_d = $m{act} > 100 ? 100 : $m{act}; 
 	my $exp_d = $m{exp} > 100 ? 100 : $m{exp}; 
@@ -342,7 +345,7 @@ sub battle_html {
 	$main_screen .= qq|<tr><td colspan="3">UŒ‚—Í [ <b>$y_at</b> ] / –hŒä—Í [ <b>$y_df</b> ] / ‘f‘‚³[ <b>$y_ag</b> ]<br></td></tr>|;
 	my $ywname = $y{wea_name} ? $y{wea_name} : $weas[$y{wea}][1];
 	$main_screen .= qq|<tr><td colspan="3">$y_tokkou•ŠíF[$weas[$y{wea}][2]] $ywname<br></td></tr>| if $y{wea};
-	$main_screen .= qq|<tr><td colspan="3">–h‹ïF[$guas[$y{gua}][2]] $guas[$y{gua}][1]<br></td></tr>| if $y{gua};
+	$main_screen .= qq|<tr><td colspan="3">$y_tokkou2–h‹ïF[$guas[$y{gua}][2]] $guas[$y{gua}][1]<br></td></tr>| if $y{gua};
 	$main_screen .= qq|</table>|;
 }
 

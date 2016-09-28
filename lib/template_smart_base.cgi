@@ -522,6 +522,8 @@ sub battle_html {
 
 	my $m_tokkou = $is_m_tokkou ? '<font color="#FFFF00">š</font>' : '';
 	my $y_tokkou = $is_y_tokkou ? '<font color="#FFFF00">š</font>' : '';
+	my $m_tokkou2 = $is_m_tokkou2 ? '<font color="#FFFF00">š</font>' : '';
+	my $y_tokkou2 = $is_y_tokkou2 ? '<font color="#FFFF00">š</font>' : '';
 
 	print qq|$m_icon $m{name} $m_mes<br>|;
 	print qq|<table border="0">|;
@@ -530,7 +532,7 @@ sub battle_html {
 	print qq|<tr><td colspan="3">UŒ‚—Í [ <b>$m_at</b> ] / –hŒä—Í [ <b>$m_df</b> ] / ‘f‘‚³[ <b>$m_ag</b> ]<br></td></tr>|;
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 	print qq|<tr><td colspan="3">$m_tokkou•ŠíF[$weas[$m{wea}][2]] $wnameš$m{wea_lv} ($m{wea_c})<br></td></tr>| if $m{wea};
-	print qq|<tr><td colspan="3">–h‹ïF[$guas[$m{gua}][2]] $guas[$m{gua}][1]<br></td></tr>| if $m{gua};
+	print qq|<tr><td colspan="3">$m_tokkou2–h‹ïF[$guas[$m{gua}][2]] $guas[$m{gua}][1]<br></td></tr>| if $m{gua};
 	print qq|<tr><td colspan="3">Íß¯ÄF$pets[$m{pet}][1]š$m{pet_c}<br></td></tr>| if $pets[$m{pet}][2] eq 'battle';
 	print qq|<tr><td>$e2j{exp}F</td><td><div class="bar4"><img src="$htmldir/space.gif" style="width: $exp%"></div></td><td> (<b>$m{exp}</b>/<b>100</b>)<br></td></tr>|;
 	print qq|<tr><td>$eggs[$m{egg}][1]F</td><td><div class="bar5"><img src="$htmldir/space.gif" style="width: $fuka%"></div></td><td> (<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)<br></td></tr>|;
@@ -544,7 +546,7 @@ sub battle_html {
 	print qq|<tr><td colspan="3">UŒ‚—Í [ <b>$y_at</b> ] / –hŒä—Í [ <b>$y_df</b> ] / ‘f‘‚³[ <b>$y_ag</b> ]<br></td></tr>|;
 	my $ywname = $y{wea_name} ? $y{wea_name} : $weas[$y{wea}][1];
 	print qq|<tr><td colspan="3">$y_tokkou•ŠíF[$weas[$y{wea}][2]] $ywname<br></td></tr>| if $y{wea};
-	print qq|<tr><td colspan="3">–h‹ïF[$guas[$y{gua}][2]] $guas[$y{gua}][1]<br></td></tr>| if $y{gua};
+	print qq|<tr><td colspan="3">$y_tokkou2–h‹ïF[$guas[$y{gua}][2]] $guas[$y{gua}][1]<br></td></tr>| if $y{gua};
 	print qq|</table>|;
 }
 
