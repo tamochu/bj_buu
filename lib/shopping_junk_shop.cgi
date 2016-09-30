@@ -199,6 +199,7 @@ sub tp_200 {
 				$line = "$cmd<>$m{pet}<>0<>";
 				$m{pet} = 0;
 				$m{icon_pet} = '';
+				$m{icon_pet_lv} = 1;
 			}
 			elsif ($cmd eq '4') {
 				$mes .= "$guas[$m{gua}][1]‚ð”„‚è‚Ü‚µ‚½<br>";

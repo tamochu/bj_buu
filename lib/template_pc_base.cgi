@@ -250,7 +250,7 @@ sub status_html {
 		$rank_name .= $m{rank_name};
 	}
 
-	my $pet_icon = qq|<p><img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;"></p>| if $m{icon_pet};
+	my $pet_icon = qq|<p><img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;"></p>| if $m{icon_pet} && $m{pet_icon_switch};
 	$main_screen .= qq|<table width="100%" border="0"><tr><td width="60%" valign="top" align="left"><tt>$head_mes|;
 	$main_screen .= qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;">| if $m{icon};
 	my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];

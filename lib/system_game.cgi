@@ -125,7 +125,7 @@ sub write_user {
 		login_time ldate start_time mail_address name pass lib tp wt act sex shogo sedai vote vote_year
 		country job seed lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
 		max_hp hp max_mp mp at df mat mdf ag cha lea wea wea_c wea_lv wea_name gua egg egg_c pet pet_c shuffle master master_c boch_pet
-		marriage lot is_full next_salary icon icon_pet mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
+		marriage lot is_full next_salary icon icon_pet icon_pet_lv mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
 		rest_a rest_b rest_c
 		
 		turn stock value is_playing bank
@@ -136,7 +136,7 @@ sub write_user {
 		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
 		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c fes_c war_c_t dom_c_t mil_c_t pro_c_t boch_c storm_c
 		shogo_t icon_t breed breed_c depot_bonus akindo_guild silent_kind silent_tail guild_number disp_casino chat_java disp_top disp_news disp_chat disp_ad disp_daihyo salary_switch no_boss incubation_switch disp_gacha_time delete_shield
-		valid_blacklist war_select_switch
+		valid_blacklist pet_icon_switch
 		c_turn c_stock c_value c_type tp_r cataso_ratio
 		no1_c money_overflow random_migrate ceo_c tam_c ban_c wt_c wt_c_latest
 		
@@ -1898,5 +1898,31 @@ sub deleteEmergency {
 	}
 }
 
+#================================================
+# ﾍﾟｯﾄｱｲｺﾝ取得
+#================================================
+sub get_icon_pet {
+	if (-f "$userdir/$id/pet_icon.cgi") {
+		open my $ifh, "< $userdir/$id/pet_icon.cgi";
+		my $line = <$ifh>;
+		close $ifh;
+
+		# 魔法少女などはﾍﾟｯﾄとｱｲｺﾝの結びつきが弱い
+		# 魔法少女などでなければﾍﾟｯﾄとｱｲｺﾝを強制的に結びつける
+		my $pattern = "<>$m{pet};";
+		$pattern .= $m{pet} unless ($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24') && ($m{boch_pet} && $m{pet});
+
+		if (index($line, $pattern) >= 0) {
+			$line =~ s/.*<>$m{pet};(.*?);(.*?)<>.*/$1;$2/;
+			my ($icon, $lv) = split /;/, $line;
+			$m{icon_pet} = $icon;
+			$m{icon_pet_lv} = $lv;
+		}
+		else {
+			$m{icon_pet} = '';
+			$m{icon_pet_lv} = 1;
+		}
+	}
+}
 
 1; # 削除不可

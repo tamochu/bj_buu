@@ -442,7 +442,10 @@ sub tp_510 {
 		while (my $file_name = readdir $dh) {
 			next if $file_name =~ /^\./;
 			next if $file_name =~ /\.html$/;
-			next unless $file_name =~ /^$m{pet}_/;
+			# ﾀﾞｯﾁﾜｲﾌじゃないなら手持ちのﾍﾟｯﾄのｱｲｺﾝのみ ﾀﾞｯﾁﾜｲﾌならすべてのﾍﾟｯﾄのｱｲｺﾝ
+			unless (($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24') && ($m{boch_pet} && $m{pet})) {
+				next unless $file_name =~ /^$m{pet}_/;
+			}
 
 			my $checked = " checked=\"checked\"" if $file_name eq $m{icon_pet};
 
@@ -454,32 +457,6 @@ sub tp_510 {
 			$mes .= qq|<input type="radio" name="icon" value="$file_name"$checked><img src="$icondir/pet/$file_name" $mobile_icon_size> $file_title<hr>|;
 		}
 		closedir $dh;
-	}
-
-	if($cmd eq '2'){
-		my %add_num = ();
-		open my $fh, "< $logdir/add_icon_number.cgi" or &error('ｱｲｺﾝﾘｽﾄが開けません');
-		while (my $line = <$fh>) {
-			my($i_name, $number) = split /<>/, $line;
-			$add_num{$i_name} = $number;
-		}
-		close $fh;
-
-		my $icon_no;
-		$icon_no = 0;
-		opendir my $dh_d, "$icondir" or &error('ﾃﾞﾌｫﾙﾄﾋﾟｸﾁｬが開けません');
-		while (my $file_name_d = readdir $dh_d) {
-			next if $file_name_d =~ /^\./;
-			next if $file_name_d =~ /\.html$/;
-
-			if ($file_name_d =~ /^_add/){
-				my $file_title_d = "No.$icon_no";
-				$file_title_d .= ":$add_num{$file_name_d}人";
-				$mes .= qq|<input type="radio" name="icon" value="$file_name_d"><img src="$icondir/$file_name_d" $mobile_icon_size> $file_title_d<hr>|;
-				$icon_no++;
-			}
-		}
-		closedir $dh_d;
 	}
 
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -527,10 +504,10 @@ sub tp_520 {
 				open my $fh, "+< $this_file" or &error("$this_file ﾌｧｲﾙが開けません");
 				eval { flock $fh, 2; };
 				my $line = <$fh>;
-				if(index($line, "<>$m{pet}_") >= 0){
-					$line =~ s/<>($m{pet}_).*?<>/<>$1$m{icon_pet}<>/;
+				if(index($line, "<>$m{pet};") >= 0){
+					$line =~ s/<>($m{pet});.*?;(.*?)<>/<>$1;$m{icon_pet};$2<>/;
 				}else{
-					$line = $line . "$m{icon_pet}<>";
+					$line = $line . "$m{pet};$m{icon_pet};1<>";
 				}
 				seek  $fh, 0, 0;
 				truncate $fh, 0;
@@ -539,7 +516,7 @@ sub tp_520 {
 			}
 			else {
 				open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
-				print $fh "<>$m{icon_pet}<>";
+				print $fh "<>$m{pet};$m{icon_pet};1<>";
 				close $fh;
 			}
 

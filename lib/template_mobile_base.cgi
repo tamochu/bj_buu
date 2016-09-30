@@ -67,6 +67,7 @@ sub top_menu_html {
 #================================================
 sub status_html {
 	print qq|<hr><img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
+	print qq|<img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon_pet} && $m{pet_icon_switch};
 	print qq|$m{name}|;
 	print qq|[$m{shogo}]| if $m{shogo};
 	print qq|<br>|;

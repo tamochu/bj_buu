@@ -72,16 +72,17 @@ sub run {
 
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $line = <$fh>) {
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
+		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bicon_pet) = split /<>/, $line;
 		$bname = &name_link($bname);
 		$bname .= "[$bshogo]" if $bshogo;
 		$bicon = $bicon ? qq|<img src="$icondir/$bicon" style="vertical-align:middle;" $mobile_icon_size>| : '';
+		$bicon_pet = $m{pet_icon_switch} && $bicon_pet ? qq| <img src="$icondir/pet/$bicon_pet" style="vertical-align:middle;" $mobile_icon_size>| : '';
 		$bcomment = &comment_change($bcomment, 0);
 		if ($is_mobile) {
-			print qq|<div>$bicon<font color="$cs{color}[$bcountry]">$bname<br>$bcomment <font size="1">($cs{name}[$bcountry] $bdate)</font></font></div><hr size="1">\n|;
+			print qq|<div>$bicon$bicon_pet<font color="$cs{color}[$bcountry]">$bname<br>$bcomment <font size="1">($cs{name}[$bcountry] $bdate)</font></font></div><hr size="1">\n|;
 		}
 		else {
-			print qq|<table border="0"><tr><td valign="top" style="padding-right: 0.5em;">$bicon<br><font color="$cs{color}[$bcountry]">$bname</font></td><td valign="top"><font color="$cs{color}[$bcountry]">$bcomment <font size="1">($cs{name}[$bcountry] $bdate)</font></font><br></td></tr></table><hr size="1">\n|;
+			print qq|<table border="0"><tr><td valign="top" style="padding-right: 0.5em;">$bicon$bicon_pet<br><font color="$cs{color}[$bcountry]">$bname</font></td><td valign="top"><font color="$cs{color}[$bcountry]">$bcomment <font size="1">($cs{name}[$bcountry] $bdate)</font></font><br></td></tr></table><hr size="1">\n|;
 		}
 	}
 	close $fh;

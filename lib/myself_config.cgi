@@ -66,9 +66,13 @@ sub begin {
 	$mes .= $m{valid_blacklist} ? qq|<input type="radio" name="valid_blacklist" value="1" checked>はい <input type="radio" name="valid_blacklist" value="0">いいえ<br>|:
 						qq|<input type="radio" name="valid_blacklist" value="1">はい <input type="radio" name="valid_blacklist" value="0" checked>いいえ<br>|;
 
-	$mes .= '戦争で条件付きじゃんけんする？<br>';
-	$mes .= $m{war_select_switch} ? qq|<input type="radio" name="war_select_switch" value="1" checked>はい <input type="radio" name="war_select_switch" value="0">いいえ<br>|:
-						qq|<input type="radio" name="war_select_switch" value="1">はい <input type="radio" name="war_select_switch" value="0" checked>いいえ<br>|;
+#	$mes .= '戦争で条件付きじゃんけんする？<br>';
+#	$mes .= $m{war_select_switch} ? qq|<input type="radio" name="war_select_switch" value="1" checked>はい <input type="radio" name="war_select_switch" value="0">いいえ<br>|:
+#						qq|<input type="radio" name="war_select_switch" value="1">はい <input type="radio" name="war_select_switch" value="0" checked>いいえ<br>|;
+
+	$mes .= 'ﾍﾟｯﾄｱｲｺﾝを表示する？<br>';
+	$mes .= $m{pet_icon_switch} ? qq|<input type="radio" name="pet_icon_switch" value="1" checked>はい <input type="radio" name="pet_icon_switch" value="0">いいえ<br>|:
+						qq|<input type="radio" name="pet_icon_switch" value="1">はい <input type="radio" name="pet_icon_switch" value="0" checked>いいえ<br>|;
 
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<input type="submit" value="変更" class="button1"></form>|;
@@ -100,7 +104,8 @@ sub tp_100 {
 	$m{incubation_switch} = $in{incubation_switch};
 	$m{disp_gacha_time} = $in{disp_gacha_time};
 	$m{valid_blacklist} = $in{valid_blacklist};
-	$m{war_select_switch} = $in{war_select_switch};
+#	$m{war_select_switch} = $in{war_select_switch};
+	$m{pet_icon_switch} = $in{pet_icon_switch};
 
 	&begin;
 }
