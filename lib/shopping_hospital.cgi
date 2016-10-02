@@ -451,10 +451,13 @@ sub tp_510 {
 
 			# ‚¿‚å‚Á‚Æs‚«“–‚½‚è‚Î‚Á‚½‚è‚Ì‹­ˆø
 			my $name = $file_name;
+			my $pet_n = $file_name;
+			$pet_n =~ s/^(\d+)_.*/\1/;
+			my $petname = ($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24') && ($m{boch_pet} && $m{pet}) ? $pets[$pet_n][1] : '';
 			$name =~ s/^\d+_//;
 			my $file_title = &get_goods_title($name);
 			$file_title =~ s/.*?\s//;
-			$mes .= qq|<input type="radio" name="icon" value="$file_name"$checked><img src="$icondir/pet/$file_name" $mobile_icon_size> $file_title<hr>|;
+			$mes .= qq|<input type="radio" name="icon" value="$file_name"$checked><img src="$icondir/pet/$file_name" $mobile_icon_size>$petname $file_title<hr>|;
 		}
 		closedir $dh;
 	}
