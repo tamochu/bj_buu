@@ -406,7 +406,7 @@ sub tp_310 {
 		close $tfh;
 		if($c){
 			$cmd = $c;
-			$m{pet} = 0 if($pets[$m{pet}][2] eq 'marriage');
+			&remove_pet if($pets[$m{pet}][2] eq 'marriage');
 		}else {
 			$cmd = 0;
 		}
@@ -440,7 +440,7 @@ sub tp_310 {
 						&write_world_news(qq|<font color="#8a2be2">ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
 						&send_twitter("ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
 						if(int(rand(5)) == 0){
-							$m{pet} = 0;
+							&remove_pet;
 						}elsif(int(rand(5)) == 0 && ($pets[$you_datas{pet}][2] eq 'marriage_y' || $pets[$you_datas{pet}][2] eq 'marriage_b')) {
 							&regist_you_data($name, 'pet', 0);
 						}

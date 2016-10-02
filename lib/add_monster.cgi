@@ -136,9 +136,7 @@ sub tp_110 {
 					&add_monster($j, $v, (0.5 + 1.0 * $skill_st / 100));
 					&c_up('mon_c');
 					$mes .= "$in{name}‚ð$places[$j][2]‚Ì’†‚É–„‚ß‚Ü‚µ‚½<br>";
-					$m{pet} = 0;
-					$m{icon_pet} = '';
-					$m{icon_pet_lv} = 1;
+					&remove_pet;
 					last;
 				}
 			}

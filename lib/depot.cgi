@@ -256,9 +256,7 @@ sub tp_210 {
 		elsif ($cmd eq '3') {
 			$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ğ—a‚¯‚Ü‚µ‚½<br>";
 			$l_mes = "$pets[$m{pet}][1]š$m{pet_c}";
-			$m{pet} = 0;
-			$m{icon_pet} = '';
-			$m{icon_pet_lv} = 1;
+			&remove_pet;
 		}
 		elsif ($cmd eq '4') {
 			$mes .= "$guas[$m{gua}][1]‚ğ—a‚¯‚Ü‚µ‚½<br>";
@@ -432,8 +430,7 @@ sub tp_410 {
 	elsif ($cmd eq '3' && $m{pet}) {
 		&send_item($in{send_name}, $cmd, $m{pet}, $m{pet_c}, 0, &is_sabakan);
 		&mes_and_send_news("$in{send_name}‚É$pets[$m{pet}][1]š$m{pet_c}‚ğ‘—‚è‚Ü‚µ‚½");
-		$m{pet} = 0;
-		$m{icon_pet} = '';
+		$remove_pet;
 		$m{money} -= $pay;
 	}
 	elsif ($cmd eq '4' && $m{gua}) {

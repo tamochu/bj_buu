@@ -35,14 +35,14 @@ my @prizes = (
 # “Á•ÊğŒ‚Å¸×½Áªİ¼Ş‚Å‚«‚é‚à‚Ì
 my %plus_needs = (
 # •”‘àNo => ğŒ•¶,					ifğŒ									# ğŒ¸Ø±Œã‚Ìˆ—
-	7  => ['ÀŞ°¸Î°½‚ğ¶æÑ',			sub{ $pets[$m{pet}][2] eq 'speed_up' },	sub{ $mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; $m{pet} = 0; } ],
-	8  => ['ÄŞ×ºŞİŒn‚ÌÍß¯Ä‚ğ¶æÑ',	sub{ $pets[$m{pet}][1] =~ /ÄŞ×ºŞİ/ },	sub{ $mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; $m{pet} = 0; } ],
+	7  => ['ÀŞ°¸Î°½‚ğ¶æÑ',			sub{ $pets[$m{pet}][2] eq 'speed_up' },	sub{ $mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; &remove_pet; } ],
+	8  => ['ÄŞ×ºŞİŒn‚ÌÍß¯Ä‚ğ¶æÑ',	sub{ $pets[$m{pet}][1] =~ /ÄŞ×ºŞİ/ },	sub{ $mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; &remove_pet; } ],
 	11 => ['E‹Æ‚ª”EÒ',			sub{ $jobs[$m{job}][1] eq '”EÒ' },		sub{} ],
 	12 => ["$eggs[23][1]‚ğ¶æÑ",	sub{ $m{egg} eq '23'},					sub{ $mes.="$eggs[$m{egg}][1]‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; $m{egg} = 0; $m{egg_c} = 0; } ],
 	15 => ['E‹Æ‚ª–‚•¨g‚¢',		sub{ $jobs[$m{job}][1] eq '–‚•¨g‚¢' },	sub{} ],
-	16 => ['¸ÛÉ½‚ğ¶æÑ+“à­n—û“x‚ªŒv5000ˆÈã',			sub{ ($pets[$m{pet}][0] eq '42' && $m{nou_c}+$m{sho_c}+$m{hei_c}>=5000) },	sub{$mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; $m{pet} = 0;} ],
-	17 => ['ºŞ°½Ä‚ğ¶æÑ+’DŒR–3ín—û“x‚ªŒv10000ˆÈã',			sub{ ($pets[$m{pet}][2] eq 'no_ambush' && $m{gou_c}+$m{cho_c}+$m{sen_c}>=10000) },	sub{$mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; $m{pet} = 0;} ],
-	18 => ['Û·‚ğ¶æÑ+í‘ˆŸ—˜”500ˆÈã',			sub{ ($pets[$m{pet}][0] eq '12' && $m{win_c}>=500) },	sub{$mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; $m{pet} = 0;} ],
+	16 => ['¸ÛÉ½‚ğ¶æÑ+“à­n—û“x‚ªŒv5000ˆÈã',			sub{ ($pets[$m{pet}][0] eq '42' && $m{nou_c}+$m{sho_c}+$m{hei_c}>=5000) },	sub{$mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; &remove_pet;} ],
+	17 => ['ºŞ°½Ä‚ğ¶æÑ+’DŒR–3ín—û“x‚ªŒv10000ˆÈã',			sub{ ($pets[$m{pet}][2] eq 'no_ambush' && $m{gou_c}+$m{cho_c}+$m{sen_c}>=10000) },	sub{$mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; &remove_pet;} ],
+	18 => ['Û·‚ğ¶æÑ+í‘ˆŸ—˜”500ˆÈã',			sub{ ($pets[$m{pet}][0] eq '12' && $m{win_c}>=500) },	sub{$mes.="$pets[$m{pet}][1]š$m{pet_c}‚ğ¶æÑ‚É‚µ‚Ü‚µ‚½<br>"; &remove_pet;} ],
 );
 
 
@@ -168,20 +168,28 @@ sub tp_300 {
 	
 	$mes .= "$units[0][1] ğŒF‚È‚µ<br>";
 	my @menus = ('‚â‚ß‚é', $units[0][1]);
-	for my $i (1 .. $#units) {
-		if ($i eq $units[$m{unit}][2]) {
+	if ($config_test) {
+		for my $i (1 .. $#units) {
 			$mes .= "$units[$i][1] ğŒF‚È‚µ<br>";
 			push @menus, $units[$i][1];
 		}
-		elsif ($m{unit} eq $units[$i][2]) {
-			$mes .= "$units[$i][1] ğŒF$units[ $units[$i][2] ][1]/ŒMÍ$units[$i][3]ŒÂ/";
-			$mes .= $plus_needs{$i}[0] if defined $plus_needs{$i};
-			$mes .= "<br>";
-			
-			push @menus, $units[$i][1];
-		}
-		else {
-			push @menus, '';
+	}
+	else {
+		for my $i (1 .. $#units) {
+			if ($i eq $units[$m{unit}][2]) {
+				$mes .= "$units[$i][1] ğŒF‚È‚µ<br>";
+				push @menus, $units[$i][1];
+			}
+			elsif ($m{unit} eq $units[$i][2]) {
+				$mes .= "$units[$i][1] ğŒF$units[ $units[$i][2] ][1]/ŒMÍ$units[$i][3]ŒÂ/";
+				$mes .= $plus_needs{$i}[0] if defined $plus_needs{$i};
+				$mes .= "<br>";
+				
+				push @menus, $units[$i][1];
+			}
+			else {
+				push @menus, '';
+			}
 		}
 	}
 	
@@ -190,8 +198,15 @@ sub tp_300 {
 sub tp_310 {
 	if ($cmd) {
 		--$cmd;
-		
+
 		if ($cmd) {
+			if ($config_test) {
+				$m{unit} = $cmd;
+				$mes .= "$units[$m{unit}][1]‚É¸×½Áªİ¼Ş‚µ‚Ü‚µ‚½<br>";
+				&begin;
+				return;
+			}
+
 			# ¸×½ÀŞ³İ
 			unless ($cmd eq $units[$m{unit}][2]) {
 				# “ÁêğŒ

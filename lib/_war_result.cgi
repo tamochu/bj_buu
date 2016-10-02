@@ -119,14 +119,9 @@ sub war_escape {
 #=================================================
 sub war_win {
 	my $is_single = shift;
-	
-	if ($w{world} eq $#world_states-4) {
-		require './lib/fate.cgi';
-		&super_attack('war');
-		if ($is_single) {
-			&super_attack('single');
-		}
-	}
+
+	&after_success_action('war', $is_single);
+
 	# ’D‘—ÍÍŞ°½:ŠK‹‰‚ª‚‚¢‚Ù‚ÇÌß×½B‰ºãAŠv–½‚Ì‚ÍŠK‹‰‚ª’á‚¢‚Ù‚ÇÌß×½
 	my $v = ($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2')) ? (@ranks - $m{rank}) * 10 + 10 : $m{rank} * 8 + 10;
 

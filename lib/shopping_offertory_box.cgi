@@ -350,7 +350,7 @@ sub tp_200 {
 	}
 	elsif ($cmd eq '3' && $m{pet}) {
 		&sale_data_log(3, $m{pet}, $m{pet_c}, 0, 500, 5);
-		$m{pet} = 0;
+		&remove_pet;
 	}
 	elsif ($cmd eq '4' && $m{gua}) {
 		&sale_data_log(4, $m{gua}, 0, 0, 500, 5);

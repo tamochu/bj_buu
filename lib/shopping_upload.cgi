@@ -48,7 +48,7 @@ $layout = 2;
 }
 
 sub tp_400 {
-	$m{pet} = 0;
+	&remove_pet;
 	&refresh;
 	&n_menu;
 }

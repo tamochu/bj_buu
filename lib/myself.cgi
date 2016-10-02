@@ -126,9 +126,7 @@ sub tp_1 {
 				}
 				$cs{strong}[$m{country}] -= $total;
 				&write_cs;
-				$m{pet} = 0;
-				$m{icon_pet} = '';
-				$m{icon_pet_lv} = '';
+				&remove_pet;
 				my %sames;
 				open my $fh, "< $logdir/$m{country}/member.cgi";
 				while (my $player = <$fh>) {
@@ -175,9 +173,7 @@ sub tp_1 {
 				else {
 					$mes .= "–ğ–Ú‚ğI‚¦‚½ $pets[$m{pet}][1] ‚ÍŒõ‚Ì”Ş•û‚ÖÁ‚¦‚Ä‚¢‚Á‚½c<br>$pets[$m{pet}][1]@É¼<br>";
 				}
-				$m{pet} = 0;
-				$m{icon_pet} = '';
-				$m{icon_pet_lv} = 1;
+				&remove_pet;
 			}
 		}
 	} elsif ($in{mode} eq 'use_attack' && $w{world} eq $#world_states-4 && $m{country}) {

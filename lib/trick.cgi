@@ -65,9 +65,7 @@ sub tp_110{
 	      &regist_you_data($in{trick_name},'icon_t',$datas{icon});
 	      &regist_you_data($in{trick_name},'icon',$in{icon});
 	      &regist_you_data($in{trick_name},'trick_time',$time + $trick_time);
-	      $m{pet} = 0;
-			$m{icon_pet} = '';
-			$m{icon_pet_lv} = 1;
+			&remove_pet;
 	      &mes_and_world_news("$datas{name}‚Ì±²ºİ‚É‚¢‚½‚¸‚ç‚ğ‚µ‚Ü‚µ‚½");
 	   }
 	   else {
@@ -112,9 +110,7 @@ sub tp_210{
 		&regist_you_data($in{trick_name},'shogo_t',$datas{shogo});
 		&regist_you_data($in{trick_name},'trick_time',$time + $trick_time);
 
-		$m{pet} = 0;
-		$m{icon_pet} = '';
-		$m{icon_pet_lv} = 1;
+		&remove_pet;
 		&mes_and_world_news("$datas{name}‚ÌÌ†‚ğ$datas{shogo}‚©‚ç$t_shogo‚É•Ï‚¦‚Ü‚µ‚½");
 	}
 	&refresh;
@@ -160,9 +156,8 @@ sub tp_310{
 		&regist_you_data($in{trick_name},'money',$datas{money});
 		$mes.="‘‚â‚µ‚Ü‚µ‚½<br>";
 	}
-	$m{pet} = 0;
-	$m{icon_pet} = '';
-	$m{icon_pet_lv} = 1;
+
+	&remove_pet;
 	&mes_and_world_news("$datas{name}‚ÌŠ‹à‚É‚¢‚½‚¸‚ç‚µ‚Ü‚µ‚½");
 	&refresh;
 	&n_menu;
@@ -195,11 +190,7 @@ sub tp_410{
 	}
 	&regist_you_data($in{trick_name},'silent_time',$time+3600);
 	&regist_you_data($in{trick_name},'silent_kind',0);
-	$m{pet} = 0 if rand(3) < 1;
-	unless ($m{pet}) {
-		$m{icon_pet} = '';
-		$m{icon_pet_lv} = 1;
-	}
+	&remove_pet if rand(3) < 1;
 	&mes_and_world_news("$in{trick_name}‚É‰ŒD‚ğ‚©‚¯‚Ü‚µ‚½");
 	&refresh;
 	&n_menu;
@@ -255,9 +246,7 @@ sub tp_510{
 	open my $fh, ">> $userdir/$trick_id/head_hunt.cgi";
 	print $fh "$m{name}<>$m{country}<>\n";
 	close $fh;
-	$m{pet} = 0;
-	$m{icon_pet} = '';
-	$m{icon_pet_lv} = 1;
+	&remove_pet;
 	&refresh;
 	&n_menu;
 }
@@ -293,9 +282,7 @@ sub tp_610{
 		&begin;
 		return;
 	}
-	$m{pet} = 0;
-	$m{icon_pet} = '';
-	$m{icon_pet_lv} = 1;
+	&remove_pet;
 	$mes .= "$m{name}‚Í";
 	my $place = int(rand(1000));
 	if($place < 950){
@@ -370,9 +357,7 @@ sub tp_710{
 		&regist_you_data($in{trick_name},'shogo_t',$datas{shogo});
 		&regist_you_data($in{trick_name},'trick_time',$time + $trick_time);
 
-		$m{pet} = 0;
-		$m{icon_pet} = '';
-		$m{icon_pet_lv} = 1;
+		&remove_pet;
 		&mes_and_world_news("$datas{name}‚É$in{trick_shogo}‚Æ‚ ‚¾–¼‚ğ‚Â‚¯‚Ü‚µ‚½");
 	}
 	&refresh;
@@ -423,10 +408,8 @@ sub tp_810{
 	} else {
 		$i = int(rand($#weas)+1);
 	}
-	
-	$m{pet} = 0;
-	$m{icon_pet} = '';
-	$m{icon_pet_lv} = 1;
+
+	&remove_pet;
 	$m{wea} = $i;
 
 	# ‚Ç‚¤‚¹è•ú‚µ‚½‚ç¸ÛÊÑš0‚É–ß‚é‚Ì‚Åš30‚É‚È‚é‚±‚Æ©‘Ì‚Í‚³‚Ù‚Ç–â‘è‚É‚È‚ç‚È‚»‚¤H
@@ -481,11 +464,7 @@ sub tp_910{
 	&regist_you_data($in{trick_name},'silent_time', $time+3600);
 	&regist_you_data($in{trick_name},'silent_kind', 4);
 	&regist_you_data($in{trick_name},'silent_tail', $in{tail});
-	$m{pet} = 0 if rand(3) < 1;
-	unless ($m{pet}) {
-		$m{icon_pet} = '';
-		$m{icon_pet_lv} = 1;
-	}
+	&remove_pet if rand(3) < 1;
 	&mes_and_world_news("$in{trick_name}‚ÌŒê”ö‚ğ‹­§‚µ‚Ü‚µ‚½");
 	&refresh;
 	&n_menu;
@@ -533,11 +512,7 @@ sub tp_1010{
 		&begin;
 		return;
 	}
-	$m{pet} = 0 if rand(7) < 1;
-	unless ($m{pet}) {
-		$m{icon_pet} = '';
-		$m{icon_pet_lv} = 1;
-	}
+	&remove_pet if rand(7) < 1;
 	&refresh;
 	&add_prisoner;
 	&n_menu;

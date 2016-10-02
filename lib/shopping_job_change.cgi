@@ -30,9 +30,7 @@ sub tp_1 {
 	elsif ($cmd >= 0 && &{ $jobs[$cmd][11] }) {
 		if ($m{money} >= $need_money) {
 			$m{money} -= $need_money;
-			if($cmd eq '21'){
-				$m{pet} = 0;
-			}
+			&remove_pet if $cmd eq '21';
 			$m{job} = $cmd;
 			$mes .= "$jobs[$cmd][1]‚Æ‚È‚Á‚ÄV‚½‚È“¹‚ği‚Ş‚ª‚æ‚¢<br>$m{name}‚Í$jobs[$cmd][1]‚É“]E‚µ‚Ü‚µ‚½<br>";
 		}

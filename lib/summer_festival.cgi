@@ -812,7 +812,7 @@ sub tp_810 {
 sub tp_820 {
 	if ($cmd && $m{pet} > 0) {
 		$mes .= $pets[$m{pet}][1] . '‚ð’©Šç‚É‚ ‚°‚½‚æ';
-		$m{pet} = 0;
+		&remove_pet;
 		$m{morning_glory} += 5;
 	}
 	&begin;

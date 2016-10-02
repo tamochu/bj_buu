@@ -50,6 +50,7 @@ sub main_system {
 		if ($m{egg}) {
 			$m{egg_c} += int(rand(6)+10);
 			$m{egg_c} += int(rand(16)+20) if $jobs[$m{job}][1] eq '卵士';
+			push @menus, ['孵化', 'incubation'] if ($m{incubation_switch} && $m{egg} && $m{egg_c} >= $eggs[$m{egg}][2]);
 		}
 		&lv_up;
 	}
@@ -306,7 +307,8 @@ sub main_system {
 		require './lib/fx_func.cgi';
 		$mes .= &check_losscut;
 	}
-	
+
+	$y{country} = 0 if $y{country} eq '';
 	$m{act} = 0 if $config_test;
 }
 
@@ -423,6 +425,7 @@ sub lv_up {
 				if ($pets[$m{pet}][2] eq 'copy_pet' && $datas{pet}) {
 					$mes .= "$pets[$m{pet}][1]★$m{pet_c}は$datas{name}のﾍﾟｯﾄの$pets[$datas{pet}][1]をｺﾋﾟｰしました<br>";
 					$m{pet} = $datas{pet};
+					&get_icon_pet;
 				}
 				
 			}
@@ -463,7 +466,7 @@ sub lv_up {
 			if ($pets[$m{pet}][2] eq 'keep_status') {
 				$mes .= "$pets[$m{pet}][1]★$m{pet_c}の力によりｽﾃｰﾀｽがそのまま引き継がれました<br>";
 				$mes .= "役目を終えた$pets[$m{pet}][1]★$m{pet_c}は、光の中へと消えていった…<br>";
-				$m{pet} = 0;
+				&remove_pet;
 			}
 			else {
 				&c_up('boch_c');
@@ -520,12 +523,12 @@ sub lv_up {
 		if ($pets[$m{pet}][2] eq 'keep_seed') {
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}の力により種族がそのまま引き継がれました<br>";
 			$mes .= "役目を終えた$pets[$m{pet}][1]★$m{pet_c}は、光の中へと消えていった…<br>";
-			$m{pet} = 0;
+			&remove_pet;
 			&seed_change('keep');
 		} elsif ($pets[$m{pet}][2] eq 'change_seed') {
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}の力により種族が変わるかもしれません<br>";
 			$mes .= "役目を終えた$pets[$m{pet}][1]★$m{pet_c}は、光の中へと消えていった…<br>";
-			$m{pet} = 0;
+			&remove_pet;
 			&seed_change('change');
 		} else {
 			&seed_change('');

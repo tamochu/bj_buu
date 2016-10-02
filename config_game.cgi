@@ -757,7 +757,7 @@ require './lib/system_game.cgi';
  	$m{job} = $no;
  	$mes .= "$pets[$m{pet}][1]★$m{pet_c}の力で $m{name} の職業が $jobs[$no][1]になりました<br>";
  	$mes .= "役目を終えた $pets[$m{pet}][1]★$m{pet_c} は光の彼方へ消えていった…<br>";
- 	$m{pet} = 0;
+	&remove_pet;
  }
  
  sub _pet_steal_country {
@@ -855,7 +855,7 @@ sub _pet_summon {
 	$mes.="なんと、$pets[$m{pet}][1]★$m{pet_c}が$pets[$v][1]を召喚しました!<br>$pets[$v][1]は預かり所へ送られました<br>";
 	&send_item($m{name}, 3, $v, 0, 0, 1);
 	if (rand(10) < 1){
-		$m{pet} = 0;
+		&remove_pet;
 		$mes .= "ﾈｸﾛﾏﾝｻｰ＜疲れたから帰る<br>";
 	}
 }

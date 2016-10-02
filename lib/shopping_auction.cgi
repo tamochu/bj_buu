@@ -266,7 +266,7 @@ sub tp_210 {
 			elsif ($cmd eq '3' && $m{pet}) {
 				&mes_and_send_news("$pets[$m{pet}][1]★$m{pet_c}を出品しました");
 				&send_twitter("$pets[$m{pet}][1]★$m{pet_c}を出品しました", 1);
-				$m{pet} = 0;
+				&remove_pet;
 			}
 			elsif ($cmd eq '4' && $m{gua}) {
 				&mes_and_send_news("$guas[$m{gua}][1]を出品しました");

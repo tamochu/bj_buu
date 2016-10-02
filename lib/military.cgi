@@ -627,10 +627,8 @@ sub tp_1000 {
 		   &npc_military;
 		}
 	}
-	if ($w{world} eq $#world_states-4) {
-		require './lib/fate.cgi';
-		&super_attack('military');
-	}
+
+	&after_success_action('military');
 
 	&write_cs;
 	&refresh;

@@ -1907,7 +1907,7 @@ sub get_icon_pet {
 		my $line = <$ifh>;
 		close $ifh;
 
-		# 魔法少女などはﾍﾟｯﾄとｱｲｺﾝの結びつきが弱い
+		# 魔法少女などはﾍﾟｯﾄとｱｲｺﾝの結びつきを弱くする（ﾍﾟｯﾄ秘匿効果あるのにｱｲｺﾝからﾍﾟｯﾄがバレるため）
 		# 魔法少女などでなければﾍﾟｯﾄとｱｲｺﾝを強制的に結びつける
 		my $pattern = "<>$m{pet};";
 		$pattern .= $m{pet} unless ($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24') && ($m{boch_pet} && $m{pet});
@@ -1923,6 +1923,30 @@ sub get_icon_pet {
 			$m{icon_pet_lv} = 1;
 		}
 	}
+}
+
+#================================================
+# 基本行動の前後の共通処理
+# 基本行動をどう捉えるかは各開発者によるものではあるが、
+# にゃあ鯖では内政・外交・軍事・戦争の四種とする
+#================================================
+sub before_action { # 行動前の共通処理
+	my $action = shift;
+}
+sub after_success_action { # 行動の成功後の共通処理
+	my $action = shift; # 行動種
+	my $v = shift; # 行動に伴う何らかのデータ
+
+	if ($w{world} eq $#world_states-4) {
+		require './lib/fate.cgi';
+		&super_attack($action);
+		&super_attack('single') if ($action eq 'war') && $v;
+	}
+}
+sub remove_pet { # ﾍﾟｯﾄ外す処理
+	$m{pet} = 0;
+	$m{icon_pet} = '';
+	$m{icon_pet_lv} = 1;
 }
 
 1; # 削除不可
