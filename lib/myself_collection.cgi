@@ -54,6 +54,11 @@ sub begin {
 				$comp_par = 100 if $comp_par > 100;
 				&write_comp_legend($kind) if $count eq ($#pets - 4);
 			}
+			elsif ($kind eq '4') {
+				$comp_par = int($count / ($#guas - 4) * 100);
+				$comp_par = 100 if $comp_par > 100;
+				&write_comp_legend($kind) if $count eq ($#guas - 4);
+			}
 		}
 		
 		$mes .= "$collections[$kind-1][0] Ås∫›Ãﬂó¶ $comp_par%Åt<br>";

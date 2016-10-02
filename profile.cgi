@@ -41,6 +41,7 @@ sub status_mobile {
 
 	print qq|<br>XV“ú $m{ldate}<hr>|;
 	print qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
+	print qq|<img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;" $mobile_icon_size>>| if $m{icon_pet};
 	print qq|$m{name}<br>|;
 	if ($m{marriage}) {
 		my $yid = unpack 'H*', $m{marriage};
@@ -113,6 +114,7 @@ sub status_mobile {
 		Ì†<b>$shogo_par</b>%<br>
 		½·Ù<b>$skill_par</b>%<br>
 		•Ší<b>$collection_pars{1}</b>%<br>
+		–h‹ï<b>$collection_pars{4}</b>%<br>
 		ÀÏºŞ<b>$collection_pars{2}</b>%<br>
 		Íß¯Ä<b>$collection_pars{3}</b>%<br>
 		<hr>
@@ -285,11 +287,16 @@ sub status_pc {
 		<hr size="1">
 		yºİÌßØ°Ä—¦z<br>
 		<table class="table1" cellpadding="3">
-			<tr><th>Ì†</th><td align="right"><b>$shogo_par</b>%<br></td></tr>
-			<tr><th>½·Ù</th><td align="right"><b>$skill_par</b>%<br></td></tr>
-			<tr><th>•Ší</th><td align="right"><b>$collection_pars{1}</b>%<br></td></tr>
-			<tr><th>ÀÏºŞ</th><td align="right"><b>$collection_pars{2}</b>%<br></td></tr>
-			<tr><th>Íß¯Ä</th><td align="right"><b>$collection_pars{3}</b>%<br></td></tr>
+			<tr>
+				<th>Ì†</th><td align="right"><b>$shogo_par</b>%<br></td>
+				<th>½·Ù</th><td align="right"><b>$skill_par</b>%<br></td>
+				<th>ÀÏºŞ</th><td align="right"><b>$collection_pars{2}</b>%<br></td>
+			</tr>
+			<tr>
+				<th>•Ší</th><td align="right"><b>$collection_pars{1}</b>%<br></td>
+				<th>–h‹ï</th><td align="right"><b>$collection_pars{4}</b>%<br></td>
+				<th>Íß¯Ä</th><td align="right"><b>$collection_pars{3}</b>%<br></td>
+			</tr>
 		</table>
 		
 		<hr size="1">
@@ -382,6 +389,9 @@ sub collection_pars { # ±²ÃÑ
 		}
 		elsif ($kind eq '3') {
 			$pars{$kind} = int(@nos / ($#pets - 4) * 100);
+		}
+		elsif ($kind eq '4') {
+			$pars{$kind} = int(@nos / ($#guas - 4) * 100);
 		}
 		$pars{$kind} = 100 if $pars{$kind} > 100;
 		++$kind;
