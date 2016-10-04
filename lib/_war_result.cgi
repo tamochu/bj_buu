@@ -340,11 +340,12 @@ sub war_win {
 	
 	# ˆÃ•
 	if ($w{world} eq $#world_states) {
+		my @acs = (1..$w{country} - 1);
+		my $dark_side = $m{country} eq $w{country} ? $union : ($union eq $w{country} ? $m{country} : 0) ; # ˆÃ•‚Ì“¯–¿‘‚Í••ˆó‘¤‚Æ‚µ‚Ä”‚¦‚È‚¢
+		splice(@acs, $dark_side - 1, 1) if $dark_side;
 		my $ahoalia = 1;
-		for my $ac (1..$w{country} - 1) {
-			if (!$cs{is_die}[$ac]) {
-				$ahoalia = 0;
-			}
+		for my $ac (@acs) {
+			$ahoalia = 0 if !$cs{is_die}[$ac]; # ••ˆó‘¤‚ª–Å–S‚µ‚Ä‚È‚¢‚È‚ç••ˆó‘¤‘S‘–Å–Sƒtƒ‰ƒO‰º‚ë‚·
 		}
 		if ($cs{strong}[$m{country}] >= $touitu_strong
 			|| ($cs{strong}[$w{country}] <= 0
