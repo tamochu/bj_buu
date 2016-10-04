@@ -430,7 +430,7 @@ sub tp_410 {
 	elsif ($cmd eq '3' && $m{pet}) {
 		&send_item($in{send_name}, $cmd, $m{pet}, $m{pet_c}, 0, &is_sabakan);
 		&mes_and_send_news("$in{send_name}‚É$pets[$m{pet}][1]š$m{pet_c}‚ğ‘—‚è‚Ü‚µ‚½");
-		$remove_pet;
+		&remove_pet;
 		$m{money} -= $pay;
 	}
 	elsif ($cmd eq '4' && $m{gua}) {
