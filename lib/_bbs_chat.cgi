@@ -40,7 +40,12 @@ sub write_comment {
 	
 	my $head_line = <$fh>;
 	my ($htime,$hname,$hcomment) = (split /<>/, $head_line)[0,2,6];
-	my ($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bicon_pet) = split /<>/, $line;
+	if ($this_file =~ /blog/) {
+		my ($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
+	}
+	else {
+		my ($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bicon_pet) = split /<>/, $line;
+	}
 	return 0 if $in{comment} eq $hcomment;
 	if ($hname eq $m{name} && $htime + $bad_time > $time) {
 		&error("òAë±ìäçeÇÕã÷é~ÇµÇƒÇ¢Ç‹Ç∑ÅB<br>ÇµÇŒÇÁÇ≠ë“Ç¡ÇƒÇ©ÇÁèëÇ´çûÇÒÇ≈Ç≠ÇæÇ≥Ç¢");
@@ -85,7 +90,12 @@ sub write_comment {
 		}
 	}
 	my $mshogo = length($m{shogo}) > $bbs_config{shogo_limit} ? substr($m{shogo}, 0, $bbs_config{shogo_limit}) : $m{shogo};
-	unshift @lines, "$time<>$date<>$mname<>$mcountry<>$mshogo<>$addr<>$in{comment}<>$m{icon}<>$m{icon_pet}<>\n";
+	if ($this_file =~ /blog/) {
+		unshift @lines, "$time<>$date<>$mname<>$mcountry<>$mshogo<>$addr<>$in{comment}<>$m{icon}<>\n";
+	}
+	else {
+		unshift @lines, "$time<>$date<>$mname<>$mcountry<>$mshogo<>$addr<>$in{comment}<>$m{icon}<>$m{icon_pet}<>\n";
+	}
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @lines;
