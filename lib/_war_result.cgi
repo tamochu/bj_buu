@@ -560,10 +560,29 @@ sub _touitu {
 			&send_twitter("深き闇より目覚めた$cs{name}[$w{country}]の猛者達が$m{name}を筆頭とし$world_name大陸を支配する");
 			$is_npc_win = 1;
 		}
-		else {
+		else { # 封印国側の勝利
 			&mes_and_world_news("<em>魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれました</em>",1);
 			&write_legend('touitu', "$c_mの$mnameとその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
 			&send_twitter("$c_mの$m{name}とその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
+
+			my @win_countries = split /,/, $w{win_countries};
+			my %sames = ();
+			for my $wc (@win_countries) {
+				for my $k (qw/war dom pro mil ceo/) {
+					if ($cs{$k}[$wc] ne '') {
+						next if ++$sames{$player} > 1;
+						&send_god_item(4, $cs{$k}[$wc]);
+					}
+				}
+
+				open my $cfh, "< $logdir/$wc/member.cgi" or &error("$logdir/$wc/member.cgiﾌｧｲﾙが開けません");
+				while (my $player = <$cfh>) {
+					$player =~ tr/\x0D\x0A//d;
+					next if ++$sames{$player} > 1; # ↑の代表報酬ですでに名前出てるので再度報酬出ることはない
+					&send_item($player, 2, int(rand($#eggs)+1), 0, 0, 1);
+				}
+				close $cfh;
+			}
 		}
 	}
 	elsif ($w{world} eq $#world_states-2) {
