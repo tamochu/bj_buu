@@ -80,6 +80,7 @@ sub exe1 {
 	$m{tp} += 10;
 	$m{turn} = $cmd;
 	$mes .= "$_[0]Œ‹‰Ê‚Í$GWT•ªŒã<br>";
+	&before_action('icon_pet_exp', $GWT);
 	&wait;
 }
 #=================================================
@@ -102,6 +103,7 @@ sub tp_400 {
 		}
 		$mes .= "$_[0]Œ‹‰Ê‚Í$GWT•ªŒã<br>";
 
+		&before_action('icon_pet_exp', $GWT);
 		&wait;
 	}
 	else {

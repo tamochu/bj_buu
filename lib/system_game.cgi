@@ -125,7 +125,7 @@ sub write_user {
 		login_time ldate start_time mail_address name pass lib tp wt act sex shogo sedai vote vote_year
 		country job seed lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
 		max_hp hp max_mp mp at df mat mdf ag cha lea wea wea_c wea_lv wea_name gua egg egg_c pet pet_c shuffle master master_c boch_pet
-		marriage lot is_full next_salary icon icon_pet icon_pet_lv mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
+		marriage lot is_full next_salary icon icon_pet icon_pet_lv icon_pet_exp mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
 		rest_a rest_b rest_c
 		
 		turn stock value is_playing bank
@@ -1913,14 +1913,16 @@ sub get_icon_pet {
 		$pattern .= $m{pet} unless ($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24') && ($m{boch_pet} && $m{pet});
 
 		if (index($line, $pattern) >= 0) {
-			$line =~ s/.*<>$m{pet};(.*?);(.*?)<>.*/$1;$2/;
-			my ($icon, $lv) = split /;/, $line;
+			$line =~ s/.*<>$m{pet};(.*?);(.*?);(.*?)<>.*/$1;$2;$3/;
+			my ($icon, $lv, $exp) = split /;/, $line;
 			$m{icon_pet} = $icon;
 			$m{icon_pet_lv} = $lv;
+			$m{icon_pet_exp} = $exp;
 		}
 		else {
 			$m{icon_pet} = '';
-			$m{icon_pet_lv} = 1;
+			$m{icon_pet_lv} = 0;
+			$m{icon_pet_exp} = 0;
 		}
 	}
 }
@@ -1932,6 +1934,25 @@ sub get_icon_pet {
 #================================================
 sub before_action { # 行動前の共通処理
 	my $action = shift;
+
+	if ($m{icon_pet} && ($action eq 'icon_pet_exp')) {
+		my $this_file = "$userdir/$id/pet_icon.cgi";
+		open my $fh, "+< $this_file" or &error("$this_file ﾌｧｲﾙが開けません");
+		eval { flock $fh, 2; };
+		my $line = <$fh>;
+
+		$m{icon_pet_exp} -= int($_[0]);
+		if ($m{icon_pet_exp} <= 0) {
+			++$m{icon_pet_lv};
+			$m{icon_pet_exp} = int(20 * (1.1 ** $m{icon_pet_lv}));
+		}
+
+		$line =~ s/<>($m{pet});.*?;.*?;.*?<>/<>$1;$m{icon_pet};$m{icon_pet_lv};$m{icon_pet_exp}<>/;
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh $line;
+		close $fh;
+	}
 }
 sub after_success_action { # 行動の成功後の共通処理
 	my $action = shift; # 行動種
@@ -1946,7 +1967,8 @@ sub after_success_action { # 行動の成功後の共通処理
 sub remove_pet { # ﾍﾟｯﾄ外す処理
 	$m{pet} = 0;
 	$m{icon_pet} = '';
-	$m{icon_pet_lv} = 1;
+	$m{icon_pet_lv} = 0;
+	$m{icon_pet_exp} = 0;
 }
 
 1; # 削除不可

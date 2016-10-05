@@ -486,8 +486,6 @@ sub tp_520 {
 	}
 	elsif ($in{icon} && (-f "$icondir/pet/$in{icon}") ) {
 		if ($m{money} >= $menus[5][1]) {
-			$m{pet_icon} = '';
-
 			$m{icon_pet} = $in{icon};
 
 			$mes .= 'これであなたのﾍﾟｯﾄもイケイケ↑よぉ<br>';
@@ -508,9 +506,11 @@ sub tp_520 {
 				eval { flock $fh, 2; };
 				my $line = <$fh>;
 				if(index($line, "<>$m{pet};") >= 0){
-					$line =~ s/<>($m{pet});.*?;(.*?)<>/<>$1;$m{icon_pet};$2<>/;
+					$line =~ s/<>($m{pet});.*?;(.*?);(.*?)<>/<>$1;$m{icon_pet};$2;$3<>/;
 				}else{
-					$line = $line . "$m{pet};$m{icon_pet};1<>";
+					$line = $line . "$m{pet};$m{icon_pet};1;22<>";
+					$m{icon_pet_lv} = 1;
+					$m{icon_pet_exp} = 22;
 				}
 				seek  $fh, 0, 0;
 				truncate $fh, 0;
@@ -519,8 +519,10 @@ sub tp_520 {
 			}
 			else {
 				open my $fh, "> $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
-				print $fh "<>$m{pet};$m{icon_pet};1<>";
+				print $fh "<>$m{pet};$m{icon_pet};1;22<>";
 				close $fh;
+				$m{icon_pet_lv} = 1;
+				$m{icon_pet_exp} = 22;
 			}
 
 			&refresh;

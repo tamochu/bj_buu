@@ -89,6 +89,7 @@ sub tp_600 {
 		print $fh "$time<>$m{name}<>\n";
 		close $fh;
 
+		&before_action('icon_pet_exp', $GWT);
 		&wait;
 	}
 	elsif ($cmd eq '2') {
@@ -98,6 +99,7 @@ sub tp_600 {
 		$m{value} = 'ambush';
 		$m{tp} += 10;
 
+		&before_action('icon_pet_exp', $GWT);
 		&wait;
 	}
 	else {
@@ -216,6 +218,7 @@ sub exe1 {
 		$m{renzoku_c} = $y{country} eq $m{renzoku} ? $m{renzoku_c} + 1 : 1;
 		$m{renzoku} = $y{country};
 
+		&before_action('icon_pet_exp', $GWT);
 		&wait;
 	}
 }

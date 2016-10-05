@@ -116,6 +116,7 @@ sub exe1 {
 
 		$mes .= "$_[0]$cs{name}[$y{country}]‚ÉŒü‚©‚¢‚Ü‚µ‚½<br>";
 		$mes .= "Œ‹‰Ê‚Í$GWT•ªŒã‚Å‚·<br>";
+		&before_action('icon_pet_exp', $GWT);
 		&wait;
 	}
 }
@@ -283,6 +284,7 @@ sub exe2 {
 
 			&mes_and_send_news("“¯–¿‘‚Ì$cs{name}[$union]‚É$_[1]‚ğ $m{value} ‘—‚è‚Ü‚µ‚½");
 			$mes .= "$GWT•ª‚É“’…‚·‚é—\\’è‚Å‚·<br>";
+			&before_action('icon_pet_exp', $GWT);
 			&wait;
 		}
 	}

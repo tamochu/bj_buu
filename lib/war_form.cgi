@@ -189,6 +189,7 @@ sub tp_100 {
 			$m{renzoku_c} = 1;
 		}
 
+		&before_action('icon_pet_exp', $GWT);
 		&wait;
 		&write_cs;
 	}
