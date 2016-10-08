@@ -205,12 +205,6 @@ sub war_win {
 		$v = int($v / 10);
 	}
 	
-	# 暗黒側カウンターの基本奪国力（少数やｳﾛﾎﾞ用）
-	# 統一期限切れそうになると封印側が有利になるのは、
-	# 統一期限切れた時に暗黒生きてても負け扱いだしどうせならちゃんと封印しろっていう仕様かと思われる
-	# 狡知の奪国力を考慮し常に狡知に合わせたカウンターにすると暗黒側狡知でゴリゴリ削れそう とりあえず封印時と暗黒時で奪国力が変わる仕様にしてしまう
-#	$npc_v = int(rand(400)+400) if $w{world} eq $#world_states;
-	$npc_v = int(rand(300)+300) if $w{world} eq $#world_states;
 
 	# 奪国力上限
 	if ($v !~ /^(\d)\1+$/) { # ｿﾞﾛ目(ｳﾛﾎﾞﾛｽ使用時など)
@@ -220,18 +214,12 @@ sub war_win {
 		}
 		else { # 通常・長期
 			if($m{unit} eq '18'){
-#				$npc_v = int(rand(750)+750) if $w{world} eq $#world_states && ($m{country} ne $w{country} && $union ne $w{country}) ; # 封印側狡知のみ狡知の奪国力に合わせたカウンター量
-#				$npc_v = int(rand(800)+450) if $w{world} eq $#world_states && ($m{country} ne $w{country} && $union ne $w{country}) ; # 封印側狡知のみ狡知の奪国力に合わせたカウンター量
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
 					$v = $v > 2000 ? int(rand(500)+1500) : int($v);
-#					$v = $v > 2000 ? int(rand(250)+1750) : int($v);
 				}
 				else {
 					$v = $v > 1500 ? int(rand(500)+1000) : int($v);
 #					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
-					# 暗黒側カウンターの奪国力
-#					$npc_v = int(rand(750)+750) if $w{world} eq $#world_states && $v > 1500;
-#					$npc_v = int(rand(525)+975) if $w{world} eq $#world_states;
 				}
 			}else{
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
@@ -241,8 +229,6 @@ sub war_win {
 				else {
 #					$v = $v > 600  ? int(rand(200)+400) : int($v);
 					$v = $v > 800  ? int(rand(200)+600) : int($v);
-					# 暗黒側カウンターの奪国力
-#					$npc_v = int(rand(400)+600) if $w{world} eq $#world_states;
 				}
 			}
 			# 統一期限が近づいてきたらﾌﾟﾗｽ
@@ -343,14 +329,15 @@ sub war_win {
 		my @acs = (1..$w{country} - 1);
 		my $dark_side = $m{country} eq $w{country} ? $union : ($union eq $w{country} ? $m{country} : 0) ; # 暗黒の同盟国は封印側として数えない
 		splice(@acs, $dark_side - 1, 1) if $dark_side;
+		# ｱﾎｱﾘｱ自体は暗黒の同盟国が暗黒を滅ぼすと同盟国を経由して暗黒に統一フラグが立ち暗黒勝利になる現象
 		my $ahoalia = 1;
 		for my $ac (@acs) {
 			$ahoalia = 0 if !$cs{is_die}[$ac]; # 封印側が滅亡してないなら封印側全国滅亡フラグ下ろす
 		}
 		if ($cs{strong}[$m{country}] >= $touitu_strong
 			|| ($cs{strong}[$w{country}] <= 0
-				&& $union ne $w{country})
-			|| ($ahoalia && $m{country} eq $w{country})) {
+				&& $union ne $w{country}) # こっちがｱﾎｱﾘｱ対策
+			|| ($ahoalia && $m{country} eq $w{country})) { # こっちは封印側がすべて滅亡しているか
 			&_touitu;
 		}
 		elsif (!$cs{is_die}[$y{country}] && $cs{strong}[$y{country}] <= 0) {
@@ -359,10 +346,37 @@ sub war_win {
 		elsif ( $cs{is_die}[$m{country}] && $cs{strong}[$m{country}] >= 5000 ) {
 			&_hukkou;
 		}
-		else{
+=pod
+		無改造の暗黒ｶｳﾝﾀｰ
+		elsif ( rand(4) < 1  || ($cs{strong}[$w{country}] < 30000 && rand(3) < 1) ) {
+			require './lib/vs_npc.cgi';
+			&npc_war;
+		}
+		暗黒の国力が 30000 以上の時は 1/4 でｶｳﾝﾀｰ発生
+		暗黒の国力が 30000 未満なら 1/3 かと思ってたけどよく考えたら加算なので (1/4) + (1/3) - (1/4*1/3) = 0.5 で無改造の最高ｶｳﾝﾀｰ率は 50%
+		※確率の加法定理 Aが生じる確率 + Bが生じる確率 - (AとBが生じる確率)
+=cut
+		else {
+			# 統一期限や暗黒の国力を終盤判定の要素としてｶｳﾝﾀｰ率うｐ調節
+			# 国数の増減は本来暗黒の強弱とは関係ないと思われる
+			# 暗黒が、3国に殴られようが5国に殴られようが10国に殴られようが封印側の国数に関係なく総戦争数は同一
+			# 布告してくる国数が増えるほど暗黒不利になるとは思うが、奪国ｶｳﾝﾀｰの奪国力を上げれば布告されていようが暗黒有利にすることは可能
+			# 無改造はそもそも布告されてる前提の奪国力で反撃するので布告してくる国数増えても暗黒の強弱には関係ないはず
+			# 黒豚鯖は布告で封印側の奪国力が一方的に上がるようになってるので布告してくる国が増えるほど暗黒が不利になる→国数によって暗黒の強弱が変わってしまうのが黒豚鯖の仕様
+			# 結論、国数による暗黒の強弱の変化は封印側の奪国力と暗黒の奪国力の差が出てしまうことによるので、暗黒の強弱のバランス調整するならカウンター率よりも奪国力を調整した方が良い
+			# ここでのｶｳﾝﾀｰ調整は拘束が長い＆鯖人員が少ない鯖だと暗黒が活発になる前に統一期限が切れそうになるの対策
+			# 鯖人員が増えたらたぶん要らない調整
+			my $npc_par = $cs{strong}[$w{country}] < 30000 ? 1 # 国力30000未満 = 2/4 = 50%
+			    : $time + 2 * 24 * 3600 > $w{limit_time} ? 0.2 # 国力30000以上 + 統一期限残り1日 = 1.2/4 = 30%
+			    : $time + 3 * 24 * 3600 > $w{limit_time} ? 0.15 # 国力30000以上 + 統一期限残り2日 = 1.15/4 = 28.7%
+			    : $time + 4 * 24 * 3600 > $w{limit_time} ? 0.1 # 国力30000以上 + 統一期限残り3日 = 1.1/4 = 27.5%
+			    : $time + 5 * 24 * 3600 > $w{limit_time} ? 0.05 # 国力30000以上 + 統一期限残り4日 = 1.05/4 = 26.2%
+			    :                                          0 # 国力30000以上 + 統一期限5日以上 = 1/4 = 25%
+			    ;
+
 			require './lib/vs_npc.cgi';
 #			if( rand(4) < $npc_war  || ($cs{strong}[$w{country}] < 30000 && rand(3) < $npc_war) ) {
-			if( rand(4) < 1  || ($cs{strong}[$w{country}] < 30000 && rand(3) < 1) ) {
+			if( rand(4) < (1 + $npc_par) ) { # 確率の加法定理使ってｶｳﾝﾀｰ率計算するの面倒なので人間が分かりやすいように省略
 			    &npc_war;
 			}
 		}

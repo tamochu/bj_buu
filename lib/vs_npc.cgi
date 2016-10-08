@@ -34,7 +34,7 @@ $npc_war = $npc_subx * (1 - $war_max) + $war_max;
 $npc_war = $npc_war < $war_min ? $war_min:
 	 $npc_war > $war_max ? $war_over:
 	 $npc_war;
-	 
+
 #=================================================
 # NPC国の追加
 #=================================================
@@ -267,25 +267,30 @@ sub _npc_get_resource {
 # NPC国の戦争 ./lib/_war_result.cgiで頻度調整
 #=================================================
 sub npc_war {
+	my @npc_pet_pars = ();
+	# 統一期限残り１日でﾍﾟｯﾄの発動率変化
+	# 拘束が長くまた鯖人員が少ない鯖だと暗黒が活発になる前に期限切れそう
+	# 統一期限切れそうになったらﾌｪﾝﾘﾙの発動率上げて勝つにしろ負けるにしろちゃんと終わるようにという調整
+	# また期限切れそうな中で再同盟っていうのも盛り上がらないだろうからﾒﾃｵの発動率下げる
+	# 安易にイジるとﾛﾌﾟﾄとﾒﾃｵが発生する 暗黒の強弱調整にﾍﾟｽﾄの発動率イジろうと思ったらﾍﾟｽﾄの位置を後ろにした方がええかも？ したらﾛﾌﾟﾄの発動率自体見直さないとだろうけど
+	if ($cs{strong}[$w{country}] < 30000) { # 暗黒のカウンターが本気 期限切れそうだからってﾌｪﾝﾘﾙ連発させると暗黒有利すぎるので下げる
+		@npc_pet_pars = ($time + 2 * 24 * 3600 > $w{limit_time}) ? (6, 10, 20, 15, 45) : (6, 10, 20, 15, 40) ;
+	}
+	elsif ($cs{strong}[$w{country}] < 50000) { # 50000 > 暗黒 >= 30000 この国力で期限切れそうだと封印がサボってると暗黒が本気出す前に時間切れ起こしそう ﾌｪﾝﾘﾙで統一国力下がるように
+		@npc_pet_pars = ($time + 2 * 24 * 3600 > $w{limit_time}) ? (4, 10, 20, 15, 45) : (6, 10, 20, 15, 40) ;
+	}
+	else { # 暗黒 >= 50000 この国力で期限切れそうならなおのことﾌｪﾝﾘﾙ連打
+		@npc_pet_pars = ($time + 2 * 24 * 3600 > $w{limit_time}) ? (2, 15, 20, 20, 55) : (3, 15, 20, 20, 50) ;
+	}
+
 	require "$datadir/npc_war_$w{country}.cgi";
-	if ($cs{strong}[$w{country}] < 50000) {
-		  rand(6)  < 1 ? &npc_use_pet_fenrir
-		: rand(10) < 1 ? &npc_use_pet_prisoner
-		: rand(20) < 1 ? &npc_use_pet_pesto
-		: rand(15) < 1 ? &npc_use_pet_loptr
-		: rand(40) < 1 ? &npc_use_pet_meteo
-		:                &npc_get_strong
-		;
-	}
-	else {
-		  rand(3)  < 1 ? &npc_use_pet_fenrir
-		: rand(15) < 1 ? &npc_use_pet_prisoner
-		: rand(20) < 1 ? &npc_use_pet_pesto
-		: rand(20) < 1 ? &npc_use_pet_loptr
-		: rand(50) < 1 ? &npc_use_pet_meteo
-		:                &npc_get_strong
-		;
-	}
+	  rand($npc_pet_pars[0])  < 1 ? &npc_use_pet_fenrir
+	: rand($npc_pet_pars[1]) < 1 ? &npc_use_pet_prisoner
+	: rand($npc_pet_pars[2]) < 1 ? &npc_use_pet_pesto
+	: rand($npc_pet_pars[3]) < 1 ? &npc_use_pet_loptr
+	: rand($npc_pet_pars[4]) < 1 ? &npc_use_pet_meteo
+	:                &npc_get_strong
+	;
 }
 sub npc_use_pet_fenrir { # ﾌｪﾝﾘﾙ
 	return if $touitu_strong < 20000;
@@ -338,7 +343,7 @@ sub npc_use_pet_prisoner { # 牢獄
 	for my $i (1 .. $w{country}-1) {
 		next if $cs{$k}[$i] eq '';
 		next if $cs{$k}[$i] eq $m{name};
-		
+
 		&regist_you_data($cs{$k}[$i], 'lib', 'prison');
 		&regist_you_data($cs{$k}[$i], 'tp',  100);
 		&regist_you_data($cs{$k}[$i], 'y_country',  $w{country});
@@ -371,19 +376,33 @@ sub npc_get_strong { # 奪国
 	
 	return if ($cs{is_die}[$country] && $cs{strong}[$country] < 5000);        # 滅亡国からは奪わない
 	return if $cs{strong}[$country] < 1000; # 国力1000未満は奪わない
-	
+
+	my $v = int(rand(300)+300); # 基本奪国力 300 ～ 599
+
+	# 暗黒側の仕官人数が封印側戦争国の布告数を上回ったり下回った場合にNPC奪国力を調整する
+	# ﾌｪﾝﾘﾙが問題になるけど、ｶｳﾝﾀｰ発生率よりもﾌｪﾝﾘﾙ自体も人数で調整のが良いかも？ わがらん
+	my $holy_mem = int($w{country} * 0.5) * 3; # 封印側戦争国の布告枚数を想定 戦争国2国で6人、戦争国4国で12人
+	my $vv = int( ($cs{member}[$w{country}] - $holy_mem) / 3) * 100; # 暗黒の停戦人員が 3 多いまたは少ない毎にNPC奪国力+-100
+	if ($vv) {
+		$vv = $vv > 300 ? 300 :
+				$vv < -300 ? -300 :
+				$vv; # 最高+-300
+		$v += int(rand($vv)+$vv);
+		return if $v < 1; # 暗黒人が多すぎて補正で奪国力0以下になったなら奪国ｶｳﾝﾀｰｷｬﾝｾﾙ 戦争国2国：暗黒15人、戦争国3国：暗黒18人 でｷｬﾝｾﾙされる場合もある？
+	}
+
+#	$v += int(rand(201)) if ($time + 2 * 24 * 3600 > $w{limit_time}); # 統一期限残り１日
+
 	# その国の相手の名前をﾗﾝﾀﾞﾑ取得
 	my $name = '';
 	open my $fh, "< $logdir/$country/member.cgi" or &error("$logdir/$country/member.cgiﾌｧｲﾙが読み込めません");
 	rand($.) < 1 and $name = $_ while <$fh>;
 	close $fh;
 	$name =~ tr/\x0D\x0A//d;
-	
-	# 狡知追加によってプレイヤーの奪国力が一律ではなくなったので _war_result.cgi で定義
-#	my $v = int(rand(300)+300);
-	$cs{strong}[$w{country}] += $npc_v;
-	$cs{strong}[$country]    -= $npc_v;
-	&write_world_news(qq|$cs{name}[$w{country}]の$npcs[int(rand(@npcs))]{name}が$cs{name}[$country]に侵攻、$nameの部隊を撃破し <font color="#FF00FF"><b>$npc_v</b> の$e2j{strong}を奪うことに成功</font>したようです|);
+
+	$cs{strong}[$w{country}] += $v;
+	$cs{strong}[$country]    -= $v;
+	&write_world_news(qq|$cs{name}[$w{country}]の$npcs[int(rand(@npcs))]{name}が$cs{name}[$country]に侵攻、$nameの部隊を撃破し <font color="#FF00FF"><b>$v</b> の$e2j{strong}を奪うことに成功</font>したようです|);
 	$cs{is_die}[$w{country}] = 0 if $cs{is_die}[$w{country}];
 }
 #=================================================
