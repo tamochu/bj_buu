@@ -501,7 +501,7 @@ sub tp_450 {
 		eval { flock $fh, 2; };
 		push @lines, $_ while <$fh>;
 		pop @lines if @lines > 50;
-		unshift @lines, "$time<>$date<>$w_name<>$m{country}<>$m{shogo}<>$addr<>$comment<>$m{icon}<>\n";
+		unshift @lines, "$time<>$date<>$w_name<>$m{country}<>$m{shogo}<>$addr<>$comment<>$m{icon}<>$m{icon_pet}<>\n";
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
 		print $fh @lines;
