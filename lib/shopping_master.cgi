@@ -183,6 +183,7 @@ sub tp_120 {
 			$m{master} = $name;
 			$m{master_c} = $expert;
 			&write_world_news(qq|$m{name}が$nameに弟子入りしました|);
+			&system_letter($name, "$m{name}が弟子になりました")
 		}
 		else {
 			push @lines, $line;
@@ -370,6 +371,35 @@ sub tp_410 {
 	}
 
 	&begin;
+}
+
+sub system_letter {
+	my $aname = shift;
+	my $content = shift;
+
+	my $send_id = unpack 'H*', $aname;
+	local $this_file = "$userdir/$send_id/letter";
+	if (-f "$this_file.cgi") {
+		$in{comment} = $content;
+		$mname = $m{name};
+		$m{name} = 'システム';
+		$mcountry = $m{country};
+		$m{country} = 0;
+		$micon = $m{icon};
+		$m{icon} = '';
+		$mshogo = $m{shogo};
+		$m{shogo} = '';
+		&send_letter($aname, 0);
+
+		$in{comment} = "";
+		$m{name} = $mname;
+		$m{country} = $mcountry;
+		$m{icon} = $micon;
+		$m{shogo} = $mshogo;
+		return 1;
+	}
+	
+	return 0;
 }
 
 1; # 削除不可
