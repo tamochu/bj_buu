@@ -378,8 +378,8 @@ sub system_letter {
 	my $content = shift;
 
 	my $send_id = unpack 'H*', $aname;
-	local $this_file = "$userdir/$send_id/letter";
-	if (-f "$this_file.cgi") {
+	my $letter_file = "$userdir/$send_id/letter";
+	if (-f "$letter_file.cgi") {
 		$in{comment} = $content;
 		$mname = $m{name};
 		$m{name} = 'ƒVƒXƒeƒ€';
