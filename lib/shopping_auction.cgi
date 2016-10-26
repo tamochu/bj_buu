@@ -102,14 +102,14 @@ sub tp_110 {
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			my($bit_time, $no, $kind, $item_no, $item_c, $item_lv, $from_name, $to_name, $item_price, $buyout_price) = split /<>/, $line;
-			if ($no eq $cmd) {
+			if ($no eq $cmd && $item_no > 0) {
 				my $need_money = int($item_price * 1.2);
 				if ($buyout_price && $need_money > $buyout_price) {
 					$need_money = $buyout_price
 				}
 				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
 					my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
-					
+
 					$m{total_auction} += $in{money};
 					$mes .= "$item_title‚É $in{money} G‚Å“üD‚µ‚Ü‚µ‚½<br>";
 					if($buyout_price && $in{money} >= $buyout_price){
@@ -138,7 +138,7 @@ sub tp_110 {
 				}
 			}
 			# —Dˆ—
-			elsif ($time > $bit_time) {
+			elsif ($time > $bit_time && $item_no > 0) {
 				my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 				
 				my $to_id = unpack 'H*', $to_name;
@@ -176,7 +176,7 @@ sub tp_110 {
 sub tp_200 {
 	$layout = 1;
 	$mes .= '‚Ç‚ê‚ğo•i‚µ‚Ü‚·‚©?<br>';
-	
+?id=6e616e616d6965&pass=1844950&cmd=4&tlimit=2&price=1000
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 	$mes .= qq|<input type="radio" id="no_1" name="cmd" value="1"><label for="no_1">$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c})</label><br>| if $m{wea};
