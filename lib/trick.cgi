@@ -504,9 +504,9 @@ sub tp_1010{
 	if ($cmd eq '1') {
 		&mes_and_send_news("$in{trick_name}‚É$pets[$in{trick_pet}][1]‚ğ‘—‚è‚Ü‚µ‚½");
 	} elsif ($cmd eq '2') {
-		&write_world_news("<b>$cs{name}[$m{country}]‚Ì$in{trick_name}‚ª</b><b>$cs{name}[$in{trick_country}]‚Æ’âíğ–ñ‚ğŒ‹‚Ñ‚Ü‚µ‚½</b>");
-	} elsif ($cmd eq '3') {
 		&write_world_news("<b>$cs{name}[$m{country}]‚Ì$in{trick_name}‚ª</b><b>$cs{name}[$in{trick_country}]‚Ééí•z‚ğ‚µ‚Ü‚µ‚½</b>");
+	} elsif ($cmd eq '3') {
+		&write_world_news("<b>$cs{name}[$m{country}]‚Ì$in{trick_name}‚ª</b><b>$cs{name}[$in{trick_country}]‚Æ’âíğ–ñ‚ğŒ‹‚Ñ‚Ü‚µ‚½</b>");
 	} else {
 		$mes .= '‚â‚ß‚Ü‚µ‚½<br>';
 		&begin;
