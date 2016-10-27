@@ -102,10 +102,11 @@ sub tp_110 {
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			my($bit_time, $no, $kind, $item_no, $item_c, $item_lv, $from_name, $to_name, $item_price, $buyout_price) = split /<>/, $line;
-			if ($no eq $cmd && $item_no > 0) {
+			next unless $item_no; # ‚Ç‚¤‚¢‚¤ŒoˆÜ‚Å‹N‚«‚½‚Ì‚©•ª‚©‚ç‚ñ‚ªƒf[ƒ^‚È‚µ‚ª—ŽŽD‚³‚ê‚½‚Ì‚Å’e‚­
+			if ($no eq $cmd) {
 				my $need_money = int($item_price * 1.2);
 				if ($buyout_price && $need_money > $buyout_price) {
-					$need_money = $buyout_price
+					$need_money = $buyout_price;
 				}
 				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
 					my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
@@ -138,7 +139,7 @@ sub tp_110 {
 				}
 			}
 			# —ŽŽDˆ—
-			elsif ($time > $bit_time && $item_no > 0) {
+			elsif ($time > $bit_time) {
 				my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
 				
 				my $to_id = unpack 'H*', $to_name;

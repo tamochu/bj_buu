@@ -540,10 +540,11 @@ sub tp_410 {
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			my($bit_time, $no, $kind, $item_no, $item_c, $item_lv, $from_name, $to_name, $item_price, $buyout_price) = split /<>/, $line;
+			next unless $item_no; # どういう経緯で起きたのか分からんがデータなしが落札されたので弾く
 			if ($no eq $cmd) {
 				my $need_money = int($item_price * 1.2);
 				if ($buyout_price && $need_money > $buyout_price) {
-					$need_money = $buyout_price
+					$need_money = $buyout_price;
 				}
 				if ( $in{money} >= $need_money && &is_buyable($kind, $item_no) ) {
 					my $item_title = &get_item_name($kind, $item_no, $item_c, $item_lv);
