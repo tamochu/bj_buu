@@ -176,7 +176,7 @@ sub tp_110 {
 sub tp_200 {
 	$layout = 1;
 	$mes .= '‚Ç‚ê‚ğo•i‚µ‚Ü‚·‚©?<br>';
-?id=6e616e616d6965&pass=1844950&cmd=4&tlimit=2&price=1000
+
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 	$mes .= qq|<input type="radio" id="no_1" name="cmd" value="1"><label for="no_1">$weas[$m{wea}][1]š$m{wea_lv}($m{wea_c})</label><br>| if $m{wea};
