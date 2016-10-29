@@ -535,6 +535,7 @@ sub tp_410 {
 	elsif ($cmd && $in{money} && $in{money} !~ /[^0-9]/) {
 		my $is_rewrite = 0;
 		my $is_sokketsu = 0;
+		my @news_messages = ();
 		my @lines = ();
 		open my $fh, "+< $this_file_a" or &error("$this_file_aが開けません");
 		eval { flock $fh, 2; };
@@ -560,7 +561,8 @@ sub tp_410 {
 						&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $in{money});
 						&sale_data_log($kind, $item_no, $item_c, $item_lv, $in{money}, 3);
 						$mes .= "即決価格を提示しました<br>";
-						&write_send_news("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
+						push @news_messages, "$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました";
+#						&write_send_news("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました"); # flock in flock
 						&send_twitter("$from_nameの出品した$item_titleを$m{name}が $in{money} G(即決)で落札しました");
 						$is_sokketsu = 1;
 						$is_rewrite = 1;
@@ -587,7 +589,8 @@ sub tp_410 {
 				&send_money($to_name, 'ｵｰｸｼｮﾝ会場', "-$item_price");
 				&send_money($from_name, 'ｵｰｸｼｮﾝ会場', $item_price);
 				&sale_data_log($kind, $item_no, $item_c, $item_lv, $item_price, 2);
-				&write_send_news("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
+				push @news_messages, "$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました";
+#				&write_send_news("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました"); # flock in flock
 				&send_twitter("$from_nameの出品した$item_titleを$to_nameが $item_price Gで落札しました");
 				$is_rewrite = 1;
 			}
@@ -601,6 +604,10 @@ sub tp_410 {
 			print $fh @lines;
 		}
 		close $fh;
+
+		for my $news_message (@news_messages) {
+			&write_send_news($news_message);
+		}
 	}
 	else {
 		$mes .= 'やめました<br>';
