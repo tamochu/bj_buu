@@ -62,7 +62,8 @@ sub tp_100 {
 			next if $file_name =~ /^\./;
 			next if $file_name =~ /^_/;
 			next if $file_name =~ /^index.html$/;
-			$mes .= qq|<input type="radio" name="file_name" value="$file_name"><img src="$userdir/$id/picture/$file_name" style="vertical-align:middle;" $mobile_icon_size><hr>|;
+			my $file_title = &get_goods_title($file_name);
+			$mes .= qq|<input type="radio" name="file_name" value="$file_name"><img src="$userdir/$id/picture/$file_name" style="vertical-align:middle;" $mobile_icon_size> $file_title <hr>|;
 		}
 		closedir $dh;
 	}
