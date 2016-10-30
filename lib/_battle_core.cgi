@@ -130,12 +130,13 @@ sub run_battle2 {
 		# ‚µ‚½‚ª‚Á‚ÄAæUŒãU‚Æ‚¢‚¤‚Ç‚¿‚ç‚ğ—Dæ‚µ‚Äˆ—‚·‚é‚©ˆÈ‘O‚É—¼•û‚Å‚«‚é‚¾‚¯‚Ìˆ—‚ğs‚¤
 
 		local $m_s = undef;
+		local $pikorin;
 		if (!$metal) { # ÒÀÙ‘Šè‚É‚Íí‚ÉUŒ‚‚Å•KE‹Z‚à‘M‚©‚È‚¢
 			$m_s = $skills[ $m_skills[ $cmd - 1 ] ] if $cmd > 0 && $guas[$m{gua}][0] ne '21'; # 1ºÏİÄŞˆÈã‚ğ“ü—Í‚µ‚Ä‚¢‚Ä‹¶ím‚ÌŠZ‚¶‚á‚È‚­ÒÀÙ‘Šè‚¶‚á‚È‚¢‚È‚ç•KE‹Z
 			$m_s = undef if defined($m_s) && ($weas[$m{wea}][2] ne $m_s->[2] || !&m_mp_check($m_s)); # •KE‹Z‚ğ‘I‘ğ‚µ‚Ä‚¢‚Ä‚à‘®«‚ªˆá‚Á‚½‚èMP‚ª‘«‚è‚È‚¢‚È‚çUŒ‚
 	
 			# ‹Z‘M‚¢‚Ä‚àƒtƒ‰ƒO‚ª—§‚½‚È‚¢–â‘è‘Îô ƒtƒ‰ƒO©‘Ì‚ÍæUŒãUŠÖŒW‚È‚¢‚Ì‚Å—\‚ß‘M‚«ˆ—‚ğÏ‚Ü‚¹‚Îƒtƒ‰ƒO—§‚Ä‚ç‚ê‚é
-			local $pikorin = &_learning if !defined($m_s); # UŒ‚‚Å‹Z‚ğ‘M‚¢‚½‚È‚ç‚Î 1 ‚ª•Ô‚èA‘M‚¢‚½‹Z‚Í $m_s ‚É“ü‚é
+			$pikorin = &_learning if !defined($m_s); # UŒ‚‚Å‹Z‚ğ‘M‚¢‚½‚È‚ç‚Î 1 ‚ª•Ô‚èA‘M‚¢‚½‹Z‚Í $m_s ‚É“ü‚é
 		}
 
 		local $y_s = $skills[ $y_skills[ int(rand(6)) - 1 ] ] if $guas[$y{gua}][0] ne '21'; # ‹¶ím‚ÌŠZ‚¶‚á‚È‚¢‚È‚ç•KE‹Z
