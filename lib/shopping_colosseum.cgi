@@ -129,7 +129,7 @@ sub tp_110 {
 	open my $fh, "< $this_file" or &error("$this_fileÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
 	my @lines = <$fh>;
 	close $fh;
-	
+
 	# –h‰qÒ”‚É‚æ‚è×³İÄŞ”’²®
 	if ($m{value} <= 0) {
 		$m{value} = @lines == 0 ? 3 # –h‰qÒ‚ª‚¢‚È‚¢‚Ì‚Å‚¢‚«‚È‚è—DŸ
@@ -244,6 +244,7 @@ sub col_win {
 sub _defence_c_up {
 	my $count = 0;
 	my @lines = ();
+	my @defence_lines = ();
 	open my $fh, "+< $this_file" or &error("$this_fileÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	my @temp_lines = <$fh>;
@@ -252,17 +253,11 @@ sub _defence_c_up {
 		if ($count == $count_sub - 3 + $m{value}) {
 			my($name,$country,$max_hp,$max_mp,$at,$df,$mat,$mdf,$ag,$cha,$wea,$skills,$mes_win,$mes_lose,$icon,$defence_c,$wea_name,$gua) = map { $_ =~ tr/\x0D\x0A//d; $_; } split /<>/, $line;
 			++$defence_c;
-			
-			&write_colosseum_news(qq|$menus[$m{stock}][0]$round_titles[$m{value}] ~ ’§íÒ<font color="$cs{color}[$m{country}]">$m{name}</font> VS –h‰qÒ<font color="$cs{color}[$y{country}]">$y{name}</font> › –h‰q$defence_c|);
 
-			# ‹K’è”ˆÈã‚¾‚Æ©“®ˆø‘Ş•Î”è
-			if ($defence_c >= $limit_defence_c) {
-				&_send_money_and_col_c_up($name, $defence_c);
-				&write_colosseum_news(qq| <i><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</i>|);
-				&write_legend("champ_$m{stock}", "$cs{name}[$country]‚Ì$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚·", 1, $name);
-				&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
-			}
-			else {
+			push @defence_lines, $line;
+
+			# ‹K’è”–¢–‚È‚çc—¯A‹K’è”ˆÈã‚¾‚Æ©“®ˆø‘Ş
+			unless ($defence_c >= $limit_defence_c) {
 				push @lines, "$name<>$country<>$max_hp<>$max_mp<>$at<>$df<>$mat<>$mdf<>$ag<>$cha<>$wea<>$skills<>$mes_win<>$mes_lose<>$icon<>$defence_c<>$wea_name<>$gua<>\n";
 			}
 		}
@@ -275,6 +270,21 @@ sub _defence_c_up {
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
+
+	for my $defence_line (@defence_lines) {
+		my($name,$country,$max_hp,$max_mp,$at,$df,$mat,$mdf,$ag,$cha,$wea,$skills,$mes_win,$mes_lose,$icon,$defence_c,$wea_name,$gua) = map { $_ =~ tr/\x0D\x0A//d; $_; } split /<>/, $defence_line;
+		++$defence_c;
+
+		&write_colosseum_news(qq|$menus[$m{stock}][0]$round_titles[$m{value}] ~ ’§íÒ<font color="$cs{color}[$m{country}]">$m{name}</font> VS –h‰qÒ<font color="$cs{color}[$y{country}]">$y{name}</font> › –h‰q$defence_c|);
+
+		# ‹K’è”ˆÈã‚¾‚ÆÎ”è
+		if ($defence_c >= $limit_defence_c) {
+			&_send_money_and_col_c_up($name, $defence_c);
+			&write_colosseum_news(qq| <i><font color="$cs{color}[$country]">$name</font>‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½</i>|);
+			&write_legend("champ_$m{stock}", "$cs{name}[$country]‚Ì$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚·", 1, $name);
+			&send_twitter("$name‚ª$menus[$m{stock}][0]‚Å$defence_c‰ñ‚Ì–h‰q‚ğ‰Ê‚½‚µ–h‰qÒ‚ğˆø‘Ş‚µ‚Ü‚µ‚½");
+		}
+	}
 }
 
 #================================================
