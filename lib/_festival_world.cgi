@@ -245,17 +245,18 @@ sub run_sessoku {
 			next if $pid =~ /\./;
 			next if $pid =~ /backup/;
 			next unless &you_exists($pid, 1);
-			my %p = &get_you_datas($pid, 1);
+			my %you_datas = &get_you_datas($pid, 1);
 
-			# Õ‚è•ñV
-			if ($strong_rank[0] eq $p{country} || $strong_rank[1] eq $p{country}) {
-				if ($$strong_rank[0] eq $p{country}) {
+			# Õ‚èn—û
+			if ($strong_rank[0] eq $you_datas{country} || $strong_rank[1] eq $you_datas{country}) {
+				# 1ˆÊ‘‚Ì‘ã•\‚É‚ÍÕ‚è•ñV
+				if ($$strong_rank[0] eq $you_datas{country}) {
 					for my $k (qw/war dom pro mil ceo/) {
-						if ($cs{$k}[$p{country}] eq $p{name}) {
-							&send_god_item(5, $cs{$k}[$p{country}]);
+						if ($cs{$k}[$you_datas{country}] eq $you_datas{name}) {
+							&send_god_item(5, $cs{$k}[$you_datas{country}]);
 						}
 					}
-					&send_item($p{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
+					&send_item($you_datas{name}, 2, int(rand($#eggs)+1), 0, 0, 1);
 				}
 				open my $fh, ">> $userdir/$pid/ex_c.cgi";
 				print $fh "fes_c<>1<>\n";
@@ -263,8 +264,8 @@ sub run_sessoku {
 			}
 
 			# ƒlƒoƒ‰ƒ“‘—‚è
-			&move_player2($p{name}, 0);
-			if ($p{name} eq $m{name}){
+			&move_player2($you_datas{name}, 0);
+			if ($you_datas{name} eq $m{name}){
 				$m{country} = 0;
 				$m{vote} = '';
 				&write_user;
