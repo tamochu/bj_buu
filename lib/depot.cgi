@@ -782,7 +782,7 @@ sub depot_common {
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		++$count;
-		if ($count >= $lost_depot) {
+		if ($count > $lost_depot) {
 			$is_rewrite = 1;
 		} else {
 			push @lines, $line;
