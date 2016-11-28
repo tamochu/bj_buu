@@ -46,11 +46,13 @@ sub write_comment {
 	else {
 		my ($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bicon_pet) = split /<>/, $line;
 	}
-	return 0 if $in{comment} eq $hcomment;
+	return 0 if $in{comment} eq $hcomment && $this_file !~ /letter/; # 手紙じゃないなら同一本文の投稿をスルー、手紙は再受信
 	if ($hname eq $m{name} && $htime + $bad_time > $time) {
 		&error("連続投稿は禁止しています。<br>しばらく待ってから書き込んでください");
 	}
-	push @lines, $head_line;
+	# 手紙に関しては、同一本文であっても送信者が違うなら手紙を受信するようにし、
+	# 同一人物からの同一本文の手紙は古い方を削除し新しい方を受信し直すタイムスタンプ更新方式に
+	push @lines, $head_line unless $in{comment} eq $hcomment && $hname eq $m{name};
 
 	while (my $line = <$fh>) {
 		push @lines, $line;
