@@ -619,7 +619,7 @@ sub modify_country {
 		for my $i (1..$w{country}) {
 			$cs{color}[$i] = $in{"color_" . $i};
 			$cs{name}[$i] = $in{"name_" . $i};
-			for my $k (qw/strong food money soldier tax state is_die/) {
+			for my $k (qw/strong food money soldier tax state is_die modify_war modify_dom modify_mil modify_pro/) {
 				$cs{$k}[$i] = $in{$k . "_" . $i};
 				if ($cs{$k}[$i] =~ /[^0-9]/ || $cs{$k}[$i] < 0) {
 					$cs{$k}[$i] = 0;
@@ -682,6 +682,14 @@ EOM
 		print qq|</td>|;
 	}
 	print qq|</tr>\n|;
+
+	for my $k (qw/modify_war modify_dom modify_mil modify_pro/) {
+		print qq|<tr><th>$k</th>|;
+		for my $i (1 .. $w{country}) {
+			print qq|<td align="right"><input type="text" name="${k}_${i}" value="$cs{$k}[$i]"/></td>|;
+		}
+		print qq|</tr>\n|;
+	}
 
 	print qq|</table>|;	
 	print <<"EOM";
