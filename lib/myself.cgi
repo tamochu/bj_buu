@@ -216,6 +216,7 @@ sub my_status_mobile {
 
 	my $sub_at  = '';
 	my $sub_mat = '';
+	my $sub_lea  = '';
 	my $sub_ag  = '';
 	if ($m{wea}) {
 		my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
@@ -227,6 +228,32 @@ sub my_status_mobile {
 		$mes .= qq|<li>d‚³:$weas[$m{wea}][5]</ul><hr>|;
 		if    ($weas[$m{wea}][2] =~ /–³|Œ•|•€|‘„/) { $sub_at  = "+$weas[$m{wea}][3]"; $sub_ag = "-$weas[$m{wea}][5]"; }
 		elsif ($weas[$m{wea}][2] =~ /•—|‰Š|—‹/)    { $sub_mat = "+$weas[$m{wea}][3]"; $sub_ag = "-$weas[$m{wea}][5]"; }
+
+		my $m_min_wea;
+		if ($weas[$m{wea}][2] eq 'Œ•') {
+			$m_min_wea = 1;
+		} elsif($weas[$m{wea}][2] eq '‘„') {
+			$m_min_wea = 6;
+		} elsif($weas[$m{wea}][2] eq '•€') {
+			$m_min_wea = 11;
+		} elsif($weas[$m{wea}][2] eq '‰Š') {
+			$m_min_wea = 16;
+		} elsif($weas[$m{wea}][2] eq '•—') {
+			$m_min_wea = 21;
+		} elsif($weas[$m{wea}][2] eq '—‹') {
+			$m_min_wea = 26;
+		} elsif($m{wea} == 0) {
+			$m_min_wea = 0;
+		} else {
+			$m_min_wea = 33;
+		}
+		$m_wea_modify = $weas[$m{wea}][5] - $weas[$m_min_wea][5];
+		$m_wea_modify = 100 if ($m{wea} == 14) || ($m{wea} == 32);
+		$m_wea_modify = 0 if ($m{wea} == 31);
+		$sub_lea = ($m_wea_modify >= 0) ? "+$m_wea_modify" : "-".abs($m_wea_modify);
+	}
+	else {
+		$sub_lea = "-100";
 	}
 	if ($m{gua}) {
 		$mes .= qq|y–h‹ïî•ñz<br><ul>|;
@@ -275,7 +302,7 @@ sub my_status_mobile {
 		$e2j{at} [<b>$m{at}</b>$sub_at]/$e2j{df} [<b>$m{df}</b>$sub_df]/<br>
 		$e2j{mat} [<b>$m{mat}</b>$sub_mat]/$e2j{mdf} [<b>$m{mdf}</b>$sub_mdf]/<br>
 		$e2j{ag} [<b>$m{ag}</b>$sub_ag]/$e2j{cha} [<b>$m{cha}</b>]/<br>
-		$e2j{lea} [<b>$m{lea}</b>]<br>
+		$e2j{lea} [<b>$m{lea}</b>$sub_lea]<br>
 		<hr>
 		yŠo‚¦‚Ä‚¢‚é‹Zz<br>
 		 $skill_info
@@ -312,7 +339,8 @@ sub my_status_pc {
 	$mes .= '<hr>';
 	my $sub_at  = '';
 	my $sub_mat = '';
-	my $sub_ah  = '';
+	my $sub_lea  = '';
+	my $sub_ag  = '';
 	if ($m{wea}) {
 		my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
 		$mes .= qq|y•Šíî•ñz<br>|;
@@ -325,6 +353,32 @@ sub my_status_pc {
 		$mes .= qq|</tr></table><hr size="1">|;
 		if    ($weas[$m{wea}][2] =~ /–³|Œ•|•€|‘„/) { $sub_at  = "£$weas[$m{wea}][3]"; $sub_ag = "¥$weas[$m{wea}][5]"; }
 		elsif ($weas[$m{wea}][2] =~ /•—|‰Š|—‹/)    { $sub_mat = "£$weas[$m{wea}][3]"; $sub_ag = "¥$weas[$m{wea}][5]"; }
+
+		my $m_min_wea;
+		if ($weas[$m{wea}][2] eq 'Œ•') {
+			$m_min_wea = 1;
+		} elsif($weas[$m{wea}][2] eq '‘„') {
+			$m_min_wea = 6;
+		} elsif($weas[$m{wea}][2] eq '•€') {
+			$m_min_wea = 11;
+		} elsif($weas[$m{wea}][2] eq '‰Š') {
+			$m_min_wea = 16;
+		} elsif($weas[$m{wea}][2] eq '•—') {
+			$m_min_wea = 21;
+		} elsif($weas[$m{wea}][2] eq '—‹') {
+			$m_min_wea = 26;
+		} elsif($m{wea} == 0) {
+			$m_min_wea = 0;
+		} else {
+			$m_min_wea = 33;
+		}
+		$m_wea_modify = $weas[$m{wea}][5] - $weas[$m_min_wea][5];
+		$m_wea_modify = 100 if ($m{wea} == 14) || ($m{wea} == 32);
+		$m_wea_modify = 0 if ($m{wea} == 31);
+		$sub_lea = ($m_wea_modify >= 0) ? "£$m_wea_modify" : "¥".abs($m_wea_modify);
+	}
+	else {
+		$sub_lea = "¥100";
 	}
 	if ($m{gua}) {
 		$mes .= qq|y–h‹ïî•ñz<br>|;
@@ -377,7 +431,7 @@ sub my_status_pc {
 			<th>$e2j{mat}</th><td align="right">$m{mat}$sub_mat</td>
 			<th>$e2j{mdf}</th><td align="right">$m{mdf}$sub_mdf</td>
 		</tr><tr>
-			<th>$e2j{lea}</th><td align="right">$m{lea}</td>
+			<th>$e2j{lea}</th><td align="right">$m{lea}$sub_lea</td>
 			<th>$e2j{ag}</th><td align="right">$m{ag}$sub_ag</td>
 			<th>$e2j{cha}</th><td align="right">$m{cha}</td>
 		</tr>
