@@ -121,22 +121,34 @@ sub tp_110 {
 sub tp_200 {
 	$m{tp} += 10;
 	$mes .= "‚Ç‚Ì‹Z‚ð–Y‚ê‚Ü‚·‚©?<br>";
-	&menu('‚â‚ß‚é', map{ "[$skills[$_][2]]$skills[$_][1]" } split /,/, $m{skills});
+	$mes .= qq|<form method="$method" action="$script">|;
+	my $count = 0;
+	for my $skill (split /,/, $m{skills}) {
+		++$count;
+		$mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1">|;
+		$mes .= qq|<label for="no_$count">| unless $is_mobile;
+		$mes .= qq|[$skills[$skill][2]]$skills[$skill][1]|;
+		$mes .= qq|</label>| unless $is_mobile;
+		$mes .= qq|<br>|;
+	}
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= $is_mobile ? qq|<input type="submit" value="–Y‚ê‚é" class="button1" accesskey="0"></form>|:
+		qq|<input type="submit" value="–Y‚ê‚é" class="button1"></form>|;
+	&n_menu;
+
 }
 sub tp_210 {
 	my @m_skills = split /,/, $m{skills};
-	if ($cmd) {
-		my $line = '';
-		for my $i (1 .. $#m_skills+1) {
-			if ($i eq $cmd) {
-				$mes .= "[$skills[ $m_skills[$i-1] ][2]]$skills[ $m_skills[$i-1] ][1]‚ð–Y‚ê‚Ü‚µ‚½";
-			}
-			else {
-				$line .= "$m_skills[$i-1],";
-			}
+	my $line = '';
+	for my $count (0 .. $#m_skills) {
+		if ($in{$count+1}) {
+			$mes .= "[$skills[ $m_skills[$count] ][2]]$skills[ $m_skills[$count] ][1]‚ð–Y‚ê‚Ü‚µ‚½<br>";
 		}
-		$m{skills} = $line;
+		else {
+			$line .= "$m_skills[$count],";
+		}
 	}
+	$m{skills} = $line;
 	&begin;
 }
 
