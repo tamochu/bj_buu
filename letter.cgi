@@ -42,17 +42,21 @@ sub letter_box_get {
 	}
 
 	my $rows = $is_mobile ? 2 : 8;
+	my ($sec,$min,$hour,$mday,$month,$year,$wday,$stime) = localtime($time);
+	my $g_card_link;
+	if ($month == 0) {
+		$g_card_link = $in{type} eq 'new_year' ?  qq|/ 年賀状| : qq| / <a href="?id=$id&pass=$pass&no=$in{no}&type=new_year">年賀状</a>|;
+	}
+
 	if($in{type} eq 'country'){
-		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / 一括送信 / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=new_year">年賀状</a></p>|;
+		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / 一括送信 / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
 	}elsif($in{type} eq 'ncountry'){
-		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / 個人宛) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=new_year">年賀状</a></p>|;
-	}elsif($in{type} eq 'new_year'){
-		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a> / 年賀状</p>|;
+		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / 個人宛) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
 	}else{
-		print qq|<p>受信箱(すべて / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=new_year">年賀状</a></p>|;
+		print qq|<p>受信箱(すべて / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
 	}
 	
-	if ($in{type} eq 'new_year' && -f "$userdir/$id/greeting_card.cgi") {
+	if ($month eq 0 && $in{type} eq 'new_year' && -f "$userdir/$id/greeting_card.cgi") {
 		my $pic_size = q|width="25px" height="25px"|;
 		my $count = 0;
 		open my $fh, "< $userdir/$id/greeting_card.cgi" or &error("$userdir/$id/greeting_card.cgiﾌｧｲﾙが開けません");
