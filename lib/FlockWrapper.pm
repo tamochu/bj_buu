@@ -97,7 +97,7 @@ BEGIN { sub import
 	$args{dir}       = "." if !defined($args{dir});
 	$args{dir}       =~ s/\/$//;
 	$args{fname}     = $args{dir}. "/lockfile";
-	$args{try}     ||= 5;
+	$args{try}     ||= 10;
 	$args{timeout} ||= 60;
 	$args{unlocked}  = 0;
 	$args{clean}     = 1 if !defined($args{clean});
