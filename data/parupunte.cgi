@@ -217,13 +217,22 @@
 				# “¯‚¶–¼‘O‚Ìl‚ª•¡”‚¢‚éê‡
 				next if ++$sames{$player} > 1;
  
-				my %datas = &get_you_datas($player);
-				&regist_you_data($player,'lib','');
-				&regist_you_data($player,'wt',0);
-				&regist_you_data($player,'tp',0);
-				&regist_you_data($player,'turn',0);
-				&regist_you_data($player,'stock',0);
-				&regist_you_data($player,'value',0);
+#				my %datas = &get_you_datas($player);
+#				&regist_you_data($player,'lib','');
+#				&regist_you_data($player,'wt',0);
+#				&regist_you_data($player,'tp',0);
+#				&regist_you_data($player,'turn',0);
+#				&regist_you_data($player,'stock',0);
+#				&regist_you_data($player,'value',0);
+				my @data = (
+					['lib', ''],
+					['wt', 0],
+					['tp', 0],
+					['turn', 0],
+					['stock', 0],
+					['value', 0]
+				);
+				&regist_you_array($player, @data);
 			}
 			close $fh;
 		}
