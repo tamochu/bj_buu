@@ -9,7 +9,7 @@ use File::Path;
 my $game_lv = $config_test ? int( rand(11) + 45 ) : int( rand(6) + 45 );
 
 # “ˆêŠúŒÀ(“ú)
-my $limit_touitu_day = int( rand(6)+5 );
+my $limit_touitu_day = int( rand(3)+4 );
 
 #================================================
 # Šú“ú‚ª‰ß‚¬‚½ê‡
@@ -85,7 +85,6 @@ sub reset {
 
 	# set world
 	$w{year}++;
-	$w{year}-- if ($config_test && $w{year} == 67);
 	$w{reset_time} = $config_test ? $time : $time + 3600 * 12;
 	$w{limit_time} = $config_test ? $time + 3600 * 36 : $time + 3600 * 24 * $limit_touitu_day;
 	$w{game_lv} = $game_lv;
@@ -152,7 +151,7 @@ sub reset {
 				my $trick_id = unpack 'H*', $cs{$k}[$i];
 				my %datas = &get_you_datas($trick_id, 1);
 				&regist_you_data($cs{$k}[$i], $kc, int($datas{$kc} * 0.5));
-				
+
 				$cs{$k}[$i] = '';
 				$cs{$kc}[$i] = 0;
 				
