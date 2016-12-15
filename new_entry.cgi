@@ -156,7 +156,7 @@ sub create_user {
 		$m{$k} = int(rand(3)) + 7;
 	}
 
-	# 初期値0 
+	# 初期値0
 	my @zeros = (qw/
 		wt act country job exp rank rank_exp unit sol sol_lv medal coin renzoku renzoku_c
 		wea wea_c wea_lv egg_c pet is_full 
@@ -169,10 +169,21 @@ sub create_user {
 	for my $k (@zeros) {
 		$m{$k} = 0;
 	}
-	
+
+	# 初期値1
+	my @ones = (qw/
+		disp_top disp_news disp_chat disp_ad disp_daihyo
+	/);
+	for my $k (@ones) {
+		$m{$k} = 1;
+	}
+
 	$m{shuffle}  = 0; # 0 で混乱時シャッフルされる
 	$m{seed} = 'human';
 	$m{coin} = $config_test ? 2500000 : 0;
+
+#	require './lib/tutorial.cgi';
+#	&start_tutorial;
 
 	&write_user;
 	
