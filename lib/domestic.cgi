@@ -27,7 +27,7 @@ sub is_satisfy {
 			return 0;
 		}
 		else {
-			$mes .= '国に属してないと行うことができません<br>';
+			$mes .= '国に属してないと行うことができません<br>仕官するには「国情報」→「仕官」から行ってみたい国を選んでください<br>';
 			&refresh;
 			&n_menu;
 			return 0;
