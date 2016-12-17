@@ -579,20 +579,13 @@ sub _touitu {
 			&write_legend('touitu', "$c_mの$mnameとその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
 			&send_twitter("$c_mの$m{name}とその仲間達が魔界を再び封印し、$world_name大陸にひとときの安らぎがおとずれる");
 
-			my @win_countries = split /,/, $w{win_countries};
+			require './lib/shopping_offertory_box.cgi';
 			my %sames = ();
 			for my $wc (@win_countries) {
-				for my $k (qw/war dom pro mil ceo/) {
-					if ($cs{$k}[$wc] ne '') {
-						next if ++$sames{$player} > 1;
-						&send_god_item(4, $cs{$k}[$wc]);
-					}
-				}
-
 				open my $cfh, "< $logdir/$wc/member.cgi" or &error("$logdir/$wc/member.cgiﾌｧｲﾙが開けません");
 				while (my $player = <$cfh>) {
 					$player =~ tr/\x0D\x0A//d;
-					next if ++$sames{$player} > 1; # ↑の代表報酬ですでに名前出てるので再度報酬出ることはない
+					next if ++$sames{$player} > 1;
 					&send_item($player, 2, int(rand($#eggs)+1), 0, 0, 1);
 				}
 				close $cfh;
@@ -696,7 +689,6 @@ sub modified_member {
 	my $i = shift;
 	return $cs{member}[$i] - $cs{new_commer}[$i];
 }
-
 
 
 1; # 削除不可
