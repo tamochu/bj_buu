@@ -73,113 +73,151 @@ sub tp_100 {
 	$mes .= "どれを引出しますか? [ $count / $max_depot ]<br>";
 	$mes .= $sub_mes;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-	$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p></form>|:
-		qq|<p><input type="submit" value="引出す" class="button1"></p></form>|;
-	
+	$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p>|:
+		qq|<p><input type="submit" value="引出す" class="button1"></p>|;
+	$mes .= qq|<input type="checkbox" id="pet_summary" name="show_summary" value="1"><label for="pet_summary">ﾍﾟｯﾄの効果を確認する</label></form>|;
+#	$mes .= qq|<a href="javascript:void(0)" onclick="var rl = document.getElementsByName('cmd'); var cmd = 0; for(var i=0; i<rl.length; i++){ if (rl[i].checked) { cmd = rl[i].value; break; } } location.href='http://www.pandora.nu/nyaa/cgi-bin/bj_test/pet_summaries.cgi?id=$id&pass=$pass&cmd=' + cmd; return false;">黄色</a>|;
+#	$mes .= qq|<div id="text">test</div>|;
 	$m{tp} += 10;
 }
 sub tp_110 {
-	if ($cmd) {
+	if ($in{show_summary} && $cmd) {
+		require './data/pet.cgi';
 		my $count = 0;
 		my $new_line = '';
-		my $add_line = '';
-		my $depot_line = '';
-		my @lines = ();
-		my $l_mes = "";
-		open my $fh, "+< $this_file" or &error("$this_fileが開けません");
-		eval { flock $fh, 2; };
+		open my $fh, "< $this_file" or &error("$this_fileが開けません");
 		while (my $line = <$fh>) {
 			my($rkind, $ritem_no, $ritem_c, $ritem_lv) = split /<>/, $line;
-			$depot_line .= "$rkind,$ritem_no,$ritem_c,$ritem_lv<>";
 			++$count;
 			if (!$new_line && $cmd eq $count) {
 				$new_line = $line;
 				my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-				$depot_line .= "$kind,$item_no,$item_c,$item_lv<>";
-				if ($kind eq '1' && $m{wea}) { 
-					if($m{wea_name}){
-						$m{wea} = 32;
-						$m{wea_c} = 0;
-						$m{wea_lv} = 0;
-						$mes .= "持ち主の手を離れた途端$m{wea_name}はただの$weas[$m{wea}][1]になってしまった<br>";
-						$m{wea_name} = "";
+				my $item_name = &get_item_name($kind, $item_no);
+				if($kind eq '3' && $m{pet} > 0) {
+					$mes .= "$item_name：$pet_effects[$item_no]<br>";
+					last;
+				}
+				else {
+					$mes .= "$item_nameはﾍﾟｯﾄではありません<br>";
+					last;
+				}
+			}
+		}
+		close $fh;
+
+		$layout = 2;
+		my($count, $sub_mes) = &radio_my_depot($cmd);
+	
+		$mes .= "どれを引出しますか? [ $count / $max_depot ]<br>";
+		$mes .= $sub_mes;
+		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p>|:
+			qq|<p><input type="submit" value="引出す" class="button1"></p>|;
+		$mes .= qq|<input type="checkbox" id="pet_summary" name="show_summary" value="1"><label for="pet_summary">ﾍﾟｯﾄの効果を確認する</label></form>|;
+	}
+	else {
+		if ($cmd) {
+			my $count = 0;
+			my $new_line = '';
+			my $add_line = '';
+			my $depot_line = '';
+			my @lines = ();
+			my $l_mes = "";
+			open my $fh, "+< $this_file" or &error("$this_fileが開けません");
+			eval { flock $fh, 2; };
+			while (my $line = <$fh>) {
+				my($rkind, $ritem_no, $ritem_c, $ritem_lv) = split /<>/, $line;
+				$depot_line .= "$rkind,$ritem_no,$ritem_c,$ritem_lv<>";
+				++$count;
+				if (!$new_line && $cmd eq $count) {
+					$new_line = $line;
+					my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+					$depot_line .= "$kind,$item_no,$item_c,$item_lv<>";
+					if ($kind eq '1' && $m{wea}) { 
+						if($m{wea_name}){
+							$m{wea} = 32;
+							$m{wea_c} = 0;
+							$m{wea_lv} = 0;
+							$mes .= "持ち主の手を離れた途端$m{wea_name}はただの$weas[$m{wea}][1]になってしまった<br>";
+							$m{wea_name} = "";
+						}
+						$add_line = "$kind<>$m{wea}<>$m{wea_c}<>$m{wea_lv}<>\n";
+						$mes .= $l_mes = "$weas[$m{wea}][1]を預け";
 					}
-					$add_line = "$kind<>$m{wea}<>$m{wea_c}<>$m{wea_lv}<>\n";
-					$mes .= $l_mes = "$weas[$m{wea}][1]を預け";
+					elsif ($kind eq '2' && $m{egg}) {
+						$add_line = "$kind<>$m{egg}<>$m{egg_c}<>0<>\n";
+						$mes .= $l_mes = "$eggs[$m{egg}][1]を預け";
+					}
+					elsif($kind eq '3' && $m{pet} > 0) {
+						$add_line = "$kind<>$m{pet}<>$m{pet_c}<>0<>\n";
+						$mes .= $l_mes = "$pets[$m{pet}][1]★$m{pet_c}を預け";
+					}
+					elsif($kind eq '4' && $m{gua}) {
+						$add_line = "$kind<>$m{gua}<>0<>0<>\n";
+						$mes .= $l_mes = "$guas[$m{gua}][1]を預け";
+					}
 				}
-				elsif ($kind eq '2' && $m{egg}) {
-					$add_line = "$kind<>$m{egg}<>$m{egg_c}<>0<>\n";
-					$mes .= $l_mes = "$eggs[$m{egg}][1]を預け";
+				else {
+					push @lines, $line;
 				}
-				elsif($kind eq '3' && $m{pet} > 0) {
-					$add_line = "$kind<>$m{pet}<>$m{pet_c}<>0<>\n";
-					$mes .= $l_mes = "$pets[$m{pet}][1]★$m{pet_c}を預け";
+			}
+			if ($new_line) {
+				push @lines, $add_line if $add_line;
+				seek  $fh, 0, 0;
+				truncate $fh, 0; 
+				print $fh @lines;
+				close $fh;
+				
+				my $s_mes;
+				my($kind, $item_no, $item_c, $item_lv) = split /<>/, $new_line;
+				if ($kind eq '1') {
+					$m{wea}    = $item_no;
+					$m{wea_c}  = $item_c;
+					$m{wea_lv} = $item_lv;
+					$mes .= "$weas[$m{wea}][1]を引出しました<br>";
+					$l_mes .= $s_mes = "$weas[$m{wea}][1]";
 				}
-				elsif($kind eq '4' && $m{gua}) {
-					$add_line = "$kind<>$m{gua}<>0<>0<>\n";
-					$mes .= $l_mes = "$guas[$m{gua}][1]を預け";
+				elsif ($kind eq '2') {
+					$m{egg}    = $item_no;
+					$m{egg_c}  = $item_c;
+					$mes .= "$eggs[$m{egg}][1]を引出しました<br>";
+					$l_mes .= $s_mes = "$eggs[$m{egg}][1]";
 				}
+				elsif ($kind eq '3') {
+					$m{pet}    = $item_no;
+					$m{pet_c}  = $item_c;
+					$mes .= "$pets[$m{pet}][1]★$m{pet_c}を引出しました<br>";
+					$l_mes .= $s_mes = "$pets[$m{pet}][1]★$m{pet_c}";
+	
+					&get_icon_pet;
+				}
+				elsif ($kind eq '4') {
+					$m{gua}    = $item_no;
+					$mes .= "$guas[$m{gua}][1]を引出しました<br>";
+					$l_mes .= $s_mes = "$guas[$m{gua}][1]";
+				}
+				my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..4];
+				$tdate = sprintf("%d/%d %02d:%02d", $tmon+1,$tmday,$thour,$tmin);
+				$s_mes .= "引出し ($tdate)";
+				if(-f "$userdir/$id/depot_watch.cgi"){
+					open my $wfh, ">> $userdir/$id/depot_watch.cgi";
+					print $wfh "$s_mes<>$depot_line\n";
+					close $wfh;
+				}
+				&penalty_depot($count);
+	
+				&add_log("引出", $l_mes);
+	
+				# 引出すﾀｲﾐﾝｸﾞで新しいｱｲﾃﾑがあればｺﾚｸｼｮﾝに追加
+				require './lib/add_collection.cgi';
+				&add_collection;
 			}
 			else {
-				push @lines, $line;
+				close $fh;
 			}
 		}
-		if ($new_line) {
-			push @lines, $add_line if $add_line;
-			seek  $fh, 0, 0;
-			truncate $fh, 0; 
-			print $fh @lines;
-			close $fh;
-			
-			my $s_mes;
-			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $new_line;
-			if ($kind eq '1') {
-				$m{wea}    = $item_no;
-				$m{wea_c}  = $item_c;
-				$m{wea_lv} = $item_lv;
-				$mes .= "$weas[$m{wea}][1]を引出しました<br>";
-				$l_mes .= $s_mes = "$weas[$m{wea}][1]";
-			}
-			elsif ($kind eq '2') {
-				$m{egg}    = $item_no;
-				$m{egg_c}  = $item_c;
-				$mes .= "$eggs[$m{egg}][1]を引出しました<br>";
-				$l_mes .= $s_mes = "$eggs[$m{egg}][1]";
-			}
-			elsif ($kind eq '3') {
-				$m{pet}    = $item_no;
-				$m{pet_c}  = $item_c;
-				$mes .= "$pets[$m{pet}][1]★$m{pet_c}を引出しました<br>";
-				$l_mes .= $s_mes = "$pets[$m{pet}][1]★$m{pet_c}";
-
-				&get_icon_pet;
-			}
-			elsif ($kind eq '4') {
-				$m{gua}    = $item_no;
-				$mes .= "$guas[$m{gua}][1]を引出しました<br>";
-				$l_mes .= $s_mes = "$guas[$m{gua}][1]";
-			}
-			my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..4];
-			$tdate = sprintf("%d/%d %02d:%02d", $tmon+1,$tmday,$thour,$tmin);
-			$s_mes .= "引出し ($tdate)";
-			if(-f "$userdir/$id/depot_watch.cgi"){
-				open my $wfh, ">> $userdir/$id/depot_watch.cgi";
-				print $wfh "$s_mes<>$depot_line\n";
-				close $wfh;
-			}
-			&penalty_depot($count);
-
-			&add_log("引出", $l_mes);
-
-			# 引出すﾀｲﾐﾝｸﾞで新しいｱｲﾃﾑがあればｺﾚｸｼｮﾝに追加
-			require './lib/add_collection.cgi';
-			&add_collection;
-		}
-		else {
-			close $fh;
-		}
+		&begin;
 	}
-	&begin;
 }
 
 #=================================================
@@ -658,16 +696,19 @@ sub penalty_depot {
 # <input type="radio" 付の預かり所の物
 #=================================================
 sub radio_my_depot {
+	my $no = shift;
 	my $count = 0;
 	my %lock = &get_lock_item;
 	my $sub_mes = qq|<form method="$method" action="$script">|;
-	$sub_mes .= qq|<input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">やめる</label><br>|;
+	my $checked = " checked" unless $no;
+	$sub_mes .= qq|<input type="radio" id="no_0" name="cmd" value="0"$checked><label for="no_0">やめる</label><br>|;
 	open my $fh, "< $this_file" or &error("$this_file が読み込めません");
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 
-		$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count">|;
+		$checked = $no == $count ? " checked" : "" ;
+		$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count"$checked>|;
 		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
