@@ -143,18 +143,22 @@ sub reset {
 			open my $fh, "> $logdir/$i/leader.cgi" or &error("国ﾘｰﾀﾞｰﾌｧｲﾙが開けません");
 			close $fh;
 		}
-		
+
 		if ($w{year} % $reset_daihyo_cycle_year == 0) {
 			for my $k (qw/war dom pro mil/) {
 				my $kc = $k . "_c";
 				next if $cs{$k}[$i] eq '';
-				my $trick_id = unpack 'H*', $cs{$k}[$i];
-				my %datas = &get_you_datas($trick_id, 1);
-				&regist_you_data($cs{$k}[$i], $kc, int($datas{$kc} * 0.5));
+				if ($m{name} eq $cs{$k}[$i]) { # 代表がreset処理を走らせたなら
+					$m{$kc} = int($m{$kc} * 0.5);
+				}
+				else { # 代表以外がreset処理を走らせたなら
+					my $trick_id = unpack 'H*', $cs{$k}[$i];
+					my %datas = &get_you_datas($trick_id, 1);
+					&regist_you_data($cs{$k}[$i], $kc, int($datas{$kc} * 0.5));
+				}
 
 				$cs{$k}[$i] = '';
 				$cs{$kc}[$i] = 0;
-				
 			}
 		}
 	}
