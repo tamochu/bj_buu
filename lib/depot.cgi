@@ -9,6 +9,10 @@ my $this_lock_file = "$userdir/$id/depot_lock.cgi";
 my $max_depot = $m{sedai} > 7 ? 50 : $m{sedai} * 5 + 15;
 $max_depot += $m{depot_bonus} if $m{depot_bonus};
 
+# 各処理の開始時に倉庫の擦り切りを行うと処理の隙間で倉庫ﾃﾞｰﾀが書き換えられていた場合に意図せぬｱｲﾃﾑの消失が起きるため、擦り切り処理を開始時ではなく直前に変更
+# 例：引き出す画面を開いた後に荷物が届いた場合、ﾕｰｻﾞｰはｱｲﾃﾑを交換したつもりでも持っていたﾍﾟｯﾄが消失し届いた荷物が末尾に追加される
+# 擦り切り処理が走るのは引き出した時と整理をした時　先に売るか捨てるかして倉庫を開ければ擦り切り対象のｱｲﾃﾑを入荷できる
+# 擦り切り対象のｱｲﾃﾑはロックを無視して売ったり捨てたりできる
 my $lost_depot = $max_depot * 2;
 
 # 相手に送るときの手数料(同国)
@@ -52,7 +56,6 @@ sub begin {
 		$mes .= "$max_depot個を超えている場合は、$penalty_money Gの罰金を支払ってもらいます<br>";
 		$mes .= "どうしますか?<br>";
 	}
-	&depot_common;
 	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '捨てる', 'ロックをかける', '履歴');
 }
 sub tp_1 {
@@ -66,22 +69,24 @@ sub tp_1 {
 # 引出す
 #=================================================
 sub tp_100 {
+	my $no = shift;
 	$layout = 2;
-	&depot_common;
-	my($count, $sub_mes) = &radio_my_depot;
+	my($count, $sub_mes) = &radio_my_depot($no);
 
-	$mes .= "どれを引出しますか? [ $count / $max_depot ]<br>";
+	my $lost_mes = '';
+	my $lost_count = ($count - $lost_depot) < 0 ? 0 : $count - $lost_depot;
+	$lost_mes = qq| / <font color="#FF0000">$lost_count</font>| if $lost_count;
+	$count -= $lost_count;
+	$mes .= "どれを引出しますか? [ $count / $max_depot$lost_mes ]<br>";
 	$mes .= $sub_mes;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p>|:
 		qq|<p><input type="submit" value="引出す" class="button1"></p>|;
 	$mes .= qq|<input type="checkbox" id="pet_summary" name="show_summary" value="1"><label for="pet_summary">ﾍﾟｯﾄの効果を確認する</label></form>|;
-#	$mes .= qq|<a href="javascript:void(0)" onclick="var rl = document.getElementsByName('cmd'); var cmd = 0; for(var i=0; i<rl.length; i++){ if (rl[i].checked) { cmd = rl[i].value; break; } } location.href='http://www.pandora.nu/nyaa/cgi-bin/bj_test/pet_summaries.cgi?id=$id&pass=$pass&cmd=' + cmd; return false;">黄色</a>|;
-#	$mes .= qq|<div id="text">test</div>|;
 	$m{tp} += 10;
 }
 sub tp_110 {
-	if ($in{show_summary} && $cmd) {
+	if ($in{show_summary} && $cmd && $cmd <= $lost_depot) { # ﾍﾟｯﾄの説明ﾓｰﾄﾞかつ非表示ﾃﾞｰﾀにアクセスしてない
 		require './data/pet.cgi';
 		my $count = 0;
 		my $new_line = '';
@@ -105,18 +110,12 @@ sub tp_110 {
 		}
 		close $fh;
 
-		$layout = 2;
-		my($count, $sub_mes) = &radio_my_depot($cmd);
-	
-		$mes .= "どれを引出しますか? [ $count / $max_depot ]<br>";
-		$mes .= $sub_mes;
-		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p>|:
-			qq|<p><input type="submit" value="引出す" class="button1"></p>|;
-		$mes .= qq|<input type="checkbox" id="pet_summary" name="show_summary" value="1"><label for="pet_summary">ﾍﾟｯﾄの効果を確認する</label></form>|;
+		$m{tp} -= 10;
+		&{ 'tp_'. $m{tp} }($cmd);
+		return;
 	}
-	else {
-		if ($cmd) {
+	else { # 引き出しﾓｰﾄﾞ
+		if ($cmd && $cmd <= $lost_depot) { # 非表示ﾃﾞｰﾀにアクセスしてない
 			my $count = 0;
 			my $new_line = '';
 			my $add_line = '';
@@ -157,7 +156,7 @@ sub tp_110 {
 						$mes .= $l_mes = "$guas[$m{gua}][1]を預け";
 					}
 				}
-				else {
+				elsif ($count <= $lost_depot) { # 擦り切り処理
 					push @lines, $line;
 				}
 			}
@@ -315,12 +314,14 @@ sub tp_210 {
 sub tp_300 {
 	my @lines = ();
 	my @sub_lines = ();
+	my $count = 0;
 	my $n_egg = 0;
 	my $n_man = 0;
 	my $n_hero = 0;	
 	open my $fh, "+< $this_file" or &error("$this_fileが開けません");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>){
+		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 		if($kind == 2 && $item_no == 53){
 			$line = "2<>42<>$item_c<>$item_lv<>\n";
@@ -334,7 +335,7 @@ sub tp_300 {
 			$line = "3<>77<>$item_c<>$item_lv<>\n";
 			$n_hero++;
 		}
-		push @lines, $line;
+		push @lines, $line if $count <= $lost_depot; # 擦り切り処理
 	}
 	@lines = map { $_->[0] }
 				sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] }
@@ -497,7 +498,12 @@ sub tp_500 {
 	$layout = 2;
 	my($count, $sub_mes) = &checkbox_my_depot;
 
-	$mes .= "どれを売りますか?[ $count / $max_depot ]<br>";
+	my $lost_mes = '';
+	my $lost_count = ($count - $lost_depot) < 0 ? 0 : $count - $lost_depot;
+	$lost_mes = qq| / <font color="#FF0000">$lost_count</font>| if $lost_count;
+	$count -= $lost_count;
+	$mes .= "どれを売りますか? [ $count / $max_depot$lost_mes ]<br>";
+#	$mes .= "どれを売りますか?[ $count / $max_depot ]<br>";
 	$mes .= $sub_mes;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="売る" class="button1"></p></form>|;
@@ -523,9 +529,9 @@ sub tp_510 {
 		++$count;
 		if ($in{$count} eq '1') {
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			if ($lock{"$kind<>$item_no<>"}) {
+			if ($count <= $lost_depot && $lock{"$kind<>$item_no<>"}) {
 				push @lines, $line;
-			} else {
+			} else { # 擦り切り対象のｱｲﾃﾑはロック無視
 				$is_rewrite = 1;
 
 				# ﾍﾟｯﾄだけ★情報追記 他は名前だけ
@@ -573,9 +579,14 @@ sub tp_510 {
 #=================================================
 sub tp_600 {
 	$layout = 2;
-	my($count, $sub_mes) = &radio_my_depot;
+	my($count, $sub_mes) = &radio_my_depot(0, 1);
 
-	$mes .= "どれを捨てますか?[ $count / $max_depot ]<br>";
+	my $lost_mes = '';
+	my $lost_count = ($count - $lost_depot) < 0 ? 0 : $count - $lost_depot;
+	$lost_mes = qq| / <font color="#FF0000">$lost_count</font>| if $lost_count;
+	$count -= $lost_count;
+	$mes .= "どれを捨てますか? [ $count / $max_depot$lost_mes ]<br>";
+#	$mes .= "どれを捨てますか?[ $count / $max_depot ]<br>";
 	$mes .= $sub_mes;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="捨てる" class="button1"></p></form>|;
@@ -583,7 +594,7 @@ sub tp_600 {
 	$m{tp} += 10;
 }
 sub tp_610 {
-	my($maxcount, $sub_mes) = &radio_my_depot;
+	my($maxcount, $sub_mes) = &radio_my_depot(0, 1);
 	my $count = 0;
 	my $is_rewrite = 0;
 	my %lock = &get_lock_item;
@@ -594,9 +605,9 @@ sub tp_610 {
 		++$count;
 		if ($cmd eq $count) {
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			if ($lock{"$kind<>$item_no<>"}) {
+			if ($count <= $lost_depot && $lock{"$kind<>$item_no<>"}) {
 				push @lines, $line;
-			} else {
+			} else { # 擦り切り対象のｱｲﾃﾑはロック無視
 				$is_rewrite = 1;
 
 				# ﾍﾟｯﾄだけ★情報追記 他は名前だけ
@@ -625,7 +636,12 @@ sub tp_700 {
 	$layout = 2;
 	my($count, $sub_mes) = &checkbox_my_depot_lock_checked;
 
-	$mes .= "どれをロックしますか?[ $count / $max_depot ]<br>";
+	my $lost_mes = '';
+	my $lost_count = ($count - $lost_depot) < 0 ? 0 : $count - $lost_depot;
+	$lost_mes = qq| / <font color="#FF0000">$lost_count</font>| if $lost_count;
+	$count -= $lost_count;
+	$mes .= "どれをロックしますか? [ $count / $max_depot$lost_mes ]<br>";
+#	$mes .= "どれをロックしますか?[ $count / $max_depot ]<br>";
 	$mes .= $sub_mes;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="ロック" class="button1"></p></form>|;
@@ -696,7 +712,8 @@ sub penalty_depot {
 # <input type="radio" 付の預かり所の物
 #=================================================
 sub radio_my_depot {
-	my $no = shift;
+	my $no = shift; # 選択状態にするｱｲﾃﾑ番号 0 で「やめる」
+	my $is_show = shift; # 溢れているｱｲﾑﾃを表示するかどうか
 	my $count = 0;
 	my %lock = &get_lock_item;
 	my $sub_mes = qq|<form method="$method" action="$script">|;
@@ -706,19 +723,26 @@ sub radio_my_depot {
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-
-		$checked = $no == $count ? " checked" : "" ;
-		$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count"$checked>|;
-		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
-		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
-		$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
-		$sub_mes .= qq|</label>| unless $is_mobile;
-		$sub_mes .= qq|<br>|;
+		if (!$is_show && $count > $lost_depot) {
+			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+			$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
+			$sub_mes .= ' 溢れてます<br>';
+		}
+		else {
+			$checked = $no == $count ? " checked" : "" ;
+			$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count"$checked>|;
+			$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
+			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+			$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
+			$sub_mes .= ' 溢れてます' if $count > $lost_depot;
+			$sub_mes .= qq|</label>| unless $is_mobile;
+			$sub_mes .= qq|<br>|;
+		}
 	}
 	close $fh;
-	
+
 	$m{is_full} = $count >= $max_depot ? 1 : 0;
-	
+
 	return $count, $sub_mes;
 }
 
@@ -748,6 +772,7 @@ sub checkbox_my_depot {
 		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
+		$sub_mes .= ' 溢れてます' if $count > $lost_depot;
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
 	}
@@ -789,6 +814,7 @@ sub checkbox_my_depot_lock_checked {
 		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		$sub_mes .= $lock_mes;
+		$sub_mes .= ' 溢れてます' if $count > $lost_depot;
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
 	}
@@ -812,29 +838,6 @@ sub get_lock_item {
 	close $lfh;
 
 	return %lock;
-}
-
-#=================================================
-# 共通処理
-#=================================================
-sub depot_common {
-	my $count = 0;
-	open my $fh, "+< $this_file" or &error("$this_fileが開けません");
-	eval { flock $fh, 2; };
-	while (my $line = <$fh>) {
-		++$count;
-		if ($count > $lost_depot) {
-			$is_rewrite = 1;
-		} else {
-			push @lines, $line;
-		}
-	}
-	if ($is_rewrite) {
-		seek  $fh, 0, 0;
-		truncate $fh, 0; 
-		print $fh @lines;
-	}
-	close $fh;
 }
 
 #=================================================
