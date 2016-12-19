@@ -88,7 +88,7 @@ sub del_cookie {
 sub write_players_html {
 	my $country = shift;
 
-	my @rows = (qw/名前 性別 階級 部隊 職業 種族 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 開始日時/);
+	my @rows = (qw/名前 性別 階級 部隊 職業 種族 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 参入日時/);
 
 	my $html = '';
 	$html .= qq|<table class="tablesorter"><thead><tr>|;
@@ -148,8 +148,8 @@ sub write_players_html {
 		my $name = $p{name};
 		$name .= "[$p{shogo}]" if $p{shogo};
 		
-		my($min,$hour,$mday,$mon,$year) = (localtime($p{start_time}))[1..4];
-		$start_date = sprintf("%d/%d %02d:%02d", $mon+1,$mday,$hour,$min);
+		my($min,$hour,$mday,$mon,$year) = (localtime($p{start_time}))[1..5];
+		my $start_date = sprintf("%d/%d/%d %02d:%02d", $year+1900, $mon+1, $mday, $hour, $min);
 
 #		$html .= $count % 2 == 0 ? qq|<tr class="stripe1">| : qq|<tr>|;
 		my $rank_name = &get_rank_name($p{rank}, $p{name});
@@ -238,7 +238,7 @@ sub write_players_html {
 }
 
 sub write_all_players_html {
-	my @rows = (qw/名前 性別 階級 部隊 職業 種族 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 開始日時/);
+	my @rows = (qw/名前 性別 階級 部隊 職業 種族 武器 ﾀﾏｺﾞ ﾍﾟｯﾄ 世代 Lv HP MP AT DF MAT MDF AG LEA CHA お金 ｺｲﾝ 更新時間 ﾒｯｾｰｼﾞ 参入日時/);
 	
 	my $html = '';
 	$html .= qq|<table class="tablesorter"><thead><tr>|;
@@ -269,8 +269,8 @@ sub write_all_players_html {
 			my $name = $p{name};
 			$name .= "[$p{shogo}]" if $p{shogo};
 		
-			my($min,$hour,$mday,$mon,$year) = (localtime($p{start_time}))[1..4];
-			$start_date = sprintf("%d/%d %02d:%02d", $mon+1,$mday,$hour,$min);
+			my($min,$hour,$mday,$mon,$year) = (localtime($p{start_time}))[1..5];
+			my $start_date = sprintf("%d/%d/%d %02d:%02d", $year+1900, $mon+1, $mday, $hour, $min);
 
 			my $rank_name = &get_rank_name($p{rank}, $p{name});
 			$html .= qq|<tr>|;
