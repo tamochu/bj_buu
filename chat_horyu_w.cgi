@@ -132,6 +132,24 @@ sub write_comment {
 	print $fh2 "<><>$limit_time<>0<>\n";
 	print $fh2 "$time<>$date<>$m{name}さん提出<br>議題<>0<><>$addr<>$in{comment}<>$m{icon}<>\n";
 	close $fh2;
+
+	$in{comment} = "$m{name}さんが議題を作成しました";
+	my $mname = $m{name};
+	$m{name} = 'システム';
+	my $mcountry = $m{country};
+	$m{country} = 0;
+	my $micon = $m{icon};
+	$m{icon} = '';
+	my $mshogo = $m{shogo};
+	$m{shogo} = '';
+	&send_group('all');
+
+	$in{comment} = "";
+	$m{name} = $mname;
+	$m{country} = $mcountry;
+	$m{icon} = $micon;
+	$m{shogo} = $mshogo;
+
 	return 1;
 }
 
