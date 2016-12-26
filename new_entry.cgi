@@ -19,6 +19,54 @@ exit;
 # 新規登録ﾌｫｰﾑ
 #================================================
 sub new_form {
+	# 仕官できる人数を調整
+	my ($s, $e) = $w{world} eq $#world_states ? (1, $w{country} - 1) :
+					$w{world} eq $#world_states-2 ? ($w{country} - 1, $w{country}) :
+					$w{world} eq $#world_states-3 ? ($w{country} - 2, $w{country}) : (1, $w{country});
+
+	++$w{player};
+
+	my $ave_c = int($w{player} / ($e - $s));
+	if($w{world} eq $#world_states-2){
+		for my $i (1 .. $w{country}) {
+			$cs{capacity}[$i] = $i < $w{country} - 1 ? 0 : $ave_c;
+		}
+	
+	}elsif($w{world} eq $#world_states-3){
+		for my $i (1 .. $w{country}) {
+			$cs{capacity}[$i] = $i < $w{country} - 2 ? 0:$ave_c;
+		}
+	
+	}else {
+		for my $i ($s .. $e) {
+			$cs{capacity}[$i] = $ave_c;
+		}
+	}
+
+	my @list;
+	for my $i ($s .. $e) {
+		push(@list, $i) if $cs{member}[$i] < $cs{capacity}[$i];
+	}
+
+	my $country_html;
+	if (!$is_mobile && @list) {
+		my @lines = &get_countries_mes();
+		$country_html .= qq|<br><table cellpadding="4" class="table2">|;
+		for my $i (0 .. $#list) {
+			my($country_mes, $country_mark) = split /<>/, $lines[$list[$i]];
+			$country_mark = 'non_mark.gif' if $country_mark eq '';
+			$country_html .= qq|<tr><td><img src="$icondir/$country_mark"></td></td><td style="color: #333; background-color: $cs{color}[$list[$i]]; text-align: right;" nowrap><b>$cs{name}[$list[$i]]</b><br>$cs{ceo}[$list[$i]]<br><br></td><td style="width:100%;">$country_mes<br></td></tr>\n|;
+		}
+		$country_html .= qq|</table>|;
+	}
+
+	my $to_country_html;
+	for my $i (0 .. $#list) {
+		$to_country_html .= qq|<input type="radio" id="cmd_$i" name="cmd" value="$list[$i]"><label for="cmd_$i">$cs{name}[$list[$i]]</label><br>|;
+	}
+	my $j = $w{country} + 1;
+	$to_country_html .= qq|<input type="radio" id="cmd_$j" name="cmd" value="$j"><label for="cmd_$j">適当に仕官する</label>|;
+
 	print <<"EOM";
 <form action="$script_index">
 	<input type="submit" value="ＴＯＰ" class="button1">
@@ -42,7 +90,9 @@ sub new_form {
 		<tr><td><tt>ﾌﾟﾚｲﾔ-名：</tt></td><td><input type="text" name="name" class="text_box1"><br></td></tr>
 		<tr><td><tt>ﾊﾟｽﾜｰﾄﾞ ：</tt></td><td><input type="text" name="pass" class="text_box1"><br></td></tr>
 		<tr><td><tt>性別　　：</tt></td><td><tt><input type="radio" name="sex" value="1" checked>男　<input type="radio" name="sex" value="2">女<br></tt></td></tr>
+		<tr><td><tt>仕官先　：</tt></td><td><tt>$to_country_html<br></tt></td></tr>
 	</table>
+	$country_html
 	<p><input type="submit" value="登録する" class="button1"></p>
 </form>
 EOM
@@ -55,6 +105,7 @@ sub new_entry {
 	&error('ﾌﾟﾚｲﾔ-名が入力されていません')	unless $in{name};
 	&error('ﾊﾟｽﾜｰﾄﾞが入力されていません')	if $in{pass} eq '';
 	&error('性別が入力されていません')		if $in{sex} eq '';
+	&error('仕官先が選択されていません')		if $cmd eq '';
 
 	&error('ﾌﾟﾚｲﾔ-名に不正な文字( ,;\"\'&<>\\\/ )が含まれています')	if $in{name} =~ /[,;\"\'&<>\\\/]/;
 	&error('ﾌﾟﾚｲﾔ-名に不正な空白が含まれています')				if $in{name} =~ /　/ || $in{name} =~ /\s/;
@@ -69,8 +120,16 @@ sub new_entry {
 
 	&error('あなたのIPｱﾄﾞﾚｽは登録が禁止されています') if &is_deny_addr;
 	&error('多重登録は禁止しています')                if (&is_renzoku_entry && !$config_test);
-	
+
 	&create_user;
+
+	# create_user自体を書き換える手もあるけどなるべくﾈﾊﾞﾗﾝから仕官するという状態を再現
+	$cmd = int(rand($w{country}) + 1) if $w{country} < $cmd; # 適当仕官
+	$m{value} = $cmd;
+	require './lib/country_move.cgi';
+	&is_move_from_neverland; # $cmd に適切な仕官先の国番号が入る
+	&move_to_country;
+	&write_user;
 
 	print <<"EOM";
 <p>以下の内容で登録しました</p>
@@ -80,6 +139,7 @@ sub new_entry {
 	<tr><th>ﾌﾟﾚｲﾔ-名</th><td>$m{name}<br></td>
 	<tr><th>ﾊﾟｽﾜｰﾄﾞ</th><td>$m{pass}<br></td>
 	<tr><th>性別</th><td>$sexes[$m{sex}]<br></td>
+	<tr><th>仕官先</th><td>$cs{name}[$m{country}]<br></td>
 	<tr><th>$e2j{max_hp}</th><td align="right">$m{max_hp}<br></td>
 	<tr><th>$e2j{max_mp}</th><td align="right">$m{max_mp}<br></td>
 	<tr><th>$e2j{at}</th><td align="right">$m{at}<br></td>

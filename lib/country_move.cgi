@@ -367,7 +367,10 @@ sub is_move_from_country {
 # 仕官できる場合には $cmd に適当な行き先が入っている
 #=================================================
 sub is_move_from_neverland {
-	if ($w{world} eq $#world_states-1) { # 混乱
+	if ($w{world} eq $#world_states) { # 暗黒 適当仕官の選択肢から除外
+		$cmd = int(rand($w{country}-1) + 1);
+	}
+	elsif ($w{world} eq $#world_states-1) { # 混乱
 		$cmd = int(rand($w{country}) + 1);
 	}
 	elsif ($w{world} eq $#world_states-2) { # 紅白
