@@ -124,7 +124,8 @@ sub new_entry {
 	&create_user;
 
 	# create_user自体を書き換える手もあるけどなるべくﾈﾊﾞﾗﾝから仕官するという状態を再現
-	$cmd = int(rand($w{country}) + 1) if $w{country} < $cmd || $cmd eq '0'; # 適当仕官
+	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
+	$cmd = int(rand($country) + 1) if $country < $cmd || $cmd eq '0'; # 適当仕官
 	$m{value} = $cmd;
 	require './lib/country_move.cgi';
 	&is_move_from_neverland; # $cmd に適切な仕官先の国番号が入る
