@@ -69,7 +69,7 @@ sub tp_1 {
 # ˆøo‚·
 #=================================================
 sub tp_100 {
-	my $no = @_[0];
+	my $no = $_[0];
 	$layout = 2;
 	my($count, $sub_mes) = &radio_my_depot($no);
 
