@@ -69,7 +69,7 @@ sub tp_1 {
 # ˆøo‚·
 #=================================================
 sub tp_100 {
-	my $no = shift;
+	my $no = @_[0];
 	$layout = 2;
 	my($count, $sub_mes) = &radio_my_depot($no);
 
@@ -98,7 +98,7 @@ sub tp_110 {
 				$new_line = $line;
 				my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 				my $item_name = &get_item_name($kind, $item_no);
-				if($kind eq '3' && $m{pet} > 0) {
+				if($kind eq '3' && $item_no > 0) {
 					$mes .= "$item_nameF$pet_effects[$item_no]<br>";
 					last;
 				}
@@ -166,7 +166,7 @@ sub tp_110 {
 				truncate $fh, 0; 
 				print $fh @lines;
 				close $fh;
-				
+
 				my $s_mes;
 				my($kind, $item_no, $item_c, $item_lv) = split /<>/, $new_line;
 				if ($kind eq '1') {
@@ -558,6 +558,7 @@ sub tp_510 {
 		seek  $fh, 0, 0;
 		truncate $fh, 0; 
 		print $fh @lines;
+		close $fh;
 
 		# ¼Ş¬İ¸‚É‘‚«‚İ
 		open my $fh2, ">> $logdir/junk_shop.cgi" or &error("$logdir/junk_shop.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
@@ -569,8 +570,15 @@ sub tp_510 {
 		print $fh3 @junk_log;
 		close $fh3;
 	}
-	close $fh;
-	&add_log("”„‹p", @depot_log) if $is_rewrite;
+	else {
+		close $fh;
+	}
+
+	if ($is_rewrite) { # ŒJ‚è•Ô‚µ‚É‚È‚é‚ªAflock’†‚Ìflock‚ğ‰ñ”ğ‚·‚é‚½‚ß
+		&add_log("”„‹p", @depot_log);
+		&run_tutorial_quest('tutorial_junk_shop_sell_1');
+	}
+
 	&begin;
 }
 
