@@ -187,6 +187,7 @@ sub tp_200 {
 		$m{exp} += $v;
 
 		$mes .= "$v‚Ì$e2j{exp}‚ğè‚É“ü‚ê‚Ü‚µ‚½<br>";
+		&run_tutorial_quest('tutorial_training_1');
 
 		&refresh;
 		&n_menu;
@@ -213,6 +214,8 @@ sub tp_200 {
 		
 		$mes .= "$v‚Ì$e2j{exp}‚ğè‚É“ü‚ê‚Ü‚µ‚½<br>";
 		$mes .= 'Cs‚ğ‘±‚¯‚Ü‚·‚©?<br>';
+		&run_tutorial_quest('tutorial_training_1');
+
 		&menu('‘±‚¯‚é','‘Îí‘Šè•ÏX','‚â‚ß‚é');
 		$m{tp} += 10;
 	}

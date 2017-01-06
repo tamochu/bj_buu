@@ -136,7 +136,7 @@ sub write_user {
 		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
 		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c fes_c war_c_t dom_c_t mil_c_t pro_c_t boch_c storm_c
 		shogo_t icon_t breed breed_c depot_bonus akindo_guild silent_kind silent_tail guild_number disp_casino chat_java disp_top disp_news disp_chat disp_ad disp_daihyo salary_switch no_boss incubation_switch disp_gacha_time delete_shield
-		valid_blacklist pet_icon_switch
+		valid_blacklist pet_icon_switch tutorial_switch
 		c_turn c_stock c_value c_type tp_r cataso_ratio
 		no1_c money_overflow random_migrate ceo_c tam_c ban_c wt_c wt_c_latest
 		
@@ -174,6 +174,11 @@ sub write_user {
 		open my $fh, "> $userdir/$id/summer.cgi";
 		print $fh "$line2\n";
 		close $fh;
+	}
+
+	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
+		&write_tutorial;
 	}
 
 	&alltime_event;
@@ -491,25 +496,26 @@ sub send_item {
 		open my $fh, ">> $userdir/$send_id/depot.cgi";
 		print $fh "$kind<>$item_no<>$item_c<>$item_lv<>\n";
 		close $fh;
-		
+
 		open my $fh2, "> $userdir/$send_id/depot_flag.cgi";
 		close $fh2; 
 	}
 	
 	$s_mes = &get_item_name($kind, $item_no); # アイテム名だけ
 	if (-f "$userdir/$send_id/depot_watch.cgi"){
-		my $depot_line = '';
-		open my $rfh, "< $userdir/$send_id/depot.cgi";
-		while (my $line = <$rfh>){
-			my ($rkind, $ritem_no, $ritem_c, $ritem_lv) = split /<>/, $line;
-			$depot_line .= "$rkind,$ritem_no,$ritem_c,$ritem_lv<>";
-		}
-		close $rfh;
+#		my $depot_line = '';
+#		open my $rfh, "< $userdir/$send_id/depot.cgi";
+#		while (my $line = <$rfh>){
+#			my ($rkind, $ritem_no, $ritem_c, $ritem_lv) = split /<>/, $line;
+#			$depot_line .= "$rkind,$ritem_no,$ritem_c,$ritem_lv<>";
+#		}
+#		close $rfh;
 		
 		open my $wfh, ">> $userdir/$send_id/depot_watch.cgi";
 		my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..4];
 		$tdate = sprintf("%d/%d %02d:%02d", $tmon+1,$tmday,$thour,$tmin);
-		print $wfh "$send_nameから$s_mes ($tdate)<>$depot_line\n";
+#		print $wfh "$send_nameから$s_mes ($tdate)<>$depot_line\n";
+		print $wfh "$send_nameから$s_mes ($tdate)<>$kind<>$item_no<>$item_c<>$item_lv\n";
 		close $wfh;
 	}
 	unless ($send_name eq $m{name}){
@@ -1875,26 +1881,26 @@ sub twitter_bot {
 #================================================
 # 緊急ﾒｯｾｰｼﾞ
 #================================================
-sub createEmergency {
-	my ($p_name, $e_mes) = @_;
+sub create_temp_message {
+	my ($p_name, $temp_mes) = @_;
 	my $p_id = unpack 'H*', $p_name;
 	&error("$p_nameというﾌﾟﾚｲﾔｰが存在しません") unless -f "$userdir/$p_id/user.cgi";
 
-	my $emergency_file = "$userdir/$p_id/emergency";
+	my $temp_mes_file = "$userdir/$p_id/temp_mes";
 
-	# ｴﾏｰｼﾞｪﾝｼｰﾌﾗｸﾞを立てる
-	open my $fh, "> $emergency_file.cgi";
-	print $fh $e_mes;
+	# 一時ﾒｯｾｰｼﾞﾌﾗｸﾞを立てる
+	open my $fh, "> $temp_mes_file.cgi";
+	print $fh $temp_mes;
 	close $fh;
 }
-sub deleteEmergency {
+sub delete_temp_message {
 	my $p_name = shift;
 	my $p_id = unpack 'H*', $p_name;
 	&error("$p_nameというﾌﾟﾚｲﾔｰが存在しません") unless -f "$userdir/$p_id/user.cgi";
 
-	my $emergency_file = "$userdir/$p_id/emergency";
-	if (-f "$emergency_file.cgi") {
-		unlink "$emergency_file.cgi";
+	my $temp_mes_file = "$userdir/$p_id/temp_mes";
+	if (-f "$temp_mes_file.cgi") {
+		unlink "$temp_mes_file.cgi";
 	}
 }
 
@@ -1969,6 +1975,40 @@ sub remove_pet { # ﾍﾟｯﾄ外す処理
 	$m{icon_pet} = '';
 	$m{icon_pet_lv} = 0;
 	$m{icon_pet_exp} = 0;
+}
+
+# ｸｴｽﾄ達成に関する行動の成功時に呼び出すと判定や達成処理などをやってくれる
+# 引数にはｸｴｽﾄｷｰを配列で渡す
+sub run_tutorial_quest {
+	return unless $m{tutorial_switch};
+	my @ks = @_;
+	my $is_bbs = 0;
+	require './lib/tutorial.cgi';
+
+	for my $k (@ks) {
+		++$m{$k};
+		if ($m{$k} eq $tutorial_quests{$k}[1]) {
+			$is_bbs = 1 if $k eq 'tutorial_bbsc_write_1';
+			my $str = &success_quest_result($k);
+			&success_quest_mes("ｸｴｽﾄ「$tutorial_quests{$k}[4]」を達成しました！<br>報酬として$str<br><br>$tutorial_quests{$k}[6]");
+
+			++$m{tutorial_quest_stamp_c};
+			for my $i (0 .. $#tutorial_stamps) {
+				if ($tutorial_stamps[$i][1] eq $m{tutorial_quest_stamp_c}) {
+					my $str = &{$tutorial_stamps[$i][2]};
+					&success_quest_mes("ｽﾀﾝﾌﾟを$tutorial_stamps[$i][1]個集めました！<br>報酬として$str");
+				}
+			}
+		}
+	}
+
+	# ｽﾀﾝﾌﾟｺﾝﾌﾟﾘｰﾄ
+	if ($m{tutorial_quest_stamp_c} eq $tutorial_quest_stamps) {
+		&success_quest_mes("すべてのｽﾀﾝﾌﾟを集めました！<br>ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞを終了します。ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞの切り替えはﾏｲﾙｰﾑ→個人設定からできます");
+		$m{tutorial_switch} = 0;
+	}
+
+	&write_user if $is_bbs;
 }
 
 1; # 削除不可

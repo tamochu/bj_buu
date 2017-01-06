@@ -293,6 +293,7 @@ sub tp_210 {
 		$mes .= "“o˜^—¿ $need_money G‚ğx•¥‚¢‚Ü‚µ‚½<br>";
 		$mes .= "$m{name}—l‚Å‚·‚ËB‚²“o˜^‚¢‚½‚µ‚Ü‚µ‚½<br>";
 		$m{money} -= $need_money;
+		&run_tutorial_quest('tutorial_mariage_1');
 	}
 	
 	&begin;
@@ -442,7 +443,14 @@ sub tp_310 {
 						if(int(rand(5)) == 0){
 							&remove_pet;
 						}elsif(int(rand(5)) == 0 && ($pets[$you_datas{pet}][2] eq 'marriage_y' || $pets[$you_datas{pet}][2] eq 'marriage_b')) {
-							&regist_you_data($name, 'pet', 0);
+#							&regist_you_data($name, 'pet', 0);
+							my @data = (
+								['pet', 0],
+								['icon_pet', ''],
+								['icon_pet_lv', 0],
+								['icon_pet_exp', 0],
+							);
+							&regist_you_array($name, @data);
 						}
 						$v *= 3;
 					}else {

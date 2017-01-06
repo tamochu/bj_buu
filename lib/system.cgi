@@ -109,6 +109,11 @@ sub read_user { # Get %m %y
 	$m{debug} = $line;
 	
 	&read_summer;
+
+	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
+		&read_tutorial;
+	}
 }
 
 #==========================================================

@@ -132,7 +132,7 @@ sub tp_110 {
 					$new_line = $line;
 					my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 					$depot_line .= "$kind,$item_no,$item_c,$item_lv<>";
-					if ($kind eq '1' && $m{wea}) { 
+					if ($kind eq '1' && $m{wea}) {
 						if($m{wea_name}){
 							$m{wea} = 32;
 							$m{wea_c} = 0;

@@ -44,6 +44,8 @@ sub run {
 				$mes .= "çëÇÃë„ï\\é“à»äOÇÕ€∏ﬁï€ë∂ÇÕÇ≈Ç´Ç‹ÇπÇÒ<br>";
 			}
 		}
+
+		&run_tutorial_quest('tutorial_bbsc_write_1') if $m{country};
 	}
 	
 	my($member_c, $member) = &get_member;
@@ -55,6 +57,7 @@ sub run {
 	print qq|<input type="submit" value="ñﬂÇÈ" class="button1"></form>|;
 	print qq|<h2>$this_title <font size="2" style="font-weight:normal;">$this_sub_title</font></h2>|;
 	print qq|<p>$mes</p>| if $mes;
+	print qq|$tutorial_mes| if $tutorial_mes;
 
 	print qq|<table><tr>|;
 	my $this_script_p = $this_script;

@@ -200,6 +200,8 @@ sub tp_210 {
 	$m{vote} = $m{name};
 	$m{vote_year} = $w{year};
 	$m{money} -= $need_money;
+
+	&run_tutorial_quest('tutorial_ceo_1');
 	&begin;
 }
 

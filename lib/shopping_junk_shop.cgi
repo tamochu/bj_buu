@@ -65,6 +65,10 @@ sub begin {
 	else {
 		$mes .= 'ｼﾞｬﾝｸｼｮｯﾌﾟでなんでも買えなんでも売る<br>';
 		$mes .= 'お前何する?<br>';
+		if ($m{tutorial_switch}) {
+			require './lib/tutorial.cgi';
+			&show_tutorial_message('内政によって戦争をするのに必要な物資を貯めることができるよ！<br>農業・商業・徴兵のいずれかの熟練度が 50 になる度に報奨金が貰えるから、まずはそれを狙ってみよう');
+		}
 	}
 	
 	&menu('やめる','買う','売る', 'ｶﾞﾁｬﾀﾏ','高額ｶﾞﾁｬﾀﾏ');
@@ -149,7 +153,14 @@ sub tp_100 {
 
 			$mes .= &get_item_name($kind, $item_no); # アイテム名だけ
 			$mes .= 'を買いました<br>';
-			
+
+			if ($kind == 1) {
+				&run_tutorial_quest('tutorial_junk_shop_wea_1');
+			}
+			elsif ($kind == 4) {
+				&run_tutorial_quest('tutorial_junk_shop_gua_1');
+			}
+
 		}
 		# 何もない場合はデフォルトアイテム
 		else {
@@ -157,10 +168,14 @@ sub tp_100 {
 				my $wea_no = $wea_nos[int(rand(@wea_nos))];
 				&send_item($m{name}, 1, $wea_no, $weas[$wea_no][4]);
 				$mes .= "$weas[$wea_no][1]を買いました<br>";
+
+				&run_tutorial_quest('tutorial_junk_shop_wea_1');
 			}else{
 				my $gua_no = $gua_nos[int(rand(@gua_nos))];
 				&send_item($m{name}, 4, $gua_no, $guas[$gua_no][4]);
 				$mes .= "$guas[$gua_no][1]を買いました<br>";
+
+				&run_tutorial_quest('tutorial_junk_shop_gua_1');
 			}
 		}
 		$mes .= "お前いい奴、友達。買た物は預かり所に送たよ<br>";
@@ -218,6 +233,8 @@ sub tp_200 {
 			open my $fh3, ">> $logdir/junk_shop_sub.cgi" or &error("$logdir/junk_shop_sub.cgiﾌｧｲﾙが開けません");
 			print $fh3 "$line$m{name}<>$time<>0<>\n";
 			close $fh3;
+
+			&run_tutorial_quest('tutorial_junk_shop_sell_1');
 	}
 	&begin;
 }
@@ -248,6 +265,8 @@ sub tp_300 {
 			$m{pop_vote} += $v;
 			$mes .= "投票権を$v枚もらったよ";
 		}
+
+		&run_tutorial_quest('tutorial_5000_gacha_1') if $cmd == 0;
 	}
 	else {
 		$mes .= 'お前貧乏。ｶﾞﾁｬｶﾞﾁｬﾀﾞﾒ。貧乏暇なし働け<br>';

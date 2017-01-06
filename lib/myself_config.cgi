@@ -14,6 +14,11 @@ sub begin {
 	}
 
 	$mes .= qq|<form method="$method" action="$script"><input type="hidden" name="cmd" value="1">|;
+
+	$mes .= 'ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞにする？<br>';
+	$mes .= $m{tutorial_switch} ? qq|<input type="radio" name="tutorial_switch" value="1" checked>はい <input type="radio" name="tutorial_switch" value="0">いいえ <br>|:
+											qq|<input type="radio" name="tutorial_switch" value="1">はい <input type="radio" name="tutorial_switch" value="0" checked>いいえ<br>|;
+
 	$mes .= '混乱の時シャッフルされる？<br>';
 	$mes .= $m{shuffle} ? qq|<input type="radio" name="shuffle" value="0">はい <input type="radio" name="shuffle" value="1" checked>いいえ <br>|:
 						qq|<input type="radio" name="shuffle" value="0" checked>はい <input type="radio" name="shuffle" value="1">いいえ<br>|;
@@ -91,7 +96,7 @@ sub tp_1 {
 # 変更
 #=================================================
 sub tp_100 {
-	$m{shuffle} = $in{shuffle};	
+	$m{shuffle} = $in{shuffle};
 	$m{disp_casino} = $in{disp_casino};
 	$m{chat_java} = $in{chat_java};
 	$m{disp_top} = $in{disp_top};
@@ -106,6 +111,14 @@ sub tp_100 {
 	$m{valid_blacklist} = $in{valid_blacklist};
 #	$m{war_select_switch} = $in{war_select_switch};
 	$m{pet_icon_switch} = $in{pet_icon_switch};
+
+	require './lib/tutorial.cgi';
+	if ($in{tutorial_switch}) {
+		&start_tutorial;
+	}
+	else {
+		&stop_tutorial;
+	}
 
 	&begin;
 }

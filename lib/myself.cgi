@@ -7,6 +7,7 @@ require "$datadir/pet.cgi";
 # ÒÆ­° ’Ç‰Á/•ÏX/íœ/•À‚×‘Ö‚¦‰Â”\
 my @menus = (
 	['‚â‚ß‚é',		'main'],
+	['½ÀİÌß’ ',		'myself_stamp'],
 	['ºÚ¸¼®İÙ°Ñ',	'myself_collection'],
 	['½·ÙŒp³',		'myself_skill'],
 	['Ì†‚ğ•ÏX',	'myself_shogo'],

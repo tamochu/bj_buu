@@ -65,6 +65,7 @@ sub tp_110 {
 		$m{hp} = $m{max_hp};
 		$m{mp} = $m{max_mp};
 		$m{money} -= &use_pet('hospital',$menus[1][1]);
+		&run_tutorial_quest('tutorial_hospital_1');
 		&refresh;
 		&n_menu;
 	}
@@ -127,6 +128,21 @@ sub tp_310 {
 		&begin;
 		return;
 	}
+
+	my $auction_file = "$logdir/auction.cgi";
+	my $is_entry = 0;
+	open my $fh, "< $auction_file" or &error("$auction_fileが読み込めません");
+	while (my $line = <$fh>) {
+		my($bit_time, $no, $kind, $item_no, $item_c, $item_lv, $from_name, $to_name, $item_price, $buyout_price) = split /<>/, $line;
+		$is_entry = 1 if $m{name} eq $to_name;
+	}
+	close $fh;
+	if ($is_entry) {
+		$mes .= "ｵｰｸｼｮﾝで入札中の方はぁ、それが済んでから来てね<br>";
+		&begin;
+		return;
+	}
+
 
 	$mes .= qq|それでわぁ、新しいお名前とﾊﾟｽﾜｰﾄﾞを教えてね<br>|;
 	$mes .= qq|<form method="GET" action="$script"><table class="table1">|;
@@ -589,7 +605,7 @@ sub tp_620 {
 	
 	$m{hp}  = $m{max_hp};
 	$m{mp}  = $m{max_mp};
-	$m{act} = 0;
+#	$m{act} = 0;
 	$m{money} -= $menus[5][1];
 	&refresh;
 	&n_menu;

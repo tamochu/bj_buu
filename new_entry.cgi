@@ -243,8 +243,8 @@ sub create_user {
 	$m{seed} = 'human';
 	$m{coin} = $config_test ? 2500000 : 0;
 
-#	require './lib/tutorial.cgi';
-#	&start_tutorial;
+	require './lib/tutorial.cgi';
+	&start_tutorial;
 
 	&write_user;
 	

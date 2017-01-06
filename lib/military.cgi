@@ -139,6 +139,8 @@ sub tp_610 {
 		truncate $fh, 0;
 		print $fh @lines;
 		close $fh;
+
+		&run_tutorial_quest('tutorial_mil_ambush_1');
 	}elsif (-s "$userdir/$id/war.cgi") {
 		open my $fh, "+< $userdir/$id/war.cgi" or &error("$userdir/$id/war.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 		eval { flock $fh, 2; };
@@ -289,7 +291,6 @@ sub exe2 {
 			} else {
 				$m{value} += int( $m{unit} eq '17' ? (rand(10)+1)*(0.7+rand(0.3)) : rand(10)+1 ); # ‰B–§‚Íã¸‹C”z’l0.7`0.9
 			}
-			$m{value} = 200 if $config_test;
 			&loop_menu;
 			$m{tp} -= 10;
 		}
@@ -305,9 +306,14 @@ sub exe2 {
 			&{ 'tp_'.$m{tp} };
 		}
 		else {
+			my $tmp_tp = $m{tp};
 			$m{tp} += 20;
 			&{ 'tp_'.$m{tp} };
 			$m{tp} = 1000;
+			if ($tmp_tp eq '120' || $tmp_tp eq '220' || $tmp_tp eq '320' ||
+				$tmp_tp eq '720' || $tmp_tp eq '820' || $tmp_tp eq '920') {
+				&run_tutorial_quest('tutorial_mil_1');
+			}
 			&n_menu;
 		}
 	}
@@ -573,6 +579,9 @@ sub tp_540 { # ‹UŒv
 	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
 	$mes .= "$c_y‚Æ‘¼‘‚Ì—FD“x‚ð$v%‰º‚°‚é‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½<br>";
 	$m{tp} = 1000;
+
+	&run_tutorial_quest('tutorial_gikei_1');
+
 	&n_menu;
 	&write_cs;
 }

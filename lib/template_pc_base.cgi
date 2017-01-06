@@ -136,12 +136,27 @@ sub framework {
 			my $line = <$fh>;
 			close $fh;
 			print qq|<table width="500" border="0" cellspacing="2" cellpadding="3" height="60" bgcolor="#CCCCCC"><tr>|;
-			print qq|<td bgcolor="#000000" align="left" valign="top"><tt>◎最新情報◎<br>$line</tt></td>|;
-			print qq|</tr></table>|;
+			print qq|<td bgcolor="#000000" align="left" valign="top"><tt>◎最新情報◎<br>$line|;
+
+			# ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ時のｸｴｽﾄ情報
+			if ($m{tutorial_switch}) {
+				if ($m{country} == 0) { # ﾈﾊﾞﾗﾝでは仕官催促固定
+					print qq|<hr>◎ﾁｭｰﾄﾘｱﾙ◎<br>|;
+					print qq|「国情報」→「仕官」から国を選ぶことで仕官できます|;
+				}
+				elsif ($m{tutorial_quest_stamp_c} < $tutorial_quest_stamps) {
+					require './lib/tutorial.cgi';
+					print qq|<hr>◎ｸｴｽﾄ情報◎<br>|;
+					my $quest = &show_quest;
+					print qq|$quest$tutorial_mes|;
+				}
+			}
+
+			print qq|</tt></td></tr></table>|;
 		}
 		elsif ($mes) { # ﾒｯｾｰｼﾞ
 			print qq|<table width="500" border="0" cellspacing="2" cellpadding="3" height="100" bgcolor="#CCCCCC"><tr>|;
-			print qq|<td bgcolor="#000000" align="left" valign="top"><tt>$mes</tt></td>|;
+			print qq|<td bgcolor="#000000" align="left" valign="top"><tt>$mes$tutorial_mes</tt></td>|;
 			print qq|</tr></table>|;
 		}
 		
@@ -164,11 +179,14 @@ sub framework {
 #================================================
 sub status_html {
 	my $head_mes = '';
-	if (-f "$userdir/$id/emergency.cgi") {
-		open my $fh, "< $userdir/$id/emergency.cgi";
+	if (-f "$userdir/$id/temp_mes.cgi") {
+		open my $fh, "< $userdir/$id/temp_mes.cgi";
 		my $line = <$fh>;
 		close $fh;
 		$head_mes .= qq|<font color="#FF0000">$line</font><br>|;
+	}
+	if ($m{tutorial_switch}) {
+		$head_mes .= qq|<font color="#FF0000">ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ</font><br>|;
 	}
 	if (-f "$userdir/$id/letter_flag.cgi") {
 		open my $fh, "< $userdir/$id/letter_flag.cgi";

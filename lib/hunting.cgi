@@ -88,16 +88,7 @@ sub _get_hunt_you_data {
 	my $data_num = $places[$m{stock}][0];
 	unless ($pets[$m{pet}][2] ne 'hunt_lv' && $data_num eq 'boss') {
 		open my $fh, "< $logdir/monster/$data_num.cgi" or &error("$logdir/monster/$data_num.cgiﾌｧｲﾙがありません");
-=pod
-		if ($m{name} eq 'nanamie' || $m{name} eq '') {
-			while ($line = <$fh>) {
-				last if index($line, 'デポジット') > -1;
-			}
-		}
-		else {
-=cut
-			rand($.) < 1 and $line = $_ while <$fh>;
-#		}
+		rand($.) < 1 and $line = $_ while <$fh>;
 
 		close $fh;
 
@@ -192,7 +183,7 @@ sub _get_hunt_you_data {
 			$mes .= "$y{name} がいます<br>";
 			&menu('戦う','逃げる');
 		}
-	} else{
+	} else {
 		if ( rand($m{cha}) < rand($y{cha}) ) {
 			$m{tp} = 200;
 			$mes .= "$y{name} が襲いかかってきました<br>";
@@ -246,6 +237,9 @@ sub tp_200 {
 			$mes .= "$vloss Gを失いました<br>";
 			$m{act} += 12;
 		}
+
+		&run_tutorial_quest('tutorial_hunting_1');
+
 		&refresh;
 		&n_menu;
 		
@@ -291,6 +285,9 @@ sub tp_200 {
 		
 		$mes .= '討伐を続けますか?<br>';
 		&menu('続ける','やめる','討伐地変更');
+
+		&run_tutorial_quest('tutorial_hunting_1');
+
 		$m{tp} += 10;
 	}
 }

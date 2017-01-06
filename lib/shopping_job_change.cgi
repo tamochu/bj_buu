@@ -33,6 +33,7 @@ sub tp_1 {
 			&remove_pet if $cmd eq '21';
 			$m{job} = $cmd;
 			$mes .= "$jobs[$cmd][1]‚Æ‚È‚Á‚ÄV‚½‚È“¹‚ği‚Ş‚ª‚æ‚¢<br>$m{name}‚Í$jobs[$cmd][1]‚É“]E‚µ‚Ü‚µ‚½<br>";
+			&run_tutorial_quest('tutorial_job_change_1');
 		}
 		else {
 			$mes .= '‚¨‹à‚ª‘«‚è‚ñ‚¼‚¢<br>‚¨‹à‚ğ‚½‚ß‚Ä‚Ü‚½—ˆ‚È‚³‚ê<br>';

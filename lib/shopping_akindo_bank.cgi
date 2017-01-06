@@ -273,6 +273,10 @@ sub tp_110 {
 	
 	$mes .= "$in{save_money} G“ü‹à‚µ‚Ü‚µ‚½(—a‹àŠz $save_money G)<br>";
 	$m{bank} = $y{name};
+
+	&run_tutorial_quest('tutorial_bank_1');
+	$mes .= $tutorial_mes;
+
 	&tp_1;
 }
 

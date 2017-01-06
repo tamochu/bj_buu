@@ -362,6 +362,13 @@ sub success {
 		&super_attack('promise');
 	}
 
+	if ($m{tp} eq '110') { # —FD¬Œ÷
+		&run_tutorial_quest('tutorial_promise1_1');
+	}
+	elsif ($m{tp} eq '210') { # ’âí¬Œ÷
+		&run_tutorial_quest('tutorial_promise2_1');
+	}
+
 	&refresh;
 	&n_menu;
 	&write_cs;

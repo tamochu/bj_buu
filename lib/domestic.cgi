@@ -44,6 +44,10 @@ sub begin {
 	}
 	else {
 		$mes .= '内政を行い自国の資源を増やします<br>どれを行いますか?<br>';
+		if ($m{tutorial_switch}) {
+			require './lib/tutorial.cgi';
+			&show_tutorial_message('内政によって戦争をするのに必要な物資を貯めることができるよ！<br>農業・商業・徴兵のいずれかの熟練度が 50 になる度に報奨金が貰えるから、まずはそれを狙ってみよう');
+		}
 	}
 	
 	&menu('やめる','農業','商業','徴兵','長期内政');
@@ -291,6 +295,8 @@ sub after1 {
 	}
 	
 	&daihyo_c_up('dom_c'); # 代表熟練度
+	&run_tutorial_quest('tutorial_dom_1');
+
 	&refresh;
 	&n_menu;
 	&write_cs;
@@ -305,9 +311,5 @@ sub special_money {
 	$m{money} += $v;
 	$mes .= "今までの功績が認められ $v Gの功労金があたえられた<br>";
 }
-
-
-
-
 
 1; # 削除不可

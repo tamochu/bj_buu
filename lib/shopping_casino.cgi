@@ -208,6 +208,7 @@ sub tp_510 {
 
 			&c_up('cas_c');
 			&use_pet('casino');
+			&run_tutorial_quest('tutorial_highlow_1');
 	}
 	else { # •‰‚¯
 		$m{coin} -= 10;
@@ -216,6 +217,7 @@ sub tp_510 {
 		$mes .= '<p>c”O‚Å‚µ‚½‚ËB‚à‚¤ˆê“x‚â‚è‚Ü‚·‚©?</p>';
 		&menu('Play!','‚â‚ß‚é');
 		$m{act} += 6;
+		&run_tutorial_quest('tutorial_highlow_1');
 	}
 	$m{tp} = 500;
 }

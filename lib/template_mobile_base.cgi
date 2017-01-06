@@ -7,7 +7,7 @@
 #================================================
 print qq|資金 $m{money} G<br>| if $m{lib} =~ /^shopping/;
 #print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
-print qq|<a name="menu">$menu_cmd</a>$mes|;
+print qq|<a name="menu">$menu_cmd</a>$mes$tutorial_mes|;
 
 if ($is_battle eq '1') {
 	&battle_html;
@@ -31,6 +31,7 @@ elsif ($m{wt} > 0) {
 	&countries_info;
 }
 elsif ($m{lib} =~ /(domestic|hunting|military|promise|training|war_form)/ && $m{tp} eq '1') {
+	print qq|<hr>|;
 	if ($m{pet} > 0) { print qq|<font color="#99CCCC">ﾍﾟｯﾄ:$pets[$m{pet}][1]★$m{pet_c}</font><br>|; }
 	elsif ($m{pet} < 0) { print qq|<font color="#99CCCC">ﾍﾟｯﾄ:$pets[$m{pet}][1](<b>$m{pet_c}</b>/<b>$pets[$m{pet}][5]</b>)</font><br>|; }
 	print qq|<font color="#99CC99">ﾀﾏｺﾞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
@@ -112,11 +113,14 @@ sub status_html {
 # 手紙、荷物ﾁｪｯｸ
 #================================================
 sub check_flag {
-	if (-f "$userdir/$id/emergency.cgi") {
-		open my $fh, "< $userdir/$id/emergency.cgi";
+	if (-f "$userdir/$id/temp_mes.cgi") {
+		open my $fh, "< $userdir/$id/temp_mes.cgi";
 		my $line = <$fh>;
 		close $fh;
 		print qq|<hr><font color="#FF0000">$line</font><br>|;
+	}
+	if ($m{tutorial_switch}) {
+		print qq|<hr><font color="#FF0000">ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ</font><br>|;
 	}
 	if (-f "$userdir/$id/letter_flag.cgi") {
 		open my $fh, "< $userdir/$id/letter_flag.cgi";
@@ -322,7 +326,19 @@ sub show_world_news {
 	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiﾌｧｲﾙが読み込めません");
 	my $line = <$fh>;
 	close $fh;
-	print "<hr>$line";
+	print "<hr>$line<hr>";
+
+	# ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ時のｸｴｽﾄ情報
+	if ($m{tutorial_switch}) {
+		if ($m{country} == 0) { # ﾈﾊﾞﾗﾝでは仕官催促固定
+			print qq|「国情報」→「仕官」から国を選ぶことで仕官できます<hr>|;
+		}
+		elsif ($m{tutorial_quest_stamp_c} < $tutorial_quest_stamps) {
+			require './lib/tutorial.cgi';
+			my $quest = &show_quest;
+			print qq|$quest<hr>|;
+		}
+	}
 }
 
 1; # 削除不可

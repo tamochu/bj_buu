@@ -33,6 +33,7 @@ if ($m{incubation_switch} && $m{egg} && $m{egg_c} >= $eggs[$m{egg}][2]) {
 if (&on_summer) {
 	push @menus, ['‰ÄÕ‚è', 'summer_festival'];
 }
+
 #================================================
 sub begin {
 	&menu( map { $_->[0] } @menus );
@@ -309,7 +310,8 @@ sub main_system {
 	}
 
 	$y{country} = 0 if $y{country} eq '';
-	$m{act} = 0 if $config_test;
+#	$m{act} = 0 if $config_test;
+	&run_tutorial_quest('tutorial_full_act_1') if $m{act} > 99;
 }
 
 #================================================
@@ -557,6 +559,7 @@ sub lv_up {
 		}
 		
 		&use_pet('lv_up');
+		&run_tutorial_quest('tutorial_lv_20_1') if $m{lv} == 20;
 	}
 }
 

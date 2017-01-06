@@ -120,8 +120,6 @@ sub war_escape {
 sub war_win {
 	my $is_single = shift;
 
-	&after_success_action('war', $is_single);
-
 	# ’D‘—ÍÍŞ°½:ŠK‹‰‚ª‚‚¢‚Ù‚ÇÌß×½B‰ºãAŠv–½‚Ì‚ÍŠK‹‰‚ª’á‚¢‚Ù‚ÇÌß×½
 	my $v = ($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2')) ? (@ranks - $m{rank}) * 10 + 10 : $m{rank} * 8 + 10;
 
@@ -289,6 +287,8 @@ sub war_win {
 		}
 	}
 
+	&after_success_action('war', $is_single);
+
 	&down_friendship;
 	&c_up('win_c');
 	++$m{medal};
@@ -323,7 +323,7 @@ sub war_win {
 	&refresh;
 
 	&daihyo_c_up('war_c'); # ‘ã•\n—û“x
-	
+
 	# ˆÃ•
 	if ($w{world} eq $#world_states) {
 		my @acs = (1..$w{country} - 1);

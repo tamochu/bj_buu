@@ -15,11 +15,24 @@ if ( ($mes && $m{wt} > 1) || (!$mes && $m{lib} eq '') ) {
 	close $fh;
 	print qq|<hr>|;
 	print qq|◎最新情報◎<br>$line|;
+	# ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ時のｸｴｽﾄ情報
+	if ($m{tutorial_switch}) {
+		if ($m{country} == 0) { # ﾈﾊﾞﾗﾝでは仕官催促固定
+			print qq|<hr>◎ﾁｭｰﾄﾘｱﾙ◎<br>|;
+			print qq|「国情報」→「仕官」から国を選ぶことで仕官できます|;
+		}
+		elsif ($m{tutorial_quest_stamp_c} < $tutorial_quest_stamps) {
+			require './lib/tutorial.cgi';
+			print qq|<hr>◎ｸｴｽﾄ情報◎<br>|;
+			my $quest = &show_quest;
+			print qq|$quest$tutorial_mes|;
+		}
+	}
 	print qq|<hr>|;
 }
 #print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
 print qq|$menu_cmd|;
-print qq|<br>$mes| if $mes;
+print qq|<br>$mes$tutorial_mes| if $mes;
 
 if ($is_battle eq '1') {
 	&battle_html;
@@ -43,6 +56,7 @@ elsif ($m{wt} > 0) {
 	&promise_table_html;
 }
 elsif ($m{lib} =~ /(domestic|hunting|military|promise|training|war_form)/ && $m{tp} eq '1') {
+	print qq|<hr>|;
 	if ($m{pet} > 0) { print qq|<font color="#99CCCC">ﾍﾟｯﾄ:$pets[$m{pet}][1]★$m{pet_c}</font><br>|; }
 	elsif ($m{pet} < 0) { print qq|<font color="#99CCCC">ﾍﾟｯﾄ:$pets[$m{pet}][1](<b>$m{pet_c}</b>/<b>$pets[$m{pet}][5]</b>)</font><br>|; }
 	print qq|<font color="#99CC99">ﾀﾏｺﾞ:$eggs[$m{egg}][1](<b>$m{egg_c}</b>/<b>$eggs[$m{egg}][2]</b>)</font><br>| if $m{egg};
@@ -479,11 +493,14 @@ sub status_html {
 # 手紙、荷物ﾁｪｯｸ
 #================================================
 sub check_flag {
-	if (-f "$userdir/$id/emergency.cgi") {
-		open my $fh, "< $userdir/$id/emergency.cgi";
+	if (-f "$userdir/$id/temp_mes.cgi") {
+		open my $fh, "< $userdir/$id/temp_mes.cgi";
 		my $line = <$fh>;
 		close $fh;
 		print qq|<hr><font color="#FF0000">$line</font><br>|;
+	}
+	if ($m{tutorial_switch}) {
+		print qq|<hr><font color="#FF0000">ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ</font><br>|;
 	}
 	if (-f "$userdir/$id/letter_flag.cgi") {
 		open my $fh, "< $userdir/$id/letter_flag.cgi";
