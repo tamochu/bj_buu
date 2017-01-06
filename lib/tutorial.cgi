@@ -82,7 +82,7 @@ sub success_quest_result {
 
 # ½ÀİÌß”
 # ¸´½ÄÃŞ°À‚ÉŠÜ‚ß‚é‚Æ¸´½Ä”‚ª•Ï“®‚µ‚½‚É‘‚«Š·‚¦‚È‚¢‚Æ‚¾‚©‚ç•ª‚¯‚Ä©“®‰»
-my $tutorial_quest_stamps = keys(%tutorial_quests);
+$tutorial_quest_stamps = keys(%tutorial_quests);
 
 # ½ÀİÌßÃŞ°À
 @tutorial_stamps = (

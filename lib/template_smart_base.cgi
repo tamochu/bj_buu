@@ -17,12 +17,12 @@ if ( ($mes && $m{wt} > 1) || (!$mes && $m{lib} eq '') ) {
 	print qq|◎最新情報◎<br>$line|;
 	# ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ時のｸｴｽﾄ情報
 	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
 		if ($m{country} == 0) { # ﾈﾊﾞﾗﾝでは仕官催促固定
 			print qq|<hr>◎ﾁｭｰﾄﾘｱﾙ◎<br>|;
 			print qq|「国情報」→「仕官」から国を選ぶことで仕官できます|;
 		}
 		elsif ($m{tutorial_quest_stamp_c} < $tutorial_quest_stamps) {
-			require './lib/tutorial.cgi';
 			print qq|<hr>◎ｸｴｽﾄ情報◎<br>|;
 			my $quest = &show_quest;
 			print qq|$quest$tutorial_mes|;

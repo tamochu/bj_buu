@@ -330,11 +330,11 @@ sub show_world_news {
 
 	# ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞ時のｸｴｽﾄ情報
 	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
 		if ($m{country} == 0) { # ﾈﾊﾞﾗﾝでは仕官催促固定
 			print qq|「国情報」→「仕官」から国を選ぶことで仕官できます<hr>|;
 		}
 		elsif ($m{tutorial_quest_stamp_c} < $tutorial_quest_stamps) {
-			require './lib/tutorial.cgi';
 			my $quest = &show_quest;
 			print qq|$quest<hr>|;
 		}
