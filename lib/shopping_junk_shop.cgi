@@ -67,7 +67,7 @@ sub begin {
 		$mes .= 'お前何する?<br>';
 		if ($m{tutorial_switch}) {
 			require './lib/tutorial.cgi';
-			&show_tutorial_message('内政によって戦争をするのに必要な物資を貯めることができるよ！<br>農業・商業・徴兵のいずれかの熟練度が 50 になる度に報奨金が貰えるから、まずはそれを狙ってみよう');
+			&show_tutorial_message('ｼﾞｬﾝｸｼｮｯﾌﾟでは、人様が売っぱらったゴミや武器・防具を拾えるよ！');
 		}
 	}
 	
