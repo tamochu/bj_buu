@@ -405,6 +405,13 @@ sub tp_300 {
 	my $count = 0;
 	my $last_year = '';
 	my $save_money = 0;
+
+	unless (-f "$logdir/guild_bank.cgi") {
+		open my $wfh, "> $logdir/guild_bank.cgi" or &error("$logdir/guild_bank.cgi Ì§²Ù‚ªì‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
+		close $wfh;
+		chmod $chmod, "$logdir/guild_bank.cgi";
+	}
+
 	open my $fh, "< $logdir/guild_bank.cgi" or &error("$logdir/guild_bank.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $line = <$fh>) {
 		my($year, $name, $money) = split /<>/, $line;
