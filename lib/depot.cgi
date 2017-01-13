@@ -662,18 +662,39 @@ sub tp_710 {
 		&{ 'tp_'. $m{tp} };
 		return;
 	}
-	my %lock = ();
+
+	my %lock = (); # ロック情報
+
+	# 倉庫内に存在しないのかアンロックしたのかの判断ができないとアンロックできない状態になりうる
+	# 倉庫内でロック指定→以前からロック→ロック（正しい）
+	# 倉庫内に存在しない→以前からロック→ロック（一見正しいがアンロックと判別しないとアンロックしてもされない）
+	# 倉庫内でアンロック指定→以前からロック→アンロック（正しい）
+
+	# ロック指定されたアイテムの取得
 	open my $fh, "< $this_file" or &error("$this_fileが開けません");
 	while (my $line = <$fh>) {
 		++$count;
-		if ($in{$count} eq '1') {
-			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			$lock{"$kind<>$item_no<>"}++;
+		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+		if ($in{$count} eq '1' && $lock{"$kind<>$item_no<>"} == 0) {
+			$lock{"$kind<>$item_no<>"} = 1; # ロック
 		}
+		elsif ($in{$count} == 0 && $lock{"$kind<>$item_no<>"} == 0) {
+			$lock{"$kind<>$item_no<>"} = -1; # アンロック
+		}
+		# 倉庫内に存在しないアイテムについては従来のロック情報を利用↓
 	}
 	close $fh;
-	
-	open my $lfh, "> $this_lock_file" or &error("$this_lock_fileが開けません");
+
+	# 従来のロック情報を取得しつつ更新
+	open my $lfh, "+< $this_lock_file" or &error("$this_lock_fileが開けません");
+	eval { flock $lfh, 2; };
+	while (my $line = <$lfh>){
+		chomp $line;
+		$lock{$line} = 1 if $lock{$line} > -1; # アンロック指定されてないなら引き続きロック
+	}
+
+	seek  $lfh, 0, 0;
+	truncate $lfh, 0;
 	foreach my $line(keys(%lock)){
 		if ($lock{$line} > 0) {
 			print $lfh "$line\n";
@@ -808,23 +829,28 @@ sub checkbox_my_depot_lock_checked {
 	if (!$is_mobile) {
 		$sub_mes .= qq|<input type="button" name="all_unchecked" value="チェックを外す" class="button1" onclick="\$('input:checkbox').prop('checked',false); "><br>|;
 	}
+	my %sames = ();
 	open my $fh, "< $this_file" or &error("$this_file が読み込めません");
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-		$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1"|;
-		my $lock_mes = '';
-		if ($lock{"$kind<>$item_no<>"}) {
-			$sub_mes .= qq| checked|;
-			$lock_mes = ' ロックされてます';
+		# 重複するアイテムは最初の一個目だけ表示
+		unless ($sames{"$kind<>$item_no<>"}) {
+			$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1"|;
+			my $lock_mes = '';
+			if ($lock{"$kind<>$item_no<>"}) {
+				$sub_mes .= qq| checked|;
+				$lock_mes = ' ロックされてます';
+			}
+			$sub_mes .= qq|>|;
+			$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
+			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
+			$sub_mes .= $lock_mes;
+			$sub_mes .= ' 溢れてます' if $count > $lost_depot;
+			$sub_mes .= qq|</label>| unless $is_mobile;
+			$sub_mes .= qq|<br>|;
 		}
-		$sub_mes .= qq|>|;
-		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
-		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
-		$sub_mes .= $lock_mes;
-		$sub_mes .= ' 溢れてます' if $count > $lost_depot;
-		$sub_mes .= qq|</label>| unless $is_mobile;
-		$sub_mes .= qq|<br>|;
+		$sames{"$kind<>$item_no<>"}++;
 	}
 	close $fh;
 	
