@@ -28,37 +28,59 @@ my @rank_status = (
     ['pro','友好',10],
     ['sal','給料',10000],
     ['dai','国畜',5],
+    ['wiki','wiki用',0],
 #    ['mil_sum','軍事',1],
 );
-
+=pod
+=cut
 #=================================================
 &decode;
 &header;
 &read_cs;
 
-# この辺めっちゃ気持ち悪い 中途半端なwiki用コード出力されるのもアクセスされるのが嫌でこうしたけど根本的に直すの面倒だしとりあえず
-my $is_wiki = 1;
-for my $i (0 .. $#rank_status) {
-	next unless $is_wiki;
-	open my $fh, "< $logdir/year_player_ranking_$rank_status[$i][0].cgi" or &error("$logdir/year_player_ranking_$rank_status[$i][0].cgiﾌｧｲﾙが読み込めません");
-	my $year = <$fh>;
-	chomp($year);
-	$is_wiki = ($year == ($w{year}-1));
-	close $fh;
-}
-push(@rank_status, ['wiki','wiki用',0]) if $is_wiki;
-
 my $max_ranking = $in{rank_num} ? $in{rank_num} : 10;
 
 $in{no} ||= 0;
 $in{no} = 0 if $in{no} >= @rank_status;
+
 my $type = $rank_status[$in{no}][0] ? "_$rank_status[$in{no}][0]" : '';
 
 my $this_file = "$logdir/year_player_ranking${type}.cgi";
 
-&update_player_ranking if $in{renew};
-#&update_player_ranking; #すぐに更新したい場合はここのコメントアウトを外す（ただし処理が重くなるので速やかに戻すこと）
-&run;
+if ($in{no} eq $#rank_status) { # wiki用
+	my $is_new_rankings = 1;
+	for my $i (0 .. $#rank_status-1) {
+		open my $fh, "< $logdir/year_player_ranking_$rank_status[$i][0].cgi" or &error("$logdir/year_player_ranking_$rank_status[$i][0].cgiﾌｧｲﾙが読み込めません");
+		my $year = <$fh>;
+		chomp($year);
+		$is_new_rankings = ($year == ($w{year}-1));
+		close $fh;
+		last unless $is_new_rankings;
+	}
+	if ($is_new_rankings) { # 1年ﾗﾝｷﾝｸﾞがすべて最新
+		open my $fh, "< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
+		my $year = <$fh>;
+		close $fh;
+
+		&update_wiki if ($w{year} > $year+1); # wiki用ﾃﾞｰﾀが古い時だけ更新
+		&run;
+	}
+	else {
+		print qq|<form action="$script_index"><input type="submit" value="ＴＯＰ" class="button1"></form>|;
+		for my $i (0 .. $#rank_status) {
+			print $i eq $in{no} ? qq|$rank_status[$i][1] / | : qq|<a href="?no=$i">$rank_status[$i][1]</a> / |;
+		}
+
+		print qq|<h1>wiki用年間ﾗﾝｷﾝｸﾞ</h1>|;
+		print qq|<div class="mes"><ul><li>すべての1年ﾗﾝｷﾝｸﾞを最新にすると表\示されます</ul></div><br>|;
+	}
+}
+else {
+	&update_player_ranking if $in{renew};
+	#&update_player_ranking; #すぐに更新したい場合はここのコメントアウトを外す（ただし処理が重くなるので速やかに戻すこと）
+	&run;
+}
+
 &footer;
 exit;
 
@@ -71,28 +93,11 @@ sub run {
 	for my $i (0 .. $#rank_status) {
 		print $i eq $in{no} ? qq|$rank_status[$i][1] / | : qq|<a href="?no=$i">$rank_status[$i][1]</a> / |;
 	}
-	my $rank = 1;
+
 	open my $fh, "< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
 	my $year = <$fh>;
 	close $fh;
 
-	if($w{year} > $year+1){
-		my $temp_this_file = $this_file;
-		my $temp_no = $in{no};
-		for my $i (0 .. $#rank_status){
-
-			$this_file  = "$logdir/year_player_ranking_$rank_status[$i][0].cgi";
-			$in{no} = $i;
-			unless(-e $this_file){
-				&error("$this_fileﾌｧｲﾙが読み込めません");
-			}
-			&update_player_ranking;
-
-		}
-		$this_file = $temp_this_file;
-		$in{no} = $temp_no;
-	}
-	
 	#項目がwikiなら出力のみ
 	if($rank_status[$in{no}][0] eq "wiki"){
 		print qq|<h1>$year年度 wiki用年間ﾗﾝｷﾝｸﾞ</h1>|;
@@ -102,13 +107,16 @@ sub run {
 		return;
 	}
 
+	&update_player_ranking if ($w{year} > $year+1);
+
 	open my $fh, "< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
 	my $year = <$fh>;
 	print qq|<h1>$year年$rank_status[$in{no}][1]年間ﾗﾝｷﾝｸﾞ</h1>|;
-	print qq|<div class="mes"><ul><li>ﾗﾝｷﾝｸﾞは毎年ごとにﾘｾｯﾄされ更新されます<li>すべてのﾗﾝｷﾝｸﾞが揃うとwiki用テンプレが表\示されます</ul></div><br>|;
+	print qq|<div class="mes"><ul><li>ﾗﾝｷﾝｸﾞは毎年ごとにﾘｾｯﾄされ更新されます</ul></div><br>|;
 
 	print qq|<table class="table1" cellpadding="2"><tr><th>順位</th><th>数値</th><th>名前</th><th>所属国</th></tr>| unless $is_mobile;
 
+	my $rank = 1;
 	my $pre_number = 0;
 	my $d_rank;
 	while ($line = <$fh>) {
@@ -136,15 +144,7 @@ sub run {
 #=================================================
 sub update_player_ranking  {
 #	my $t0 = [gettimeofday];
-
-	#wiki用出力が選ばれていれば別の更新処理
-	my $index_wiki = $#rank_status;
-	if ($this_file eq  "$logdir/year_player_ranking_$rank_status[$index_wiki][0].cgi"){
-		&update_wiki;
-		return;
-	}
-
-	for my $i(1..10){
+	for my $i(1..10){
 		my $to_file_name;
 		my $old_year = 10 - $i;
 		my $old_file_name = $this_file;
@@ -287,6 +287,7 @@ sub update_player_ranking  {
 	my @ranking = (0, 0); # 順位, ダブリ
 	while ($max_ranking > $ranking[0]) {
 		last unless @p_ranks;
+
 		# sort の代わりにトップを順次抜き出す
 		my $max_value = 0;
 		my $max_index = 0;
@@ -296,9 +297,11 @@ sub update_player_ranking  {
 				$max_index = $index;
 			}
 		}
+
 		# 2位以下が上位と同じ数値ならダブリ数うｐ、違うならダブリ数リセット
 		$ranking[1] = $old_max_value > $max_value ? 0 : $ranking[1]+1 if $count > 0;
 		$ranking[0] = $count+1 - $ranking[1]; # (インデックス+1) - ダブリ数 = 順位
+
 		# 給料ﾗﾝｷﾝｸﾞ以外の1位のプレイヤーに No.1 熟練付与
 		if ($status ne 'sal' && $ranking[0] == 1) {
 			my $no1_name = $p_ranks[$max_index][1];
@@ -308,6 +311,7 @@ sub update_player_ranking  {
 			print $ufh "no1_c<>1<>\n";
 			close $ufh;
 		}
+
 		push(@line, join('<>', @{splice(@p_ranks, $max_index, 1)})."\n");
 		$count++;
 		$old_max_value = $max_value;
@@ -317,12 +321,14 @@ sub update_player_ranking  {
 	if (@p_ranks) {
 		# sortで1行にできるけど配列の全要素を操作せずにﾗﾝｸｲﾝするﾌﾟﾚｲﾔｰだけをﾋﾟｯｸする↑の方が速い
 		@p_ranks = sort {$b->[0] <=> $a->[0]} @p_ranks;
+
 		# ﾗﾝｷﾝｸﾞﾃﾞｰﾀの書き込み準備
 		my @ranking = (0, 0); # 順位, ダブリ
 		for my $count (0 .. $#p_ranks) {
 			# 2位以下が上位と同じ数値ならダブリ数うｐ、違うならダブリ数リセット
 			$ranking[1] = $p_ranks[$count-1][0] > $p_ranks[$count][0] ? 0 : $ranking[1]+1 if $count > 0;
 			$ranking[0] = $count+1 - $ranking[1]; # (インデックス+1) - ダブリ数 = 順位
+
 			# 給料ﾗﾝｷﾝｸﾞ以外の1位のプレイヤーに No.1 熟練付与
 			if ($status ne 'sal' && $ranking[0] == 1) {
 				my $no1_name = $p_ranks[0][1];
@@ -332,6 +338,7 @@ sub update_player_ranking  {
 				print $ufh "no1_c<>1<>\n";
 				close $ufh;
 			}
+
 			push @line, "$p_ranks[$count][0]<>$p_ranks[$count][1]<>$p_ranks[$count][2]\n";
 			last if $ranking[0] >= $max_ranking; # 順位が $max_ranking 以上になったらお終い
 		}
@@ -347,7 +354,7 @@ sub update_player_ranking  {
 
 #wiki用のデータ更新
 sub update_wiki{
-	my @wiki_data; 
+	my @wiki_data;
 	my $year;
 	my $is_write = 1;
 
@@ -474,4 +481,3 @@ sub output_wiki{
 	print "|>|>|>|>|>|>|>|>|>|>||";
 	print "</textarea>";
 }
-
