@@ -106,10 +106,10 @@ sub add_npc_country {
 	$cs{state}[$i]    = 5;
 	$cs{capacity}[$i] = $npc_cap; 
 	$cs{is_die}[$i]   = 0;
-	$cs{modify_war}[$i]   = 5;
-	$cs{modify_dom}[$i]   = 5;
-	$cs{modify_mil}[$i]   = 5;
-	$cs{modify_pro}[$i]   = 5;
+	$cs{modify_war}[$i]   = 0;
+	$cs{modify_dom}[$i]   = 0;
+	$cs{modify_mil}[$i]   = 0;
+	$cs{modify_pro}[$i]   = 0;
 	
 	my @lines = &get_countries_mes();
 	if ($w{country} > $#lines) {
@@ -255,7 +255,7 @@ sub npc_military_ds { # Dead Soldier €—ì‚Ì¢Š«
 }
 sub _npc_get_resource {
 	my($country, $k) = @_;
-	my $v = int(rand(15000)+15000);
+	my $v = int(rand(20000)+10000);
 	$v *= 2 if $cs{strong}[$w{country}] < 30000;
 	$v = $v > $cs{$k}[$country] ? $cs{$k}[$country] : $v;
 	$cs{$k}[$country]    -= $v;
