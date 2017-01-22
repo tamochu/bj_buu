@@ -15,7 +15,11 @@ my @answers = ('断る!', '望むところだ!', '返り討ちにしてくれる!', 'いざ勝負!', '
 my @war_forms = ('攻撃陣形','防御陣形','突撃陣形');
 
 # 新規のボーナスタイム(戦争勝利数)リミット
-my $new_entry_war_c = 100;
+my $new_entry_war_c = 100; #100
+
+#$m_lea_modify = &get_wea_modify($m{lea}, $m{wea});
+#$y_lea_modify = &get_wea_modify($y{lea}, $y{wea});
+
 =pod
 # ランダムセレクト用コマンド退避
 my $m_cmd = $cmd;
@@ -216,7 +220,7 @@ sub tp_100 {
 	}
 =cut
 	if ($config_test) {
-		$y{sol} /= 1;
+		$y{sol} /= 10;
 	}
 	
 	$m{tp} += 10;
@@ -266,6 +270,7 @@ sub tp_140 { # 一騎打ち
 #================================================
 sub loop_menu {
 	$is_battle = 2;
+
 	$mes .= "残り$m{turn} ﾀｰﾝ<br>";
 	$mes .= "$m{name}軍 $m{sol}人 VS $y{name}軍 $y{sol}人<br>";
 	$mes .= '攻め込む陣形を選んでください<br>';
@@ -523,6 +528,7 @@ sub _crash {
 				;
 	}
 	
+
 	my $m_lea = $m{lea};
 	my $y_lea = $y{lea};
 	my $m_min_wea;
@@ -574,7 +580,7 @@ sub _crash {
 	$y_lea += $y_wea_modify;
 	$y_lea -= 100 unless $y{wea};
 	$y_lea =  0 if ($y_lea < 0);
-	
+
 	my $m_attack = ($m{sol}*0.1 + $m_lea*2) * $m{sol_lv} * 0.01 * $units[$m{unit}][4] * $units[$y{unit}][5];
 	my $y_attack = ($y{sol}*0.1 + $y_lea*2) * $y{sol_lv} * 0.01 * $units[$y{unit}][4] * $units[$m{unit}][5];
 
@@ -718,6 +724,10 @@ sub _get_war_you_data {
 	}
 	
 	# ｼｬﾄﾞｳ or NPC
+	# 前回の戦争相手のﾍﾟｯﾄﾃﾞｰﾀを引き継がせないようにﾍﾟｯﾄ初期化（ﾌﾞﾚﾊ継続問題）
+	# ﾁｷﾝは待ち伏せ処理に入ると発動するのでｼｬﾄﾞｳ or NPCには直接関係ない
+	# 問題は、ﾁｷﾝ持ちかどうかを武器にして判定している（一騎打ちしないし変数使い回しちゃえ？）ので、武器による統率補正がおそらくバグってること
+	$y{pet} = 0; 
 	($pets[$m{pet}][2] eq 'no_shadow' && $w{world} ne '17') || int(rand(3 / $war_mod)) == 0 || ($w{world} eq '7' || ($w{world} eq '19' && $w{world_sub} eq '7'))
 		? &_get_war_npc_data : &_get_war_shadow_data;
 }
@@ -803,6 +813,51 @@ sub is_tokkou {
 	return 0;
 }
 
+#================================================
+# 武器の統率補正の取得
+#================================================
+sub get_wea_modify {
+	my ($lea, $wea) = @_;
+
+	my $min_wea;
+	if($weas[$wea][2] eq '剣'){
+		$min_wea = 1;
+	}elsif($weas[$wea][2] eq '槍'){
+		$min_wea = 6;
+	}elsif($weas[$wea][2] eq '斧'){
+		$min_wea = 11;
+	}elsif($weas[$wea][2] eq '炎'){
+		$min_wea = 16;
+	}elsif($weas[$wea][2] eq '風'){
+		$min_wea = 21;
+	}elsif($weas[$wea][2] eq '雷'){
+		$min_wea = 26;
+#	}elsif($m_wea == 0){
+#		$m_min_wea = 0;
+	}else{
+		$min_wea = 33;
+	}
+
+#	$y_wea_modify = $weas[$y{wea}][5] - $weas[$y_min_wea][5];
+#	$y_wea_modify -= 100 unless $y{wea};
+#	$y_wea_modify = 100 if ($y{wea} == 14);
+#	$y_wea_modify = 0 if ($y{wea} == 31);
+#	$y_wea_modify = 100 if ($y{wea} == 32);
+#	$y_lea += $y_wea_modify;
+#	$y_lea -= 100 unless $y{wea};
+#	$y_lea =  0 if ($y_lea < 0);
+
+
+	my $wea_modify = $weas[$wea][5] - $weas[$min_wea][5];
+	$wea_modify -= 100 unless $wea;
+	$wea_modify = 100 if ($wea == 14);
+	$wea_modify = 0 if ($wea == 31);
+	$wea_modify = 100 if ($wea == 32);
+	$lea += $wea_modify;
+	$lea = 0 if ($lea < 0);
+
+	return $lea;
+}
 
 #================================================
 # _war_result.cgiに処理結果を渡す
