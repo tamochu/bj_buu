@@ -185,10 +185,10 @@ sub war_html {
 	my $y_tokkou = $is_y_tokkou ? '<font color="#FFFF00"><b>š“ÁUš</b></font>' : '';
 	
 	print qq|$m_icon<font color="$cs{color}[$m{country}]">$m{name}$m_mes</font><br>|;
-	print qq|$m_tokkou$units[$m{unit}][1]/<b>$m{sol}</b>•º/m‹C[<b>$m{sol_lv}</b>%]/“—¦[<b>$m{lea}</b>]<br>|;
+	print qq|$m_tokkou$units[$m{unit}][1]/<b>$m{sol}</b>•º/m‹C[<b>$m{sol_lv}</b>%]/“—¦[<b>$m_lea</b>]<br>|;
 	print qq|<hr>|;
 	print qq|$y_icon<font color="$cs{color}[$y{country}]">$y{name}$y_mes</font><br>|;
-	print qq|$y_tokkou$units[$y{unit}][1]/<b>$y{sol}</b>•º/m‹C[<b>$y{sol_lv}</b>%]/“—¦[<b>$y{lea}</b>]<br>|;
+	print qq|$y_tokkou$units[$y{unit}][1]/<b>$y{sol}</b>•º/m‹C[<b>$y{sol_lv}</b>%]/“—¦[<b>$y_lea</b>]<br>|;
 }
 
 #================================================

@@ -17,8 +17,10 @@ my @war_forms = ('攻撃陣形','防御陣形','突撃陣形');
 # 新規のボーナスタイム(戦争勝利数)リミット
 my $new_entry_war_c = 100; #100
 
-#$m_lea_modify = &get_wea_modify($m{lea}, $m{wea});
-#$y_lea_modify = &get_wea_modify($y{lea}, $y{wea});
+# 再ﾛｸﾞｲﾝ時に表示する統率 到着時に相手が確定し上書き、さらにｺﾏﾝﾄﾞ入力毎にも上書き
+# template_xxx_base.cgi で参照させるためにグローバル
+$m_lea = &get_wea_modify('m');
+$y_lea = &get_wea_modify('y');
 
 =pod
 # ランダムセレクト用コマンド退避
@@ -222,7 +224,10 @@ sub tp_100 {
 	if ($config_test) {
 		$y{sol} /= 10;
 	}
-	
+
+	$m_lea = &get_wea_modify('m');
+	$y_lea = &get_wea_modify('y');
+
 	$m{tp} += 10;
 	&n_menu;
 }
@@ -238,7 +243,7 @@ sub tp_110 {
 #	$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
 #	$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
 	&menu(@war_forms,'退却');
-	
+
 	$m{tp} += 10;
 	&write_cs;
 }
@@ -528,7 +533,7 @@ sub _crash {
 				;
 	}
 	
-
+=pod
 	my $m_lea = $m{lea};
 	my $y_lea = $y{lea};
 	my $m_min_wea;
@@ -580,6 +585,9 @@ sub _crash {
 	$y_lea += $y_wea_modify;
 	$y_lea -= 100 unless $y{wea};
 	$y_lea =  0 if ($y_lea < 0);
+=cut
+	$m_lea = &get_wea_modify('m');
+	$y_lea = &get_wea_modify('y');
 
 	my $m_attack = ($m{sol}*0.1 + $m_lea*2) * $m{sol_lv} * 0.01 * $units[$m{unit}][4] * $units[$y{unit}][5];
 	my $y_attack = ($y{sol}*0.1 + $y_lea*2) * $y{sol_lv} * 0.01 * $units[$y{unit}][4] * $units[$m{unit}][5];
@@ -817,44 +825,43 @@ sub is_tokkou {
 # 武器の統率補正の取得
 #================================================
 sub get_wea_modify {
-	my ($lea, $wea) = @_;
+	my $who = shift;
+	my ($wea, $lea) = (${$who}{wea}, ${$who}{lea});
 
-	my $min_wea;
-	if($weas[$wea][2] eq '剣'){
-		$min_wea = 1;
-	}elsif($weas[$wea][2] eq '槍'){
-		$min_wea = 6;
-	}elsif($weas[$wea][2] eq '斧'){
-		$min_wea = 11;
-	}elsif($weas[$wea][2] eq '炎'){
-		$min_wea = 16;
-	}elsif($weas[$wea][2] eq '風'){
-		$min_wea = 21;
-	}elsif($weas[$wea][2] eq '雷'){
-		$min_wea = 26;
-#	}elsif($m_wea == 0){
-#		$m_min_wea = 0;
-	}else{
-		$min_wea = 33;
-	}
+# ﾁｷﾝでやっぱりバグりそうだし可読性悪いしとりあえず無効
+#	my @weas_data = (6, 5); # 属性数、各属性の武器数 属性数や武器数を増やしたらここの数で調整する
+#	my $min_wea = $wea eq '0' ? 0
+#					# 例 if ($wea <= 30) { return int(10 / 5.01) * 5 + 1;} 基本武器30個のうち、10番目の武器の最下位は6番目の武器といった感じ とりあえず100個ぐらいまで自動で収まる
+#					: $wea <= ($weas_data[0]*$weas_data[1]) ? int($wea / ($weas_data[1]+0.01)) * $weas_data[1] + 1
+#					: 33;
 
-#	$y_wea_modify = $weas[$y{wea}][5] - $weas[$y_min_wea][5];
-#	$y_wea_modify -= 100 unless $y{wea};
-#	$y_wea_modify = 100 if ($y{wea} == 14);
-#	$y_wea_modify = 0 if ($y{wea} == 31);
-#	$y_wea_modify = 100 if ($y{wea} == 32);
-#	$y_lea += $y_wea_modify;
-#	$y_lea -= 100 unless $y{wea};
-#	$y_lea =  0 if ($y_lea < 0);
+	# 所持武器種の最下位の武器ﾅﾝﾊﾞｰ
+	my $min_wea = $weas[$wea][2] eq '剣' ? 1
+					: $weas[$wea][2] eq '槍' ? 6
+					: $weas[$wea][2] eq '斧' ? 11
+					: $weas[$wea][2] eq '炎' ? 16
+					: $weas[$wea][2] eq '風' ? 21
+					: $weas[$wea][2] eq '雷' ? 26
+					# ==演算子だと相手がﾁｷﾝを持っている場合に 'no_single' == 0 で true になる（数値を表さない文字列が数値に型変換されると 0 になる？）
+					# eq演算子だと、0 eq '0' のような比較でも true、'no_single' eq '0' なら false になる
+					: $wea eq '0' ? 0
+					# ﾐｻｲﾙだけじゃなくﾁｷﾝ持ちもﾐｻｲﾙ持ってることになってる（ﾁｷﾝはとりあえず放置）
+					: 33;
 
-
+	# 所持武器の重さ - 所持武器種の最下位の重さ = 武器による基本統率補正
+	# ﾁｷﾝ持ちは範囲外参照で 0 - 100 = -100
 	my $wea_modify = $weas[$wea][5] - $weas[$min_wea][5];
-	$wea_modify -= 100 unless $wea;
-	$wea_modify = 100 if ($wea == 14);
-	$wea_modify = 0 if ($wea == 31);
-	$wea_modify = 100 if ($wea == 32);
+
+	$wea_modify -= 100 unless $wea; # 素手
+	$wea_modify = 100 if ($wea == 14); # ﾃﾞﾋﾞﾙｱｸｽ
+	$wea_modify = 0 if ($wea == 31); # ﾄﾞﾚｲﾉｸｻﾘ
+	$wea_modify = 100 if ($wea == 32); # ｸﾛﾑﾊｰﾂ
+
+	# 相手側だけ、武器を持ってないとさらに -100
+	# 結果、素手の相手は統率が -200 される
 	$lea += $wea_modify;
-	$lea = 0 if ($lea < 0);
+	$lea -= 100 unless $wea || $who eq 'm';
+	$lea =  0 if ($lea < 0);
 
 	return $lea;
 }

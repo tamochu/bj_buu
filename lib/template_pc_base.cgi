@@ -391,7 +391,7 @@ sub war_html {
 		$rank_name .= $m{rank_name};
 	}
 	$main_screen .= qq|$m_icon $m{name} [$rank_name] $m_mes<br>|;
-	$main_screen .= qq|$m_tokkou$units[$m{unit}][1] 統率[<b>$m{lea}</b>] <br>|;
+	$main_screen .= qq|$m_tokkou$units[$m{unit}][1] 統率[<b>$m_lea</b>] <br>|;
 	$main_screen .= qq|<table border="0">|;
 	$main_screen .= qq|<tr><td>兵士：</td><td><div class="bar1"><img src="$htmldir/space.gif" style="width: $m_sol_par%"></div></td><td> (<b>$m{sol}</b>兵)<br></td></tr>|;
 	$main_screen .= qq|<tr><td>士気：</td><td><div class="bar2"><img src="$htmldir/space.gif" style="width: $m{sol_lv}%"></div></td><td> (<b>$m{sol_lv}</b>%)<br></td></tr>|;
@@ -399,7 +399,7 @@ sub war_html {
 	$main_screen .= qq|　 VS　 残り$m{turn}ﾀｰﾝ<br>|;
 	my $yrank_name = &get_rank_name($y{rank}, $y{name});
 	$main_screen .= qq|$y_icon $y{name} [$yrank_name] $y_mes<br>|;
-	$main_screen .= qq|$y_tokkou$units[$y{unit}][1] 統率[<b>$y{lea}</b>]<br>|;
+	$main_screen .= qq|$y_tokkou$units[$y{unit}][1] 統率[<b>$y_lea</b>]<br>|;
 	$main_screen .= qq|<table border="0">|;
 	$main_screen .= qq|<tr><td>兵士：</td><td><div class="bar1"><img src="$htmldir/space.gif" style="width: $y_sol_par%"></div></td><td> (<b>$y{sol}</b>兵)<br></td></tr>|;
 	$main_screen .= qq|<tr><td>士気：</td><td><div class="bar2"><img src="$htmldir/space.gif" style="width: $y{sol_lv}%"></div></td><td> (<b>$y{sol_lv}</b>%)<br></td></tr>|;
