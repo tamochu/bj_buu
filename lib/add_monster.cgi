@@ -170,6 +170,7 @@ sub add_monster {
 	$monster .= "$m{wea}<>$m{skills}<>$in{mes_win}<>$in{mes_lose}<>$m_icon<>$m{name}<>\n";
 	
 	my @lines = ();
+	my @removes = ();
 	open my $fh, "+< $logdir/monster/$p_name.cgi" or &error("$logdir/monster/$p_name.cgiﾌｧｲﾙが開けません");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
@@ -181,16 +182,10 @@ sub add_monster {
 			next unless -f "$icondir/$yicon"; # 画像がない
 			my $y_id  = unpack 'H*', $yname;
 			next unless -d "$userdir/$y_id/picture"; # ﾌﾟﾚｲﾔｰが存在しない
-			
+
 			# 魔物から主への手紙
 			my $m_message = $m_messages[ int( rand(@m_messages) ) ];
-			$in{comment}  = qq|$places[$place][2]に住む魔物$ymnameの最後を見届けた$m{name}からの手紙<br><br>|;
-			$in{comment} .= qq|$ymnameの最後の言葉『$m_message$ymes_win』<br>|;
-			$in{comment} .= qq|$ymnameの画像はﾏｲﾋﾟｸﾁｬに戻りました<br>|;
-			$in{comment} .= qq|$ymnameからﾀﾏｺﾞが贈られたようだ<br>|;
-
-			$bad_time = 0;
-			&send_letter($yname);
+			push @removes, "$places[$place][2]<>$ymname<>$m{name}<>$m_message<>$ymes_win<>$yname<>\n";
 			rename "$icondir/$yicon", "$userdir/$y_id/picture/$yicon"; 
 			
 			my $egg_no = $egg_nos[int(rand(@egg_nos))];
@@ -205,8 +200,18 @@ sub add_monster {
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
+
+	# 魔物から主への手紙
+	for my $i (0 .. $#removes) {
+		my($place, $ymname, $mname, $m_message, $ymes_win, $yname) = split /<>/, $removes[$i];
+		$in{comment}  = qq|$placeに住む魔物$ymnameの最後を見届けた$mnameからの手紙<br><br>|;
+		$in{comment} .= qq|$ymnameの最後の言葉『$m_message$ymes_win』<br>|;
+		$in{comment} .= qq|$ymnameの画像はﾏｲﾋﾟｸﾁｬに戻りました<br>|;
+		$in{comment} .= qq|$ymnameからﾀﾏｺﾞが贈られたようだ<br>|;
+
+		$bad_time = 0;
+		&send_letter($yname);
+	}
 }
-
-
 
 1; # 削除不可
