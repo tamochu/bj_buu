@@ -34,6 +34,7 @@ $in{sort} ||= 'addr';
 if    ($in{mode} eq 'admin_delete_user') { &admin_delete_user; }
 elsif ($in{mode} eq 'admin_get_depot_data')   { &admin_get_depot_data; }
 elsif ($in{mode} eq 'admin_get_akindo_data')   { &admin_get_akindo_data; }
+elsif ($in{mode} eq 'admin_get_bank_log')     { &admin_get_bank_log; }
 elsif ($in{mode} eq 'admin_refresh')     { &admin_refresh; }
 elsif ($in{mode} eq 'admin_go_neverland')     { &admin_go_neverland; }
 elsif ($in{mode} eq 'admin_violate')   { &admin_violate; }
@@ -101,7 +102,7 @@ sub top {
 	print qq|ﾘｾｯﾄは、画面に何も表\示されなくなったり、Nextループにはまった状態を修正します。<br>|;
 	print qq|<table class="table1"><tr>|;
 
-	for my $k (qw/削除 ﾛｸﾞｲﾝ 倉庫 商人の店 名前 ﾌｫﾙﾀﾞ ﾘｾｯﾄ 無所属へ 国 IPｱﾄﾞﾚｽ ﾎｽﾄ名 UserAgent(ﾌﾞﾗｳｻﾞ) 更新時間 ｱｸｾｽﾁｪｯｸ/) {
+	for my $k (qw/削除 ﾛｸﾞｲﾝ 倉庫 商人の店 銀行ﾛｸﾞ 名前 ﾌｫﾙﾀﾞ ﾘｾｯﾄ 無所属へ 国 IPｱﾄﾞﾚｽ ﾎｽﾄ名 UserAgent(ﾌﾞﾗｳｻﾞ) 更新時間 ｱｸｾｽﾁｪｯｸ/) {
 		print qq|<th>$k</th>|;
 	}
 	print qq|</tr>|;
@@ -130,6 +131,11 @@ sub top {
 					print qq|<td>|;
 					if (-f "$userdir/$pid/shop_sale_detail.cgi") {
 						print qq|<input type="button" class="button_s" value="商人の店" onClick="location.href='?mode=admin_get_akindo_data&pass=$in{pass}&id=$pid&name=$pname';">|;
+					}
+					print qq|</td>|;
+					print qq|<td>|;
+					if (-f "$userdir/$pid/shop_bank_log.cgi") {
+						print qq|<input type="button" class="button_s" value="銀行ﾛｸﾞ" onClick="location.href='?mode=admin_get_bank_log&pass=$in{pass}&id=$pid&name=$pname';">|;
 					}
 					print qq|</td>|;
 					print qq|<td>$pname</td>|;
@@ -163,6 +169,11 @@ sub top {
 			print qq|<td>|;
 			if (-f "$userdir/$id/shop_sale_detail.cgi") {
 				print qq|<input type="button" class="button_s" value="商人の店" onClick="location.href='?mode=admin_get_akindo_data&pass=$in{pass}&id=$id&name=$name';">|;
+			}
+			print qq|</td>|;
+			print qq|<td>|;
+			if (-f "$userdir/$id/shop_bank_log.cgi") {
+				print qq|<input type="button" class="button_s" value="銀行ﾛｸﾞ" onClick="location.href='?mode=admin_get_bank_log&pass=$in{pass}&id=$id&name=$pname';">|;
 			}
 			print qq|</td>|;
 			print qq|<td>$name</td>|;
@@ -1133,46 +1144,6 @@ sub admin_all_pet_check {
 # 臨時処理(おそらく一度だけの処理の場合その都度ここで処理)
 #=================================================
 sub admin_expendable {
-=pod
-	# 夏祭り用 簡易ｱｻｶﾞｵﾗﾝｷﾝｸﾞ
-	my @morning_glory = ();
-
-	opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
-	while (my $id = readdir $dh) {
-		next if $id =~ /\./;
-		next if $id =~ /backup/;
-
-		my %m = &get_you_datas($id, 1);
-
-		# 夏祭り用
-		unless (-f "$userdir/$id/summer.cgi") {
-			open my $fh, "> $userdir/$id/summer.cgi";
-			close $fh;
-		}
-		open my $fh, "< $userdir/$id/summer.cgi" or &error("そのような名前のﾌﾟﾚｲﾔｰが存在しません");
-		my $line = <$fh>;
-		close $fh;
-
-		for my $hash (split /<>/, $line) {
-			my($k, $v) = split /;/, $hash;
-			$m{$k} = $v;
-		}
-		$m{dummy} = 0;
-
-		push @morning_glory, "$m{name}<>$m{morning_glory}<>\n";
-	}
-	closedir $dh;
-	
-	@morning_glory = map { $_->[0] } sort {$b->[2] <=> $a->[2]} map { [$_, split /<>/] } @morning_glory;
-	my $rank = 1;
-	for my $line (@morning_glory) {
-		my ($name, $height) = split /<>/, $line;
-		my $v = 11 - $rank;
-		my $vv = $rank > 7 ? $rank - 7 : 1;
-		$mes .= "$rank位 $name ${height}mm<br>" if $height;
-		$rank++;
-	}
-=cut
 }
 
 #=================================================
@@ -1404,6 +1375,29 @@ sub admin_get_akindo_data {
 		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
 
 		$mes .= qq|<tr><td>$item</td><td>$y_name</td><td>$ltime2</td></tr>|;
+	}
+	close $fh2;
+	$mes .= qq|</table>|;
+}
+
+#=================================================
+# 銀行の取引履歴
+#=================================================
+sub admin_get_bank_log {
+	my $pid = $in{id};
+
+	$mes .= qq|$in{name}<br>\n|;
+	$mes .= qq|<table><tr><th>銀行</th><th>金額</th><th>取引</th><th>取引日時</th></tr>\n|;
+	open my $fh2, "< $userdir/$pid/shop_bank_log.cgi" or &error("銀行ﾛｸﾞﾌｧｲﾙを開けませんでした");
+	while (my $line = <$fh2>) {
+
+		my($y_name, $type, $money, $ltime) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ltime);
+		$year += 1900;
+		$mon++;
+		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+
+		$mes .= qq|<tr><td>$y_name</td><td>$type</td><td>$money</td><td>$ltime2</td></tr>|;
 	}
 	close $fh2;
 	$mes .= qq|</table>|;

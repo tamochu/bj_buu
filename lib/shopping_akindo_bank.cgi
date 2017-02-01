@@ -1,3 +1,4 @@
+my $this_log = "$userdir/$id/shop_bank_log.cgi";
 #================================================
 # ¤l‚Ì‹âs Created by Merino
 #================================================
@@ -270,9 +271,11 @@ sub tp_110 {
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
-	
+
 	$mes .= "$in{save_money} G“ü‹à‚µ‚Ü‚µ‚½(—a‹àŠz $save_money G)<br>";
 	$m{bank} = $y{name};
+
+	&add_log($m{bank}, "“ü‹à", $in{save_money});
 
 	&run_tutorial_quest('tutorial_bank_1');
 	$mes .= $tutorial_mes;
@@ -386,6 +389,11 @@ sub tp_210 {
 		print $fh @lines;
 	}
 	close $fh;
+
+	if ($is_rewrite) {
+		my $bank = $m{bank} ? $m{bank} : "Œ_–ñI—¹";
+		&add_log($bank, "ˆøo", $in{get_money});
+	}
 
 	if ($v > 0 && $m{name} ne $y{name}) {
 		&send_rishi($v);
@@ -515,6 +523,9 @@ sub tp_310 {
 	
 	$mes .= "$in{save_money} G“ü‹à‚µ‚Ü‚µ‚½(—a‹àŠz $save_money G)<br>";
 	$m{bank} = $y{name};
+
+	&add_log($m{bank}, "“ü‹à", $in{save_money});
+
 	&tp_1;
 }
 
@@ -611,6 +622,11 @@ sub tp_410 {
 	}
 	close $fh;
 
+	if ($is_rewrite) {
+		my $bank = $m{bank} ? $m{bank} : "Œ_–ñI—¹";
+		&add_log($bank, "ˆøo", $in{get_money});
+	}
+
 	&begin;
 }
 
@@ -674,6 +690,42 @@ sub send_rishi {
 	}
 	else {
 		&send_money($y{name}, "y$m{stock}(”N—˜‘ã)z$m{name}", "-$v");
+	}
+}
+
+#=================================================
+# ‹âsÛ¸Ş
+# add_log("‹âs–¼", "ˆøo", money)
+#=================================================
+sub add_log {
+	my ($bank, $type, $money) = @_;
+	my $max_log = 15;
+
+#	my($tmin,$thour,$tmday,$tmon,$tyear) = (localtime($time))[1..4];
+#	$tdate = sprintf("%d/%d %02d:%02d", $tmon+1,$tmday,$thour,$tmin);
+	my $s_mes = "$bank<>$money<>$type<>$time<>";
+
+	if (-f $this_log) {
+		open my $fh, "+< $this_log";
+		eval { flock $fh, 2; };
+		my @log_lines = ();
+		my $log_count = 0;
+		while (my $log_line = <$fh>) {
+			push @log_lines, $log_line;
+			$log_count++;
+			last if $log_count >= $max_log;
+		}
+		unshift @log_lines, "$s_mes\n";
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh @log_lines;
+		close $fh;
+	}
+	else {
+		open my $fh, "> $this_log";
+		print $fh "$s_mes\n";
+		close $fh;
+		chmod $chmod, $this_log;
 	}
 }
 
