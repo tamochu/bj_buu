@@ -22,27 +22,6 @@ my $new_entry_war_c = 100; #100
 $m_lea = &get_wea_modify('m');
 $y_lea = &get_wea_modify('y');
 
-=pod
-# ランダムセレクト用コマンド退避
-my $m_cmd = $cmd;
-if (!$m{war_select_switch} && $m_cmd >= 0 && $m_cmd <= 2) {
-	while (1) {
-		$m_cmd = int(rand(3));
-		if ($m{rest_a} + $m{rest_b} + $m{rest_c} <= 0) {
-			last;
-		}
-		if ($m_cmd eq '0' && $m{rest_a} > 0) {
-			last;
-		}
-		if ($m_cmd eq '1' && $m{rest_b} > 0) {
-			last;
-		}
-		if ($m_cmd eq '2' && $m{rest_c} > 0) {
-			last;
-		}
-	}
-}
-=cut
 #================================================
 # 利用条件
 #================================================
@@ -156,71 +135,7 @@ sub tp_100 {
 		$m{sol} += $v;
 		$mes .= "なんと、$cs{name}[$union]から$v兵の援軍が駆けつけた!<br>";
 	}
-=pod
-	# 配牌
-	if ($m{war_select_switch}) {
-		$m{rest_a} = 0;
-		$m{rest_b} = 0;
-		$m{rest_c} = 0;
-		$y{rest_a} = 0;
-		$y{rest_b} = 0;
-		$y{rest_c} = 0;
-		
-		my $idx = 0;
-		for my $cnt (1..$m{turn}) {
-			unless ($units[$m{unit}][7][$idx]) {
-				$idx = 0;
-			}
-			
-			if ($units[$m{unit}][7][$idx] eq '1') {
-				$m{rest_a}++;
-			} elsif ($units[$m{unit}][7][$idx] eq '2') {
-				$m{rest_b}++;
-			} elsif ($units[$m{unit}][7][$idx] eq '3') {
-				$m{rest_c}++;
-			} else {
-				if (rand(3) < 1) {
-					$m{rest_a}++;
-				} elsif (rand(2) < 1) {
-					$m{rest_b}++;
-				} else {
-					$m{rest_c}++;
-				}
-			}
-			$idx++;
-		}
-		$idx = 0;
-		for my $cnt (1..$m{turn}) {
-			unless ($units[$y{unit}][7][$idx]) {
-				$idx = 0;
-			}
-			
-			if ($units[$y{unit}][7][$idx] eq '1') {
-				$y{rest_a}++;
-			} elsif ($units[$y{unit}][7][$idx] eq '2') {
-				$y{rest_b}++;
-			} elsif ($units[$y{unit}][7][$idx] eq '3') {
-				$y{rest_c}++;
-			} else {
-				if (rand(3) < 1) {
-					$y{rest_a}++;
-				} elsif (rand(2) < 1) {
-					$y{rest_b}++;
-				} else {
-					$y{rest_c}++;
-				}
-			}
-			$idx++;
-		}
-	} else {
-		$m{rest_a} = $m{turn};
-		$m{rest_b} = $m{turn};
-		$m{rest_c} = $m{turn};
-		$y{rest_a} = $m{turn};
-		$y{rest_b} = $m{turn};
-		$y{rest_c} = $m{turn};
-	}
-=cut
+
 	if ($config_test) {
 		$y{sol} /= 10;
 	}
@@ -240,8 +155,6 @@ sub tp_110 {
 	$mes .= "今回の作戦の限界ﾀｰﾝは $m{turn} ﾀｰﾝです<br>";
 	$mes .= "$m{name}軍 $m{sol}人 VS $y{name}軍 $y{sol}人<br>";
 	$mes .= '攻め込む陣形を選んでください<br>';
-#	$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
-#	$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
 	&menu(@war_forms,'退却');
 
 	$m{tp} += 10;
@@ -279,29 +192,9 @@ sub loop_menu {
 	$mes .= "残り$m{turn} ﾀｰﾝ<br>";
 	$mes .= "$m{name}軍 $m{sol}人 VS $y{name}軍 $y{sol}人<br>";
 	$mes .= '攻め込む陣形を選んでください<br>';
-#	$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
-#	$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
 	&menu(@war_forms);
 }
-=pod
-sub _rest_check {
-	if ($m{rest_a} + $m{rest_b} + $m{rest_c} > 0) {
-		if ($m_cmd eq '0' && $m{rest_a} <= 0) {
-			$mes .= '残り回数がありません<br>';
-			return 0;
-		}
-		if ($m_cmd eq '1' && $m{rest_b} <= 0) {
-			$mes .= '残り回数がありません<br>';
-			return 0;
-		}
-		if ($m_cmd eq '2' && $m{rest_c} <= 0) {
-			$mes .= '残り回数がありません<br>';
-			return 0;
-		}
-	}
-	return 1;
-}
-=cut
+
 sub tp_190 {
 
 # 元のは $cmd が空だと 0 判定されてじゃんけんが進む
@@ -310,17 +203,6 @@ sub tp_190 {
 #	if ($m_cmd >= 0 && $m_cmd <= 2 && &_rest_check) {
 	if (defined($cmd) && $cmd >= 0 && $cmd <= 2) {
 		--$m{turn};
-=pod
-		if ($m_cmd eq '0') {
-			$m{rest_a}--;
-		}
-		if ($m_cmd eq '1') {
-			$m{rest_b}--;
-		}
-		if ($m_cmd eq '2') {
-			$m{rest_c}--;
-		}
-=cut
 		$mes .= "残り$m{turn}ﾀｰﾝ<br>";
 		&_crash;
 		
@@ -357,9 +239,6 @@ sub tp_190 {
 		}
 		else {
 			$mes .= '攻め込む陣形を選んでください<br>';
-#			$mes .= "自分 $war_forms[0]:$m{rest_a}回 $war_forms[1]:$m{rest_b}回 $war_forms[2]:$m{rest_c}回<br>";
-#			$mes .= "相手 $war_forms[0]:$y{rest_a}回 $war_forms[1]:$y{rest_b}回 $war_forms[2]:$y{rest_c}回<br>";
-
 			# 一騎打ち出現確立
 			if ($y{wea} eq 'no_single') {
 				&menu(@war_forms,'退却');
@@ -378,7 +257,6 @@ sub tp_190 {
 			}
 		}
 	}
-#	elsif ($m_cmd eq '3' && $m{tp} eq '120') {
 	elsif ($cmd eq '3' && $m{tp} eq '120') {
 		$m_mes = '全軍退却!!';
 
@@ -403,7 +281,6 @@ sub tp_190 {
 			&loop_menu;
 		}
 	}
-#	elsif ($m_cmd eq '3' && $m{tp} eq '130') {
 	elsif ($cmd eq '3' && $m{tp} eq '130') {
 		$m_mes = "$y{name}と一騎打ち願いたい!";
 
@@ -440,152 +317,32 @@ sub tp_190 {
 #================================================
 # 陣形戦結果
 #================================================
-=pod
-sub _ai {
-	my @y_cmds = (0, 1, 2);
-	my $y_cmd;
-
-	if ($m{rest_a} + $m{rest_b} <= 0){
-		if ($y{rest_b} > 0) {
-			@y_cmds = (1);
-		} elsif ($y{rest_c} > 0) {
-			@y_cmds = (2);
-		}
-	} elsif ($m{rest_b} + $m{rest_c} <= 0) {
-		if ($y{rest_c} > 0) {
-			@y_cmds = (2);
-		} elsif ($y{rest_a} > 0) {
-			@y_cmds = (0);
-		}
-	} elsif ($m{rest_c} + $m{rest_a} <= 0) {
-		if ($y{rest_a} > 0) {
-			@y_cmds = (0);
-		} elsif ($y{rest_b} > 0) {
-			@y_cmds = (1);
-		}
-	} elsif ($m{rest_a} <= 0 && $y{rest_a} + $y{rest_b} > 0) {
-		@y_cmds = (0, 1);
-	} elsif ($m{rest_b} <= 0 && $y{rest_b} + $y{rest_c} > 0) {
-		@y_cmds = (1, 2);
-	} elsif ($m{rest_c} <= 0 && $y{rest_c} + $y{rest_a} > 0) {
-		@y_cmds = (0, 2);
-	}
-
-	while (1) {
-		$y_cmd = $y_cmds[int(rand(@y_cmds))];
-		if ($y{rest_a} + $y{rest_b} + $y{rest_c} <= 0) {
-			last;
-		}
-		if ($y_cmd eq '0' && $y{rest_a} > 0) {
-			last;
-		}
-		if ($y_cmd eq '1' && $y{rest_b} > 0) {
-			last;
-		}
-		if ($y_cmd eq '2' && $y{rest_c} > 0) {
-			last;
-		}
-	}
-	return $y_cmd;
-}
-=cut
 sub _crash {
-=pod
-	my $y_cmd = &_ai;
-	if ($y_cmd eq '0') {
-		$y{rest_a}--;
-	}
-	if ($y_cmd eq '1') {
-		$y{rest_b}--;
-	}
-	if ($y_cmd eq '2') {
-		$y{rest_c}--;
-	}
-	
-	$m_mes = $war_forms[$m_cmd];
-	$y_mes = $war_forms[$y_cmd];
-=cut
 	my $y_cmd = int(rand(3));
 
 	$m_mes = $war_forms[$cmd];
 	$y_mes = $war_forms[$y_cmd];
 
 	my $result = 'lose';
-#	if ($m_cmd eq '0') {
 	if ($cmd eq '0') {
 		$result = $y_cmd eq '1' ? 'win'
 				: $y_cmd eq '2' ? 'lose'
 				:				  'draw'
 				;
 	}
-#	elsif ($m_cmd eq '1') {
 	elsif ($cmd eq '1') {
 		$result = $y_cmd eq '2' ? 'win'
 				: $y_cmd eq '0' ? 'lose'
 				:				  'draw'
 				;
 	}
-#	elsif ($m_cmd eq '2') {
 	elsif ($cmd eq '2') {
 		$result = $y_cmd eq '0' ? 'win'
 				: $y_cmd eq '1' ? 'lose'
 				:				  'draw'
 				;
 	}
-	
-=pod
-	my $m_lea = $m{lea};
-	my $y_lea = $y{lea};
-	my $m_min_wea;
-	if($weas[$m{wea}][2] eq '剣'){
-		$m_min_wea = 1;
-	}elsif($weas[$m{wea}][2] eq '槍'){
-		$m_min_wea = 6;
-	}elsif($weas[$m{wea}][2] eq '斧'){
-		$m_min_wea = 11;
-	}elsif($weas[$m{wea}][2] eq '炎'){
-		$m_min_wea = 16;
-	}elsif($weas[$m{wea}][2] eq '風'){
-		$m_min_wea = 21;
-	}elsif($weas[$m{wea}][2] eq '雷'){
-		$m_min_wea = 26;
-	}elsif($m{wea} == 0){
-		$m_min_wea = 0;
-	}else{
-		$m_min_wea = 33;
-	}
-	my $y_min_wea;
-	if($weas[$y{wea}][2] eq '剣'){
-		$y_min_wea = 1;
-	}elsif($weas[$y{wea}][2] eq '槍'){
-		$y_min_wea = 6;
-	}elsif($weas[$y{wea}][2] eq '斧'){
-		$y_min_wea = 11;
-	}elsif($weas[$y{wea}][2] eq '炎'){
-		$y_min_wea = 16;
-	}elsif($weas[$y{wea}][2] eq '風'){
-		$y_min_wea = 21;
-	}elsif($weas[$y{wea}][2] eq '雷'){
-		$y_min_wea = 26;
-	}else{
-		$y_min_wea = 33;
-	}
-	$m_wea_modify = $weas[$m{wea}][5] - $weas[$m_min_wea][5];
-	$m_wea_modify -= 100 unless $m{wea};
-	$m_wea_modify = 100 if ($m{wea} == 14);
-	$m_wea_modify = 0 if ($m{wea} == 31);
-	$m_wea_modify = 100 if ($m{wea} == 32);
-	$m_lea += $m_wea_modify;
-	$m_lea =  0 if ($m_lea < 0);
-	$y_wea_modify = $weas[$y{wea}][5] - $weas[$y_min_wea][5];
-	$y_wea_modify -= 100 unless $y{wea};
-	$y_wea_modify = 100 if ($y{wea} == 14);
-	$y_wea_modify = 0 if ($y{wea} == 31);
-	$y_wea_modify = 100 if ($y{wea} == 32);
-	$y_lea += $y_wea_modify;
-	$y_lea -= 100 unless $y{wea};
-	$y_lea =  0 if ($y_lea < 0);
-=cut
+
 	$m_lea = &get_wea_modify('m');
 	$y_lea = &get_wea_modify('y');
 
@@ -732,10 +489,11 @@ sub _get_war_you_data {
 	}
 	
 	# ｼｬﾄﾞｳ or NPC
-	# 前回の戦争相手のﾍﾟｯﾄﾃﾞｰﾀを引き継がせないようにﾍﾟｯﾄ初期化（ﾌﾞﾚﾊ継続問題）
+	# %y に格納されているﾃﾞｰﾀの一部を引き継がせないように初期化（ｼｬﾄﾞｳ・NPCがﾌﾞﾚﾊを持っていたり防具を持っている問題）
 	# ﾁｷﾝは待ち伏せ処理に入ると発動するのでｼｬﾄﾞｳ or NPCには直接関係ない
 	# 問題は、ﾁｷﾝ持ちかどうかを武器にして判定している（一騎打ちしないし変数使い回しちゃえ？）ので、武器による統率補正がおそらくバグってること
-	$y{pet} = 0; 
+	$y{gua} = 0; # 防具についてはイジる余地あり？　修行と一騎打ちで結果違っちゃうし
+	$y{pet} = 0;
 	($pets[$m{pet}][2] eq 'no_shadow' && $w{world} ne '17') || int(rand(3 / $war_mod)) == 0 || ($w{world} eq '7' || ($w{world} eq '19' && $w{world_sub} eq '7'))
 		? &_get_war_npc_data : &_get_war_shadow_data;
 }
