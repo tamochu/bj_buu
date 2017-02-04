@@ -1310,7 +1310,7 @@ sub alltime_event {
 			&super_attack('random');
 		}
 	}
-	&debug_log("$m{lib}:$m{tp}", 'play_log');
+#	&debug_log("$m{lib}:$m{tp}", 'play_log');
 }
 
 #================================================
@@ -2005,6 +2005,7 @@ sub run_tutorial_quest {
 	# ｽﾀﾝﾌﾟｺﾝﾌﾟﾘｰﾄ
 	if ($m{tutorial_quest_stamp_c} eq $tutorial_quest_stamps) {
 		&success_quest_mes("すべてのｽﾀﾝﾌﾟを集めました！<br>ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞを終了します。ﾁｭｰﾄﾘｱﾙﾓｰﾄﾞの切り替えはﾏｲﾙｰﾑ→個人設定からできます");
+		&write_tutorial;
 		$m{tutorial_switch} = 0;
 	}
 
