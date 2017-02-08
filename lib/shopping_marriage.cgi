@@ -154,6 +154,8 @@ sub tp_120 {
 	}
 	
 	my $is_rewrite = 0;
+	my $is_approach = 0;
+	my $you = '';
 	my @lines = ();
 	open my $fh, "+< $this_file" or &error("$this_file ‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
@@ -165,14 +167,8 @@ sub tp_120 {
 				$is_rewrite = 1;
 			}
 			elsif ( &is_unmarried($name) ) { # ‘¶İ‚·‚é + –¢¥‚È‚ç
-				$in{comment} .= "<hr>yŒ‹¥‘Š’kŠF$m{name}—l‚©‚ç$name—lˆ¶z";
-				$in{comment} .= "™ÌßÛÎß°½Ş™" if $in{is_proposal};
-				&send_letter($name);
-				$mes .= "$name‚É±ÌßÛ°Á‚Ìè†‚ğ‘—‚è‚Ü‚µ‚½<br>";
-				
-				# ÌßÛÎß°½Ş
-				&proposal($name) if $in{is_proposal};
-				
+				$is_approach = 1;
+				$you = $line;
 				push @lines, $line;
 			}
 			else {
@@ -195,7 +191,18 @@ sub tp_120 {
 		print $fh @lines;
 	}
 	close $fh;
-	
+
+	if ($is_approach) {
+		my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $you;
+		$in{comment} .= "<hr>yŒ‹¥‘Š’kŠF$m{name}—l‚©‚ç$name—lˆ¶z";
+		$in{comment} .= "™ÌßÛÎß°½Ş™" if $in{is_proposal};
+		&send_letter($name);
+		$mes .= "$name‚É±ÌßÛ°Á‚Ìè†‚ğ‘—‚è‚Ü‚µ‚½<br>";
+
+		# ÌßÛÎß°½Ş
+		&proposal($name) if $in{is_proposal};
+	}
+
 	&begin;
 }
 
@@ -358,6 +365,8 @@ sub tp_300 {
 }
 # Œ‹¥
 sub tp_310 {
+	my $is_marriage = 0;
+	my $you = '';
 	if ($cmd && $pets[$m{pet}][2] eq 'marriage' || (($pets[$m{pet}][2] eq 'marriage_y' ||$pets[$m{pet}][2] eq 'marriage_b') && $m{pet_c} >= 5)) {
 		my $is_rewrite = 0;
 		my @lines = ();
@@ -372,22 +381,8 @@ sub tp_310 {
 					$is_rewrite = 1;
 				}
 				elsif ( &is_unmarried($name) ) {
-					my @plines = ();
-					open my $pfh, "+< $userdir/$id/proposal.cgi" or &error("$userdir/$id/proposal.cgiÌ§²Ù‚ªŠJ‚«‚Ü‚¹‚ñ");
-					eval { flock $pfh, 2; };
-					while (my $pline = <$pfh>) {
-						my($pname) = (split /<>/, $pline)[2];
-						next if $pname eq $name;
-						push @plines, $pline
-					}
-					my($last_no) = (split /<>/, $plines[0])[0];
-					++$last_no;
-					unshift @plines, "$last_no<>$mdate<>$name<>$country<>$lv<>$rank<>$shogo<>$message<>$icon<>\n";
-					seek  $pfh, 0, 0;
-					truncate $pfh, 0;
-					print $pfh @plines;
-					close $pfh;
-					$c = $last_no;
+					$is_marriage = 1;
+					$you = $line;
 					push @lines, $line;
 				}
 				else {
@@ -405,6 +400,27 @@ sub tp_310 {
 			print $tfh @lines;
 		}
 		close $tfh;
+
+		if ($is_marriage) {
+			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $you;
+			my @plines = ();
+			open my $pfh, "+< $userdir/$id/proposal.cgi" or &error("$userdir/$id/proposal.cgiÌ§²Ù‚ªŠJ‚«‚Ü‚¹‚ñ");
+			eval { flock $pfh, 2; };
+			while (my $pline = <$pfh>) {
+				my($pname) = (split /<>/, $pline)[2];
+				next if $pname eq $name;
+				push @plines, $pline
+			}
+			my($last_no) = (split /<>/, $plines[0])[0];
+			++$last_no;
+			unshift @plines, "$last_no<>$mdate<>$name<>$country<>$lv<>$rank<>$shogo<>$message<>$icon<>\n";
+			seek  $pfh, 0, 0;
+			truncate $pfh, 0;
+			print $pfh @plines;
+			close $pfh;
+			$c = $last_no;
+		}
+
 		if($c){
 			$cmd = $c;
 			&remove_pet if($pets[$m{pet}][2] eq 'marriage');
@@ -414,60 +430,16 @@ sub tp_310 {
 	}
 
 	if ($cmd) {
-		my $is_marriage = 0;
+		$is_marriage = 0;
+		$you = '';
 		open my $fh, "+< $userdir/$id/proposal.cgi" or &error("$userdir/$id/proposal.cgi Ì§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
 			if ($cmd eq $no) {
 				if ( &is_unmarried($name) ) {
-					$mes .= "$name‚ÆŒ‹¥‚·‚é‚±‚Æ‚ÉŒˆ‚ß‚Ü‚µ‚½!<br>";
-					
-					# ‘Šè‚ÌŒ‹¥€–Ú‚ğ•ÏX
-					&regist_you_data($name, 'marriage', $m{name});
-					
-					$m{marriage} = $name;
 					$is_marriage = 1;
-					if($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24'){
-						$m{job} = 0;
-					}
-					
-					# ‘Šè‚Ìv‚¢oÌ§²Ù‚É‘‚«‚İ
-					&write_memory("$m{name}‚ÆŒ‹¥‚µ‚Ü‚µ‚½™", $name);
-					&write_memory("$name‚ÆŒ‹¥‚µ‚Ü‚µ‚½™");
-					my %you_datas = &get_you_datas($name);
-					my $v = int( ($rank_sols[$you_datas{rank}] + $rank_sols[$m{rank}]) * 0.5);
-					if($m{sex} eq $you_datas{sex}) {
-						&write_world_news(qq|<font color="#8a2be2">ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
-						&send_twitter("ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
-						if(int(rand(5)) == 0){
-							&remove_pet;
-						}elsif(int(rand(5)) == 0 && ($pets[$you_datas{pet}][2] eq 'marriage_y' || $pets[$you_datas{pet}][2] eq 'marriage_b')) {
-#							&regist_you_data($name, 'pet', 0);
-							my @data = (
-								['pet', 0],
-								['icon_pet', ''],
-								['icon_pet_lv', 0],
-								['icon_pet_exp', 0],
-							);
-							&regist_you_array($name, @data);
-						}
-						$v *= 3;
-					}else {
-						&write_world_news(qq|<font color="#FF99FF">ƒ™:ß*'Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
-						&send_twitter("ƒ™:ß*'Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
-					}
-					if($you_datas{job} eq '22' || $you_datas{job} eq '23' || $you_datas{job} eq '24'){
-						&regist_you_data($name, 'job', 0);
-					}
-					
-					&send_money($name,    'Œ‹¥j‚¢‹à', $v);
-					&send_money($m{name}, 'Œ‹¥j‚¢‹à', $v);
-					
-					# “o˜^‚³‚ê‚Ä‚¢‚é–¼‘O‚ğíœ
-					&delete_entry_marriage($m{name});
-					&delete_entry_marriage($name);
-					
+					$you = $line;
 					last;
 				}
 			}
@@ -479,8 +451,58 @@ sub tp_310 {
 		truncate $fh, 0;
 		print $fh @lines unless $is_marriage; # Œ‹¥‚ğ‘I‘ğ‚µ‚½‚ªA‰½‚ç‚©‚Ì–â‘è‚ÅŒ‹¥‚Å‚«‚¸A‚»‚Ìl‚ğœ‚«ã‘‚«
 		close $fh;
+
+		if ($is_marriage) {
+			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $you;
+			$mes .= "$name‚ÆŒ‹¥‚·‚é‚±‚Æ‚ÉŒˆ‚ß‚Ü‚µ‚½!<br>";
+			
+			# ‘Šè‚ÌŒ‹¥€–Ú‚ğ•ÏX
+			&regist_you_data($name, 'marriage', $m{name});
+			
+			$m{marriage} = $name;
+			$is_marriage = 1;
+			if($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24'){
+				$m{job} = 0;
+			}
+			
+			# ‘Šè‚Ìv‚¢oÌ§²Ù‚É‘‚«‚İ
+			&write_memory("$m{name}‚ÆŒ‹¥‚µ‚Ü‚µ‚½™", $name);
+			&write_memory("$name‚ÆŒ‹¥‚µ‚Ü‚µ‚½™");
+			my %you_datas = &get_you_datas($name);
+			my $v = int( ($rank_sols[$you_datas{rank}] + $rank_sols[$m{rank}]) * 0.5);
+			if($m{sex} eq $you_datas{sex}) {
+				&write_world_news(qq|<font color="#8a2be2">ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
+				&send_twitter("ƒ™:ß*'“¯«Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
+				if(int(rand(5)) == 0){
+					&remove_pet;
+				}elsif(int(rand(5)) == 0 && ($pets[$you_datas{pet}][2] eq 'marriage_y' || $pets[$you_datas{pet}][2] eq 'marriage_b')) {
+					#&regist_you_data($name, 'pet', 0);
+					my @data = (
+						['pet', 0],
+						['icon_pet', ''],
+						['icon_pet_lv', 0],
+						['icon_pet_exp', 0],
+					);
+					&regist_you_array($name, @data);
+				}
+				$v *= 3;
+			}else {
+				&write_world_news(qq|<font color="#FF99FF">ƒ™:ß*'Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½</font>|);
+				&send_twitter("ƒ™:ß*'Œ‹¥'*ß:™„$m{name}‚Æ$name‚ªŒ‹¥‚µ‚Ü‚µ‚½");
+			}
+			if($you_datas{job} eq '22' || $you_datas{job} eq '23' || $you_datas{job} eq '24'){
+				&regist_you_data($name, 'job', 0);
+			}
+			
+			&send_money($name,    'Œ‹¥j‚¢‹à', $v);
+			&send_money($m{name}, 'Œ‹¥j‚¢‹à', $v);
+			
+			# “o˜^‚³‚ê‚Ä‚¢‚é–¼‘O‚ğíœ
+			&delete_entry_marriage($m{name});
+			&delete_entry_marriage($name);
+		}
 	}
-	
+
 	&begin;
 }
 
