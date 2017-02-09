@@ -1,11 +1,11 @@
 my $entry_file = $m{sex} eq '1' ? "$logdir/marriage_man.cgi" : "$logdir/marriage_woman.cgi";
 #my $this_file  = $m{sex} eq '2' ? "$logdir/marriage_man.cgi" : "$logdir/marriage_woman.cgi";
 my $this_file;
-if (($m{sex} eq '2' && $pets[$m{pet}][2] ne 'marriage_y') || ($m{sex} eq '1' && $pets[$m{pet}][2] eq 'marriage_b')){
-   $this_file  = "$logdir/marriage_man.cgi";
-   }
-   else{
-   $this_file = "$logdir/marriage_woman.cgi";
+if (($m{sex} eq '2' && $pets[$m{pet}][2] ne 'marriage_y') || ($m{sex} eq '1' && $pets[$m{pet}][2] eq 'marriage_b')) {
+	$this_file  = "$logdir/marriage_man.cgi";
+}
+else {
+	$this_file = "$logdir/marriage_woman.cgi";
 }
 #================================================
 # 結婚相談所 Created by Merino
@@ -19,7 +19,6 @@ my $need_lv = 20;
 
 # 登録料,ﾌﾟﾛﾎﾟｰｽﾞ料
 my $need_money = $m{sedai} > 20 ? int(40000+$m{lv}*1000) : int($m{sedai}*2000+$m{lv}*1000);
-
 
 #================================================
 # 利用条件
@@ -92,7 +91,7 @@ sub tp_100 {
 	$mes .= qq|</table>| unless $is_mobile;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="ｱﾌﾟﾛｰﾁする" class="button1"></p></form>|;
-	
+
 	$m{tp} += 10;
 }
 # ------------------
@@ -102,7 +101,7 @@ sub tp_110 {
 		&begin;
 		return;
 	}
-	
+
 	my $send_to;
 	open my $fh, "< $this_file" or &error("$this_file が開けません");
 	while (my $line = <$fh>) {
@@ -123,7 +122,7 @@ sub tp_110 {
 	$layout = 1;
 	$mes .= "ｱﾌﾟﾛｰﾁ(相手にﾒｯｾｰｼﾞを送る)は無料です<br>";
 	$mes .= "ﾌﾟﾛﾎﾟｰｽﾞは、成功しても失敗しても $need_money Gかかりますので、<br>ﾌﾟﾛﾎﾟｰｽﾞは親密な関係になってからにしましょう<br>";
-	
+
 	my $rows = $is_mobile ? 2 : 6;
 	$mes .= qq|<form method="$method" action="$script"><input type="hidden" name="cmd" value="$cmd">|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -134,7 +133,7 @@ sub tp_110 {
 	$m{tp} += 10;
 }
 # ------------------
-sub tp_120 {
+sub tp_120 { # flock
 	if (!$in{comment}) {
 		$mes .= '本文がありません<br>';
 		&begin;
@@ -152,10 +151,10 @@ sub tp_120 {
 			return;
 		}
 	}
-	
+
+	my $you = ''; # ｱﾌﾟﾛｰﾁの対象者
+
 	my $is_rewrite = 0;
-	my $is_approach = 0;
-	my $you = '';
 	my @lines = ();
 	open my $fh, "+< $this_file" or &error("$this_file が開けません");
 	eval { flock $fh, 2; };
@@ -167,20 +166,21 @@ sub tp_120 {
 				$is_rewrite = 1;
 			}
 			elsif ( &is_unmarried($name) ) { # 存在する + 未婚なら
-				$is_approach = 1;
 				$you = $line;
 				push @lines, $line;
 			}
-			else {
+			else { # 存在する + 既婚 or 存在しない
 				if (($m{sex} eq '2' && $pets[$m{pet}][2] eq 'marriage_y') || ($m{sex} eq '1' && $pets[$m{pet}][2] eq 'marriage_b')){
-					$is_rewrite = 0;
-   				}
-				else{
+					$is_rewrite = 0; # ﾕﾘﾊﾞﾗだと更新しない？ ﾕﾘﾊﾞﾗのｴﾛｽ効果？
+   			}
+				else {
 					$is_rewrite = 1;
 				}
 			}
 		}
 		else {
+			# 大したことじゃないけど、すでに登録されている非存在のPCと同じ名前に改名すると登録料踏み倒せそう
+			# それよりも非存在のｷｬﾗを表示されても邪魔だから登録時に排除 tp_210
 			push @lines, $line;
 		}
 	}
@@ -192,7 +192,7 @@ sub tp_120 {
 	}
 	close $fh;
 
-	if ($is_approach) {
+	if ($you) {
 		my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $you;
 		$in{comment} .= "<hr>【結婚相談所：$m{name}様から$name様宛】";
 		$in{comment} .= "☆ﾌﾟﾛﾎﾟｰｽﾞ☆" if $in{is_proposal};
@@ -208,10 +208,10 @@ sub tp_120 {
 
 # ------------------
 # ﾌﾟﾛﾎﾟｰｽﾞ
-sub proposal {
+sub proposal { # flock
 	my $name = shift;
-	
 	my $y_id = unpack 'H*', $name;
+
 	my @lines = ();
 	open my $fh, "+< $userdir/$y_id/proposal.cgi" or &error("$userdir/$y_id/proposal.cgiﾌｧｲﾙが開きません");
 	eval { flock $fh, 2; };
@@ -263,7 +263,7 @@ sub tp_200 {
 	$mes .= qq|　 <input type="checkbox" name="cmd" value="1" checked>登録する</form>|;
 	$m{tp} += 10;
 }
-sub tp_210 {
+sub tp_210 { # flock
 	return if &is_ng_cmd(1);
 
 	my $is_find = 0;
@@ -276,7 +276,7 @@ sub tp_210 {
 			$is_find = 1;
 			last;
 		}
-		push @lines, $line;
+		push @lines, $line;# if &you_exists($name); # 非存在のｷｬﾗは消去したいが、タイミングによってはﾃﾞｰﾀの範囲外にアクセスされるためにリスト埋まるようにしている？
 
 		last if @lines >= $max_marriage_list+1;
 	}
@@ -305,7 +305,6 @@ sub tp_210 {
 	
 	&begin;
 }
-
 
 #================================================
 # 婚約する
@@ -364,9 +363,9 @@ sub tp_300 {
 	}
 }
 # 結婚
-sub tp_310 {
-	my $is_marriage = 0;
+sub tp_310 { # flock
 	my $you = '';
+	# ｴﾛｽ・ﾕﾘ・ﾊﾞﾗ
 	if ($cmd && $pets[$m{pet}][2] eq 'marriage' || (($pets[$m{pet}][2] eq 'marriage_y' ||$pets[$m{pet}][2] eq 'marriage_b') && $m{pet_c} >= 5)) {
 		my $is_rewrite = 0;
 		my @lines = ();
@@ -381,7 +380,6 @@ sub tp_310 {
 					$is_rewrite = 1;
 				}
 				elsif ( &is_unmarried($name) ) {
-					$is_marriage = 1;
 					$you = $line;
 					push @lines, $line;
 				}
@@ -393,7 +391,7 @@ sub tp_310 {
 				push @lines, $line;
 			}
 		}
-	# 存在しない人、性転換した人、既婚の人がいたら書き換え
+		# 存在しない人、性転換した人、既婚の人がいたら書き換え
 		if ($is_rewrite) {
 			seek  $tfh, 0, 0;
 			truncate $tfh, 0;
@@ -401,7 +399,7 @@ sub tp_310 {
 		}
 		close $tfh;
 
-		if ($is_marriage) {
+		if ($you) {
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $you;
 			my @plines = ();
 			open my $pfh, "+< $userdir/$id/proposal.cgi" or &error("$userdir/$id/proposal.cgiﾌｧｲﾙが開きません");
@@ -429,9 +427,9 @@ sub tp_310 {
 		}
 	}
 
+	$you = '';
 	if ($cmd) {
-		$is_marriage = 0;
-		$you = '';
+		my $is_marriage = 0;
 		open my $fh, "+< $userdir/$id/proposal.cgi" or &error("$userdir/$id/proposal.cgi ﾌｧｲﾙが読み込めません");
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
@@ -453,18 +451,19 @@ sub tp_310 {
 		close $fh;
 
 		if ($is_marriage) {
+			my @you_data;
+
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $you;
 			$mes .= "$nameと結婚することに決めました!<br>";
-			
+
 			# 相手の結婚項目を変更
-			&regist_you_data($name, 'marriage', $m{name});
-			
+			push @you_data, (['marriage', $m{name}]);
+
 			$m{marriage} = $name;
-			$is_marriage = 1;
 			if($m{job} eq '22' || $m{job} eq '23' || $m{job} eq '24'){
 				$m{job} = 0;
 			}
-			
+
 			# 相手の思い出ﾌｧｲﾙに書き込み
 			&write_memory("$m{name}と結婚しました☆", $name);
 			&write_memory("$nameと結婚しました☆");
@@ -477,13 +476,12 @@ sub tp_310 {
 					&remove_pet;
 				}elsif(int(rand(5)) == 0 && ($pets[$you_datas{pet}][2] eq 'marriage_y' || $pets[$you_datas{pet}][2] eq 'marriage_b')) {
 					#&regist_you_data($name, 'pet', 0);
-					my @data = (
+					push @you_data, (
 						['pet', 0],
 						['icon_pet', ''],
 						['icon_pet_lv', 0],
 						['icon_pet_exp', 0],
-					);
-					&regist_you_array($name, @data);
+						);
 				}
 				$v *= 3;
 			}else {
@@ -491,15 +489,16 @@ sub tp_310 {
 				&send_twitter("＜☆:ﾟ*'結婚'*ﾟ:☆＞$m{name}と$nameが結婚しました");
 			}
 			if($you_datas{job} eq '22' || $you_datas{job} eq '23' || $you_datas{job} eq '24'){
-				&regist_you_data($name, 'job', 0);
+				push @you_data, (['job', 0]);
 			}
-			
+			&regist_you_array($name, @you_data); # ﾌｧｲﾙｵｰﾌﾟﾝ数3回→1回に圧縮
+			undef @you_data;
+
 			&send_money($name,    '結婚祝い金', $v);
 			&send_money($m{name}, '結婚祝い金', $v);
-			
+
 			# 登録されている名前を削除
-			&delete_entry_marriage($m{name});
-			&delete_entry_marriage($name);
+			&delete_entry_marriage($m{name}, $name); # ﾌｧｲﾙｵｰﾌﾟﾝ数4回→最高2回に圧縮
 		}
 	}
 
@@ -563,22 +562,35 @@ sub is_entry_marriage {
 #================================================
 # 登録削除
 #================================================
-sub delete_entry_marriage {
-	my $del_name = shift || $m{name};
-	
-	for my $file ($entry_file, $this_file) {
+sub delete_entry_marriage { # flock
+#	my $del_name = shift || $m{name};
+	my @del_names = @_;
+
+	# ﾌｧｲﾙｵｰﾌﾟﾝ数削減
+	# 無改造だと男女両方のﾌｧｲﾙを操作するため必ず2回開く必要があるが、ﾕﾘﾊﾞﾗは1回に済むので省略
+	# また、性転換した場合などを想定すると取りこぼす可能性があるが黒豚鯖からそうだし別の処理で排除されるため無視
+	my @files;
+	@files = $entry_file eq $this_file ? ($entry_file) : ($entry_file, $this_file);
+
+	for my $file (@files) {
 		my $is_rewrite = 0;
 		my @lines = ();
 		open my $fh, "+< $file" or &error("$fileﾌｧｲﾙが開けません");
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			my($no, $mdate, $name, $country, $lv, $rank, $shogo, $message, $icon) = split /<>/, $line;
-			if ($name eq $del_name) {
-				$is_rewrite = 1;
+			my $is_not_find = 0;
+			for my $del_name (@del_names) {
+				if ($name eq $del_name) {
+					$is_rewrite = 1;
+					$is_not_find = 0;
+					last;
+				}
+				else {
+					$is_not_find = 1;
+				}
 			}
-			else {
-				push @lines, $line;
-			}
+			push @lines, $line if $is_not_find;
 		}
 		if ($is_rewrite) {
 			seek  $fh, 0, 0;
@@ -588,6 +600,5 @@ sub delete_entry_marriage {
 		close $fh;
 	}
 }
-
 
 1; # 削除不可
