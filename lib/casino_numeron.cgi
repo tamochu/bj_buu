@@ -126,9 +126,10 @@ sub run {
 	close $fh;
 }
 
-sub get_member {
+sub get_member { # flock
 	my $is_find = 0;
 	my $leave_name = '';
+	my @leave_members = ();
 	my $member  = '';
 	my @members = ();
 	my %sames = ();
@@ -146,11 +147,12 @@ sub get_member {
 		if ($time - $limit_member_time > $mtime) {
 			if($mturn > 0){
 				$leave_name = $mname if $state ne 'waiting';
-				&you_c_reset($mname);
+				push @leave_members, $mname;
 			}else {
 				next;
 			}
 		}
+		# push @leave_members, $mname; よりも以前にないとマズい気もする
 		next if $sames{$mname}++; # 同じ人なら次
 		
 		if ($mname eq $m{name}) {
@@ -176,7 +178,13 @@ sub get_member {
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
-	
+
+	if (@leave_members) {
+		for my $name (@leave_members) {
+			&you_c_reset($name);
+		}
+	}
+
 	if($leave_name){
 		&reset_game($leave_name);
 	}elsif($leader && !$leader_find){
@@ -207,8 +215,8 @@ sub play_number {
 	}
 	close $fh;
 
-	return("相手の番です") if $state ne $m{name};
-	
+	return("相手の番です") if $state ne $m{name}; # 動作未確認だけど、whileループ入る前に $state 代入された直後に close return した方が良いのでは
+
 	if($in{comment} > 0 && $in{comment} !~ /[^0-9]/){
 		my($hit, $blow) = &hb_count($in{comment}, $e_value);
 		$state = $e_name;
@@ -227,11 +235,11 @@ sub play_number {
 		print $fh @members;
 		close $fh;
 	}
-	
+
 	if($reset_flag){
 		&reset_game;
 	}
-	
+
 	return ($ret_mes);
 }
 
@@ -439,7 +447,7 @@ sub use_item {
 	return ($ret_mes);
 }
 
-sub make_leader {
+sub make_leader { # flock
 	my @number;
 	return("ｺｲﾝがありません") if $m{coin} < 0;
 	if($in{number} > 0 && $in{number} !~ /[^0-9]/){
@@ -501,44 +509,51 @@ sub start_game{
 	return ("勝負！");
 }
 
-sub reset_game{
+sub reset_game{ # flock
 	my $leave_name = shift;
-	my @members = ();
-	
+	my $is_find = 0; # $leave_name のﾌﾟﾚｲﾔｰが存在するか
+	my @winners = (); # ｹﾞｰﾑ勝利者
+	my @members = (); # 閲覧者含む全ﾌﾟﾚｲﾔｰ
+
+	$m{c_turn} = 0;
+	&write_user;
+
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
-	my($leader, $max_bet, $state) = split /<>/, $head_line;
-	$m{c_turn} = 0;
-	&write_user;
-	my $eplayer = '';
-	my $ev = 0;
 	while (my $line = <$fh>) {
 		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		if($leave_name ne '' && $mturn){
-			if($mname eq $leave_name){
-				$ev = -1 * &coin_move(-1*$max_bet, $mname);
-			}else{
-				$eplayer = $mname;
+		if ($leave_name ne '' && $mturn) { # 敗者が存在するｹﾞｰﾑの参加者
+			if ($leave_name eq $mname) { # 敗者
+				$is_find = 1;
+			}
+			else {
+				push @winners, $mname; # 勝者
 			}
 		}
-		if($mturn){
-			&you_c_reset($mname);
-		}
-		push @members, "$mtime<>$mname<>$maddr<>0<>0<>\n";
+		push @members, "$mtime<>$mname<>$maddr<>0<>0<>\n"; # 閲覧者含む全ﾌﾟﾚｲﾔｰ
 	}
-	if ($eplayer ne '') {
-		&coin_move($ev, $eplayer);
-	}
-	
-	$state = '';
-	$leader = '';
-	$max_bet = 0;
-	unshift @members, "$leader<>$max_bet<>$state<>\n";
+	unshift @members, "<>0<><>\n";
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
+
+	my($leader, $max_bet, $state) = split /<>/, $head_line; # ｹﾞｰﾑの情報
+	my $ev = 0;
+
+	# ｺｲﾝ闇湧き対策 まず敗者からｺｲﾝむしり取る
+	if ($is_find) {
+		$ev = -1 * &coin_move(-1*$max_bet, $leave_name);
+		&you_c_reset($leave_name);
+	}
+
+	# 敗者からむしり取ったｺｲﾝを勝利者に分配
+	for my $name (@winners) {
+		&coin_move($ev, $name) if $is_find;
+		&you_c_reset($name);
+	}
+
 	return ("リセットしました");
 }
 
@@ -623,7 +638,7 @@ sub hb_count {
 	my @answer = (int($y_number / 100), int($y_number / 10) % 10, $y_number % 10);
 	my $hit = 0;
 	my $blow = 0;
-	for my $i (0..2){
+	for my $i (0..2) {
 		if($answer[$i] == $number[$i]){
 			$hit++;
 		}else{
