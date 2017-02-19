@@ -72,9 +72,12 @@ sub show_templates {
 	}
 	
 	$mes .= qq|</table>| unless $is_mobile;
+	$mes .= qq|<p>新種族の持つ能\力などの要望（実装するとは限らない）</p>|;
 	$mes .= qq|<textarea name="free"></textarea>|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="cmd" value="1">|;
 	$mes .= qq|<p><input type="submit" value="決定" class="button1"></p></form>|;
+	$mes .= qq|<h3>新種族作成の説明</h3>|;
+	$mes .= qq|<p>新種族転生時には、まずﾎﾟｲﾝﾄを割り振って種族の大まかな能\力について決めてください。ﾎﾟｲﾝﾄの初期値は1～2のランダムですが、各能\力の合計値が初期値に収まれば問題ないのでマイナスのデメリット能\力と組み合わせることで高ﾎﾟｲﾝﾄの能\力を選択することができます。また、新種族特有の能\力など思い付くものがあればコメント欄に書いてください。</p>|;
 }
 
 sub create_seed {
