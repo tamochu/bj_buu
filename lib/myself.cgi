@@ -192,6 +192,9 @@ sub tp_1 {
 			require './lib/fate.cgi';
 			if (&regist_attack($in{trigger}, $in{timing}, $in{demerit}, $in{max_count}, $in{effect}, $in{voice}, $in{random})) {
 				$mes .= '•KE‹Z‚ğİ’è‚µ‚Ü‚µ‚½B';
+				&refresh;
+				&n_menu;
+				return;
 			}
 		}
 
