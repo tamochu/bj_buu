@@ -137,7 +137,7 @@ sub tp_100 {
 	}
 
 	if ($config_test) {
-		$y{sol} /= 10;
+		$y{sol} /= 2;
 	}
 
 	$m_lea = &get_wea_modify('m');
@@ -155,7 +155,13 @@ sub tp_110 {
 	$mes .= "今回の作戦の限界ﾀｰﾝは $m{turn} ﾀｰﾝです<br>";
 	$mes .= "$m{name}軍 $m{sol}人 VS $y{name}軍 $y{sol}人<br>";
 	$mes .= '攻め込む陣形を選んでください<br>';
-	&menu(@war_forms,'退却');
+
+	if (&seed_bonus('hellbent')) {
+		&menu(@war_forms);
+	}
+	else {
+		&menu(@war_forms,'退却');
+	}
 
 	$m{tp} += 10;
 	&write_cs;
@@ -239,6 +245,11 @@ sub tp_190 {
 		}
 		else {
 			$mes .= '攻め込む陣形を選んでください<br>';
+			if (&seed_bonus('hellbent')) {
+				&menu(@war_forms);
+				return;
+			}
+
 			# 一騎打ち出現確立
 			if ($y{wea} eq 'no_single') {
 				&menu(@war_forms,'退却');
@@ -346,8 +357,17 @@ sub _crash {
 	$m_lea = &get_wea_modify('m');
 	$y_lea = &get_wea_modify('y');
 
-	my $m_attack = ($m{sol}*0.1 + $m_lea*2) * $m{sol_lv} * 0.01 * $units[$m{unit}][4] * $units[$y{unit}][5];
-	my $y_attack = ($y{sol}*0.1 + $y_lea*2) * $y{sol_lv} * 0.01 * $units[$y{unit}][4] * $units[$m{unit}][5];
+	# hellbent 種族ファイルに直接埋め込みたかったが、
+	# 戻り値がスカラーを経由するせいなのか、
+	# リファレンス・デリファレンスの使い方間違えてるのか、意図した動きにならないので諦めてこっちに…
+	my @unit_modify = (0, 0);
+	if (&seed_bonus('hellbent')) {
+		$unit_modify[0] += 0.1;
+		$unit_modify[1] += 0.05;
+	}
+
+	my $m_attack = ($m{sol}*0.1 + $m_lea*2) * $m{sol_lv} * 0.01 * ($units[$m{unit}][4] + $unit_modify[0]) * $units[$y{unit}][5];
+	my $y_attack = ($y{sol}*0.1 + $y_lea*2) * $y{sol_lv} * 0.01 * $units[$y{unit}][4] * ($units[$m{unit}][5] + $unit_modify[1]);
 
 	if (&is_tokkou($m{unit}, $y{unit})) {
 		$is_m_tokkou = 1;
