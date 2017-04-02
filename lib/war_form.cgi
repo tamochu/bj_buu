@@ -5,7 +5,15 @@
 # 拘束時間
 $GWT = int($GWT * 1.5);
 
-my @needs = $m{unit} ne '18' ? (0.5, 1.0, 2.0) : (0.75, 1.5, 3.0);
+my @needs = (0.5, 1.0, 2.0); #通常部隊
+if ($m{unit} eq '16') { # 軽装部隊 消費物資0.75倍
+	$needs[$_] = $needs[$_] * 0.75 for (0 .. $#needs);
+}
+elsif ($m{unit} eq '18') { # 狡知部隊 消費物資1.5倍
+	$needs[$_] = $needs[$_] * 1.5 for (0 .. $#needs);
+}
+if ($m{pet} eq '193') { $needs[$_] = $needs[$_] * 0.5 for (0 .. $#needs); } # ﾀﾞｰｸﾗﾋﾞｯﾄ 消費物資0.5倍
+
 
 # 進軍種類
 my @war_marchs = (
@@ -16,7 +24,6 @@ my @war_marchs = (
 );
 if($m{value} < 0 || $m{value} >= @war_marchs){$m{value} = $#war_marchs;}
 my $need_costs = $rank_sols[$m{rank}] * $war_marchs[$m{value}][2];
-if($m{unit} eq '16'){$need_costs *= 0.75;}
 
 #=================================================
 # 利用条件
@@ -62,6 +69,9 @@ sub begin {
 		if (&{ $war_march->[3] }) {
 			my $need_fm  = $rank_sols[$m{rank}] * $war_march->[2];
 			my $need_GWT = &_unit_march($GWT * $war_march->[1]);
+			# ちょっと強引 _unit_march() の内部で $m{value} を参照するので未代入の begin 呼び出し時に意図しない数値が返る
+			# 長期進軍より長い拘束時間の進軍方法が実装された場合に、また表示と内部の拘束時間のズレが生じそう
+			$need_GWT = 20 if $war_march->[1] > 1 && $need_GWT < 20;
 			$mes .= "$war_march->[0] [消費兵糧：$need_fm 消費予\算：$need_fm 時間：$need_GWT分]<br>";
 			push @menus, $war_march->[0];
 		}
@@ -212,15 +222,16 @@ sub _unit_march {
 	elsif ( ($m{unit} eq '7' || $m{unit} eq '8' || ($pets[$m{pet}][2] eq 'speed_up' && $w{world} ne '17')) && $need_GWT * 0.5 > 20 && $m{unit} ne '18') {
 		$need_GWT = $need_GWT * 0.5;
 	}
+
 	if ($pets[$m{pet}][2] eq 'speed_down' && $w{world} ne '17') {
 		$need_GWT *= $m{unit} eq '7' || $m{unit} eq '8' ? 4 : 2;
 		$m{value} *= 3 unless $m{unit} eq '18';
 	}
-	
-	if ($m{pet} eq '193'
-#	&& $w{world} ne '7' && $w{world} ne $#world_states	
+	elsif ($m{pet} eq '193' && $w{world} ne '7'
+#	&& $w{world} ne $#world_states	
 	) {
 		$need_GWT -= 10;
+		$need_GWT = 20 if $m{value} > 1 && $need_GWT < 20;
 	}
 	return int($need_GWT);
 }
