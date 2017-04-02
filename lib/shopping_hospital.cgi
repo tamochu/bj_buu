@@ -559,11 +559,11 @@ sub tp_520 {
 # 符牒更新
 #================================================
 sub tp_600 {
-	$mes .= "$menus[5][0]をするとぉ、貴方のﾊﾟｽﾜｰﾄﾞを変えることができるわぁ<br>";
-	$mes .= "変更をするには、$menus[5][1] G必要よぉ<br>";
+	$mes .= "$menus[6][0]をするとぉ、貴方のﾊﾟｽﾜｰﾄﾞを変えることができるわぁ<br>";
+	$mes .= "変更をするには、$menus[6][1] G必要よぉ<br>";
 	$mes .= "どぉするぅ？<br>";
 	$m{tp} += 10;
-	&menu("やめる", "$menus[5][0]する");
+	&menu("やめる", "$menus[6][0]する");
 }
 sub tp_610 {
 	return if &is_ng_cmd(1);
@@ -577,7 +577,7 @@ sub tp_610 {
 	&n_menu;
 }
 sub tp_620 {
-	if ($m{money} < $menus[5][1]) {
+	if ($m{money} < $menus[6][1]) {
 		$mes .= 'あらぁ、お金が足りませんわぁ<br>';
 		&begin;
 		return;
@@ -606,7 +606,7 @@ sub tp_620 {
 	$m{hp}  = $m{max_hp};
 	$m{mp}  = $m{max_mp};
 #	$m{act} = 0;
-	$m{money} -= $menus[5][1];
+	$m{money} -= $menus[6][1];
 	&refresh;
 	&n_menu;
 
