@@ -82,7 +82,7 @@ sub tp_100 {
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p>|:
 		qq|<p><input type="submit" value="引出す" class="button1"></p>|;
-	$mes .= qq|<input type="checkbox" id="pet_summary" name="show_summary" value="1"><label for="pet_summary">ﾍﾟｯﾄの効果を確認する</label></form>|;
+	$mes .= qq|<label><input type="checkbox" id="pet_summary" name="show_summary" value="1">ﾍﾟｯﾄの効果を確認する</label></form>|;
 	$m{tp} += 10;
 }
 sub tp_110 {
@@ -747,7 +747,7 @@ sub radio_my_depot {
 	my %lock = &get_lock_item;
 	my $sub_mes = qq|<form method="$method" action="$script">|;
 	my $checked = " checked" unless $no;
-	$sub_mes .= qq|<input type="radio" id="no_0" name="cmd" value="0"$checked><label for="no_0">やめる</label><br>|;
+	$sub_mes .= qq|<label><input type="radio" name="cmd" value="0"$checked>やめる</label><br>|;
 	open my $fh, "< $this_file" or &error("$this_file が読み込めません");
 	while (my $line = <$fh>) {
 		++$count;
@@ -759,8 +759,8 @@ sub radio_my_depot {
 		}
 		else {
 			$checked = $no == $count ? " checked" : "" ;
-			$sub_mes .= qq|<input type="radio" id="no_$count" name="cmd" value="$count"$checked>|;
-			$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
+			$sub_mes .= qq|<label>| unless $is_mobile;
+			$sub_mes .= qq|<input type="radio" name="cmd" value="$count"$checked>|;
 			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 			$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
 			$sub_mes .= ' 溢れてます' if $count > $lost_depot;
@@ -797,8 +797,8 @@ sub checkbox_my_depot {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 
-		$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1">|;
-		$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
+		$sub_mes .= qq|<label>| unless $is_mobile;
+		$sub_mes .= qq|<input type="checkbox" name="$count" value="1">|;
 		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 		$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
 		$sub_mes .= ' 溢れてます' if $count > $lost_depot;
@@ -836,14 +836,14 @@ sub checkbox_my_depot_lock_checked {
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 		# 重複するアイテムは最初の一個目だけ表示
 		unless ($sames{"$kind<>$item_no<>"}) {
-			$sub_mes .= qq|<input type="checkbox" id="no_$count" name="$count" value="1"|;
+			$sub_mes .= qq|<label>| unless $is_mobile;
+			$sub_mes .= qq|<input type="checkbox" name="$count" value="1"|;
 			my $lock_mes = '';
 			if ($lock{"$kind<>$item_no<>"}) {
 				$sub_mes .= qq| checked|;
 				$lock_mes = ' ロックされてます';
 			}
 			$sub_mes .= qq|>|;
-			$sub_mes .= qq|<label for="no_$count">| unless $is_mobile;
 			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
 			$sub_mes .= $lock_mes;
 			$sub_mes .= ' 溢れてます' if $count > $lost_depot;
