@@ -69,9 +69,24 @@ sub tp_1 {
 		while (my $line = <$fh>) {
 			++$count;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+
 			if($kind eq '3' && $lock{"$kind<>$item_no<>"} < 1){
-				$mes .= qq|<input type="radio" id="$count" name="cmd" value="$count">|;
-				$mes .= qq|<label for="$count">| unless $is_mobile;
+				my $good_bad = 'normal';
+				for my $bpet (@bad_pets){
+					if($bpet == $item_no){
+						$good_bad = 'bad';
+						last;
+					}
+				}
+				for my $gpet (@good_pets){
+					if($gpet == $item_no){
+						$good_bad = 'good';
+						last;
+					}
+				}
+
+				$mes .= qq|<label class="$good_bad">| unless $is_mobile;
+				$mes .= qq|<input type="radio" name="cmd" value="$count">|;
 				$mes .= qq|[Çÿ]$pets[$item_no][1]Åö$item_c|;
 				$mes .= qq|</label>| unless $is_mobile;
 				$mes .= qq|<br>|;
@@ -107,13 +122,29 @@ sub tp_1 {
 		while (my $line = <$fh>) {
 			++$count;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
+
 			if($kind eq '3' && $lock{"$kind<>$item_no<>"} < 1){
+				my $good_bad = 'normal';
+				for my $bpet (@bad_pets){
+					if($bpet == $item_no){
+						$good_bad = 'bad';
+						last;
+					}
+				}
+				for my $gpet (@good_pets){
+					if($gpet == $item_no){
+						$good_bad = 'good';
+						last;
+					}
+				}
+
 				my $checked = '';
 				if ($cmd eq '3' && $item_no == 126) {
 					$checked = ' checked';
 				}
-				$mes .= qq|<input type="checkbox" id="$count" name="pet_$count" value="1"$checked>|;
-				$mes .= qq|<label for="$count">| unless $is_mobile;
+				$mes .= qq|<label class="$good_bad">| unless $is_mobile;
+				$mes .= qq|<input type="checkbox" name="pet_$count" value="1"$checked>|;
+#				$mes .= qq|<label for="$count">| unless $is_mobile;
 				$mes .= qq|[Çÿ]$pets[$item_no][1]Åö$item_c|;
 				$mes .= qq|</label>| unless $is_mobile;
 				$mes .= qq|<br>|;
