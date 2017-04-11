@@ -183,14 +183,18 @@ sub tp_310 {
 sub tp_400 {
 	$layout = 1;
 
+	my $vote_disagree = 5 - $need_vote_violator;
+	my $find = 0;
+
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<input type="submit" value="やめる" class="button1"></form>|;
 	
 	$mes .= "議決により荒らしや国の方針に従わない者を自国から追放することができます<br>";
 	$mes .= "賛成が$need_vote_violator票以上：追放者を自国から追放<br>";
-	$mes .= "反対が$need_vote_violator票以上：申\請した代表\者が国から追放<br>";
+	$mes .= "反対が$vote_disagree票以上：申\請した代表\者が国から追放<br>";
 	$mes .= "<hr>追放者ﾘｽﾄ<br>";
+	$mes .= qq|<form method="$method" action="$script">|;
 	open my $fh, "< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
 	while (my $line = <$fh>) {
 		my($no, $name, $country, $violator, $message, $yess, $nos, $w_span) = split /<>/, $line;
@@ -199,34 +203,40 @@ sub tp_400 {
 		my @no_c  = split /,/, $nos;
 		my $yes_c = @yes_c;
 		my $no_c  = @no_c;
+		my $type_mes = $w_span == 1 ? '『追放』' : '『国外退去』処分に';
 		
-		$mes .= qq|<form method="$method" action="$script"><input type="hidden" name="cmd" value="$no">|;
-		$mes .= $w_span == 1 ? qq|$nameが『$violator』を追放すべきと思っています<br>|:qq|$nameが『$violator』を国外退去処分すべきと思っています<br>|;
-		$mes .= qq|理由：$message<br>|;
-		$mes .= qq|<input type="radio" name="answer" value="1" checked>賛成 $yes_c票：$yess<br>|;
-		$mes .= qq|<input type="radio" name="answer" value="2">反対 $no_c票：$nos<br>|;
+#		$mes .= qq|<hr><input type="hidden" name="cmd" value="$no">|;
+		$mes .= qq|<hr>|;
+		$mes .= qq|『$message』を理由に『$violator』を$type_mesすべきと$nameが申\請<br>|;
+#		$mes .= qq|理由：<br>|;
+		$mes .= qq|<input type="radio" name="answer_$no" value="1" checked>賛成 $yes_c票：$yess<br>|;
+		$mes .= qq|<input type="radio" name="answer_$no" value="2">反対 $no_c票：$nos<br>|;
 		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$mes .= qq|<input type="submit" value="投票" class="button_s"></form><hr>|;
+		$mes .= qq|<input type="checkbox" name="$no" value="1">投票|;
+		$find = 1;
 	}
 	close $fh;
+	$mes .= qq|<hr><input type="submit" value="投票" class="button_s"></form>| if $find;
 
 	$m{tp} += 10;
 }
 sub tp_410 {
-	if (!$in{answer} || $in{answer} =~ /[^12]/) {
-		$mes .= 'やめました<br>';
-		&begin;
-		return;
-	}
-	
+#	if (!$in{answer} || $in{answer} =~ /[^12]/) {
+#		$mes .= 'やめました<br>';
+#		&begin;
+#		return;
+#	}
+
 	my @lines = ();
 	open my $fh, "+< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
 	while (my $line = <$fh>) {
 		my($no, $name, $country, $violator, $message, $yess, $nos, $w_span) = split /<>/, $line;
-		
-		if ($cmd eq $no) {
+
+#		if ($cmd eq $no) {
+		if ($in{$no}) {
+			my $answer = $in{"answer_$no"};
 			# 申請したのが自分で反対なら申請を取消
-			if ($m{name} eq $name && $in{answer} eq '2') {
+			if ($m{name} eq $name && $answer eq '2') {
 				$mes .= "$violatorの追放申\請を取消ました<br>";
 				next;
 			}
@@ -258,11 +268,11 @@ sub tp_410 {
 				$new_nos .= "$n,";
 			}
 			
-			if ($in{answer} eq '1') {
+			if ($answer eq '1') {
 				$new_yess .= "$m{name},";
 				$mes .= "$violatorの追放に賛成します<br>";
 			}
-			elsif ($in{answer} eq '2') {
+			elsif ($answer eq '2') {
 				$new_nos .= "$m{name},";
 				$mes .= "$violatorの追放に反対します<br>";
 			}
@@ -279,16 +289,30 @@ sub tp_410 {
 				my %datas = &get_you_datas($v_id, 1);
 				&move_player($violator, $datas{country}, 0);
 
-				&regist_you_data($violator, 'wt', $penalty_time);
-				&regist_you_data($violator, 'country', 0);
-				&regist_you_data($violator, 'lib', '');
-				&regist_you_data($violator, 'tp', 0);
+				my @data = (
+					['wt', $penalty_time],
+					['country', 0],
+					['lib', ''],
+					['tp', 0],
+				);
+				&regist_you_array($violator, @data);
+#				&regist_you_data($violator, 'wt', $penalty_time);
+#				&regist_you_data($violator, 'country', 0);
+#				&regist_you_data($violator, 'lib', '');
+#				&regist_you_data($violator, 'tp', 0);
 				if($w_span == 2){
 					# 代表ﾎﾟｲﾝﾄ半分
-					for my $k (qw/war dom mil pro/) {
-						my $kc = $k . "_c";
-						&regist_you_data($violator, $kc, 0);
-					}
+					my @data2 = (
+						['war_c', 0],
+						['dom_c', 0],
+						['mil_c', 0],
+						['pro_c', 0],
+					);
+					&regist_you_array($violator, @data2);
+#					for my $k (qw/war dom mil pro/) {
+#						my $kc = $k . "_c";
+#						&regist_you_data($violator, $kc, 0); # 半分じゃなくて 0 ？
+#					}
 				}
 
 				&write_world_news("【議決】$cs{name}[$m{country}]の代表\者達の評議により、$violatorが国外追放となりました", 1, $violator);
@@ -299,23 +323,37 @@ sub tp_410 {
 				next unless -f "$userdir/$y_id/user.cgi"; # 申請した人が消えていた場合
 				&move_player($name, $country, 0);
 
-				&regist_you_data($name, 'wt', $penalty_time);
-				&regist_you_data($name, 'country', 0);
-				&regist_you_data($name, 'lib', '');
-				&regist_you_data($name, 'tp', 0);
+				my @data = (
+					['wt', $penalty_time],
+					['country', 0],
+					['lib', ''],
+					['tp', 0],
+				);
+				&regist_you_array($name, @data);
+#				&regist_you_data($name, 'wt', $penalty_time);
+#				&regist_you_data($name, 'country', 0);
+#				&regist_you_data($name, 'lib', '');
+#				&regist_you_data($name, 'tp', 0);
 				if($w_span == 2){
 					# 代表ﾎﾟｲﾝﾄ半分
-					for my $k (qw/war dom mil pro/) {
-						my $kc = $k . "_c";
-						&regist_you_data($name, $kc, 0);
-					}
+					my @data2 = (
+						['war_c', 0],
+						['dom_c', 0],
+						['mil_c', 0],
+						['pro_c', 0],
+					);
+					&regist_you_array($name, @data2);
+#					for my $k (qw/war dom mil pro/) {
+#						my $kc = $k . "_c";
+#						&regist_you_data($name, $kc, 0);
+#					}
 				}
 
 				&write_world_news("【議決】$cs{name}[$m{country}]の代表\者達の評議により、$nameが国外追放となりました", 1, $name);
 				$mes .= "反対が$vote_desagree票以上になったので$nameが追放されました<br>";
 			}
 			else {
-				push @lines, "$no<>$name<>$country<>$violator<>$message<>$new_yess<>$new_nos<>\n";
+				push @lines, "$no<>$name<>$country<>$violator<>$message<>$new_yess<>$new_nos<>$w_span\n";
 			}
 		}
 		else {
@@ -360,7 +398,7 @@ sub tp_510 {
 				open my $fh, "+< $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
 				eval { flock $fh, 2; };
 				push @lines, $_ while <$fh>;
-				my($last_no) = (split /<>/, $lines[0])[0];
+				my($last_no) = (split /<>/, $lines[$#lines])[0];
 				++$last_no;
 				push @lines, "$last_no<>$m{name}<>$m{country}<>$in{violator}<>$in{message}<>$m{name},<><>$in{w_span}<>\n";
 				seek  $fh, 0, 0;
