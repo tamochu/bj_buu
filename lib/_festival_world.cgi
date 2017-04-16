@@ -403,6 +403,9 @@ sub add_festival_country {
 		$cs{state}[$i]    = 0;
 		$cs{capacity}[$i] = $max_c;
 		$cs{is_die}[$i]   = 0;
+
+		require './lib/_rampart.cgi';
+		$cs{barrier}[$i]  = &get_init_barrier;
 	}
 
 	for my $i (1 .. $w{country}-$country_num) {

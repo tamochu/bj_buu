@@ -713,6 +713,10 @@ sub countries_info {
 		print qq|</tr>\n|;
 	}
 
+	print qq|<tr><th style="border: 2px solid #999; background: #336;">èÈï«</th>|;
+	print qq|<td align="center" style="border: 1px solid #999; background: #333;word-break:break-all;">$cs{barrier}[$_]%</td>| for (1 .. $w{country});
+	print qq|</tr>\n|;
+
 	for my $k (qw/ceo war dom pro mil/) {
 		print qq|<tr><th style="border: 2px solid #999; background: #336;">$e2j{$k}</th>|;
 		for my $i (1 .. $w{country}) {

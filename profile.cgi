@@ -98,10 +98,10 @@ sub status_mobile {
 		<hr>
 		yn—û“xz<br>
 		”_‹Æ <b>$m{nou_c}</b>/¤‹Æ <b>$m{sho_c}</b>/’¥•º <b>$m{hei_c}</b>/ŠOŒğ <b>$m{gai_c}</b>/‘Ò•š <b>$m{mat_c}</b>/<br>
-		‹­’D <b>$m{gou_c}</b>/’³•ñ <b>$m{cho_c}</b>/ô”] <b>$m{sen_c}</b>/‹UŒv <b>$m{gik_c}</b>/’ã@ <b>$m{tei_c}</b>/<br>
-		Cs <b>$m{shu_c}</b>/“¢”° <b>$m{tou_c}</b>/“¬‹Z <b>$m{col_c}</b>/¶¼ŞÉ <b>$m{cas_c}</b>/–‚•¨ <b>$m{mon_c}</b>/<br>
-		’E– <b>$m{esc_c}</b>/‹~o <b>$m{res_c}</b>/Õ <b>$m{fes_c}</b>/no1 <b>$m{no1_c}</b>/Ú°Ä <b>$m{cataso_ratio}</b>/<br>
-		“ˆê <b>$m{hero_c}</b>/•œ‹» <b>$m{huk_c}</b>/–Å–S <b>$m{met_c}</b>/<br>
+		‹­’D <b>$m{gou_c}</b>/’³•ñ <b>$m{cho_c}</b>/ô”] <b>$m{sen_c}</b>/’E– <b>$m{esc_c}</b>/‹~o <b>$m{res_c}</b>/<br>
+		’ã@ <b>$m{tei_c}</b>/‹UŒv <b>$m{gik_c}</b>/Ué <b>$m{kou_c}</b>/¶¼ŞÉ <b>$m{cas_c}</b>/–‚•¨ <b>$m{mon_c}</b>/<br>
+		Cs <b>$m{shu_c}</b>/“¢”° <b>$m{tou_c}</b>/“¬‹Z <b>$m{col_c}</b>/Ú°Ä  <b>$m{cataso_ratio}</b>/no1 <b>$m{no1_c}</b>/<br>
+		“ˆê <b>$m{hero_c}</b>/•œ‹» <b>$m{huk_c}</b>/–Å–S <b>$m{met_c}</b>/Õ <b>$m{fes_c}</b>/<br>
 		<hr>
 		y‘ã•\\ÒÎß²İÄz<br>
 		í‘ˆ <b>$m{war_c}</b>/“à­ <b>$m{dom_c}</b>/ŒR– <b>$m{mil_c}</b>/ŠOŒğ <b>$m{pro_c}</b>/
@@ -235,29 +235,29 @@ sub status_pc {
 			<th>‹­’D</th><td align="right">$m{gou_c}</td>
 			<th>’³•ñ</th><td align="right">$m{cho_c}</td>
 			<th>ô”]</th><td align="right">$m{sen_c}</td>
-			<th>‹UŒv</th><td align="right">$m{gik_c}</td>
+			<th>’E–</th><td align="right">$m{esc_c}</td>
+			<th>‹~o</th><td align="right">$m{res_c}</td>
+		</tr>
+		<tr>
 			<th>’ã@</th><td align="right">$m{tei_c}</td>
+			<th>‹UŒv</th><td align="right">$m{gik_c}</td>
+			<th>Ué</th><td align="right">$m{kou_c}</td>
+			<th>¶¼ŞÉ</th><td align="right">$m{cas_c}</td>
+			<th>–‚•¨</th><td align="right">$m{mon_c}</td>
 		</tr>
 		<tr>
 			<th>Cs</th><td align="right">$m{shu_c}</td>
 			<th>“¢”°</th><td align="right">$m{tou_c}</td>
 			<th>“¬‹Z</th><td align="right">$m{col_c}</td>
-			<th>¶¼ŞÉ</th><td align="right">$m{cas_c}</td>
-			<th>–‚•¨</th><td align="right">$m{mon_c}</td>
+			<th>Ú°Ä</th><td align="right">$m{cataso_ratio}</td>
+			<th>no1</th><td align="right">$m{no1_c}</td>
 		</tr>
 		<tr>
 			<th>“ˆê</th><td align="right">$m{hero_c}</td>
 			<th>•œ‹»</th><td align="right">$m{huk_c}</td>
 			<th>–Å–S</th><td align="right">$m{met_c}</td>
-			<th>’E–</th><td align="right">$m{esc_c}</td>
-			<th>‹~o</th><td align="right">$m{res_c}</td>
-		</tr>
-		<tr>
 			<th>Õ</th><td align="right">$m{fes_c}</td>
-			<th>no1</th><td align="right">$m{no1_c}</td>
-			<th>Ú°Ä</th><td align="right">$m{cataso_ratio}</td>
-			<th></th><td align="right"></td>
-			<th></th><td align="right"></td>
+			<th>@</th><td align="right">@</td>
 		</tr>
 		</table>
 		

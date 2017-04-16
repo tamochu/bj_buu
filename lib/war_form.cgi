@@ -7,12 +7,12 @@ $GWT = int($GWT * 1.5);
 
 my @needs = (0.5, 1.0, 2.0); #通常部隊
 if ($m{unit} eq '16') { # 軽装部隊 消費物資0.75倍
-	$needs[$_] = $needs[$_] * 0.75 for (0 .. $#needs);
+	$needs[$_] *= 0.75 for (0 .. $#needs);
 }
 elsif ($m{unit} eq '18') { # 狡知部隊 消費物資1.5倍
-	$needs[$_] = $needs[$_] * 1.5 for (0 .. $#needs);
+	$needs[$_] *= 1.5 for (0 .. $#needs);
 }
-if ($m{pet} eq '193') { $needs[$_] = $needs[$_] * 0.5 for (0 .. $#needs); } # ﾀﾞｰｸﾗﾋﾞｯﾄ 消費物資0.5倍
+if ($m{pet} eq '193') { $needs[$_] *= 0.5 for (0 .. $#needs); } # ﾀﾞｰｸﾗﾋﾞｯﾄ 消費物資0.5倍
 
 
 # 進軍種類
@@ -68,10 +68,7 @@ sub begin {
 	for my $war_march (@war_marchs) {
 		if (&{ $war_march->[3] }) {
 			my $need_fm  = $rank_sols[$m{rank}] * $war_march->[2];
-			my $need_GWT = &_unit_march($GWT * $war_march->[1]);
-			# ちょっと強引 _unit_march() の内部で $m{value} を参照するので未代入の begin 呼び出し時に意図しない数値が返る
-			# 長期進軍より長い拘束時間の進軍方法が実装された場合に、また表示と内部の拘束時間のズレが生じそう
-			$need_GWT = 20 if $war_march->[1] > 1 && $need_GWT < 20;
+			my $need_GWT = &_unit_march($GWT, $war_march->[1]);
 			$mes .= "$war_march->[0] [消費兵糧：$need_fm 消費予\算：$need_fm 時間：$need_GWT分]<br>";
 			push @menus, $war_march->[0];
 		}
@@ -186,7 +183,7 @@ sub tp_100 {
 		$m{sol} += 500 if($m{cha} == 999); # cha999で+500
 		$m{value} = $war_marchs[$m{value}][1];
 
-		$GWT = &_unit_march($GWT * $m{value});
+		$GWT = &_unit_march($GWT, $m{value});
 
 		$mes .= "$vの兵を率いて$cs{name}[$y{country}]に進軍を開始します<br>";
 		$mes .= "$GWT分後に到着する予\定です<br>";
@@ -211,8 +208,34 @@ sub tp_100 {
 
 #================================================
 # 部隊により進軍時間の増減(極端に長すぎ・短すぎはｹﾞｰﾑﾊﾞﾗﾝｽ崩壊するので時間制限)
+# 引数の仕様変更 (基本拘束時間, 進軍種類)
+# ﾀﾞｸﾎの仕様を鑑みるに、布告の効く通常・長期の最短進軍時間が停戦条約よりも短くなるのを忌避してると思われる
 #================================================
 sub _unit_march {
+	my ($_GWT, $_form) = @_;
+	my $need_GWT = $_GWT * $_form;
+
+	# 重兵。最高進軍時間90分
+	if ($m{unit} eq '1' && ($pets[$m{pet}][2] ne 'speed_up' || ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) && $need_GWT * 1.5 < 90) {
+		$need_GWT = $need_GWT * 1.5;
+	}
+	# 天馬,飛竜。最低進軍時間20分
+	elsif ( ($m{unit} eq '7' || $m{unit} eq '8' || ($pets[$m{pet}][2] eq 'speed_up' && $w{world} ne '17')) && $need_GWT * 0.5 > 20 && $m{unit} ne '18') {
+		$need_GWT = $need_GWT * 0.5;
+	}
+
+	# ﾀﾞｰｸﾀｰﾄﾙ
+	if ($pets[$m{pet}][2] eq 'speed_down' && $w{world} ne '17' && $_form > $war_marchs[0][1]) { # 謎情勢時の白兵はﾀﾞｰﾄﾙ使える 長い拘束時間中に情勢が変わることを想定している？
+		$need_GWT *= $m{unit} eq '7' || $m{unit} eq '8' ? 4 : 2;
+		$m{value} *= 3 unless $m{unit} eq '18';
+	}
+	# ﾀﾞｰｸﾗﾋﾞｯﾄ 通常・長期の進軍時間最低20分 停戦条約との兼ね合いによりけり ﾀﾞｸﾎも同様かと
+	elsif ($m{pet} eq '193' && $w{world} ne '7') { #	&& $w{world} ne $#world_states	
+		$need_GWT -= 10;
+		$need_GWT = 20 if $_form > 0.5 && $need_GWT < 20;
+	}
+	return int($need_GWT);
+=pod
 	my $need_GWT = shift;
 	# 重兵。最高進軍時間90分
 	if ($m{unit} eq '1' && ($pets[$m{pet}][2] ne 'speed_up' || ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) && $need_GWT * 1.5 < 90) {
@@ -234,7 +257,7 @@ sub _unit_march {
 		$need_GWT = 20 if $m{value} > 1 && $need_GWT < 20;
 	}
 	return int($need_GWT);
+=cut
 }
-
 
 1; # 削除不可

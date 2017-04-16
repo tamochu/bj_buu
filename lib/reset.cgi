@@ -77,7 +77,7 @@ sub reset {
 			require './lib/_festival_world.cgi';
 			&end_festival_world;
 		}
-		$w{world} = int(rand($#world_states-5));
+		$w{world} = int(rand($#world_states-5)); # 特殊情勢終了後、ユーザーが情勢を選択するまでの一時的情勢変更
 	}
 
 	# ここまでが一年の最後の最後
@@ -90,12 +90,6 @@ sub reset {
 	$w{game_lv} = $game_lv;
 
 	# reset countries
-	my $sleep_num = 0;
-	for my $i (1 .. $w{country}) {
-		$cs{strong}[$i] = 8000;
-#		$sleep_num++ if $cs{is_die}[$i] > 2;
-	}
-
 	# 仕官できる人数
 	my $country = $w{world} eq $#world_states ? $w{country} - 1 : $w{country};
 #	$country -= $sleep_num if $sleep_num > 0;
@@ -117,14 +111,11 @@ sub reset {
 		$cs{modify_dom}[$i]   = 0;
 		$cs{modify_mil}[$i]   = 0;
 		$cs{modify_pro}[$i]   = 0;
-#		if ($cs{is_die}[$i] > 2) {
-#			$cs{strong}[$i]   = 0;
-#			$cs{capacity}[$i] = 0;
-#		}
-#		else {
-			$cs{is_die}[$i]   = 0;
-			$cs{capacity}[$i] = $ave_c;
-#		}
+		$cs{is_die}[$i]   = 0;
+		$cs{capacity}[$i] = $ave_c;
+
+		require './lib/_rampart.cgi';
+		$cs{barrier}[$i]  = &get_init_barrier;
 		
 		for my $j ($i+1 .. $w{country}) {
 			$w{ "f_${i}_${j}" } = int(rand(40));

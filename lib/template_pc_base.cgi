@@ -438,6 +438,17 @@ sub countries_html {
 		print qq|</tr>\n|;
 	}
 
+#	print qq|<tr><th>é•Ç</th>|;
+#	for my $i (1 .. $w{country}) {
+#		my $color = sprintf("%02x", $cs{barrier}[$i]*2.55); # —vC³
+#		print qq|<td align="center"><span style="color:#ff$color$color;">$cs{barrier}[$i]</span>%</td>|;
+#	}
+	print qq|</tr>\n|;
+	print qq|<tr><th>é•Ç</th>|;
+	print qq|<td align="center">$cs{barrier}[$_]%</td>| for (1 .. $w{country});
+	print qq|</tr>\n|;
+
+
 	for my $k (qw/ceo war dom pro mil/) {
 		print qq|<tr><th>$e2j{$k}</th>|;
 		for my $i (1 .. $w{country}) {

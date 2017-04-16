@@ -227,8 +227,8 @@ sub create_user {
 	my @zeros = (qw/
 		wt act country job exp rank rank_exp unit sol sol_lv medal coin renzoku renzoku_c
 		wea wea_c wea_lv egg_c pet is_full 
-		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
-		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c
+		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c kou_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
+		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c no1_c fes_c
 		turn stock value shogo_t icon_t breed breed_c depot_bonus
 		y_max_hp y_hp y_max_mp y_mp y_at y_df y_mat y_mdf y_ag y_cha y_lea y_wea
 		y_country y_rank y_sol y_unit y_sol_lv

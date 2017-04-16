@@ -264,6 +264,9 @@ sub countries_info {
 #			:                     "$cs{strong}[$i]"
 #			;
 		
+
+		print "[$cs{barrier}[$i]%]"; # é•Ç’l
+
 		if ($m{country} && $m{country} ne $i) {
 			my $c_c = &union($m{country}, $i);
 			print qq|[$w{'f_'.$c_c}%]|;

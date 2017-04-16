@@ -41,33 +41,34 @@ sub begin {
 		$mes .= 'ŒR–‚ğs‚¢‚Ü‚·<br>‚Ç‚ê‚ğs‚¢‚Ü‚·‚©?<br>';
 	}
 	if($m{gou_c} >= 50 && $m{cho_c} >= 50 && $m{sen_c} >= 50){
-		&menu('‚â‚ß‚é','H—¿‚ğ‹­’D','‘‹à‚ğ’D‚¤','•ºm‚ğô”]','“à•”’ã@','‹UŒv','‘Ò‚¿•š‚¹','H—¿‚ğ‹­’D(’·Šú)','‘‹à‚ğ’D‚¤(’·Šú)','•ºm‚ğô”](’·Šú)');
+		&menu('‚â‚ß‚é','H—¿‚ğ‹­’D','‘‹à‚ğ’D‚¤','•ºm‚ğô”]','“à•”’ã@','‹UŒv','Ué','‘Ò‚¿•š‚¹','H—¿‚ğ‹­’D(’·Šú)','‘‹à‚ğ’D‚¤(’·Šú)','•ºm‚ğô”](’·Šú)');
 	}else{
-		&menu('‚â‚ß‚é','H—¿‚ğ‹­’D','‘‹à‚ğ’D‚¤','•ºm‚ğô”]','“à•”’ã@','‹UŒv','‘Ò‚¿•š‚¹');
+		&menu('‚â‚ß‚é','H—¿‚ğ‹­’D','‘‹à‚ğ’D‚¤','•ºm‚ğô”]','“à•”’ã@','‹UŒv','Ué','‘Ò‚¿•š‚¹');
 	}
 }
 sub tp_1 {
 	if($m{gou_c} >= 50 && $m{cho_c} >= 50 && $m{sen_c} >= 50){
-		return if &is_ng_cmd(1..9);
+		return if &is_ng_cmd(1..10);
 	}else{
-		return if &is_ng_cmd(1..6);
+		return if &is_ng_cmd(1..7);
 	}
 	
 	$m{tp} = $cmd * 100;
-	if ($cmd eq '6') {
+	if ($cmd eq '7') {
 		$mes .= "“G‘‚©‚ç‚ÌŒR–sˆ×‚ğŒ©’£‚Á‚½‚èA“G‘‚©‚ç‚ÌiŒR‚ğ‘Ò‚¿•š‚¹‚µ‚ÄŠh—‚³‚¹‚Ü‚·($GWT•ª`)<br>";
 		$mes .= "‚Ç‚¿‚ç‚Ì‘Ò‚¿•š‚¹‚ğ‚µ‚Ü‚·‚©?<br>";
 		&menu('‚â‚ß‚é', 'ŒR–sˆ×‚ğŒ©’£‚é', 'iŒR‚ğ‘Ò‚¿•š‚¹');
 	}
-	else { # 1-5 7-9
-		if    ($cmd eq '1') { $mes .= "‘Šè‘‚É”E‚Ñ‚İH—¿‚ğ’D‚¢‚Ü‚·<br>"; }
-		elsif ($cmd eq '2') { $mes .= "‘Šè‘‚Ì‘‹àÙ°Ä‚ğŠh—‚µ‚¨‹à‚ğ—¬o‚³‚¹‚Ü‚·<br>"; }
-		elsif ($cmd eq '3') { $mes .= "‘Šè‘‚Ì•ºm‚ğô”]‚µA©‘‚Ì•ºm‚É‚µ‚Ü‚·<br>"; }
-		elsif ($cmd eq '4') { $mes .= "‘Šè‘‚Ì“à•”‚Ìó‘Ô‚ğ‘Fõ‚µ‚És‚«‚Ü‚·<br>"; }
-		elsif ($cmd eq '5') { $mes .= "‘Šè‘‚Éˆ«‚¢‰\\‚ğ—¬‚µ—FD“x‚ğ‰º‚°‚Ü‚·<br>"; }
-		elsif ($cmd eq '7') { $mes .= "‘Šè‘‚É”E‚Ñ‚İ‘å–Ú‚ÉH—¿‚ğ’D‚¢‚Ü‚·<br>"; $GWT *= 2.5; }
-		elsif ($cmd eq '8') { $mes .= "‘Šè‘‚Ì‘‹àÙ°Ä‚ğŠh—‚µ‘å–Ú‚É‚¨‹à‚ğ—¬o‚³‚¹‚Ü‚·<br>"; $GWT *= 2.5; }
-		elsif ($cmd eq '9') { $mes .= "‘Šè‘‚Ì•ºm‚ğ‘å–Ú‚Éô”]‚µA©‘‚Ì•ºm‚É‚µ‚Ü‚·<br>"; $GWT *= 2.5; }
+	else { # 1-6 8-10
+		if    ($cmd eq '1')  { $mes .= "‘Šè‘‚É”E‚Ñ‚İH—¿‚ğ’D‚¢‚Ü‚·<br>"; }
+		elsif ($cmd eq '2')  { $mes .= "‘Šè‘‚Ì‘‹àÙ°Ä‚ğŠh—‚µ‚¨‹à‚ğ—¬o‚³‚¹‚Ü‚·<br>"; }
+		elsif ($cmd eq '3')  { $mes .= "‘Šè‘‚Ì•ºm‚ğô”]‚µA©‘‚Ì•ºm‚É‚µ‚Ü‚·<br>"; }
+		elsif ($cmd eq '4')  { $mes .= "‘Šè‘‚Ì“à•”‚Ìó‘Ô‚ğ‘Fõ‚µ‚És‚«‚Ü‚·<br>"; }
+		elsif ($cmd eq '5')  { $mes .= "‘Šè‘‚Éˆ«‚¢‰\\‚ğ—¬‚µ—FD“x‚ğ‰º‚°‚Ü‚·<br>"; }
+		elsif ($cmd eq '6')  { $mes .= "‘Šè‘‚Ìé•Ç‚ğ”j‰ó‚µA–hŒä—Í‚ğ‰º‚°‚Ü‚·<br>"; }
+		elsif ($cmd eq '8')  { $mes .= "‘Šè‘‚É”E‚Ñ‚İ‘å–Ú‚ÉH—¿‚ğ’D‚¢‚Ü‚·<br>"; $GWT *= 2.5; }
+		elsif ($cmd eq '9')  { $mes .= "‘Šè‘‚Ì‘‹àÙ°Ä‚ğŠh—‚µ‘å–Ú‚É‚¨‹à‚ğ—¬o‚³‚¹‚Ü‚·<br>"; $GWT *= 2.5; }
+		elsif ($cmd eq '10') { $mes .= "‘Šè‘‚Ì•ºm‚ğ‘å–Ú‚Éô”]‚µA©‘‚Ì•ºm‚É‚µ‚Ü‚·<br>"; $GWT *= 2.5; }
 		$mes .= "‚Ç‚Ì‘‚ÉŒü‚©‚¢‚Ü‚·‚©?($GWT•ª)<br>";
 		&menu('‚â‚ß‚é', @countries);
 	}
@@ -76,7 +77,8 @@ sub tp_1 {
 #=================================================
 # ‘Ò‚¿•š‚¹
 #=================================================
-sub tp_600 {
+sub tp_700 {
+	require './lib/_rampart.cgi'; # é•Ç
 	if ($cmd eq '1') {
 		$mes .= "“G‘‚©‚ç‚ÌŒR–sˆ×‚ª‚È‚¢‚©©‘‚ğ„‰ñ‚µŠÄ‹‚µ‚Ü‚·<br>";
 		$mes .= "‘Ò‚¿•š‚¹‚Ì—LŒøŠÔ‚ÍÅ‚‚Å$max_ambush_hourŠÔ‚Ü‚Å‚Å‚·<br>";
@@ -90,6 +92,7 @@ sub tp_600 {
 		close $fh;
 
 		&before_action('icon_pet_exp', $GWT);
+		&gain_mil_barrier(1);
 		&wait;
 	}
 	elsif ($cmd eq '2') {
@@ -100,13 +103,14 @@ sub tp_600 {
 		$m{tp} += 10;
 
 		&before_action('icon_pet_exp', $GWT);
+		&gain_mil_barrier(1);
 		&wait;
 	}
 	else {
 		&begin;
 	}
 }
-sub tp_610 {
+sub tp_710 {
 	$m{turn} = 1;
 	$mes .= "‘Ò‚¿•š‚¹‚ğI—¹‚µ‚Ü‚µ‚½<br>";
 	
@@ -120,6 +124,7 @@ sub tp_610 {
 		close $fh;
 		
 		my @lines = split /<>/, $line;
+		
 		$mes .= join ",<br>", @lines;
 		$mes .= "<br>‚ğ‘Ò‚¿•š‚¹‚ÅŒ‚‘Ş‚µ‚Ü‚µ‚½!<br>";
 		$m{turn} = @lines;
@@ -157,13 +162,28 @@ sub tp_610 {
 		seek  $fh, 0, 0;
 		truncate $fh, 0;
 		close $fh;
+=pod
+		unless (&gain_mil_barrier(chomp($head_line))) {
+			my($name, $result) = split /<>/, $head_line;
+			if ($result eq '0') {
+				$mes .= "$name‚ğŒ‚‘Ş‚µ‚Ü‚µ‚½<br>";
+			}
+			elsif ($result eq '1') {
+				$mes .= "$name‚É”s–k‚µ‚Ü‚µ‚½<br>";
+			}
+		}
+=cut
 	}
 
-	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
+	&special_money($m{turn} * 500);
 	&c_up('mat_c') for 1 .. $m{turn};
 	&military_master_c_up('mat_c');
 	&use_pet('mat') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '32');
-	&tp_1000;
+
+	require './lib/_rampart.cgi'; # é•Ç
+	&gain_mil_barrier(0);
+
+	&tp_1100;
 }
 
 #=================================================
@@ -174,9 +194,10 @@ sub tp_200 { &exe1("‘‹àÙ°Ä‚ğŠh—‚µ‚É") }
 sub tp_300 { &exe1("•ºm‚ğô”]‚µ‚É") }
 sub tp_400 { &exe1("“à•”î¨‚ğ’ã@‚µ‚É") }
 sub tp_500 { &exe1("‹UŒv‚ğ‚µ‚É") }
-sub tp_700 { &exe1("H—¿‚ğ‘å–Ú‚É‹­’D‚µ‚É") }
-sub tp_800 { &exe1("‘‹àÙ°Ä‚ğ‘å–Ú‚ÉŠh—‚µ‚É") }
-sub tp_900 { &exe1("•ºm‚ğ‘å–Ú‚Éô”]‚µ‚É") }
+sub tp_600 { &exe1('Ué‚ğ‚µ‚É') }
+sub tp_800 { &exe1("H—¿‚ğ‘å–Ú‚É‹­’D‚µ‚É") }
+sub tp_900 { &exe1("‘‹àÙ°Ä‚ğ‘å–Ú‚ÉŠh—‚µ‚É") }
+sub tp_1000 { &exe1("•ºm‚ğ‘å–Ú‚Éô”]‚µ‚É") }
 sub exe1 {
 	return if &is_ng_cmd(1..$w{country});
 	
@@ -233,9 +254,10 @@ sub tp_210 { &form1('’³•ñ‚ğs‚¤') }
 sub tp_310 { &form1('ô”]‚ğs‚¤') }
 sub tp_410 { &form1('î¨‚ğ’T‚é') }
 sub tp_510 { &form1('ˆ«‚¢‰\\‚ğ—¬‚·') }
-sub tp_710 { &form1('H—¿‚ğ’D‚¤(’·Šú)') }
-sub tp_810 { &form1('’³•ñ‚ğs‚¤(’·Šú)') }
-sub tp_910 { &form1('ô”]‚ğs‚¤(’·Šú)') }
+sub tp_610 { &form1('Ué‚ğs‚¤') }
+sub tp_810 { &form1('H—¿‚ğ’D‚¤(’·Šú)') }
+sub tp_910 { &form1('’³•ñ‚ğs‚¤(’·Šú)') }
+sub tp_1010 { &form1('ô”]‚ğs‚¤(’·Šú)') }
 sub form1 {
 	$mes .= "$c_y‚É“’…‚µ‚Ü‚µ‚½<br>";
 	$m{tp} += 10;
@@ -271,9 +293,10 @@ sub tp_220 { &exe2 }
 sub tp_320 { &exe2 }
 sub tp_420 { &exe2 }
 sub tp_520 { &exe2 }
-sub tp_720 { &exe2 }
+sub tp_620 { &exe2 }
 sub tp_820 { &exe2 }
 sub tp_920 { &exe2 }
+sub tp_1020 { &exe2 }
 sub exe2 {
 	if ($cmd eq '0') { # Às
 		if ( $m{value} > rand(110)+35 ) { # ¸”s ’Pƒ‚Érand(100)‚É‚·‚é‚Æ30%‚­‚ç‚¢‚ÅŒ©‚Â‚©‚Á‚Ä‚µ‚Ü‚¤‚Ì‚Å rand(110)+30‚É•ÏX
@@ -309,9 +332,9 @@ sub exe2 {
 			my $tmp_tp = $m{tp};
 			$m{tp} += 20;
 			&{ 'tp_'.$m{tp} };
-			$m{tp} = 1000;
+			$m{tp} = 1100;
 			if ($tmp_tp eq '120' || $tmp_tp eq '220' || $tmp_tp eq '320' ||
-				$tmp_tp eq '720' || $tmp_tp eq '820' || $tmp_tp eq '920') {
+				$tmp_tp eq '820' || $tmp_tp eq '920' || $tmp_tp eq '1020') {
 				&run_tutorial_quest('tutorial_mil_1');
 			}
 			&n_menu;
@@ -372,15 +395,22 @@ sub tp_530{ # ‹UŒv
 	$v = 10 if $v > 10;
 	$mes .= "‰R‚Ìî•ñ‚ğ—¬‚·‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ‹UŒv $v% ]<br>";
 }
-sub tp_730 { # ‹­’D¬Œ÷
+sub tp_630{ # Ué
+	my $v = $m{turn} <= 1 ? 1:
+	      	$m{kou_c} > 2000 ? int($m{turn} * 1.4):
+		int($m{turn} * (2000 + $m{kou_c}) / 2900);
+	$v = 10 if $v > 10;
+	$mes .= "é•Ç‚ğ”j‰ó‚·‚é‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙUé $v% ]<br>";
+}
+sub tp_830 { # ‹­’D¬Œ÷
 	my $v = &get_mil_success('gou', 'at', 4500, 6);
 	&get_mil_message('food', '‹­’D', "$v‚ÌH—¿‹­’D‚É¬Œ÷‚µ‚Ü‚µ‚½!", "H—¿‚ªs‚«‚Ü‚µ‚½!");
 }
-sub tp_830 { # ’³•ñ¬Œ÷
+sub tp_930 { # ’³•ñ¬Œ÷
 	my $v = &get_mil_success('cho', 'mat', 4500, 6);
 	&get_mil_message('money', '’³•ñ', "$v‚Ì‘‹à—¬o‚É¬Œ÷‚µ‚Ü‚µ‚½!", "$e2j{money}‚ªs‚«‚Ü‚µ‚½!");
 }
-sub tp_930 { # ô”]¬Œ÷
+sub tp_1030 { # ô”]¬Œ÷
 	my $v = &get_mil_success('sen', 'cha', 4000, 6);
 	&get_mil_message('soldier', 'ô”]', "$vl‚Ì•ºmô”]‚É¬Œ÷‚µ‚Ü‚µ‚½!", "•ºm‚ª‚à‚¤‚¢‚Ü‚¹‚ñ!");
 }
@@ -400,15 +430,15 @@ sub tp_340 { # ô”]
 	my $v = &exe3('soldier', 'sen');
 	&mes_and_world_news("$c_y‚Ì$v‚Ì•º‚ğô”]‚·‚é‚±‚Æ‚É¬Œ÷!$c_m‚Ì•º‚Éæ‚è‚İ‚Ü‚µ‚½");
 }
-sub tp_740 { # ‹­’D
+sub tp_840 { # ‹­’D
 	my $v = &exe3('food', 'gou');
 	&mes_and_world_news("$c_y‚ÉŠïPUŒ‚‚ğÀ{B$v‚Ì•º—Æ‚ğ‹­’D‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
-sub tp_840 { # ’³•ñ
+sub tp_940 { # ’³•ñ
 	my $v = &exe3('money', 'cho');
 	&mes_and_world_news("$c_y‚Ì‘‹à’²’BÙ°Ä‚ğŠh—‚µA$v‚Ì$e2j{money}‚ğ—¬o‚³‚¹‚é‚±‚Æ‚É¬Œ÷‚µ‚Ü‚µ‚½");
 }
-sub tp_940 { # ô”]
+sub tp_1040 { # ô”]
 	my $v = &exe3('soldier', 'sen');
 	&mes_and_world_news("$c_y‚Ì$v‚Ì•º‚ğô”]‚·‚é‚±‚Æ‚É¬Œ÷!$c_m‚Ì•º‚Éæ‚è‚İ‚Ü‚µ‚½");
 }
@@ -443,7 +473,7 @@ sub exe3 {
 	
 	&write_cs;
 
-	&special_money(int($v * 0.1)) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
+	&special_money(int($v * 0.1));
 	&write_yran($l, $v, 0,
 					"${l}_t", $v, 1) if $v > 0;
 	return $v;
@@ -466,7 +496,7 @@ sub tp_450 {
 	&c_up('tei_c') for 1 .. $m{turn};
 	&military_master_c_up('tei_c');
 	&use_pet('tei') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '36');
-	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
+	&special_money($m{turn} * 500);
 
 	my $lcomment = "<br>";
 	my $need_count = 7;
@@ -539,7 +569,7 @@ sub tp_450 {
 		$mes .= "$m{name}‚Ì‹¹‚Ì“à‚É”é‚ß‚Ä‚¨‚­‚±‚Æ‚É‚µ‚Ü‚µ‚½<br>";
 	}
 
-	$m{tp} = 1000;
+	$m{tp} = 1100;
 	&n_menu;
 }
 
@@ -576,11 +606,39 @@ sub tp_540 { # ‹UŒv
 		}
 	}
 	
-	&special_money($m{turn} * 500) if $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
+	&special_money($m{turn} * 500);
 	$mes .= "$c_y‚Æ‘¼‘‚Ì—FD“x‚ğ$v%‰º‚°‚é‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½<br>";
-	$m{tp} = 1000;
+	$m{tp} = 1100;
 
 	&run_tutorial_quest('tutorial_gikei_1');
+
+	&n_menu;
+	&write_cs;
+}
+
+# ----------------------------
+sub tp_640 { # Ué
+	&c_up('kou_c') for 1 .. $m{turn};
+	&military_master_c_up('kou_c');
+#	&use_pet('kou') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '37'); # 37 ÍßÃİ
+	my $v = $m{turn} <= 1 ? 1:
+	      	$m{kou_c} > 2000 ? int($m{turn} * 1.4):
+		int($m{turn} * (2000 + $m{kou_c}) / 2900);
+	$v = 10 if $v > 10;
+	$v *= 1.3 if  $cs{mil}[$m{country}] eq $m{name};
+	$v = &seed_bonus('kou', $v);
+	$v = int($v);
+	&write_yran('kou', $v, 1) if $v > 0;
+
+	# é•Çƒf[ƒ^}
+	require './lib/_rampart.cgi'; # é•Ç
+	&change_barrier($y{country}, -$v);
+
+	&special_money($m{turn} * 500);
+	$mes .= "$c_y‚Ìé•Ç‚ğ$v%”j‰ó‚·‚é‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½<br>";
+	$m{tp} = 1100;
+
+#	&run_tutorial_quest('tutorial_gikei_1');
 
 	&n_menu;
 	&write_cs;
@@ -613,7 +671,7 @@ sub tp_1900 {
 #=================================================
 # ¬Œ÷
 #=================================================
-sub tp_1000 {
+sub tp_1100 {
 	$m{act} += $m{turn};
 
 	my $v = int( (rand(3)+3) * $m{turn} );
@@ -694,6 +752,7 @@ sub military_master_c_up {
 }
 
 sub special_money {
+	return unless $w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1');
 	$m{money} += $_[0];
 	$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $_[0] G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
 }

@@ -55,16 +55,16 @@ sub begin {
 sub tp_1 {
 	return if &is_ng_cmd(1..4);
 	
+	my @size = ('やめる', "小規模    ($GWT_s分)", "中規模    ($GWT分)", "大規模    ($GWT_b分)");
+
 	if    ($cmd eq '1') { $mes .= "穀物を採取して国の$e2j{food}を増やします<br>"; }
 	elsif ($cmd eq '2') { $mes .= "国民からお金を徴税をして$e2j{money}を増やします<br>"; }
 	elsif ($cmd eq '3') { $mes .= "兵士を募集して国の$e2j{soldier}を増やします<br>※1人につき1G<br>"; }
-	elsif ($cmd eq '4') { $mes .= "農業,商業,徴兵をまとめて行います<br>"; $GWT_s *= 3; $GWT_b *= 3; $GWT *= 3; $GWT_l *= 3; }
+	elsif ($cmd eq '4') { $mes .= "農業,商業,徴兵をまとめて行います<br>"; $GWT_s *= 3; $GWT_b *= 3; $GWT *= 3; $GWT_l *= 3; push @size, "超規模    ($GWT_l分)"; }
 
 	$m{tp} = $cmd * 100;
 	$mes .= 'どのくらい行いますか?<br>';
-	
-	my @size = ('やめる', "小規模    ($GWT_s分)", "中規模    ($GWT分)", "大規模    ($GWT_b分)");
-	push @size, "超規模    ($GWT_l分)" if ($cmd eq '4');
+
 	&menu(@size);
 }
 
@@ -74,12 +74,26 @@ sub tp_1 {
 sub tp_100 { &exe1('穀物を採取します<br>') }
 sub tp_200 { &exe1('お金を徴税します<br>') }
 sub tp_300 { &exe1('兵士を雇用します<br>') }
+sub tp_400 { &exe1('まとめて内政を行います<br>') }
 sub exe1 {
-	return if &is_ng_cmd(1..3);
-	$GWT = $cmd eq '1' ? $GWT_s
-		 : $cmd eq '3' ? $GWT_b
-		 :               $GWT
-		 ;
+	my $i = 1;
+	if ($m{tp} == 400 && !&is_ng_cmd(1..4)) { # 長期内政
+		unless ($m{nou_c} >= 5 && $m{sho_c} >= 5 && $m{hei_c} >= 5) {
+			$mes .= "長期内政を行うには、農業,商業,徴兵の熟練度が5回以上でないとできません<br>";
+			&begin;
+			return;
+		}
+		$i = 3; # 内政 3 種
+	}
+	elsif (&is_ng_cmd(1..3)) {
+		return;
+	}
+
+	$GWT =  $cmd eq '1' ? $GWT_s * $i
+			: $cmd eq '3' ? $GWT_b * $i
+			: $cmd eq '4' ? $GWT_l * $i
+			:               $GWT   * $i
+			;
 
 	$m{tp} += 10;
 	$m{turn} = $cmd;
@@ -87,47 +101,29 @@ sub exe1 {
 	&before_action('icon_pet_exp', $GWT);
 	&wait;
 }
-#=================================================
-# 長期内政
-#=================================================
-sub tp_400 {
-	return if &is_ng_cmd(1..4);
 
-	$GWT = $cmd eq '1' ? $GWT_s * 3
-		 : $cmd eq '3' ? $GWT_b * 3
-		 : $cmd eq '4' ? $GWT_l * 3
-		 :               $GWT   * 3
-		 ;
-	
-	if ($m{nou_c} >= 5 && $m{sho_c} >= 5 && $m{hei_c} >= 5) {
-		$m{tp} += 10;
-		$m{turn} = $cmd;
-		if($cmd eq '4'){
-			$m{turn} = 5;
-		}
-		$mes .= "$_[0]結果は$GWT分後<br>";
+#=================================================
+# 内政効果量ボーナス（x倍補正 一定数量ボーナスを付け足すならば位置に注意）
+#=================================================
+sub multi_bonus {
+	my ($k, $v) = @_;
 
-		&before_action('icon_pet_exp', $GWT);
-		&wait;
-	}
-	else {
-		$mes .= "長期内政を行うには、農業,商業,徴兵の熟練度が5回以上でないとできません<br>";
-		&begin;
-	}
-}
-#=================================================
-# 内政官&君主ボーナス
-#=================================================
-sub dom_ceo_bonus {
-	my $v = shift;
 	# 内政官は内政力1.1倍
-	return $v * 1.1 if $cs{dom}[$m{country}] eq $m{name};
+	$v *= 1.1 if $cs{dom}[$m{country}] eq $m{name};
+
 	# 君主は内政力1.05倍、暴君時ならば1.2倍
-	if ($cs{ceo}[$m{country}] eq $m{name}) {
-		return $v * ( ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05 );
-	}
+	$v *= ( ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05 ) if $cs{ceo}[$m{country}] eq $m{name};
+
+	# 国設定補正
+	$v *= &get_modify('dom');
+
+	# 種族補正
+	$v = &seed_bonus($k, $v);
+	$v = &seed_bonus('red_moon', $v);
+
 	return $v;
 }
+
 #=================================================
 # 農業結果
 #=================================================
@@ -142,22 +138,8 @@ sub tp_110 {
 		$v *= 0.5; # 暴風
 	}
 	
-	$v = dom_ceo_bonus($v);
-#	if ($cs{dom}[$m{country}] eq $m{name}) {
-#		$v *= 1.1; # 代表ボーナス
-#	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-#		$v *= 1.05;
-#	}
-	
-	# 各国設定
-	$v *= &get_modify('dom');
-	
+	$v = &multi_bonus('nou', $v);
 	$v = &use_pet('nou', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '28');
-	
-	$v = &seed_bonus('nou', $v);
-	# 獣化
-	$v = &seed_bonus('red_moon', $v);
-	
 	$v = int($v);
 	
 	$cs{food}[$m{country}] += $v;
@@ -167,7 +149,9 @@ sub tp_110 {
 	&write_yran('nou', $v, 1);
 	
 	return if $m{tp} eq '410';
+
 	&after1;
+	&after2;
 }
 #=================================================
 # 商業結果
@@ -183,22 +167,8 @@ sub tp_210 {
 		$v *= 0.5; # 不況
 	}
 	
-	$v = dom_ceo_bonus($v);
-#	if ($cs{dom}[$m{country}] eq $m{name}) {
-#		$v *= 1.1; # 代表ボーナス
-#	} elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-#		$v *= 1.05;
-#	}
-	
-	# 各国設定
-	$v *= &get_modify('dom');
-	
+	$v = &multi_bonus('sho', $v);
 	$v = &use_pet('sho', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '29');
-	
-	$v = &seed_bonus('sho', $v);
-	# 獣化
-	$v = &seed_bonus('red_moon', $v);
-	
 	$v = int($v);
 
 	$cs{money}[$m{country}] += $v;
@@ -208,7 +178,9 @@ sub tp_210 {
 	&write_yran('sho', $v, 1);
 
 	return if $m{tp} eq '410';
+
 	&after1;
+	&after2;
 }
 #=================================================
 # 徴兵結果
@@ -221,24 +193,10 @@ sub tp_310 {
 		$v *= 0.5; # 飢饉
 	}
 	
-	$v = dom_ceo_bonus($v);
-#	if ($cs{dom}[$m{country}] eq $m{name}) {
-#		$v *= 1.1; # 代表ボーナス
-#	}elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-#		$v *= 1.05;
-#	}
-	
-	# 各国設定
-	$v *= &get_modify('dom');
-	
+	$v = &multi_bonus('hei', $v);
 	if ($v < $m{money}){
 		$v = &use_pet('hei', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '30');
 	}
-	
-	$v = &seed_bonus('hei', $v);
-	# 獣化
-	$v = &seed_bonus('red_moon', $v);
-
 	$v = int($v);
 
 	$v = $m{money} if $v > $m{money};
@@ -254,10 +212,11 @@ sub tp_310 {
 	}
 
 	return if $m{tp} eq '410';
-	
+
+	&after1;
 	# 徴兵はお金がかかるので、経験値と評価をちょっとﾌﾟﾗｽ
 	$m{turn} += 2 if 0 < $v && 0 < $m{money};
-	&after1;
+	&after2;
 }
 #=================================================
 # 長期内政結果
@@ -266,14 +225,27 @@ sub tp_410 {
 	&tp_110;
 	&tp_210;
 	&tp_310;
-	$m{turn} *= 4;
+
 	&after1;
+	$m{turn} = 5 if $m{turn} eq '4';
+	$m{turn} *= 4;
+	&after2;
 }
 
 #=================================================
 # 終了処理
 #=================================================
-sub after1 {
+sub after1 { # $m{turn} から拘束時間を割り出せる最後のタイミングで呼ばれる
+	require './lib/_rampart.cgi'; # 城壁
+	my $i = $m{tp} == 410 ? 3 : 1; # 内政 3 種：内政 1 種
+	my $g = $m{turn} eq '1' ? $GWT_s * $i
+			: $m{turn} eq '3' ? $GWT_b * $i
+			: $m{turn} eq '4' ? $GWT_l * $i
+			:                   $GWT   * $i
+			;
+	&gain_dom_barrier($g);
+}
+sub after2 {
 	my $v = int( (rand(3)+4) * $m{turn} );
 	$v = &use_pet('domestic', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '160');
 	$m{exp} += $v;
@@ -287,7 +259,7 @@ sub after1 {
 	$m{act} = 0;
 	$mes .= '疲労が回復しました<br>';
 	
-	&special_money if ($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1'));
+	&special_money;
 
 	if ($w{world} eq $#world_states-4) {
 		require './lib/fate.cgi';
@@ -302,11 +274,11 @@ sub after1 {
 	&write_cs;
 }
 
-
 #=================================================
 # 功労金
 #=================================================
 sub special_money {
+	return unless ($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1'));
 	my $v = int($m{rank} * 150 * $m{turn});
 	$m{money} += $v;
 	$mes .= "今までの功績が認められ $v Gの功労金があたえられた<br>";

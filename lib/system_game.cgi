@@ -14,13 +14,13 @@ sub write_cs {
 	
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可)
 	my @keys = (qw/
-		name strong tax food money soldier state is_die member capacity color
+		name strong barrier tax food money soldier state is_die member capacity color
 		win_c old_ceo ceo war dom mil pro war_c dom_c mil_c pro_c ceo_continue
 		modify_war modify_dom modify_mil modify_pro
 		extra extra_limit disaster disaster_limit
 		new_commer
 	/);
-	# 国名　総国力　税率　総兵糧　国家予算　総兵士数　状態　滅亡ﾌﾗｸﾞ　所属人数　定員　国色
+	# 国名　総国力　城壁値　税率　総兵糧　国家予算　総兵士数　状態　滅亡ﾌﾗｸﾞ　所属人数　定員　国色
 	# 統一数　旧代表者　代表者　参謀　内政官　策士　外交官　参謀ﾎﾟｲﾝﾄ　内政官ﾎﾟｲﾝﾄ　策士ﾎﾟｲﾝﾄ　外交官ﾎﾟｲﾝﾄ　代表年期
 	# 各国設定戦争　内政　軍事　外交
 	# 追加効果　追加効果期限　国別災害　国別災害有効期間
@@ -32,7 +32,7 @@ sub write_cs {
 	$cs{food}[$m{country}]    = $max_resource if $cs{food}[$m{country}]    > $max_resource;
 	$cs{money}[$m{country}]   = $max_resource if $cs{money}[$m{country}]   > $max_resource;
 	$cs{soldier}[$m{country}] = $max_resource if $cs{soldier}[$m{country}] > $max_resource;
-	
+
 	# 拙速
 	if ($w{world} eq $#world_states - 5) {
 		$cs{state}[$m{country}] = 0;
@@ -133,7 +133,7 @@ sub write_user {
 		y_name y_country y_rank y_sol y_unit y_sol_lv y_icon y_mes_win y_mes_lose y_pet y_value y_gua
 		y_rest_a y_rest_b y_rest_c
 		
-		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
+		nou_c sho_c hei_c gai_c gou_c cho_c sen_c gik_c kou_c tei_c mat_c cas_c tou_c shu_c col_c mon_c
 		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c fes_c war_c_t dom_c_t mil_c_t pro_c_t boch_c storm_c
 		shogo_t icon_t breed breed_c depot_bonus akindo_guild silent_kind silent_tail guild_number disp_casino chat_java disp_top disp_news disp_chat disp_ad disp_daihyo salary_switch no_boss incubation_switch disp_gacha_time delete_shield
 		valid_blacklist pet_icon_switch tutorial_switch
@@ -188,7 +188,7 @@ sub write_user {
 #================================================
 # 待ち時間を秒に変換 + 次へ
 sub wait {
-	$m{wt} = $GWT * 60;
+	$m{wt} = $config_test ? 0 : $GWT * 60;
 	$m{wt_c} += $m{wt};
 	&n_menu;
 	$m{is_playing} = 0;
@@ -424,7 +424,7 @@ sub c_up { # count up
 	}
 	
 	# 軍事系の師匠効果は ./lib/military.cgi で military_master_c_up
-	return if $c == 'gou_c' || $c == 'cho_c' || $c == 'sen_c' || $c == 'tei_c' || $c == 'gik_c' || $c == 'mat_c';
+	return if $c eq 'gou_c' || $c eq 'cho_c' || $c eq 'sen_c' || $c eq 'tei_c' || $c eq 'gik_c' || $c eq 'kou_c' || $c eq 'mat_c';
 	# 弟子の場合2倍取得
 	if ($m{master_c} eq $c) {
 		++$m{$c};

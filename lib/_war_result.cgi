@@ -8,6 +8,13 @@ use File::Path;
 # 救出人数
 my $max_rescue = 1;
 
+# m{value} は兵士の倍率や奪国力の補正など取り回されていてややこしい上に、進軍種類を楽に求められないので不便
+# 進軍種類さえ問えればそれらも求められるので根本的に仕様変更したい（ﾀﾞｰﾄﾙの進軍時周りの書き直しがネックか）
+# m{value} を進軍種類と再定義し、0, 1, 2 といった風に しかしコードの変更箇所が多いので諦める
+# ﾀﾞｰﾄﾙは進軍時に情勢を見て補正を掛けているので着弾時の情勢は無関係、$m{value} が * 3 されているかが重要 進軍種類が追加されるとバグりそう
+my $war_form = ($pets[$m{pet}][2] eq 'speed_down' && $m{unit} ne '18' && $m{value} >= 3) ? $m{value} / 3 : $m{value};
+$war_form = ($war_form == 1.5) ? 2 : int($war_form); # 進軍種類 少数：0 通常：1 長期：2
+
 #=================================================
 # 引き分け
 #=================================================
@@ -120,6 +127,8 @@ sub war_escape {
 sub war_win {
 	my $is_single = shift;
 
+	require './lib/_rampart.cgi'; # 城壁
+
 	# 奪国力ﾍﾞｰｽ:階級が高いほどﾌﾟﾗｽ。下克上、革命の時は階級が低いほどﾌﾟﾗｽ
 	my $v = ($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2')) ? (@ranks - $m{rank}) * 10 + 10 : $m{rank} * 8 + 10;
 
@@ -164,7 +173,11 @@ sub war_win {
 	
 	# 各国設定
 	$v *= &get_modify('war');
-	
+
+	# 城壁補正
+	my ($r_v, $r_vv) = &get_rampart_modify($y{country}); # 城壁による奪国力と奪国上限の補正が返る
+	$v *= $r_v;
+
 	# 参謀は奪国力1.1倍
 	if ($cs{war}[$m{country}] eq $m{name}) {
 		$v = int($v * 1.1) ;
@@ -231,20 +244,20 @@ sub war_win {
 		else { # 通常・長期
 			if($m{unit} eq '18'){
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
-					$v = $v > 2000 ? int(rand(500)+1500) : int($v);
+					$v = $v > (2000 + $r_vv) ? int(rand(500+($r_vv*0.5))+1500+($r_vv*0.5)) : int($v);
 				}
 				else {
-					$v = $v > 1500 ? int(rand(500)+1000) : int($v);
+					$v = $v > (1500 + $r_vv) ? int(rand(500+($r_vv*0.5))+1000+($r_vv*0.5)) : int($v);
 #					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
 				}
 			}else{
 				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # 統一期限残り１日
-					$v = $v > 1500 ? int(rand(500)+1000) : int($v);
+					$v = $v > (1500 + $r_vv) ? int(rand(500+($r_vv*0.5))+1000+($r_vv*0.5)) : int($v);
 #					$v = $v > 1500 ? int(rand(250)+1250) : int($v);
 				}
 				else {
 #					$v = $v > 600  ? int(rand(200)+400) : int($v);
-					$v = $v > 800  ? int(rand(200)+600) : int($v);
+					$v = $v > (800 + $r_vv)  ? int(rand(200+($r_vv*0.5))+600+($r_vv*0.5)) : int($v);
 				}
 			}
 			# 統一期限が近づいてきたらﾌﾟﾗｽ
@@ -304,6 +317,9 @@ sub war_win {
 				;
 		}
 	}
+
+	# 城壁データ±
+	&change_barrier($y{country}, -$units[$m{unit}][7][$war_form]);
 
 	&after_success_action('war', $is_single);
 
