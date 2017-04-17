@@ -5,7 +5,7 @@
 # S‘©ŠÔ
 $GWT = int($GWT * 1.5);
 
-my @needs = (0.5, 1.0, 2.0); #’Êí•”‘à
+my @needs = (0.5, 1.0, 2.0); # ’Êí•”‘à
 if ($m{unit} eq '16') { # Œy‘••”‘à Á”ï•¨‘0.75”{
 	$needs[$_] *= 0.75 for (0 .. $#needs);
 }
@@ -13,7 +13,6 @@ elsif ($m{unit} eq '18') { # àÂ’m•”‘à Á”ï•¨‘1.5”{
 	$needs[$_] *= 1.5 for (0 .. $#needs);
 }
 if ($m{pet} eq '193') { $needs[$_] *= 0.5 for (0 .. $#needs); } # ÀŞ°¸×ËŞ¯Ä Á”ï•¨‘0.5”{
-
 
 # iŒRí—Ş
 my @war_marchs = (
@@ -57,12 +56,11 @@ sub is_satisfy {
 sub begin {
 	if ($m{tp} > 1) {
 		$m{tp} = 1;
-		$mes .= '‚Ç‚Ì‚æ‚¤‚ÉU‚ß‚İ‚Ü‚·‚©?<hr>';
 	}
 	else {
 		$mes .= "‘¼‘‚ÖU‚ß‚İ$e2j{strong}‚ğ’D‚¢‚Ü‚·<br>";
-		$mes .= "‚Ç‚Ì‚æ‚¤‚ÉU‚ß‚İ‚Ü‚·‚©?<hr>";
 	}
+	$mes .= "‚Ç‚Ì‚æ‚¤‚ÉU‚ß‚İ‚Ü‚·‚©?<hr>";
 
 	my @menus = ('‚â‚ß‚é');
 	for my $war_march (@war_marchs) {
@@ -75,6 +73,11 @@ sub begin {
 		else {
 			push @menus, '';
 		}
+	}
+
+	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
+		&show_tutorial_message('í‘ˆ‚É‚æ‚Á‚Ä“G‘‚Ì‘—Í‚ğ’D‚¤‚±‚Æ‚ª‚Å‚«‚é‚æI<br>Ÿ‚¿”‚æ‚è‚à•‰‚¯”‚ª‘½‚¢‚Æ’·ŠúiŒR‚ª‚Å‚«‚È‚­‚È‚Á‚¿‚á‚¤‚©‚çAí‘ˆ‚ÉŸ‚Ä‚È‚¢‚È‚ç‰ï‹cº‚Å‘Š’k‚µ‚Ä‚İ‚æ‚¤');
 	}
 
 	&menu(@menus);
@@ -235,29 +238,6 @@ sub _unit_march {
 		$need_GWT = 20 if $_form > 0.5 && $need_GWT < 20;
 	}
 	return int($need_GWT);
-=pod
-	my $need_GWT = shift;
-	# d•ºBÅ‚iŒRŠÔ90•ª
-	if ($m{unit} eq '1' && ($pets[$m{pet}][2] ne 'speed_up' || ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) && $need_GWT * 1.5 < 90) {
-		$need_GWT = $need_GWT * 1.5;
-	}
-	# “V”n,”ò—³BÅ’áiŒRŠÔ20•ª
-	elsif ( ($m{unit} eq '7' || $m{unit} eq '8' || ($pets[$m{pet}][2] eq 'speed_up' && $w{world} ne '17')) && $need_GWT * 0.5 > 20 && $m{unit} ne '18') {
-		$need_GWT = $need_GWT * 0.5;
-	}
-
-	if ($pets[$m{pet}][2] eq 'speed_down' && $w{world} ne '17') {
-		$need_GWT *= $m{unit} eq '7' || $m{unit} eq '8' ? 4 : 2;
-		$m{value} *= 3 unless $m{unit} eq '18';
-	}
-	elsif ($m{pet} eq '193' && $w{world} ne '7'
-#	&& $w{world} ne $#world_states	
-	) {
-		$need_GWT -= 10;
-		$need_GWT = 20 if $m{value} > 1 && $need_GWT < 20;
-	}
-	return int($need_GWT);
-=cut
 }
 
 1; # íœ•s‰Â
