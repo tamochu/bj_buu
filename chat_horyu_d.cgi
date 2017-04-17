@@ -3,6 +3,7 @@ require 'config.cgi';
 require './lib/_comment_tag.cgi';
 #=================================================
 # 改造案討論所詳細
+# ログの表示を降順と昇順入れ替えた ログファイルへの書き込み順を変えるのが一番だが面倒だったので表示上だけ入れ替えた 96行前後 いつか直すかも
 #=================================================
 &get_data;
 
@@ -90,6 +91,9 @@ sub run {
 		}
 	}
 	my $last_write_time;
+	my $second_line = '';
+	my $contents = '';
+
 	while (my $linet = <$fh2>) {
 		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bid) = split /<>/, $linet;
 		$bname .= "[$bshogo]" if ($bshogo && $bname ne '名無しさん@黒豚鯖');
@@ -100,10 +104,18 @@ sub run {
 			$bcountry = 0;
 		}
 		$bcomment = &comment_change($bcomment, 1);
-		print qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
+#		print qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
+		if ($second_line) {
+			$contents = qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n| . $contents;
+		}
+		else {
+			$second_line = qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
+		}
 		$last_write_time = $btime;
 	}
 	close $fh2;
+	print $second_line;
+	print $contents;
 	print qq|</form>|;
 	if ($last_write_time + $remind_time < $time) {
 		&remind($in{line});
