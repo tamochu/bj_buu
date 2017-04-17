@@ -162,17 +162,19 @@ sub disp_now {
 		}elsif($m{tp} eq '510'){
 			$state .= "(‹UŒv)";
 		}elsif($m{tp} eq '610'){
+			$state .= "(Ué)";
+		}elsif($m{tp} eq '710'){
 			if($m{value} eq 'military_ambush'){
 				$state = "ŒR–";
 			}else{
 				$state = "iŒR";
 			}
 			$state .= "‘Ò‚¿•š‚¹’†‚Å‚·";
-		}elsif($m{tp} eq '710'){
-			$state .= "(’·Šú‹­’D)";
 		}elsif($m{tp} eq '810'){
-			$state .= "(’·Šú’³•ñ)";
+			$state .= "(’·Šú‹­’D)";
 		}elsif($m{tp} eq '910'){
+			$state .= "(’·Šú’³•ñ)";
+		}elsif($m{tp} eq '1010'){
 			$state .= "(’·Šúô”])";
 		}
 	}elsif($m{lib} eq 'prison'){

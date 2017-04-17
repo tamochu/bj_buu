@@ -55,16 +55,17 @@ sub begin {
 sub tp_1 {
 	return if &is_ng_cmd(1..4);
 	
-	my @size = ('‚â‚ß‚é', "¬‹K–Í    ($GWT_s•ª)", "’†‹K–Í    ($GWT•ª)", "‘å‹K–Í    ($GWT_b•ª)");
-
 	if    ($cmd eq '1') { $mes .= "’•¨‚ğÌæ‚µ‚Ä‘‚Ì$e2j{food}‚ğ‘‚â‚µ‚Ü‚·<br>"; }
 	elsif ($cmd eq '2') { $mes .= "‘–¯‚©‚ç‚¨‹à‚ğ’¥Å‚ğ‚µ‚Ä$e2j{money}‚ğ‘‚â‚µ‚Ü‚·<br>"; }
 	elsif ($cmd eq '3') { $mes .= "•ºm‚ğ•åW‚µ‚Ä‘‚Ì$e2j{soldier}‚ğ‘‚â‚µ‚Ü‚·<br>¦1l‚É‚Â‚«1G<br>"; }
-	elsif ($cmd eq '4') { $mes .= "”_‹Æ,¤‹Æ,’¥•º‚ğ‚Ü‚Æ‚ß‚Äs‚¢‚Ü‚·<br>"; $GWT_s *= 3; $GWT_b *= 3; $GWT *= 3; $GWT_l *= 3; push @size, "’´‹K–Í    ($GWT_l•ª)"; }
+	elsif ($cmd eq '4') { $mes .= "”_‹Æ,¤‹Æ,’¥•º‚ğ‚Ü‚Æ‚ß‚Äs‚¢‚Ü‚·<br>"; $GWT_s *= 3; $GWT_b *= 3; $GWT *= 3; $GWT_l *= 3; }
+
 
 	$m{tp} = $cmd * 100;
 	$mes .= '‚Ç‚Ì‚­‚ç‚¢s‚¢‚Ü‚·‚©?<br>';
 
+	my @size = ('‚â‚ß‚é', "¬‹K–Í    ($GWT_s•ª)", "’†‹K–Í    ($GWT•ª)", "‘å‹K–Í    ($GWT_b•ª)");
+	push @size, "’´‹K–Í    ($GWT_l•ª)" if ($cmd eq '4');
 	&menu(@size);
 }
 
