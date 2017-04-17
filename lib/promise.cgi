@@ -31,7 +31,12 @@ sub begin {
 	else {
 		$mes .= "他国と外交をします($GWT分)<br>何を行いますか?<br>";
 	}
-	
+
+	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
+		&show_tutorial_message('友好条約によって他国との交戦を防いだり、同盟を組むことができるよ<br>交戦させようとしている場合もあるから、どこと友好条約を結ぶか迷ったら会議室で相談してみよう');
+	}
+
 	my @menus = ('やめる','友好条約','停戦協定');
 	
 	if (&is_daihyo) {
