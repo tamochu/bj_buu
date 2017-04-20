@@ -33,10 +33,10 @@ sub war_draw {
 		$cs{soldier}[$m{country}] += $m{sol};
 		$is_rewrite = 1;
 	}
-	if ($y{sol} > 0) {
-		$cs{soldier}[$y{country}] += int($y{sol} / 3);
-		$is_rewrite = 1;
-	}
+#	if ($y{sol} > 0) {
+#		$cs{soldier}[$y{country}] += int($y{sol} / 3);
+#		$is_rewrite = 1;
+#	}
 
 	if($y{value} eq 'ambush'){
 		my $send_id = unpack 'H*', $y{name};
@@ -74,7 +74,7 @@ sub war_lose {
 		$mes .= "‚³‚ç‚É$v‚Ì$e2j{exp}‚ğè‚É“ü‚ê‚Ü‚µ‚½<br>";
 	}
 	
-	$cs{soldier}[$y{country}] += int($y{sol} / 3) if $y{sol} > 0;
+#	$cs{soldier}[$y{country}] += int($y{sol} / 3) if $y{sol} > 0;
 	&down_friendship;
 
 	# ˜A‘±‚Å“¯‚¶‘‚¾‚Æ‚Šm—¦‚ÅÀ²°Î
@@ -106,7 +106,7 @@ sub war_escape {
 	&write_yran('war', 1, 1);
 
 	$cs{soldier}[$m{country}] += $m{sol};
-	$cs{soldier}[$y{country}] += int($y{sol} / 3);
+#	$cs{soldier}[$y{country}] += int($y{sol} / 3);
 
 	if($y{value} eq 'ambush'){
 		my $send_id = unpack 'H*', $y{name};

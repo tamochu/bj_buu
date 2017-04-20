@@ -4,7 +4,8 @@ sub tp_1  { &refresh; $m{shogo}=$shogos[1][0]; &write_user; &error('ﾌﾟﾛｸﾞﾗﾑｴﾗｰ異
 #================================================
 # 戦争 Created by Merino
 #================================================
-# $m{value} には 兵士の倍率
+# $m{value} には 兵士の倍率 奪国時には進軍補正としても取り回されていてややこしい
+# 進軍種類を明確に問うのであれば、ﾀﾞｰﾄﾙ装備時には $m{value} / 3 で求められる 進軍種類 少数：0.5 通常：1.0 長期：1.5
 
 $m{war_select_switch} = 0;
 
@@ -57,7 +58,10 @@ sub tp_100 {
 		$y{sol} = int($rank_sols[$y{rank}]);
 	}
 	else {
-		$y{sol} = int($rank_sols[$y{rank}] * $m{value});
+		$y{sol} = int($rank_sols[$y{rank}] * $m{value}); # ﾀﾞｰﾄﾙは少数無効
+	}
+	if ($config_test) {
+		$y{sol} = 20000;
 	}
 
 	# 兵が足りない
@@ -69,9 +73,9 @@ sub tp_100 {
 		&write_cs;
 	}
 	else {
-		$cs{soldier}[$y{country}] -= int($y{sol} / 3);
+#		$cs{soldier}[$y{country}] -= int($y{sol} / 3);
 		$y{sol_lv} = 80;
-		&write_cs;
+#		&write_cs;
 	}
 
 	# 待ち伏せ
@@ -117,7 +121,7 @@ sub tp_100 {
 		$m{sol_lv} = 80;
 		$mes .= "$c_yから$y{name}率いる$y{sol}の兵が出てきました<br>";
 	}
-	if ($m{pet} == -1) { # ﾕｰﾚｲの埋め込み処理
+	if ($m{pet} == -1) { # ﾕｰﾚｲの埋め込み処理 これもっと汎用的にしないと
 		$m{pet_c}--;
 		if ($m{pet_c} <= 0) {
 			$m{pet} = 0;
@@ -134,10 +138,6 @@ sub tp_100 {
 		my $v = int( $m{sol} * (rand(0.1)+0.1) );
 		$m{sol} += $v;
 		$mes .= "なんと、$cs{name}[$union]から$v兵の援軍が駆けつけた!<br>";
-	}
-
-	if ($config_test) {
-		$y{sol} /= 2;
 	}
 
 	$m_lea = &get_wea_modify('m');
