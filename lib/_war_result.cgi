@@ -1,5 +1,6 @@
 use File::Copy::Recursive qw(rcopy);
 use File::Path;
+require './lib/_rampart.cgi'; # 城壁
 #=================================================
 # 戦争結果 Created by Merino
 #=================================================
@@ -9,8 +10,8 @@ use File::Path;
 my $max_rescue = 1;
 
 # m{value} は兵士の倍率や奪国力の補正など取り回されていてややこしい上に、進軍種類を楽に求められないので不便
-# 進軍種類さえ問えればそれらも求められるので根本的に仕様変更したい（ﾀﾞｰﾄﾙの進軍時周りの書き直しがネックか）
-# m{value} を進軍種類と再定義し、0, 1, 2 といった風に しかしコードの変更箇所が多いので諦める
+# 進軍種類さえ問えればそれらも求められるので根本的に仕様変更したい
+# m{value} を進軍種類と再定義し、0, 1, 2 といった風に しかしコードの変更箇所が多いので諦める（特にﾀﾞｰﾄﾙの進軍時周りの書き直しがネックか）
 # ﾀﾞｰﾄﾙは進軍時に情勢を見て補正を掛けているので着弾時の情勢は無関係、$m{value} が * 3 されているかが重要 進軍種類が追加されるとバグりそう
 my $war_form = ($pets[$m{pet}][2] eq 'speed_down' && $m{unit} ne '18' && $m{value} >= 3) ? $m{value} / 3 : $m{value};
 $war_form = ($war_form == 1.5) ? 2 : int($war_form); # 進軍種類 少数：0 通常：1 長期：2
@@ -37,6 +38,9 @@ sub war_draw {
 #		$cs{soldier}[$y{country}] += int($y{sol} / 3);
 #		$is_rewrite = 1;
 #	}
+
+	# 城壁データ±
+	&change_barrier($y{country}, -$units[$m{unit}][7][$war_form]);
 
 	if($y{value} eq 'ambush'){
 		my $send_id = unpack 'H*', $y{name};
@@ -75,6 +79,10 @@ sub war_lose {
 	}
 	
 #	$cs{soldier}[$y{country}] += int($y{sol} / 3) if $y{sol} > 0;
+
+	# 城壁データ±
+	&change_barrier($y{country}, -$units[$m{unit}][7][$war_form]);
+
 	&down_friendship;
 
 	# 連続で同じ国だと高確率でﾀｲｰﾎ
@@ -108,6 +116,9 @@ sub war_escape {
 	$cs{soldier}[$m{country}] += $m{sol};
 #	$cs{soldier}[$y{country}] += int($y{sol} / 3);
 
+	# 城壁データ±
+	&change_barrier($y{country}, -$units[$m{unit}][7][$war_form]);
+
 	if($y{value} eq 'ambush'){
 		my $send_id = unpack 'H*', $y{name};
 		open my $fh, ">> $userdir/$send_id/war.cgi";
@@ -127,7 +138,6 @@ sub war_escape {
 sub war_win {
 	my $is_single = shift;
 
-	require './lib/_rampart.cgi'; # 城壁
 
 	# 奪国力ﾍﾞｰｽ:階級が高いほどﾌﾟﾗｽ。下克上、革命の時は階級が低いほどﾌﾟﾗｽ
 	my $v = ($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2')) ? (@ranks - $m{rank}) * 10 + 10 : $m{rank} * 8 + 10;
