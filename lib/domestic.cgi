@@ -44,10 +44,10 @@ sub begin {
 	}
 	else {
 		$mes .= '内政を行い自国の資源を増やします<br>どれを行いますか?<br>';
-		if ($m{tutorial_switch}) {
-			require './lib/tutorial.cgi';
-			&show_tutorial_message('内政によって戦争をするのに必要な物資を貯めることができるよ！<br>農業・商業・徴兵のいずれかの熟練度が 50 になる度に報奨金が貰えるから、まずはそれを狙ってみよう');
-		}
+	}
+	if ($m{tutorial_switch}) {
+		require './lib/tutorial.cgi';
+		&show_tutorial_message('内政によって戦争をするのに必要な物資を貯めることができるよ！<br>農業・商業・徴兵のいずれかの熟練度が 50 になる度に報奨金が貰えるから、まずはそれを狙ってみよう');
 	}
 	
 	&menu('やめる','農業','商業','徴兵','長期内政');
@@ -59,7 +59,6 @@ sub tp_1 {
 	elsif ($cmd eq '2') { $mes .= "国民からお金を徴税をして$e2j{money}を増やします<br>"; }
 	elsif ($cmd eq '3') { $mes .= "兵士を募集して国の$e2j{soldier}を増やします<br>※1人につき1G<br>"; }
 	elsif ($cmd eq '4') { $mes .= "農業,商業,徴兵をまとめて行います<br>"; $GWT_s *= 3; $GWT_b *= 3; $GWT *= 3; $GWT_l *= 3; }
-
 
 	$m{tp} = $cmd * 100;
 	$mes .= 'どのくらい行いますか?<br>';
@@ -78,7 +77,8 @@ sub tp_300 { &exe1('兵士を雇用します<br>') }
 sub tp_400 { &exe1('まとめて内政を行います<br>') }
 sub exe1 {
 	my $i = 1;
-	if ($m{tp} == 400 && !&is_ng_cmd(1..4)) { # 長期内政
+	if ($m{tp} == 400) { # 長期内政
+		return if &is_ng_cmd(1..4);
 		unless ($m{nou_c} >= 5 && $m{sho_c} >= 5 && $m{hei_c} >= 5) {
 			$mes .= "長期内政を行うには、農業,商業,徴兵の熟練度が5回以上でないとできません<br>";
 			&begin;
@@ -86,8 +86,8 @@ sub exe1 {
 		}
 		$i = 3; # 内政 3 種
 	}
-	elsif (&is_ng_cmd(1..3)) {
-		return;
+	else {
+		return if &is_ng_cmd(1..3);
 	}
 
 	$GWT =  $cmd eq '1' ? $GWT_s * $i
