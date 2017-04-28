@@ -4,8 +4,8 @@
 
 # require './lib/_rampart.cgi'; # 城壁
 
-$dom_barrier_ratio = 0.25; # 内政時間4分毎に1%回復
-$mil_barrier_ratio = 0.125; # 待伏時間8分毎に1%回復
+$dom_barrier_ratio = 5; # 内政時間5分毎に1%回復
+$mil_barrier_ratio = 4; # 20%回復 + 拘束20分以降の待伏時間4分毎に1%回復
 
 # 城壁値の定義
 @barrier = (
@@ -59,10 +59,11 @@ sub change_barrier {
 # 内政による城壁修復
 # ＞小規模3%、中規模5%、大規模10%。長規模も分数*0.25づつ回復。
 # つまり拘束時間 * 0.25 だけ上昇
+# 1%/5分に変更
 #================================================
 sub gain_dom_barrier {
 	my $v = shift;
-	&change_barrier($m{country}, $v * $dom_barrier_ratio);
+	&change_barrier($m{country}, $v / $dom_barrier_ratio);
 }
 
 #================================================
@@ -71,6 +72,7 @@ sub gain_dom_barrier {
 # 20 * 1 + (拘束時間 - 20) * 0.25、つまり最高 135 %回復
 # 内政に比べて効率が良い 例：内政4時間で 60 %に対して待伏4時間で 75 %、待伏8時間で 135 %
 # テストするまでもないぐらい上がりすぎな気しかしないのでむしろ内政よりも抑えて 拘束時間 * 0.125→待伏8時間で 60% 内政4時間と同じ
+# 原案に変更
 #================================================
 sub gain_mil_barrier {
 	my $is_start = shift;
@@ -91,8 +93,9 @@ sub gain_mil_barrier {
 		my $line = <$fh>;
 		close $fh;
 
-		my $v = ($time - $line) * $mil_barrier_ratio / 60;
-		$v = $v > 60 ? 60 : $v; # 最高60% 超長期内政と同じ値
+		my $v = ($time - $line - $GWT * 60) / (60 * $mil_barrier_ratio);
+		$v += 20;
+#		$v = $v > 60 ? 60 : $v; # 最高60% 超長期内政と同じ値
 		&change_barrier($m{country}, $v);
 	}
 }
