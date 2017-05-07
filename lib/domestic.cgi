@@ -260,7 +260,7 @@ sub after2 {
 	$m{act} = 0;
 	$mes .= '”æ˜J‚ª‰ñ•œ‚µ‚Ü‚µ‚½<br>';
 	
-	&special_money;
+	&special_money if ($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1'));
 
 	if ($w{world} eq $#world_states-4) {
 		require './lib/fate.cgi';
@@ -279,7 +279,6 @@ sub after2 {
 # Œ÷˜J‹à
 #=================================================
 sub special_money {
-	return unless ($w{world} eq '1' || ($w{world} eq '19' && $w{world_sub} eq '1'));
 	my $v = int($m{rank} * 150 * $m{turn});
 	$m{money} += $v;
 	$mes .= "¡‚Ü‚Å‚ÌŒ÷Ñ‚ª”F‚ß‚ç‚ê $v G‚ÌŒ÷˜J‹à‚ª‚ ‚½‚¦‚ç‚ê‚½<br>";
