@@ -14,14 +14,12 @@ use File::Path;
 # 祭り情勢時に追加される国の数・国力・国名・国色の定義
 #================================================
 
-if ($config_test) {
-	use constant FESTIVAL_COUNTRY_PROPERTY => {
+use constant FESTIVAL_COUNTRY_PROPERTY => {
 #		'kouhaku' => [2, 1, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
 #		'sangokusi' => [3, 1, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
-		'kouhaku' => [2, 75000, ["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
-		'sangokusi' => [3, 50000, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
-	};
-}
+	'kouhaku' => [2,["きのこの山", "たけのこの里"], ["#ffffff", "#ff0000"]],
+	'sangokusi' => [3, ["魏", "呉", "蜀"], ["#4444ff", "#ff4444", "#44ff44"]]
+};
 
 #================================================
 # 祭り情勢開始時の国や情勢を設定して始める
@@ -352,6 +350,7 @@ sub add_festival_country {
 	my $country_num = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[0];
 	$w{country} += $country_num;
 	my $max_c = int($w{player} / $country_num) + 3;
+	require './lib/_rampart.cgi';
 	for my $i ($w{country}-($country_num-1)..$w{country}){
 		mkdir "$logdir/$i" or &error("$logdir/$i ﾌｫﾙﾀﾞが作れませんでした") unless -d "$logdir/$i";
 		for my $file_name (qw/bbs bbs_log bbs_member depot_log patrol prison prison_member prisoner violator leader member/) {
@@ -391,20 +390,18 @@ sub add_festival_country {
 		}
 
 		my $num = $i-($w{country}+1-$country_num);
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[3][$num];
+		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1][$num];
+		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
 		$cs{member}[$i]   = 0;
 		$cs{win_c}[$i]    = 999;
 		$cs{tax}[$i]      = 99;
-		$cs{strong}[$i]   = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1];
+		$cs{strong}[$i]   = $max_c * 500; # 仕官上限 * 500
 		$cs{food}[$i]     = $config_test ? 999999 : 0;
 		$cs{money}[$i]    = $config_test ? 999999 : 0;
 		$cs{soldier}[$i]  = $config_test ? 999999 : 0;
 		$cs{state}[$i]    = 0;
 		$cs{capacity}[$i] = $max_c;
 		$cs{is_die}[$i]   = 0;
-
-		require './lib/_rampart.cgi';
 		$cs{barrier}[$i]  = &get_init_barrier;
 	}
 
