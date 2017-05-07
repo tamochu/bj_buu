@@ -1,4 +1,6 @@
 #!/usr/local/bin/perl --
+use Time::HiRes;
+$load_time = Time::HiRes::time unless $load_time;
 require './lib/system.cgi';
 require './lib/move_player.cgi';
 use File::Copy;

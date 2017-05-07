@@ -1,4 +1,6 @@
 #!/usr/local/bin/perl --
+use Time::HiRes;
+$load_time = Time::HiRes::time unless $load_time;
 use CGI::Carp qw(fatalsToBrowser);
 require 'config.cgi';
 require 'config_game.cgi';
@@ -142,7 +144,7 @@ sub disp_now {
 				$state = "¬‹K–Í";
 			}elsif($m{turn} eq '3'){
 				$state = "‘å‹K–Í";
-			}elsif($m{turn} eq '5'){
+			}elsif($m{turn} eq '4'){
 				$state = "’´‹K–Í";
 			}else{
 				$state = "’†‹K–Í";

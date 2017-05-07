@@ -1,3 +1,5 @@
+use Time::HiRes;
+$load_time = Time::HiRes::time unless $load_time;
 require './lib/jcode.pl';
 require './lib/summer_system.cgi';
 use Time::Local;
@@ -489,6 +491,7 @@ sub footer {
 	print qq|<br><div align="right" style="font-size:11px">|;
 	print qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br><a href="http://www.game-smartphone.com/simulation/game_387.html">スマートフォンゲームズ</a><br>|; # 著作表示:削除・非表示 禁止!!
 	print qq|$copyright|;
+	printf("%0.10f秒",Time::HiRes::time - $load_time);
 	print qq|</div></body></html>|;
 }
 

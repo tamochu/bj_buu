@@ -1,3 +1,5 @@
+use Time::HiRes;
+$load_time = Time::HiRes::time unless $load_time;
 require './lib/system.cgi';
 require './lib/summer_system_game.cgi';
 #================================================
@@ -17,7 +19,7 @@ $VERSION = '2.71';
 $mente_min = 0;
 
 # テスト用
-$config_test = 0;
+$config_test = (-1 < index($ENV{'REQUEST_URI'}, 'test')) ? 1 : 0;
 
 # 管理ﾊﾟｽﾜｰﾄﾞ(適当な半角英数字に必ず変更してください)
 require './admin_password.cgi';
@@ -81,7 +83,7 @@ $auto_delete_day = 30;
 $sales_ranking_cycle_day = 15;
 
 # 基本拘束時間(分) Game Standard Wait Time
-$GWT = 20;
+$GWT = $config_test ? 20 : 20;
 
 # 給与をもらえる間隔(時)
 $salary_hour = 6;
@@ -210,5 +212,6 @@ if ($is_smart
 #================================================
 # javascriptファイル更新変数
 #================================================
-$jstime = '201605192158';
+$jstime = '201703170225';
+#$jstime = '201605192158';
 1; # 削除不可
