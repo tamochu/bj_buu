@@ -55,7 +55,7 @@ sub run {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print qq|<input type="hidden" name="mode" value="result_table">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
-		print qq|<input type="submit" value="結果一覧" class="button_s"></form><br>|;
+		print qq|<input type="submit" value="結果一覧" class="button_s"></form>|;
 	}elsif($m{name} ne $leader) {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print qq|<input type="hidden" name="mode" value="exit">|;
@@ -66,7 +66,7 @@ sub run {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print qq|<input type="hidden" name="mode" value="reset">|;
 		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
-		print qq|<input type="submit" value="ちゃぶ台返し" class="button_s"></form><br>|;
+		print qq|<input type="submit" value="ちゃぶ台返し" class="button_s"></form>|;
 	}
 	print qq|<h2>$this_title</h2>|;
 	print qq|<form method="$method" action="$this_script" name="form">|;
@@ -83,43 +83,59 @@ sub run {
 	print qq|</form><font size="2">$member_c人:$member</font><br>|;
 	print $leader eq '' ? qq|親:募集中 レート:<br>|:qq|親:$leader レート:$rate 対戦相手:$wmember<br>|;
 	if($leader){
-		&print_field;
-		print qq|<br>|;
-		&print_gotten;
+		if ($wmember && $state ne 'waiting') {
+			&print_field;
+#			print qq|<br>|;
+			&print_gotten;
+		}
+		else {
+			if ($m{name} eq $leader && $wmember) {
+				print qq|$wmemberとこいこいしますか？<br>|;
+			}
+			elsif ($m{name} eq $leader) {
+				print qq|こいこいする相手を待っています<br>|;
+			}
+			elsif ($m{c_turn} < 1) {
+				print qq|$leaderが一緒にこいこいしようとこいこいしています<br>|;
+			}
+			else {
+				print qq|$leaderのゲーム開始を待っています<br>|;
+			}
+		}
 		if(($state eq $m{name} || $state eq $m{name}.'_山札') && $m{c_turn}){
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="play">|;
-			&print_hand;
+			&print_hand if $wmember;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-			print qq|<input type="submit" value="札を出す" class="button_s"></form><br>|;
+			print qq|<input type="submit" value="札を出す" class="button_s"></form>|;
 			
 			if (&is_teyaku) {
 				print qq|<form method="$method" action="$this_script" name="form">|;
 				print qq|<input type="hidden" name="mode" value="win_teyaku">|;
 				print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-				print qq|<input type="submit" value="手上がり" class="button_s"></form><br>|;
+				print qq|<br><input type="submit" value="手上がり" class="button_s"></form><br>|;
 			}
 		}elsif(($state eq $m{name}.'_こいこい' || $state eq $m{name}.'_山札_こいこい') && $m{c_turn}){
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="continue">|;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-			print qq|<input type="submit" value="こいこい" class="button_s"></form><br>|;
+			print qq|<input type="submit" value="こいこい" class="button_s"></form>|;
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="win">|;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-			print qq|<input type="submit" value="終了" class="button_s"></form><br>|;
+			print qq|<input type="submit" value="終了" class="button_s"></form>|;
 		}elsif($state eq 'waiting' && $m{name} ne $leader && ($m{c_turn} eq '0' || $m{c_turn} eq '')) {
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="participate">|;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-			print qq|<input type="submit" value="参加する" class="button_s"></form><br>|;
+			print qq|<input type="submit" value="参加する" class="button_s"></form>|;
 		}elsif($state eq 'waiting' && $m{name} eq $leader && $in{mode} ne 'leader' && $waiting) {
 			print qq|<form method="$method" action="$this_script" name="form">|;
 			print qq|<input type="hidden" name="mode" value="start">|;
 			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="waiting" value="$waiting"><input type="hidden" name="guid" value="ON">|;
-			print qq|<input type="submit" value="開始" class="button_s"></form><br>|;
+			print qq|<input type="submit" value="開始" class="button_s"></form>|;
 		}
-		&print_my_hand;
+		&print_my_hand if $state ne 'waiting';
 	}else {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print qq|<input type="hidden" name="mode" value="leader">|;
@@ -128,7 +144,7 @@ sub run {
 		for my $i(0..$#rates){
 			print qq|<option value="$i">$rates[$i]</option>|;
 		}
-		print qq|<input type="submit" value="親になる" class="button_s"></form><br>|;
+		print qq|<input type="submit" value="親になる" class="button_s"></form>|;
 	}
 	print qq|<hr>|;
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
@@ -190,9 +206,14 @@ sub get_member {
 		if ($time - $limit_member_time > $mtime) {
 			if($mturn > 0){
 				$leave_name = $mname if $state ne 'waiting';
-				&regist_you_data($mname,'c_turn',0);
-				&regist_you_data($mname,'c_value',0);
-				&regist_you_data($mname,'c_stock',0);
+				my @array = (['c_turn', '0'],
+								['c_value', '0'],
+								['c_stock', '0']);
+				&regist_you_array($mname, @array);
+
+#				&regist_you_data($mname,'c_turn',0);
+#				&regist_you_data($mname,'c_value',0);
+#				&regist_you_data($mname,'c_stock',0);
 			}else {
 				next;
 			}
@@ -566,10 +587,14 @@ sub print_hand {
 				my $gif_str = &num_to_gif($hcard);
 				$gif_str .= &num_to_gif($fcard);
 				if($first_card){
-					print qq|<input type="radio" name="card" value="${hcard}_${fcard}" selected>$gif_str<br>|;
+					print qq|<label>| unless $is_mobile;
+					print qq|<input type="radio" name="card" value="${hcard}_${fcard}" checked>$gif_str<br>|;
+					print qq|</label>| unless $is_mobile;
 					$first_card = 0;
 				}else{
+					print qq|<label>| unless $is_mobile;
 					print qq|<input type="radio" name="card" value="${hcard}_${fcard}">$gif_str<br>|;
+					print qq|</label>| unless $is_mobile;
 				}
 				$match_card = 1;
 			}
@@ -577,19 +602,20 @@ sub print_hand {
 		unless($match_card){
 			my $gif_str = &num_to_gif($hcard);
 			if($first_card){
-				print qq|<input type="radio" name="card" value="$hcard" selected>$gif_str<br>|;
-				$first_card = 0;
+				print qq|<label>| unless $is_mobile;
+				print qq|<input type="radio" name="card" value="$hcard" checked>$gif_str<br>|;
+				print qq|</label>| unless $is_mobile;
 			}else{
+				print qq|<label>| unless $is_mobile;
 				print qq|<input type="radio" name="card" value="$hcard">$gif_str<br>|;
+				print qq|</label>| unless $is_mobile;
 			}
 		}
 	}
 }
 
 sub print_my_hand {
-	print qq|<br>残り<span id="nokori_time">$limit_member_time秒</span><br>|;
-	print qq|<script type="text/javascript"><!--\n nokori_time($limit_member_time, 0, 0, 0, 0);\n// --></script>\n|;
-
+	return unless $m{c_stock};
 	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	my $head_line = <$fh>;
 	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
@@ -600,7 +626,7 @@ sub print_my_hand {
 	if($state eq $m{name}.'_山札' || $state eq $m{name}.'_こいこい'){
 		$d_card = pop @hand_cards;
 	}
-	print qq|<br>手札：|;
+	print qq|手札：|;
 	for my $hcard (@hand_cards){
 		next unless($hcard);
 		next if $hcard == $d_card;
@@ -620,6 +646,8 @@ sub print_field {
 	
 	print qq|山札 $num_deck 枚<br>|;
 	print qq|こいこい $koikoi 回<br>|;
+	print qq|残り<span id="nokori_time">$limit_member_time秒</span><br>|;
+	print qq|<script type="text/javascript"><!--\n nokori_time($limit_member_time, 0, 0, 0, 0);\n// --></script>\n|;
 	for my $card (@field_cards){
 		my $gif_str = &num_to_gif($card);
 		print qq|$gif_str|;
@@ -658,8 +686,11 @@ sub print_gotten {
 		my $gif_str = &num_to_gif($card);
 		print qq|$gif_str|;
 	}
+	print qq|<br>|;
 }
 
+# 処理の工数的には確実にゲームが始まる start_game 内で初期化した方がスマートではあるが、
+# 親になったプレイヤーに前回のゲームデータが見えるのが気持ち悪いので親になる度に初期化
 sub make_leader {
 	my @number;
 	return("ｺｲﾝがありません") if $m{coin} <= 0;
@@ -680,7 +711,8 @@ sub make_leader {
 		$m{c_stock} = '';
 		&write_user;
 	}
-	push @members, "$leader<>$rate<>$state<>$field_card<>$deck<>$koikoi<>\n";
+#	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
+	push @members, "$leader<>$rate<>$state<><><>0<>\n";
 	while (my $line = <$fh>) {
 		my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		next if $time - $limit_member_time > $mtime;
@@ -696,110 +728,120 @@ sub make_leader {
 
 sub start_game{
 	my @members = ();
+	my @e_members = ();
 	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
-	$state = $leader;
-	$koikoi = 0;
-	my $e_card = '';
-	while (1) {
-		my @decks = &shuffled_deck;
+	my $field_card = ''; # 場札
+	my $e_card = ''; # 相手の手札
+	my $deck = ''; # 山札
+	my $koikoi = 0; # こいこい数
+
+	while (1) { # 場四ではない場札の作成
+		my @decks = &shuffled_deck; # ランダムな並びの48枚の山札を作成
+		my @field_cards = splice @decks, 0, 8; # 山札から8枚場札へ
+
+		# 場札が場四かチェック
 		my @mmonth = (0,0,0,0,0,0,0,0,0,0,0,0);
-		$field_card = shift @decks;
-		$mmonth[int($field_card / 10) - 1]++;
-		for(2..8){
-			my $card = shift @decks;
-			$mmonth[int($card / 10) - 1]++;
-			$field_card .= ",$card";
-		}
+		$mmonth[int($_ / 10) - 1]++ for (@field_cards); # 場札を1枚ずつチェック
 		my $bayon = 0;
 		for my $mm (@mmonth) {
-			if ($mm == 4) {
-				$bayon++;
-			}
+			$bayon ++ if $mm == 4;
 		}
 
-		$e_card = shift @decks;
-		for(2..8){
-			my $card = shift @decks;
-			$e_card .= ",$card";
-		}
-		$m{c_stock} = shift @decks;
-		for(2..8){
-			my $card = shift @decks;
-			$m{c_stock} .= ",$card";
-			&write_user;
-		}
-		$deck = shift @decks;
-		for my $card (@decks){
-			$deck .= ",$card";
-		}
-		if ($bayon) {
+		if ($bayon) { # 場四なら場札の再抽選
 			$koikoi++;
 			&system_comment("場四蒔き直し");
-		} else {
+		}
+		else { # 場四じゃないなら諸々の札確定
+			$field_card = join(',', @field_cards); # 場札の確定
+			$e_card = join(',', splice(@decks, 0, 8)); # 山札から8枚相手の手札へ
+			$m{c_stock} = join(',', splice(@decks, 0, 8)); # 山札から8枚自分の手札へ
+			&write_user;
+			$deck = join(',', @decks); # 残った山札は山札
 			last;
 		}
 	}
-	
+
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	my($leader, $rate, $state) = split /<>/, $head_line;
+	$state = $leader;
 	push @members, "$leader<>$rate<>$state<>$field_card<>$deck<>$koikoi<>\n";
 	while (my $line = <$fh>) {
 		push @members, $line;
 		my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		if ($mturn > 0 && $mname ne $m{name}){
-			&regist_you_data($mname,'c_stock',$e_card);
+			push @e_members, $mname;
 		}
 	}
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
+
+	for my $e_member (@e_members) {
+		&regist_you_data($e_member,'c_stock',$e_card);
+	}
+
 	return ("勝負！");
 }
 
 sub reset_game{
 	my $leave_name = shift;
 	my @members = ();
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
+	my @cm_members = ();
+	my @reset_members = ();
+
 	$m{c_turn} = 0;
 	$m{c_value} = 0;
 	$m{c_stock} = 0;
 	&write_user;
+
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
 	while (my $line = <$fh>) {
 		my($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
-		my $y_id = unpack 'H*', $mname;
-		if(-f "$userdir/$y_id/user.cgi"){
+		if(&you_exists($mname)){
 			if($leave_name ne '' && $mturn){
 				if($mname eq $leave_name){
-					&coin_move(-1*$rate, $mname);
+					push @cm_members, [-1*$rate, $mname];
+#					&coin_move(-1*$rate, $mname);
 				}else{
-					&coin_move($rate, $mname);
+					push @cm_members, [$rate, $mname];
+#					&coin_move($rate, $mname);
 				}
 			}
 			if($mturn){
-				&regist_you_data($mname,'c_turn',0);
-				&regist_you_data($mname,'c_value',0);
-				&regist_you_data($mname,'c_stock',0);
+				push @reset_members, "$mname";
+#				&regist_you_data($mname,'c_turn',0);
+#				&regist_you_data($mname,'c_value',0);
+#				&regist_you_data($mname,'c_stock',0);
 			}
 			push @members, "$mtime<>$mname<>$maddr<>0<>0<>0<>\n";
-		}else{
+		} else {
 			next;
 		}
 	}
-	$state = '';
-	$leader = '';
-	$rate = 0;
-	unshift @members, "$leader<>$rate<>$state<>$field_card<>$deck<>$koikoi<>\n";
+#	my($leader, $rate, $state, $field_card, $deck, $koikoi) = split /<>/, $head_line;
+	unshift @members, "<>0<><><>$deck<>0<>\n"; # $field_card と $deck が次のゲームに持ち越し
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
+
+	for my $cm_member (@cm_members) {
+		&coin_move($cm_member->[0], $cm_member->[1]);
+	}
+
+	my @array = (['c_turn', '0'],
+					['c_value', '0'],
+					['c_stock', '0']);
+	for my $member (@reset_members) {
+		&regist_you_array($member, @array);
+	}
+
 	return ("リセットしました");
 }
 
