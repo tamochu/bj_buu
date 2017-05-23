@@ -51,6 +51,11 @@ sub tp_1 {
 			&begin;
 			return;
 		}
+		if ($pets[$m{pet}][0] eq '9' && $m{pet_c} >= 15) { # Ì§İÄÑ™15‚Å‹­‰»ŒÀŠE
+			$mes .= "$pets[$m{pet}][1]‚Í‚à‚¤‡¬‚Å‚«‚È‚¢‚ñ‚¾B‚²‚ß‚ñ‚Ë<br>";
+			&begin;
+			return;
+		}
 		if ($cmd eq '1' && $m{is_full}) {
 			$mes .= "—a‚èŠ‚ª‚¢‚Á‚Ï‚¢‚Å‡¬‚µ‚½Íß¯Ä‚ª“ü‚ç‚È‚¢‚æ<br>";
 			&begin;
@@ -163,7 +168,6 @@ sub tp_1 {
 # ‡¬
 #=================================================
 sub tp_100 {
-	
 	if ($cmd) {
 		my $count = 0;
 		my $pet_no;
@@ -240,14 +244,14 @@ sub tp_200 {
 	print $fh @lines;
 	close $fh;
 
-	&begin;	
+	&begin;
 }
 
 sub mix{
 	my $pet_no = shift;
 	my $no_logging = shift;
 	
-	if($m{pet_c} >= $max_mix){
+	if($m{pet_c} >= $max_mix || $pets[$m{pet}][0] eq '9' && $m{pet_c} >= 15){ # ™20ˆÈã‚©Ì§İÄÑ™15ˆÈã‚Å‹­‰»ŒÀŠE
 		$mes .= "‚»‚ÌÍß¯Ä‚Í‚±‚êˆÈã‡¬‚Å‚«‚È‚¢‚æ<br>";
 		&begin;
 		return -1;
@@ -283,7 +287,7 @@ sub mix{
 
 sub fib{
 	my $x = shift;
-	my @fib_rets = (1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 2000, 5000, 10000, 20000, 50000, 100000);
+	my @fib_rets = (1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765);
 	return $fib_rets[$x];
 }
 
