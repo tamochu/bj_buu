@@ -9,7 +9,7 @@ use File::Copy;
 
 my @rank_status = (
 #•Ï”,•\¦–¼,Å’á’l
-    ['strong','’D‘—Í',5000],
+    ['strong','’D‘—Í',2500],
     ['nou','”_‹Æ',100000],
     ['sho','¤‹Æ',100000],
     ['hei','’¥•º',100000],
@@ -20,6 +20,7 @@ my @rank_status = (
     ['cho_t','’³•ñ(—İŒv)',3000],
     ['sen_t','ô”](—İŒv)',3000],
     ['gik','‹UŒv',50],
+    ['kou','Ué',50],
     ['res','‹~o',3],
     ['esc','’E–',3],
     ['tei','’ã@',30],
@@ -107,6 +108,7 @@ sub run {
 		return;
 	}
 
+	# ƒ†[ƒU[‚ªŠe€–Ú‚ÉƒAƒNƒZƒX‚µ‚½’iŠK‚Å‚»‚Ì€–Ú‚Ì×İ·İ¸Ş‚ğì¬i•‰‰×•ªUj
 	&update_player_ranking if ($w{year} > $year+1);
 
 	open my $fh, "< $this_file" or &error("$this_fileÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");

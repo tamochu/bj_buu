@@ -2,6 +2,8 @@
 # ŒR– Created by Merino
 #=================================================
 
+$gik_limit = 10; # ‹UŒv‚ÌãŒÀ
+
 #=================================================
 # —˜—pğŒ
 #=================================================
@@ -234,7 +236,7 @@ sub exe1 {
 			}
 		}
 
-		$GWT *= 2.5 if $m{tp} >= 710 && $m{tp} <= 910;	
+		$GWT *= 2.5 if $m{tp} >= 810 && $m{tp} <= 1010;
 		$mes .= "$_[0]$cs{name}[$y{country}]‚ÉŒü‚©‚¢‚Ü‚µ‚½<br>";
 		$mes .= "$GWT•ªŒã‚É“’…‚·‚é—\\’è‚Å‚·<br>";
 
@@ -392,7 +394,7 @@ sub tp_530{ # ‹UŒv
 	my $v = $m{turn} <= 1 ? 1:
 	      	$m{gik_c} > 2000 ? int($m{turn} * 1.4):
 		int($m{turn} * (2000 + $m{gik_c}) / 2900);
-	$v = 10 if $v > 10;
+	$v = $gik_limit if $v > $gik_limit;
 	$mes .= "‰R‚Ìî•ñ‚ğ—¬‚·‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½!<br>[ ˜A‘±$m{turn}‰ñ¬Œ÷ Ä°ÀÙ‹UŒv $v% ]<br>";
 }
 sub tp_630{ # Ué
@@ -580,7 +582,7 @@ sub tp_540 { # ‹UŒv
 	my $v = $m{turn} <= 1 ? 1:
 	      	$m{gik_c} > 2000 ? int($m{turn} * 1.4):
 		int($m{turn} * (2000 + $m{gik_c}) / 2900);
-	$v = 10 if $v > 10;
+	$v = $gik_limit if $v > $gik_limit;
 	$v = &seed_bonus('gik', $v);
 	&write_yran('gik', $v, 1) if $v > 0;
 	for my $i (1 .. $w{country}) {
@@ -623,7 +625,6 @@ sub tp_640 { # Ué
 	my $v = $m{turn} <= 1 ? 1:
 	      	$m{kou_c} > 2000 ? int($m{turn} * 1.4):
 		int($m{turn} * (2000 + $m{kou_c}) / 2900);
-	$v = 10 if $v > 10;
 	$v *= 1.3 if  $cs{mil}[$m{country}] eq $m{name};
 	$v = &seed_bonus('kou', $v);
 	$v = int($v);
@@ -636,8 +637,6 @@ sub tp_640 { # Ué
 	&special_money($m{turn} * 500);
 	$mes .= "$c_y‚Ìé•Ç‚ğ$v%”j‰ó‚·‚é‚Ì‚É¬Œ÷‚µ‚Ü‚µ‚½<br>";
 	$m{tp} = 1100;
-
-#	&run_tutorial_quest('tutorial_gikei_1');
 
 	&n_menu;
 	&write_cs;

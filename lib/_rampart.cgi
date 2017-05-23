@@ -52,7 +52,7 @@ sub change_barrier {
 	my ($c, $v) = @_;
 	my $max_value = &get_max_barrier;
 	$cs{barrier}[$c] += int($v);
-	$cs{barrier}[$c] = ($cs{barrier}[$c] < 0) ? 0 : ($cs{barrier}[$c] > $max_value) ? $max_value : $cs{barrier}[$c];
+	$cs{barrier}[$c] = ($cs{barrier}[$c] < 0) ? 0 : ($v > 0 && $cs{barrier}[$c] > $max_value) ? $max_value : $cs{barrier}[$c];
 }
 
 #================================================
