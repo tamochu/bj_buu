@@ -110,6 +110,9 @@ sub add_npc_country {
 	$cs{modify_dom}[$i]   = 0;
 	$cs{modify_mil}[$i]   = 0;
 	$cs{modify_pro}[$i]   = 0;
+
+	require './lib/_rampart.cgi';
+	$cs{barrier}[$i]  = $barrier[1][0]; # 暗黒だけ初期化周りが不統一
 	
 	my @lines = &get_countries_mes();
 	if ($w{country} > $#lines) {
@@ -267,6 +270,7 @@ sub _npc_get_resource {
 # NPC国の戦争 ./lib/_war_result.cgiで頻度調整
 #=================================================
 sub npc_war {
+=pod
 	my @npc_pet_pars = ();
 	# 統一期限残り１日でﾍﾟｯﾄの発動率変化
 	# 拘束が長くまた鯖人員が少ない鯖だと暗黒が活発になる前に期限切れそう
@@ -282,8 +286,27 @@ sub npc_war {
 	else { # 暗黒 >= 50000 この国力で期限切れそうならなおのことﾌｪﾝﾘﾙ連打
 		@npc_pet_pars = ($time + 2 * 24 * 3600 > $w{limit_time}) ? (2, 15, 20, 20, 55) : (3, 15, 20, 20, 50) ;
 	}
-
+=cut
 	require "$datadir/npc_war_$w{country}.cgi";
+	if ($cs{strong}[$w{country}] < 50000) {
+		  rand(6)  < 1 ? &npc_use_pet_fenrir
+		: rand(10) < 1 ? &npc_use_pet_prisoner
+		: rand(20) < 1 ? &npc_use_pet_pesto
+		: rand(15) < 1 ? &npc_use_pet_loptr
+		: rand(40) < 1 ? &npc_use_pet_meteo
+		:                &npc_get_strong
+		;
+	}
+	else {
+		  rand(3)  < 1 ? &npc_use_pet_fenrir
+		: rand(15) < 1 ? &npc_use_pet_prisoner
+		: rand(20) < 1 ? &npc_use_pet_pesto
+		: rand(20) < 1 ? &npc_use_pet_loptr
+		: rand(50) < 1 ? &npc_use_pet_meteo
+		:                &npc_get_strong
+		;
+	}
+=pod
 	  rand($npc_pet_pars[0])  < 1 ? &npc_use_pet_fenrir
 	: rand($npc_pet_pars[1]) < 1 ? &npc_use_pet_prisoner
 	: rand($npc_pet_pars[2]) < 1 ? &npc_use_pet_pesto
@@ -291,6 +314,7 @@ sub npc_war {
 	: rand($npc_pet_pars[4]) < 1 ? &npc_use_pet_meteo
 	:                &npc_get_strong
 	;
+=cut
 }
 sub npc_use_pet_fenrir { # ﾌｪﾝﾘﾙ
 	return if $touitu_strong < 20000;
@@ -381,15 +405,15 @@ sub npc_get_strong { # 奪国
 
 	# 暗黒側の仕官人数が封印側戦争国の布告数を上回ったり下回った場合にNPC奪国力を調整する
 	# ﾌｪﾝﾘﾙが問題になるけど、ｶｳﾝﾀｰ発生率よりもﾌｪﾝﾘﾙ自体も人数で調整のが良いかも？ わがらん
-	my $holy_mem = int($w{country} * 0.5) * 3; # 封印側戦争国の布告枚数を想定 戦争国2国で6人、戦争国4国で12人
-	my $vv = int( ($cs{member}[$w{country}] - $holy_mem) / 3) * 100; # 暗黒の停戦人員が 3 多いまたは少ない毎にNPC奪国力+-100
-	if ($vv) {
-		$vv = $vv > 300 ? 300 :
-				$vv < -300 ? -300 :
-				$vv; # 最高+-300
-		$v += int(rand($vv)+$vv);
-		return if $v < 1; # 暗黒人が多すぎて補正で奪国力0以下になったなら奪国ｶｳﾝﾀｰｷｬﾝｾﾙ 戦争国2国：暗黒15人、戦争国3国：暗黒18人 でｷｬﾝｾﾙされる場合もある？
-	}
+#	my $holy_mem = int($w{country} * 0.5) * 3; # 封印側戦争国の布告枚数を想定 戦争国2国で6人、戦争国4国で12人
+#	my $vv = int( ($cs{member}[$w{country}] - $holy_mem) / 3) * 100; # 暗黒の停戦人員が 3 多いまたは少ない毎にNPC奪国力+-100
+#	if ($vv) {
+#		$vv = $vv > 300 ? 300 :
+#				$vv < -300 ? -300 :
+#				$vv; # 最高+-300
+#		$v += int(rand($vv)+$vv);
+#		return if $v < 1; # 暗黒人が多すぎて補正で奪国力0以下になったなら奪国ｶｳﾝﾀｰｷｬﾝｾﾙ 戦争国2国：暗黒15人、戦争国3国：暗黒18人 でｷｬﾝｾﾙされる場合もある？
+#	}
 
 #	$v += int(rand(201)) if ($time + 2 * 24 * 3600 > $w{limit_time}); # 統一期限残り１日
 
@@ -409,6 +433,7 @@ sub npc_get_strong { # 奪国
 # 同じ人が何度もNPC国に仕官しないように制御
 #=================================================
 sub is_move_npc_country {
+	return 1 if $config_test;
 	my @lines = ();
 	open my $fh, "+< $logdir/$w{country}/old_member.cgi" or &error("$logdir/$w{country}/old_member.cgiﾌｧｲﾙが開けません");
 	eval { flock $fh, 2; };

@@ -58,9 +58,9 @@ sub write_cs {
 sub _get_world_line { # Get %w line
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可)
 	my @keys = (qw/
-		country year game_lv limit_time reset_time win_countries player world playing world_sub sub_time twitter_bot
+		country year game_lv limit_time reset_time win_countries player world playing world_sub sub_time twitter_bot half_hour_time
 	/);
-	# 国の数　年　難易度　統一期限　ﾘｾｯﾄされた時間　前回の統一国(複数)　ﾌﾟﾚｲﾔｰ人数　世界情勢　ﾌﾟﾚｲ中人数　サブ情勢　サブ時間　twitter用カウント
+	# 国の数　年　難易度　統一期限　ﾘｾｯﾄされた時間　前回の統一国(複数)　ﾌﾟﾚｲﾔｰ人数　世界情勢　ﾌﾟﾚｲ中人数　サブ情勢　サブ時間　twitter用カウント　サブ時間の0.5時間版
 	
 	my $line = '';
 	for my $k (@keys) {
@@ -188,7 +188,7 @@ sub write_user {
 #================================================
 # 待ち時間を秒に変換 + 次へ
 sub wait {
-	$m{wt} = $config_test ? 0 : $GWT * 60;
+	$m{wt} = $config_test ? 10 : $GWT * 60;
 	$m{wt_c} += $m{wt};
 	&n_menu;
 	$m{is_playing} = 0;
@@ -339,7 +339,20 @@ sub menu {
 		}
 		$menu_cmd .= qq|</table>|;
 
-	}else{
+	}
+	elsif ($is_appli) {
+		$menu_cmd  = qq|<div id="commands">|;
+		for my $i (0 .. $#menus) {
+			next if $menus[$i] eq '';
+			$menu_cmd .= qq|<form method="$method" action="$script">|;
+			$menu_cmd .= qq|<input type="submit" value="$menus[$i]" class="button2s"><input type="hidden" name="cmd" value="$i">|;
+			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			$menu_cmd .= qq|</form>|;
+			$menu_cmd .= qq|<br class="cmd_br" />| if ($i+1) % 7 == 0;
+		}
+		$menu_cmd .= qq|<br class="cmd_br" /></div>|;
+	}
+	else{
 		$menu_cmd  = qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
 		for my $i (0 .. $#menus) {
 			next if $menus[$i] eq '';
@@ -1316,6 +1329,7 @@ sub alltime_event {
 #================================================
 # login.cgi→bj.cgi
 # ログインしユーザーデータの取得後、真っ先に呼び出される
+# 国情報の読み込みよりも先っぽい　例：城壁の劣化を alltime_event でやるとタイミング的な問題かワンテンポズレる
 #================================================
 sub before_bj {
 	my($lmin,$lhour,$lmday,$lmon,$lyear) = (localtime($m{ltime}))[1..5];
@@ -1351,6 +1365,19 @@ sub before_bj {
 			$mes .= "おじさん「君、おじさんの投票権をあげよう」<br>";
 			$m{pop_vote}++;
 		}
+	}
+
+	if ($w{half_hour_time} < $time) {
+		# 前回の処理から30分経過毎に -1% を一括処理というか累計というか
+		my $span = 30 * 60; # 30分毎に -1%
+		my $t = $time;
+		my $v = ($t - $w{half_hour_time} + $span) / $span;
+		$w{half_hour_time} = $t + $span;
+		require './lib/_rampart.cgi'; # 城壁
+		for my $i (1 .. $w{country}) {
+			&change_barrier($i, -$v);
+		}
+		&write_cs;
 	}
 }
 

@@ -691,7 +691,7 @@ sub tp_1100 {
 	if ( $w{world} eq $#world_states) {
 		require './lib/vs_npc.cgi';
 #		if (rand(12) < $npc_mil || ($cs{strong}[$w{country}] < 50000 && rand(4) < $npc_mil) ){ 		
-		if (rand(12) < 1 || ($cs{strong}[$w{country}] < 50000 && rand(4) < 1) ) {
+		if (rand(14) < 1 || ($cs{strong}[$w{country}] < 50000 && rand(7) < 1) ) { # (1/14) + (1/7) - ( (1/14) * (1/7) ) = 0.20408163265
 		   &npc_military;
 		}
 	}
