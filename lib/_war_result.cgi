@@ -599,8 +599,19 @@ sub _rescue {
 # 統一
 #=================================================
 sub _touitu {
+	# すげー気持ち悪い多重統一処理防止
+	# 同年同情勢同一キャラによる統一がされてたらとりあえず情勢選択へ移行
+	open my $fh, "< $logdir/legend/touitu.cgi" or &error("$logdir/legend/touitu.cgi ﾌｧｲﾙが開けません");
+	my $line = <$fh>;
+	close $fh;
+	if ($line =~ /$world_name暦$w{year}年【$world_states[$w{world}]】.*$m{name}.*/) {
+		$m{lib} = 'world';
+		$m{tp}  = 100;
+		return;
+	}
+
 	&c_up('hero_c');
-	&debug_log(\%w, 'touitsu_w');
+#	&debug_log(\%w, 'touitsu_w');
 	if ($union) {
 		$w{win_countries} = "$m{country},$union";
 		++$cs{win_c}[$union];
