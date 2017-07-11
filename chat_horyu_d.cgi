@@ -23,7 +23,7 @@ $max_log     = 50;
 $max_comment = 2000;
 
 # 催促時間
-$remind_time = 3 * 24 * 3600;
+$remind_time = 7 * 24 * 3600;
 
 # 催促無し
 @no_remind = ($admin_name, $admin_sub_name);
@@ -75,7 +75,7 @@ sub run {
 		print qq|<option value="7" selected>期限七日</option>|;
 		print qq|</select><br>|;
 	}
-	print qq|<input type="radio" name="mode" value="good">賛成<input type="radio" name="mode" value="bad">反対<input type="radio" name="mode" value="no">棄権<br>|;
+	print qq|<input type="radio" name="mode" value="good">賛成<input type="radio" name="mode" value="bad">反対<input type="radio" name="mode" value="no">棄権<br>| if $limit > $time;
 	print qq|<hr size="1">|;
 	if($limit > $time + 7 * 24 * 3600){
 		print qq|議論段階<br>実装希望者 $goodn 人:$bgood 実装反対者 $badn 人:$bbad<br>\n|;
@@ -158,33 +158,37 @@ sub good_comment {
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
 	my ($bgood,$bbad,$limit,$hidden) = split /<>/, $head_line;
-	my @goods = split /,/, $bgood;
-	my @bads = split /,/, $bbad;
-	$bgood = "";
-	for my $gname (@goods){
-		unless($gname eq $m{name}){
-			if($bgood eq ""){
-				$bgood .= "$gname";
-			}else{
-				$bgood .= ",$gname";
+
+	if ($limit > $time) {
+		my @goods = split /,/, $bgood;
+		my @bads = split /,/, $bbad;
+		$bgood = "";
+		for my $gname (@goods){
+			unless($gname eq $m{name}){
+				if($bgood eq ""){
+					$bgood .= "$gname";
+				}else{
+					$bgood .= ",$gname";
+				}
 			}
 		}
-	}
-	$bbad = "";
-	for my $bname (@bads){
-		unless($bname eq $m{name}){
-			if($bbad eq ""){
-				$bbad .= "$bname";
-			}else{
-				$bbad .= ",$bname";
+		$bbad = "";
+		for my $bname (@bads){
+			unless($bname eq $m{name}){
+				if($bbad eq ""){
+					$bbad .= "$bname";
+				}else{
+					$bbad .= ",$bname";
+				}
 			}
 		}
+		if($bgood eq ""){
+			$bgood .= "$m{name}";
+		}else{
+			$bgood .= ",$m{name}";
+		}
 	}
-	if($bgood eq ""){
-		$bgood .= "$m{name}";
-	}else{
-		$bgood .= ",$m{name}";
-	}
+
 	push @lines, "$bgood<>$bbad<>$limit<>$hidden<>\n";
 	while (my $line = <$fh>) {
 		push @lines, $line;
@@ -209,33 +213,37 @@ sub bad_comment {
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
 	my ($bgood,$bbad,$limit,$hidden) = split /<>/, $head_line;
-	my @goods = split /,/, $bgood;
-	my @bads = split /,/, $bbad;
-	$bgood = "";
-	for my $gname (@goods){
-		unless($gname eq $m{name}){
-			if($bgood eq ""){
-				$bgood .= "$gname";
-			}else{
-				$bgood .= ",$gname";
+
+	if ($limit > $time) {
+		my @goods = split /,/, $bgood;
+		my @bads = split /,/, $bbad;
+		$bgood = "";
+		for my $gname (@goods){
+			unless($gname eq $m{name}){
+				if($bgood eq ""){
+					$bgood .= "$gname";
+				}else{
+					$bgood .= ",$gname";
+				}
 			}
 		}
-	}
-	$bbad = "";
-	for my $bname (@bads){
-		unless($bname eq $m{name}){
-			if($bbad eq ""){
-				$bbad .= "$bname";
-			}else{
-				$bbad .= ",$bname";
+		$bbad = "";
+		for my $bname (@bads){
+			unless($bname eq $m{name}){
+				if($bbad eq ""){
+					$bbad .= "$bname";
+				}else{
+					$bbad .= ",$bname";
+				}
 			}
 		}
+		if($bbad eq ""){
+			$bbad .= "$m{name}";
+		}else{
+			$bbad .= ",$m{name}";
+		}
 	}
-	if($bbad eq ""){
-		$bbad .= "$m{name}";
-	}else{
-		$bbad .= ",$m{name}";
-	}
+
 	push @lines, "$bgood<>$bbad<>$limit<>$hidden<>\n";
 	while (my $line = <$fh>) {
 		push @lines, $line;
@@ -260,25 +268,28 @@ sub no_comment {
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
 	my ($bgood,$bbad,$limit,$hidden) = split /<>/, $head_line;
-	my @goods = split /,/, $bgood;
-	my @bads = split /,/, $bbad;
-	$bgood = "";
-	for my $gname (@goods){
-		unless($gname eq $m{name}){
-			if($bgood eq ""){
-				$bgood .= "$gname";
-			}else{
-				$bgood .= ",$gname";
+
+	if ($limit > $time) {
+		my @goods = split /,/, $bgood;
+		my @bads = split /,/, $bbad;
+		$bgood = "";
+		for my $gname (@goods){
+			unless($gname eq $m{name}){
+				if($bgood eq ""){
+					$bgood .= "$gname";
+				}else{
+					$bgood .= ",$gname";
+				}
 			}
 		}
-	}
-	$bbad = "";
-	for my $bname (@bads){
-		unless($bname eq $m{name}){
-			if($bbad eq ""){
-				$bbad .= "$bname";
-			}else{
-				$bbad .= ",$bname";
+		$bbad = "";
+		for my $bname (@bads){
+			unless($bname eq $m{name}){
+				if($bbad eq ""){
+					$bbad .= "$bname";
+				}else{
+					$bbad .= ",$bname";
+				}
 			}
 		}
 	}
@@ -326,13 +337,13 @@ sub close_line {
 	my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bid) = split /<>/, $line;
 	my ($lmin, $lhour, $lday, $lmon) = (localtime($limit))[1, 2, 3, 4];
 	$lmon += 1;
-	$vcomment = $bcomment . "の期限が$lmon月$lday日$lhour時$lmin分に設定されました。";
+	$vcomment = "改造案" . $bcomment . "の投票期限が$lmon月$lday日$lhour時$lmin分に設定されました。<br>投票しましょう。";
 	$bcomment .= "<br>議論期限:$lmon月$lday日$lhour時$lmin分";
 	push @lines, "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>\n";
 	
-	for my $vname (@voter) {
-		&system_letter($vname, $vcomment);
-	}
+#	for my $vname (@voter) {
+#		&system_letter($vname, $vcomment);
+#	}
 	
 	while (my $line = <$fh>) {
 		push @lines, $line;
@@ -341,6 +352,24 @@ sub close_line {
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
+
+	$in{comment} = $vcomment;
+	my $mname = $m{name};
+	$m{name} = 'システム';
+	my $mcountry = $m{country};
+	$m{country} = 0;
+	my $micon = $m{icon};
+	$m{icon} = '';
+	my $mshogo = $m{shogo};
+	$m{shogo} = '';
+	&send_group('all');
+
+	$in{comment} = "";
+	$m{name} = $mname;
+	$m{country} = $mcountry;
+	$m{icon} = $micon;
+	$m{shogo} = $mshogo;
+
 	return 1;
 }
 
@@ -368,7 +397,7 @@ sub remind {
 		}
 	}
 	
-	if (&system_letter($aname, "あなたの発議した議論<br>$acomment<br>が3日間進んでません。")) {
+	if (&system_letter($aname, "あなたの発議した議論<br>$acomment<br>が7日間進んでません。")) {
 		open my $fh3, ">> $this_dir/$target.cgi" or &error("$this_dir/$target.cgi ﾌｧｲﾙが開けません");
 		print $fh3 "$time<>$date<>システム<>0<><><>発議者に催促状を出しました<><>\n";
 		close $fh3;
