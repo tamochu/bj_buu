@@ -115,6 +115,9 @@ sub multi_bonus {
 	# ŒNå‚Í“à­—Í1.05”{A–\ŒN‚È‚ç‚Î1.2”{
 	$v *= ( ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05 ) if $cs{ceo}[$m{country}] eq $m{name};
 
+	# Œy‘•‚Í“à­—Í1.1”{
+	$v *= 1.1 if $m{unit} eq '16';
+
 	# ‘İ’è•â³
 	$v *= &get_modify('dom');
 
