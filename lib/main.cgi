@@ -241,7 +241,7 @@ sub main_system {
 		eval { flock $fh, 2; };
 		while (my $line = <$fh>) {
 			my($hname, $hcountry) = split /<>/, $line;
-			$mes .= "$hname‚©‚ç $cs{name}[$hcountry]y‚Ö‚ÌŠ©—U‚ðŽó‚¯‚Ü‚µ‚½<br>";
+			$mes .= "$hname‚©‚ç $cs{name}[$hcountry] ‚Ö‚ÌŠ©—U‚ðŽó‚¯‚Ü‚µ‚½<br>";
 			if ($m{shogo} eq $shogos[1][0]) {
 				$m{shogo} = '';
 				$m{shogo_t} = $shogos[1][0];

@@ -314,7 +314,7 @@ sub exe2 {
 				my $tei_sp = rand($m{tei_c} / 500);
 				$m{value} += $tei_sp > 5 ? int(rand(5)+1): int(rand(10-$tei_sp)+1);
 			} else {
-				$m{value} += int( $m{unit} eq '17' ? (rand(10)+1)*(0.7+rand(0.3)) : rand(10)+1 ); # ‰B–§‚Íã¸‹C”z’l0.7`0.9
+				$m{value} += int( $m{unit} eq '17' ? (rand(10)+1)*(0.7+rand(0.3)) : rand(10)+1 ); # ‰B–§‚Íã¸‹C”z’l0`8H ’Êí•”‘à‚Í1`10
 			}
 			&loop_menu;
 			$m{tp} -= 10;
@@ -482,7 +482,8 @@ sub exe3 {
 
 # ----------------------------
 sub tp_440 { # ’ã@
-	$mes .= "y$c_y‚Ìî•ñz<br>";
+	my $bbs_name = $cs{bbs_name}[$y{country}] eq '' ? "$cs{name}[$y{country}]ìí‰ï‹cº" : $cs{bbs_name}[$y{country}];
+	$mes .= "y$c_y‚Ìî•ñz$bbs_name<br>";
 	$mes .= "$e2j{food}F$cs{food}[$y{country}] <br>"       if $m{turn} >= 1;
 	$mes .= "$e2j{money}F$cs{money}[$y{country}] <br>"     if $m{turn} >= 2;
 	$mes .= "$e2j{soldier}F$cs{soldier}[$y{country}] <br>" if $m{turn} >= 3;
@@ -494,17 +495,19 @@ sub tp_440 { # ’ã@
 	$m{tp} += 10;
 }	
 sub tp_450 {
+	my $bbs_name = $cs{bbs_name}[$y{country}] eq '' ? "$cs{name}[$y{country}]ìí‰ï‹cº" : $cs{bbs_name}[$y{country}];
+
 	&c_up('tei_c') for 1 .. $m{turn};
 	&military_master_c_up('tei_c');
 	&use_pet('tei') unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) && $m{pet} ne '36');
 	&special_money($m{turn} * 500);
 
-	my $lcomment = "<br>";
+	my $lcomment = "$bbs_name<br>";
 	my $need_count = 7;
 	if ($m{turn} > $need_count) {
 		$m{turn} += $m{turn} - $need_count if $w{world} eq '3' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '3' || $w{world_sub} eq '5'));
 		&write_yran('tei', $m{turn}-$need_count, 1);
-		$mes .= "$c_y‚Ì‰ï‹cº‚Ìî•ñ‚ğ‚¢‚­‚Â‚©“‚İ•·‚«‚Å‚«‚½<br>";
+		$mes .= "$c_y‚Ì‰ï‹cºi$bbs_namej‚Ìî•ñ‚ğ‚¢‚­‚Â‚©“‚İ•·‚«‚Å‚«‚½<br>";
 		
 		my $count = $need_count;
 		my @bbs_logs = ();
@@ -529,7 +532,8 @@ sub tp_450 {
 		$comment .= "$e2j{tax}F$cs{tax}[$y{country}]%/"        if $m{turn} >= 4;
 		$comment .= "$e2j{state}F$country_states[ $cs{state}[$y{country}] ]/" if $m{turn} >= 5;
 		$comment .= "$e2j{strong}F$cs{strong}[$y{country}]/"   if $m{turn} >= 6;
-		$comment .= '<br>‰ï˜b‚ğ—§‚¿•·‚«‚µ‚Ü‚µ‚½' if $m{turn} > 7;
+		$comment .= "<br>$bbs_name‚Ì‰ï˜b‚ğ—§‚¿•·‚«‚µ‚Ü‚µ‚½" if $m{turn} > 7;
+
 		my $comment2 = '';
 		$comment2 .= $lcomment if $m{turn} > $need_count;
 
