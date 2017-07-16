@@ -8,7 +8,9 @@ require './lib/bbsc.cgi';
 #&error("$cs{name}[0]‚Ì•û‚Í‚²—˜—p‚Å‚«‚Ü‚¹‚ñ") if $m{country} eq '0';
 &error("˜S–’†‚Íìí‰ï‹cº‚É‚Í“ü‚ê‚Ü‚¹‚ñ") if $m{lib} eq 'prison';
 
-$this_title  = "$cs{name}[$m{country}]ìí‰ï‹cº";
+# ‰ï‹cº‚ÌÃŞÌ«ÙÄ–¼F››ìí‰ï‹cº
+# country_config.cgi ‚Å’¼‘Å‚¿—˜—p‚³‚ê‚Ä‚é‚Ì‚ÅÃŞÌ«ÙÄ•Ï‚¦‚éê‡‚Í‚»‚¿‚ç‚à—v•ÏXc
+$this_title  = $cs{bbs_name}[$m{country}] eq '' ? "$cs{name}[$m{country}]ìí‰ï‹cº" : $cs{bbs_name}[$m{country}];
 $this_file   = "$logdir/$m{country}/bbs";
 $this_script = 'bbs_country.cgi';
 

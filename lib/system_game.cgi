@@ -14,7 +14,7 @@ sub write_cs {
 	
 	# •Ï”’Ç‰Á‚·‚éê‡‚Í”¼Šp½Íß°½‚©‰üs‚ğ“ü‚ê‚Ä’Ç‰Á(‡•s“¯A•À‚×‘Ö‚¦‰Â)
 	my @keys = (qw/
-		name strong barrier tax food money soldier state is_die member capacity color
+		name bbs_name strong barrier tax food money soldier state is_die member capacity color
 		win_c old_ceo ceo war dom mil pro war_c dom_c mil_c pro_c ceo_continue
 		modify_war modify_dom modify_mil modify_pro
 		extra extra_limit disaster disaster_limit

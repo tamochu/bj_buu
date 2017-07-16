@@ -49,11 +49,12 @@ sub begin {
 	}
 	else {
 		$mes .= "流刑者を各国の$e2j{ceo}の投票により削除することができます<br>" if $is_ceo_delete;
-		$mes .= "$c_mの名前、色、方針を変更することができます<br>";
+		$mes .= "$c_mの名前、色、方針、会議室名を変更することができます<br>";
 		$mes .= "$e2j{name}：$c_m<br>";
 		$mes .= "国色：$cs{color}[$m{country}]<br>";
+		$mes .= $cs{bbs_name}[$m{country}] eq '' ? "$cs{name}[$m{country}]作戦会議室" : $cs{bbs_name}[$m{country}];
 	}
-	my @menus = ('やめる', '国名/色を変更', '方針/ｼﾝﾎﾞﾙを変更','NPC名を変更','国庫の設定','各国設定','安楽死');
+	my @menus = ('やめる', '国名/色を変更', '方針/ｼﾝﾎﾞﾙを変更','NPC名を変更','国庫の設定','各国設定','会議室名を変更','安楽死');
 	if ($is_ceo_delete) {
 		push @menus, '流刑者議決';
 		push @menus, '流刑者申\請';
@@ -65,7 +66,7 @@ sub begin {
 	&menu(@menus);
 }
 sub tp_1 {
-	return if &is_ng_cmd(1..9);
+	return if &is_ng_cmd(1..10);
 
 	$m{tp} = $cmd * 100;
 	&{ 'tp_'.$m{tp} };
@@ -247,7 +248,7 @@ sub tp_300 {
 	$mes .= qq|<form method="$method" action="$script">|;
 
 	require "$datadir/npc_war_$m{country}.cgi";
-	for my $i (0..$#npcs){
+	for my $i (0..$#npcs) {
 		$mes .= qq|<input type="text" name="npc_$i" value="$npcs[$i]{name}" class="text_box1" style="text-align:right"><br>|;
 	}
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -442,9 +443,59 @@ sub cut_minus {
 }
 
 #================================================
-# 安楽死
+# 会議室名変更
 #================================================
 sub tp_600 {
+	my $bbs_name = $cs{bbs_name}[$m{country}] eq '' ? "$cs{name}[$m{country}]作戦会議室" : $cs{bbs_name}[$m{country}];
+
+	$mes .= qq|会議室名は全角12(半角24)文字まで。半角記号(,;"'&)、空白(ｽﾍﾟｰｽ)は使えません<br>|;
+	#"
+	$mes .= qq|<form method="$method" action="$script">|;
+	$mes .= qq|会議室名：<input type="text" name="bbs_name" value="$bbs_name" class="text_box1"><br>|;
+	$mes .= qq|<input type="checkbox" name="default" value="1">ﾃﾞﾌｫﾙﾄにする<br>|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<p><input type="submit" value="変更する/やめる" class="button1"></p></form>|;
+	$m{tp} += 10;
+	&n_menu;
+}
+sub tp_610 {
+	my $is_rewrite = 0;
+	if ($in{default} eq '1') {
+		$cs{bbs_name}[$m{country}] = ''; # ﾃﾞﾌｫﾙﾄ
+
+		$mes .= "会議室名をﾃﾞﾌｫﾙﾄに変更しました<br>";
+
+		$is_rewrite = 1;
+	}
+	elsif ($in{bbs_name}) {
+		unless ($cs{bbs_name}[$m{country}] eq $in{bbs_name}) {
+			&error("会議室名を記入してください") if $in{bbs_name} eq '';
+			&error("会議室名に不正な文字( ,;\"\'&<>\\\/ )が含まれています") if $in{bbs_name} =~ /[,;\"\'&<>\\\/]/;
+			#"
+			&error("会議室名に不正な空白が含まれています") if $in{bbs_name} =~ /　/ || $in{bbs_name} =~ /\s/;
+			&error("会議室名は全角12(半角24)文字までです") if length $in{bbs_name} > 24;
+
+			$mes .= "会議室名を$in{bbs_name}に変更しました<br>";
+			
+			$cs{bbs_name}[$m{country}] = $in{bbs_name};
+			$is_rewrite = 1;
+		}
+	}
+
+	if ($is_rewrite) {
+		&write_cs;
+	}
+	else {
+		$mes .= 'やめました<br>';
+	}
+	
+	&begin;
+}
+
+#================================================
+# 安楽死
+#================================================
+sub tp_700 {
 	my @lines = &get_country_members($m{country});
 	$mes .= '以下のプレイヤーがキャラクター削除を望んでいます';
 	$mes .= qq|<form method="$method" action="$script">|;
@@ -464,7 +515,7 @@ sub tp_600 {
 	$m{tp} += 10;
 }
 
-sub tp_610 {
+sub tp_710 {
 	if ($in{suicide}) {
 		my %you_datas = &get_you_datas($in{suicide});
 		if ($pets[$you_datas{pet}][2] eq 'life_down') {
@@ -478,13 +529,13 @@ sub tp_610 {
 #================================================
 # 流刑者議決
 #================================================
-sub tp_700 {
+sub tp_800 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには決議権がありません<br>";
 		&begin;
 		return;
 	}
-	
+
 	$layout = 1;
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
@@ -519,7 +570,7 @@ sub tp_700 {
 	$m{tp} += 10;
 }
 
-sub tp_710 {
+sub tp_810 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには決議権がありません<br>";
 		&begin;
@@ -654,7 +705,7 @@ sub tp_710 {
 #================================================
 # 流刑者申請
 #================================================
-sub tp_800 {
+sub tp_900 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには申\請権がありません<br>";
 		&begin;
@@ -675,7 +726,7 @@ sub tp_800 {
 	$m{tp} += 10;
 	&n_menu;
 }
-sub tp_810 {
+sub tp_910 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには申\請権がありません<br>";
 		&begin;
@@ -716,7 +767,7 @@ sub tp_810 {
 #================================================
 # 多重者ﾁｪｯｸ
 #================================================
-sub tp_900 {
+sub tp_1000 {
 	if (!$is_ceo_delete || !$is_ceo_watch_multi) {
 		&begin;
 		return;
@@ -801,9 +852,9 @@ sub tp_900 {
 	
 	$m{tp} += 10;
 }
-sub tp_910 {
+sub tp_1010 {
 	if ($in{violator}) {
-		$m{tp} = 800;
+		$m{tp} = 900;
 		&{ 'tp_'.$m{tp} };
 	}
 	else {

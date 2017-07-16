@@ -136,7 +136,7 @@ sub tp_110 {
 		}
 		&write_cs;
 	}
-	# 君主が一度選ばれたけど支持しないが君主の票が代表に必要な票より下がった時
+	# 君主がいる場合に、君主の得票数が代表に必要な票未満になった時
 	elsif ($cs{ceo}[$m{country}] && $top_vote < $need_ceo_point) {
 		$cs{ceo}[$m{country}] = '';
 		&write_cs;
