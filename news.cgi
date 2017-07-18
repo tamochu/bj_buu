@@ -30,9 +30,14 @@ sub run {
 	$in{no} = 0 if $in{no} >= @files;
 	
 	if ($in{id} && $in{pass}) {
-		print qq|<form method="$method" action="$script">|;
-		print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
-		print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
+		if ($is_appli) {
+			&show_page_switcher;
+		}
+		else {
+			print qq|<form method="$method" action="$script">|;
+			print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+			print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
+		}
 	}
 	else {
 		print qq|<form action="$script_index">|;

@@ -19,7 +19,7 @@ $VERSION = '2.71';
 $mente_min = 0;
 
 # テスト用
-$config_test = (-1 < index($ENV{'REQUEST_URI'}, 'test')) ? 1 : 0;
+$config_test = (-1 < index($ENV{'REQUEST_URI'}, 'bj_test')) ? 1 : 0;
 
 # 管理ﾊﾟｽﾜｰﾄﾞ(適当な半角英数字に必ず変更してください)
 require './admin_password.cgi';
@@ -208,6 +208,12 @@ if ($is_smart
 		$mobile_icon_size = q|width="25px" height="25px"|;
 }
 
+if ($is_appli
+	|| $agent =~ /BJ_Nyaa/i # 専ブラ
+	) {
+		$is_appli = 1;
+		$title = "アプリ";
+}
 
 #================================================
 # javascriptファイル更新変数

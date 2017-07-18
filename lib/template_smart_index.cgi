@@ -97,8 +97,10 @@ sub index {
 		$country_html .= qq|<tr><td colspan="2">$c_count人:$cs_c{"${i}_member"}</td></tr>\n| if $cs_c{"${i}_member"};
 	}
 	$country_html .= qq|</table>|;
+	my $title_html = $title_img ? qq|<img src="$title_img">| : qq|<h1>$title</h1>|;
 
 	print <<"EOM";
+$title_html
 $login_box_html
 <p style="text-align:center;">
 <a href="#attention">アクセス規制について</a>

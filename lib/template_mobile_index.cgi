@@ -16,6 +16,7 @@ sub index {
 	$cs_c{all} ||= 0;
 	$cs_c{0}   ||= 0;
 	print <<"EOM";
+<h1><a name="top">$title</a></h1>
 <form method="$method" action="login.cgi">
 <div>ÌßÚ²Ô°–¼:<input type="text" name="login_name" value="$cook_name"></div>
 <div>Êß½Ü°ÄÞ:<input type="text" name="pass" value="$cook_pass"></div>

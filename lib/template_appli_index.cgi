@@ -1,5 +1,5 @@
 #================================================
-# index.cgiﾃﾝﾌﾟﾚｰﾄ(PC) Created by Merino
+# index.cgiﾃﾝﾌﾟﾚｰﾄ(ｱﾌﾟﾘ) Created by nanamie
 #================================================
 
 #================================================
@@ -24,18 +24,12 @@ sub index {
 		$country_html .= qq|<tr><td><img src="$icondir/$country_mark"></td></td><td style="color: #333; background-color: $cs{color}[$i]; text-align: right;" nowrap><b>$cs{name}[$i]</b><br>$c_count人<br>$cs{ceo}[$i]<br></td><td style="width:100%;">$country_mes<br></td></tr>\n|;
 	}
 	$country_html .= qq|</table>|;
-	my $title_html = $title_img ? qq|<img src="$title_img">| : qq|<h1>$title</h1>|;
 
 	my $login_html = '';
 	if ($cs_c{all} >= $max_login) {
 		$login_box_html .= qq|<br><p style="font-size: 16px; color: #FF0; font-weight: bold;">ﾛｸﾞｲﾝ規制中</p><p>ﾛｸﾞｲﾝ人数が減るまでしばらくお待ちください。携帯からのﾛｸﾞｲﾝは可能\です。</p><br>|;
 	}
 	else {
-		$login_box_html .= qq|<form method="$method" action="login.cgi" style="margin: 0; padding: 0;"><table class="table1">|;
-		$login_box_html .= qq|<tr><th><tt>ﾌﾟﾚｲﾔｰ名:</tt></th><td><input type="text" name="login_name" value="$cook_name" class="text_box1"></td></tr>|;
-		$login_box_html .= qq|<tr><th><tt>ﾊﾟｽﾜｰﾄﾞ:</tt></th><td><input type="password" name="pass" value="$cook_pass" class="text_box1"></td></tr>|;
-		$login_box_html .= qq|<tr><td colspan="2"><input type="checkbox" name="is_cookie" value="1" $checked> <tt>次回から入力省略</tt></th></tr>|;
-		$login_box_html .= qq|</table><p><input type="submit" value="[> ログイン" class="button_login"></p></form>|;
 	}
 	
 	print <<"EOM";
@@ -45,7 +39,6 @@ body { margin: 0; padding: 0; }
 form { margin: 0; padding: 7px; }
 -->
 </style>
-$title_html
 <div align="center">
 <table width="840" border="0" cellpading="0" cellspacing="0" class="top_box">
 <tr>
@@ -60,10 +53,6 @@ $title_html
 		</div>
 	</td>
 	<td valign="top" align="center">
-		<div class="login_box">
-			Chromeのデータセーバーを無効にしないとアクセスできません
-			$login_box_html
-		</div>
 		<div align="left" style="padding: 0.2em 2em;">
 			<p><a href="new_entry.cgi" class="link1">[> 新規登録</a></p>
 			<p class="text_small">登録前に説明書必読!</p>
@@ -73,7 +62,7 @@ $title_html
 			<p class="text_small">質問する前に必ず読むこと!</p>
 			<p><a href="http://www.pandora.nu/nyaa/cgi-bin/upbbs/imgboard.cgi" class="link1">[> 画像掲示板</a></p>
 		</div>
-		
+
 		<hr style="border: 1px dashed #CCC;">
 		<form action="./html/0.html">
 			<input type="submit" value="ﾌﾟﾚｲﾔｰ一覧" class="button1">

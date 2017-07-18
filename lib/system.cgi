@@ -458,7 +458,8 @@ sub header {
 	
 	print qq|<html><head>|;
 	print qq|<meta http-equiv="Cache-Control" content="no-cache">|;
-	unless ($is_mobile) {
+	if (!$is_mobile && !$is_appli) {
+#	unless ($is_mobile) {
 		print qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
 		print qq|<link rel="shortcut icon" href="$htmldir/favicon.ico">|;
 		print qq|<link rel="stylesheet" type="text/css" href="$htmldir/bj.css?$jstime">|;
@@ -473,15 +474,38 @@ sub header {
 #			print qq|<link rel="stylesheet" media="screen and (min-width: 481px)" href="$htmldir/tablet.css" />|;
 #			print qq|<link rel="stylesheet" media="screen and (min-width: 481px) and (max-width: 720px)" href="$htmldir/tablet.css?$jstime" />|;
 #		}
-	} else {
+	}
+	elsif ($is_mobile) {
 		# ガラケーで外部CSSの読み込みはNG
 		# HTMLファイルを読み込んだ後にCSSファイルを読み込むため、
 		# 素のHTMLが表示された後にCSSが適用され画面がチラつくなどの問題がある
 		print qq|<style type="text/css"><!-- a.clickable_name {color: inherit; text-decoration: none;} --></style>|;
 	}
+	elsif ($is_appli) {
+		print qq|<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">|;
+#		print qq|<link rel="shortcut icon" href="$htmldir/favicon.ico">|;
+		print qq|<link rel="stylesheet" type="text/css" href="$htmldir/bj_appli.css?$jstime">|;
+		print qq|<script type="text/javascript" src="$htmldir/nokori_time.js?$jstime"></script>\n|;
+		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
+		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
+	}
 #	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
-	print qq|<title>$title</title>|;
-	print qq|</head><body $body><a name="top"></a>|;
+	unless ($is_appli) {
+		print qq|<title>$title</title>|;
+		print qq|</head><body $body><a name="top"></a>|;
+	}
+	else {
+		my $footer = "";
+		$footer .= qq|<form method="$method" action="" class="cmd_form">|;
+		$footer .= qq|<input type="submit" value="button22" class="button2s">|;
+		$footer .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$footer .= qq|</form>|;
+
+		print qq|<title>$title</title>|;
+#		print qq|</head><body><div id="container"><div id="header">ヘッダー</div><div id="contents">コンテンツ</div><div id="footer">$footer</div></div></body>|;
+#		print qq|</head><body><div id="container"><div id="header">過去の栄光とか</div><div id="contents"></div><div id="footer">$footer</div></div></body>|;
+		print qq|</head><body><div id="container"><div id="contents">|;
+	}
 }
 #================================================
 # footer
@@ -492,7 +516,8 @@ sub footer {
 	print qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br><a href="http://www.game-smartphone.com/simulation/game_387.html">スマートフォンゲームズ</a><br>|; # 著作表示:削除・非表示 禁止!!
 	print qq|$copyright|;
 	printf("%0.10f秒",Time::HiRes::time - $load_time);
-	print qq|</div></body></html>|;
+#	print qq|</div></body></html>|;
+	print qq|</div></div></body></html>|;
 }
 
 #==========================================================
@@ -758,6 +783,65 @@ sub load_RWD {
 #	elsif (!$is_mobile) {
 #		print qq|<meta name="viewport" content="width=device-width">|;
 #	}
+}
+
+#================================================
+# 専用アプリ向けのページスイッチャー
+#================================================
+sub show_page_switcher {
+	print qq|<div align="center" valign="bottom" id="commands">|;
+
+	print qq|<form method="$method" action="news.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}"><input type="hidden" name="no" value="$in{no}">|;
+	print qq|<input type="submit" value="過去の栄光" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="bbs_public.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="掲示板" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="chat_public.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="交流広場" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="chat_horyu.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="改造案投票所" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="bbs_ad.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="宣伝言板" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="chat_prison.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="牢獄" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="bbs_country.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="作戦会議室" class="button2s"></form>|;
+
+	print qq|<br class="cmd_br" />|;
+
+	print qq|<form method="$method" action="bbs_union.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="同盟会議室" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="chat_casino.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="対人ｶｼﾞﾉ" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="bbs_daihyo.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="代表\評議会" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="letter.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}"><input type="hidden" name="no" value="$in{no}"><input type="hidden" name="type" value="$in{type}">|;
+	print qq|<input type="submit" value="My ROOM" class="button2s"></form>|;
+
+	print qq|<form method="$method" action="chat_admin.cgi">|;
+	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<input type="submit" value="運営議論場" class="button2s"></form>|;
+
+	print qq|</div>|;
 }
 
 1; # 削除不可

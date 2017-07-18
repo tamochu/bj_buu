@@ -9,6 +9,7 @@ require 'config.cgi';
 
 $is_mobile ? require './lib/template_mobile_index.cgi' :
 	$is_smart ? require './lib/template_smart_index.cgi' :
+	$is_appli ? require './lib/template_appli_index.cgi' :
 	require './lib/template_pc_index.cgi';
 &index(&get_login_member);
 
@@ -97,5 +98,5 @@ sub header2 {
 	}
 #	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	print qq|<title>$title</title>|;
-	print qq|</head><body $body><h1><a name="top">$title</a></h1>|;
+	print qq|</head><body $body>|;
 }

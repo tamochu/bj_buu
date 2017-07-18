@@ -52,9 +52,15 @@ sub run {
 
 	$in{text} =~ s/&lt;_&gt;/\r\n/g;
 
-	print qq|<form method="$metod" action="$script">|;
-	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-	print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
+	if ($is_appli) {
+		&show_page_switcher;
+	}
+	else {
+		print qq|<form method="$metod" action="$script">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
+	}
+
 	print qq|<h2>$this_title <font size="2" style="font-weight:normal;">$this_sub_title</font></h2>|;
 	print qq|<p>$mes</p>| if $mes;
 	print qq|$tutorial_mes| if $tutorial_mes;
