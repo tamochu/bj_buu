@@ -94,7 +94,8 @@ else {
 
 &auto_heal unless $is_battle;
 $is_mobile ? require './lib/template_mobile_base.cgi' :
-	$is_smart ? require './lib/template_smart_base.cgi' : require './lib/template_pc_base.cgi';
+	$is_smart ? require './lib/template_smart_base.cgi' :
+	$is_appli ? require './lib/template_appli_base.cgi' : require './lib/template_pc_base.cgi';
 &write_user;
 &footer;
 # ------------------
