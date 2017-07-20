@@ -668,6 +668,9 @@ sub regist_mes {
 			$tm .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 			$tm .= qq|<input type="checkbox" name="luxury" value="1">‹ó‘Å‚¿|;
 			$tm .= qq|<input type="submit" value="•KŽE‹Z‚ðŽg—p‚·‚é" class="button1"></form>|;
+
+			my $power_v = $triggers[$trigger][3] * $timings[$timing][3] * $demerits[$demerit][3] * $max_counts[$max_count][2] * (10 + ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 0.1);
+			$tm .= qq|—\\‘z”{—¦ <font color="#FF0000"><b>$power_v</b></font>|;
 		}
 		else {
 			my $nokori_time = ($last_attack + $cooldown_time) - $time;
