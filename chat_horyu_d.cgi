@@ -337,7 +337,7 @@ sub close_line {
 	my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bid) = split /<>/, $line;
 	my ($lmin, $lhour, $lday, $lmon) = (localtime($limit))[1, 2, 3, 4];
 	$lmon += 1;
-	$vcomment = "‰ü‘¢ˆÄ" . $bcomment . "‚Ì“Š•[ŠúŒÀ‚ª$lmonŒ$lday“ú$lhour$lmin•ª‚Éİ’è‚³‚ê‚Ü‚µ‚½B<br>“Š•[‚µ‚Ü‚µ‚å‚¤B";
+	$vcomment = "‰ü‘¢ˆÄ" . $bcomment . "‚Ì“Š•[ŠúŒÀ‚ª$lmonŒ$lday“ú$lhour$lmin•ª‚Éİ’è‚³‚ê‚Ü‚µ‚½<br>“Š•[‚µ‚Ü‚µ‚å‚¤<hr>y‰ü‘¢ˆÄ‚©‚ç‘—Mz";
 	$bcomment .= "<br>‹c˜_ŠúŒÀ:$lmonŒ$lday“ú$lhour$lmin•ª";
 	push @lines, "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>\n";
 	

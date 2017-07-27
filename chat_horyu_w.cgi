@@ -134,7 +134,7 @@ sub write_comment {
 	print $fh2 "$time<>$date<>$m{name}さん提出<br>議題<>0<><>$addr<>$in{comment}<>$m{icon}<>\n";
 	close $fh2;
 
-	$in{comment} = "$m{name}さんが議題を作成しました";
+	$in{comment} = "$m{name}さんが改造案を作成しました<hr>【改造案から送信】";
 	my $mname = $m{name};
 	$m{name} = 'システム';
 	my $mcountry = $m{country};

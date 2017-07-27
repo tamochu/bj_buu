@@ -49,11 +49,13 @@ sub letter_box_get {
 	}
 
 	if($in{type} eq 'country'){
-		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / 一括送信 / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
+		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / 一括送信 / <a href="?id=$id&pass=$pass&no=$in{no}&type=horyu">改造案</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
 	}elsif($in{type} eq 'ncountry'){
-		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / 個人宛) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
+		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=horyu">改造案</a> / 個人宛) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
+	}elsif($in{type} eq 'horyu'){
+		print qq|<p>受信箱(<a href="?id=$id&pass=$pass&no=$in{no}&type=get">すべて</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / 改造案 / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
 	}else{
-		print qq|<p>受信箱(すべて / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
+		print qq|<p>受信箱(すべて / <a href="?id=$id&pass=$pass&no=$in{no}&type=country">一括送信</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=horyu">改造案</a> / <a href="?id=$id&pass=$pass&no=$in{no}&type=ncountry">個人宛</a>) / <a href="?id=$id&pass=$pass&no=$in{no}&type=send">送信箱</a>$g_card_link</p>|;
 	}
 	
 	if ($month eq 0 && $in{type} eq 'new_year' && -f "$userdir/$id/greeting_card.cgi") {
@@ -111,8 +113,9 @@ sub letter_box_get {
 	open my $fh, "< $userdir/$id/letter.cgi" or &error("$userdir/$id/letter.cgiﾌｧｲﾙが開けません");
 	while (my $line = <$fh>) {
 		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
-		next if($bcomment =~ /全員に送信】/ && $in{type} eq 'ncountry');
-		next if($bcomment !~ /全員に送信】/ && $in{type} eq 'country');
+		next if(($bcomment =~ /全員に送信】/ || $bcomment =~ /<hr>【改造案から送信】/) && $in{type} eq 'ncountry'); # 個人宛 全通か改造案ならnext
+		next if($bcomment !~ /全員に送信】/ && $in{type} eq 'country'); # 全通 全通じゃないならnext
+		next if($bcomment !~ /<hr>【改造案から送信】/ && $in{type} eq 'horyu'); # 改造案 改造案じゃないならnext
 		$bshogo = $bshogo ? "[$bshogo]" : '';
 		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
 
