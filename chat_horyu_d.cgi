@@ -117,9 +117,9 @@ sub run {
 	print $second_line;
 	print $contents;
 	print qq|</form>|;
-	if ($last_write_time + $remind_time < $time) {
-		&remind($in{line});
-	}
+#	if ($last_write_time + $remind_time < $time) {
+#		&remind($in{line});
+#	}
 }
 
 #=================================================
