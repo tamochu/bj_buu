@@ -1516,7 +1516,7 @@ sub send_coin{
 	require './config_game.cgi';
 	my %datas = &get_you_datas($s_name);
 	my $v_coin = $datas{coin} + $s_coin;
-	$v_coin = $vcoin < 0 ? 0 : $v_coin;
+	$v_coin = $v_coin < 0 ? 0 : $v_coin;
 	&regist_you_data($s_name, 'coin', $v_coin);
 	$g_msg = "$s_name‚Í";
 	if($s_flag == 0){
