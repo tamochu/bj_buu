@@ -48,7 +48,7 @@ $layout = 2;
 }
 
 sub tp_400 {
-	&remove_pet;
+	&remove_pet if !-f "$userdir/$id/upload_token.cgi";
 	&refresh;
 	&n_menu;
 }

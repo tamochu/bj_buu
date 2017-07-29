@@ -2,60 +2,89 @@
 
 require './config.cgi';
 require './config_game.cgi';
-require './cgi-lib.pl';
+
+# “Ç‚İ‚İ—e—Ê‚ğƒI[ƒo[‚µ‚½ó‘Ô‚Å cgi-lib.pl ‚ğƒ[ƒh‚·‚é‚Æ‚»‚¿‚ç‚ÌƒGƒ‰[‚ÉŠª‚«‚Ü‚ê‚Ä—‚¿‚é
+# ƒGƒ‰[‚ÉŠª‚«‚Ü‚ê‚é‚æ‚¤‚Å‚ ‚ê‚Î©•ª‚ÅƒGƒ‰[ˆ—‚ğ‚·‚é
+my $maxdata    = 131072;
+my $len  = $ENV{'CONTENT_LENGTH'};
+my $is_error = $len > $maxdata;
+if ($is_error) {
+	&decode;
+}
+else {
+	require './cgi-lib.pl';
+}
 
 my $size = 15 * 1024;
 
 &header;
-&ReadParse;
+&ReadParse unless $is_error; # cgi-lib.pl ‚ÌƒGƒ‰[‚ÉŠª‚«‚Ü‚ê‚é‚æ‚¤‚Å‚È‚¯‚ê‚Î
 if($in{back} eq '1'){
 	&read_user;
 	&read_cs;
 	$m{lib} = 'shopping_upload';
 	$m{tp} = 100;
 	&write_user;
-	&error("ã‚¤ãƒªãƒ¼ã‚¬ãƒ«ãªã‚¢ã‚¯ã‚»ã‚¹ã§ã™");
+	&error("ƒCƒŠ[ƒKƒ‹‚ÈƒAƒNƒZƒX‚Å‚·");
 	&footer;
-}else {
+} else {
+	my $_time = $time;
+	my $newfile = ''; # ‚È‚º‚© add_picture “à‚Å”»•Ê‚Å‚«‚È‚¢‚Ì‚ÅŠO‚Å
 	&up_read_user;
-	if (-f "$userdir/$id/upload_token.cgi") {
-		unlink "$userdir/$id/upload_token.cgi";
-		if($ENV{REQUEST_METHOD} eq 'POST'){
-			&add_picture;
+	unless ($is_error) { # cgi-lib.pl ‚ÌƒGƒ‰[‚ÉŠª‚«‚Ü‚ê‚é‚æ‚¤‚Å‚È‚¯‚ê‚Î
+		if (-f "$userdir/$id/upload_token.cgi") {
+			if($ENV{REQUEST_METHOD} eq 'POST'){
+				$newfile = &add_picture($_time); # add_picture “à‚Å”»•Ê‚Å‚«‚È‚¢‚Ì‚ÅŠO‚Éo‚·
+			}
+		}
+
+		if (!-f $newfile) { # ‚È‚º‚© add_picture ŠO‚È‚ç”»•Ê‚Å‚«‚é
+			$m{lib} = 'shopping_upload';
+			$m{tp} = 100;
+			&write_user;
+			&error("ƒCƒ[ƒWƒtƒ@ƒCƒ‹‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½");
+		}
+		else {
+			# Íß²İÀ°‚ªŒø‚¢‚½‚É‚¾‚¯ upload_token.cgi ‚ğíœ
+			# shopping_upload.cgi $m{tp} == 400 ‚Ì‚É‚±‚ÌÌ§²Ù‚ªc‚Á‚Ä‚¢‚é‚È‚ç¸”s‚µ‚Ä‚é‚Æ”»’f‚Å‚«‚é
+			unlink "$userdir/$id/upload_token.cgi";
+			&show_picture;
+			&footer;
 		}
 	}
-	&show_picture;
-	&footer;
 }
 exit;
 
-
 sub add_picture {
-	foreach $tmp (@in){
-		if ($tmp =~ /(.*)Content-type:(.*)/i){
+	my $time2 = shift;
+	my $ext = '';
+	my $path = "$userdir/$id/picture";
+
+	for my $tmp (@in) {
+		if ($tmp =~ /(.*)Content-type:(.*)/i) {
 			if ($2 =~ /image\/jpeg/i) { $ext = '.jpg'; }
 			elsif ($2 =~ /image\/pjpeg/i) { $ext = '.jpg'; }
 			elsif ($2 =~ /image\/gif/i) { $ext = '.gif'; }
 			elsif ($2 =~ /image\/png/i) { $ext = '.png'; }
 			else { $ext = 'NO'; }
 		}
-		elsif ($tmp =~ /(.*)filename=(.*)/i){
+		elsif ($tmp =~ /(.*)filename=(.*)/i) {
 			if ($2 =~ /\.jpg/i) { $ext = '.jpg'; }
 			elsif ($2 =~ /\.gif/i) { $ext = '.gif'; }
 			elsif ($2 =~ /\.png/i) { $ext = '.png'; }
 			else { $ext = 'NO'; }
 		}
 	}
-	if (($ext eq 'NO') || ($ext eq '')){
+
+	my $newfile = "$path/_$time2$ext";
+
+	if (($ext eq 'NO') || ($ext eq '') || !defined($ext)) {
 		$m{lib} = 'shopping_upload';
 		$m{tp} = 100;
 		&write_user;
-		&error('ä¸æ­£ãªæ‹¡å¼µå­ã§ã™');
-	}else{
-		my $path = "$userdir/$id/picture";
-		my $newfile = "$path/_$time$ext";
-
-		open my $nfh,">$newfile" or &error("ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œã‚Œã¾ã›ã‚“");
+		&error('•s³‚ÈŠg’£q‚Å‚·');
+	} else {
+		open my $nfh,">$newfile" or &error("ƒCƒ[ƒWƒtƒ@ƒCƒ‹‚ğì‚ê‚Ü‚¹‚ñ");
 		binmode $nfh;
 		print $nfh $in{'upfile'};
 		close $nfh;
@@ -65,15 +94,16 @@ sub add_picture {
 			$m{lib} = 'shopping_upload';
 			$m{tp} = 100;
 			&write_user;
-			&error("ã‚µã‚¤ã‚ºè¶…éã§ã™");
+			&error("ƒTƒCƒY’´‰ß‚Å‚·(15KB‚Ü‚Å)");
 		}
 	}
+	return $newfile;
 }
 
 sub show_picture{
 	$layout = 2;
 	my $count = 0;
-	opendir my $dh, "$userdir/$id/picture" or &error("ï¾ï½²ï¾‹ï¾Ÿï½¸ï¾ï½¬ãŒé–‹ã‘ã¾ã›ã‚“");
+	opendir my $dh, "$userdir/$id/picture" or &error("Ï²Ëß¸Á¬‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	while (my $file_name = readdir $dh) {
 		next if $file_name =~ /^\./;
 		next if $file_name =~ /^index.html$/;
@@ -94,7 +124,7 @@ sub up_read_user {
 	%y = ();
 	$id   = $in{id};
 	$pass = $in{pass};
-	open my $fh, "< $userdir/$id/user.cgi" or &error("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ‡ãƒ¼ã‚¿ãŒèª­ã¿è¾¼ã‚ã¾ã›ã‚“");
+	open my $fh, "< $userdir/$id/user.cgi" or &error("ƒvƒŒƒCƒ„[ƒf[ƒ^‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
 	my $line = <$fh>;
 	close $fh;
 	for my $hash (split /<>/, $line) {
@@ -105,7 +135,7 @@ sub up_read_user {
 			$m{$k} = $v;
 		}
 	}
-	&error('ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ãŒé•ã„ã¾ã™') unless $m{pass} eq $pass;
-	# æ‹˜æŸæ™‚é–“ãŒã‚ã‚‹å ´åˆã€çµŒéæ™‚é–“åˆ†æ¸›ã‚‰ã™
+	&error('ƒpƒXƒ[ƒh‚ªˆá‚¢‚Ü‚·') unless $m{pass} eq $pass;
+	# S‘©ŠÔ‚ª‚ ‚éê‡AŒo‰ßŠÔ•ªŒ¸‚ç‚·
 	$m{wt} -= ($time - $m{ltime}) if $m{wt} > 0;
 }
