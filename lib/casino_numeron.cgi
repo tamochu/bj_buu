@@ -26,7 +26,7 @@ show_game_infoでﾌﾟﾚｲ画面などを表示 ここにｶｼﾞﾉ毎の独自の変数が渡ってくる
 =cut
 
 sub run {
-#	$m{c_turn} = 2;
+#	$m{c_turn} = 0;
 #	&write_user;
 	&_default_run;
 }
@@ -485,7 +485,7 @@ sub play {
 	my $is_find = 0;
 	my @members = ();
 	while (my $line = <$fh>) {
-		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock, $mhp, $mstr) = split /<>/, $line;
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		next if $sames{$mname}++; # 同じ人なら次
 
 		if ($mname eq $player[1]) {
@@ -503,9 +503,10 @@ sub play {
 	if($in{number} > 0 && $in{number} !~ /[^0-9]/){
 		my($hit, $blow) = &hb_count($in{number}, $e_value);
 		$result_mes = "$in{number}:$hit イート $blow バイト";
+		$lastupdate = $time;
 		if($hit == 3){
 			$result_mes .= "勝利";
-			@game_member = split /,/, $participants;
+			@game_members = split /,/, $participants;
 			$penalty_coin = $rate;
 			($state, $lastupdate, $participants, $rate) = ('', '', '', '');
 			$is_reset = 1;
@@ -513,7 +514,7 @@ sub play {
 		$participants =~ s/^(.*?),(.*)/$2$1,/g if $is_find; # 操作中のﾌﾟﾚｲﾔｰを最後尾に移動
 	}
 
-	unshift @members, "$state<>$time<>$participants<>$rate<>\n"; # ﾍｯﾀﾞｰ
+	unshift @members, "$state<>$lastupdate<>$participants<>$rate<>\n"; # ﾍｯﾀﾞｰ
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
@@ -530,7 +531,7 @@ sub play {
 		 		&regist_you_data($game_member, 'c_turn', '0');
 			}
 		}
-		my $cv = -1 * &coin_move(-1 * $rate, $e_name);
+		my $cv = -1 * &coin_move(-1 * $penalty_coin, $e_name);
 		&coin_move($cv, $m{name});
 	}
 
