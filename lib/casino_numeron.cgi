@@ -499,12 +499,14 @@ sub play {
 	my $result_mes = '';
 	my @game_member = ();
 	my $is_reset = 0;
+	my $penalty_coin = 0;
 	if($in{number} > 0 && $in{number} !~ /[^0-9]/){
 		my($hit, $blow) = &hb_count($in{number}, $e_value);
 		$result_mes = "$in{number}:$hit イート $blow バイト";
 		if($hit == 3){
 			$result_mes .= "勝利";
 			@game_member = split /,/, $participants;
+			$penalty_coin = $rate;
 			($state, $lastupdate, $participants, $rate) = ('', '', '', '');
 			$is_reset = 1;
 		}
