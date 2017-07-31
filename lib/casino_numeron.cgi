@@ -1,8 +1,617 @@
 #================================================
-# ﾁﾝﾁﾛﾘﾝ
+# ﾇﾒﾛﾝ
 #================================================
 require './lib/_casino_funcs.cgi';
 
+=pod
+主な処理の流れ
+_casino_funcs.cgi
+	sub _default_run
+		call &{$in{mode}} ﾛｰﾀﾞｰ
+		call @datas = &get_menber
+		call &show_game_info(@datas)
+
+this_file.cgi
+	sub run
+		call _default_run
+	sub get_member
+	sub show_game_info
+	sub &{$in{mode}}
+
+ｺﾏﾝﾄﾞの値から関数を呼び出す
+get_memberでｶｼﾞﾉのﾍｯﾀﾞｰを定義 ここでｶｼﾞﾉ毎の独自の変数を定義
+show_game_infoでﾌﾟﾚｲ画面などを表示 ここにｶｼﾞﾉ毎の独自の変数が渡ってくる
+ﾌﾟﾚｲ画面で表示するｺﾏﾝﾄﾞの定義(このｺﾏﾝﾄﾞ値を関数として呼び出す)
+ｺﾏﾝﾄﾞ値から呼び出される関数を定義
+=cut
+
+sub run {
+#	$m{c_turn} = 2;
+#	&write_user;
+	&_default_run;
+}
+
+# ﾒﾝﾊﾞｰﾌｧｲﾙの読み込み
+# 戻り値は第一と第二が固定($member_c, $member)、それ以降はｶｼﾞﾉ毎にｵﾘｼﾞﾅﾙ要素、それらがshow_game_infoに渡ってくる
+sub get_member {
+	# 固定変数
+	my $member  = ''; # 参加者・閲覧者などすべてのﾌﾟﾚｲﾔｰ名を持つ
+	my @members = (); # ↑の配列
+	my @active_players = (); # ﾌﾟﾚｲ中の参加者の配列
+	my @non_active_players = (); # 除外された参加者の配列
+
+	# ｶｼﾞﾉ毎の変数
+	my $penalty_coin = 0;
+	my @result_my_datas = ();
+
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	# ｶｼﾞﾉ毎のｵﾘｼﾞﾅﾙﾃﾞｰﾀ
+	# ｹﾞｰﾑの状態、ｹﾞｰﾑの最終更新時間、ｹﾞｰﾑの参加者、ﾚｰﾄ
+	my ($state, $lastupdate, $participants, $rate) = split /<>/, $head_line;
+
+	my $is_reset = 0; # 第三者によるﾘｾｯﾄ：GAME_RESET、参加者による脱落確認：LEAVE_PLAYER
+	if (-1 < index($participants, "$m{name},")) { # 参加者によるﾛｰﾄﾞでｹﾞｰﾑの最終更新時間を更新
+		$lastupdate = $time;
+	}
+	elsif (($lastupdate + $limit_game_time < $time) && $participants && (index($participants, "$m{name},") < 0) && $m{c_turn} < 1) { # 非参加者が止まっているｹﾞｰﾑを閲覧したらﾘｾｯﾄ
+		$is_reset = GAME_RESET;
+		@non_active_players = split /,/, $participants;
+		$penalty_coin = $rate if $state; # すでにｹﾞｰﾑを開始していたらｺｲﾝ没収
+		($state, $lastupdate, $participants, $rate) = ('', '', '', '');
+	}
+
+	my %sames = ();
+	my $is_find = 0;
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		next if $sames{$mname}++; # 同じ人なら次
+
+		my $index = index($participants, "$mname,");
+		if ($mname eq $m{name}) {
+			$is_find = 1;
+#			push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$m{c_value}<>$m{c_stock}<>\n";
+			push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$mvalue<>$mstock<>\n"; # 自動で脱落するので余計なﾃﾞｰﾀ要らない（他のｶｼﾞﾉ行き来された時にc_turnは必要）
+			@result_my_datas = ($m{c_turn}, $mvalue, $mstock);
+			$member .= "$mname,";
+
+			push @active_players, "$mname" if -1 < $index;
+		}
+		else {
+			# ｱｸﾃｨﾌﾞな参加者とｱｸﾃｨﾌﾞな閲覧者だけ残す
+			if ( ((-1 < $index) && ($time < $mtime + $limit_think_time)) || ($time < $mtime + $limit_member_time) ) {
+				push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+				$member .= "$mname,";
+
+				push @active_players, "$mname" if -1 < $index;
+			}
+			else {
+				if (-1 < $index && -1 < index($participants, "$m{name},")) { # 参加者を弾けるのは参加者の確認が必要
+					substr($participants, $index, length("$mname,"), ''); # 参加者文字列から非ｱｸﾃｨﾌﾞﾌﾟﾚｲﾔｰを除外
+					push @non_active_players, "$mname"; # 除外された参加者を追加
+					$rate = $m{coin} unless $state; # ﾌﾟﾚｲ中でなければ賭け上限を残ったﾌﾟﾚｲﾔｰの全ｺｲﾝに
+				}
+			}
+		}
+	}
+	unless ($is_find) { # 自分が閲覧者にいないなら追加
+#		push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$m{c_value}<>$m{c_stock}<>\n";
+		push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>0<>0<>\n"; # 自動で脱落するので余計なﾃﾞｰﾀ要らない（他のｶｼﾞﾉ行き来された時にc_turnは必要）
+		@result_my_datas = ($m{c_turn}, $mvalue, $mstock);
+		$member .= "$m{name},";
+	}
+
+	if (!$is_reset && @non_active_players > 0) { # GAME_RESETで初期化されておらず、放置ﾌﾟﾚｲﾔｰがいる場合
+		$is_reset = LEAVE_PLAYER;
+		$penalty_coin = $rate if $state;
+		($state, $lastupdate, $participants, $rate) = ('', '', '', '') if @active_players == 1 && $penalty_coin;
+	}
+
+	unshift @members, "$state<>$lastupdate<>$participants<>$rate<>\n"; # ﾍｯﾀﾞｰ
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	if ($is_reset) { # 放置されたｹﾞｰﾑか放置しているﾌﾟﾚｲﾔｰの片付け
+		my @array = (['c_turn', '0'], ['c_value', '0'], ['c_stock', '0']);
+		for my $leave_player (@non_active_players) {
+			if ($is_reset eq GAME_RESET) {
+#				&coin_move(-0.5 * $penalty_coin, $leave_player) if $penalty_coin;
+			}
+			elsif ($is_reset eq LEAVE_PLAYER) {
+				if ($penalty_coin) {
+					my $cv = -1 * &coin_move(-1 * $penalty_coin, $leave_player);
+					&coin_move($cv, $active_players[0]);
+					&system_comment("ﾌﾟﾚｲ中の放置ﾌﾟﾚｲﾔｰ$leave_playerを除外しました");
+				}
+				else {
+					&system_comment("募集中の放置ﾌﾟﾚｲﾔｰ$leave_playerを除外しました");
+				}
+			}
+			&regist_you_array($leave_player, @array);
+		}
+		if ($is_reset eq GAME_RESET) {
+			&system_comment($penalty_coin ? "放置されたﾌﾟﾚｲ中のｹﾞｰﾑをﾘｾｯﾄしました" : '放置された募集中のｹﾞｰﾑをﾘｾｯﾄしました');
+		}
+		elsif ($penalty_coin && @active_players == 1) {
+			if ($active_players[0] eq $m{name}) {
+				$m{c_turn} = $m{c_value} = $m{c_stock} = '0';
+				&write_user;
+			}
+			else {
+				&regist_you_array($active_players[0], @array);
+			}
+			&system_comment("参加者が$active_players[0]だけとなったためｹﾞｰﾑをﾘｾｯﾄしました");
+		}
+	}
+
+	# 固定処理
+	my $member_c = @members - 1;
+	return ($member_c, $member, $state, $participants, $rate, @result_my_datas);
+}
+
+sub show_game_info {
+	my ($state, $participants, $rate, @result_my_datas) = @_;
+
+	my @participants = split /,/, $participants;
+
+	print qq|<br>ﾇﾒﾛﾝ修正中につきあんまり触らない方が良いと思う<br>|;
+	print qq|ﾌﾟﾚｲ中に参加者が10分放置し(思考猶予\を超え)ているのを他の参加者が閲覧すると放置ﾌﾟﾚｲﾔｰが負け<br>|;
+	print qq|ｹﾞｰﾑの最終ﾌﾟﾚｲから20分放置されているのをｹﾞｰﾑに参加していない閲覧者が閲覧すると流れ<br><br>|;
+	if ($participants) {
+		print qq|賭け上限:$rate 参加者:$participants|;
+	}
+	else {
+		print qq|ﾒﾝﾊﾞｰ募集中|;
+	}
+
+	if ($state) { # ｹﾞｰﾑが開始している
+		print qq|<br>自分の番号:$result_my_datas[1]| if -1 < index($participants, "$m{name},");
+		&play_form($participants, @result_my_datas);
+	}
+	else { # ｹﾞｰﾑが開始していない
+		if (-1 < index($participants, "$m{name},")) { # ｹﾞｰﾑに参加している
+			&start_game_form($participants, @result_my_datas); # 開始ﾌｫｰﾑ
+		}
+		else { # ｹﾞｰﾑに参加していない
+			if ($participants[0] && $participants[1]) { # 親と子が決まっている
+				print qq|<br>ｹﾞｰﾑの開始を待っています|;
+			}
+			else { # 親と子どちらか決まってない
+				&participate_form($participants[0], $participants[1], $rate); # 参加ﾌｫｰﾑ
+			}
+		}
+	}
+}
+
+sub show_game {
+	my @members = ();
+	$m{c_turn} = 0;
+	&write_user;
+
+	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
+	my $head_line = <$fh>;
+	my ($state, $lastupdate, $participants, $rate) = split /<>/, $head_line;
+
+	my %sames = ();
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		next if $sames{$mname}++; # 同じ人なら次
+
+		if (-1 < index($participants, "$mname,") && $mname eq $m{name}) { # 参加者のﾃﾞｰﾀだけ
+			print qq|<br>自分の番号:$mvalue<br>|;
+		}
+	}
+	close $fh;
+	return;
+}
+
+sub participate_form { # 「参加する」のﾌｫｰﾑ
+	my ($leader, $opponent, $rate) = @_;
+
+	my $button = $leader ? "参加する" : "親になる";
+
+	print qq|<form method="$method" action="$this_script" name="form">|;
+	print qq|<input type="hidden" name="mode" value="participate">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+	print qq|<input type="text"  name="number" class="text_box_b"> 自分の番号<br>|;
+	print qq|<input type="text"  name="bet" class="text_box_b"> 賭けるｺｲﾝ<br>| if $leader;
+	print qq|<input type="submit" value="$button" class="button_s"></form>|;
+}
+
+sub participate { # 「参加する」処理
+	return "ｺｲﾝがありません" unless $m{coin};
+
+	my @number;
+	if ($in{number} > 0 && $in{number} !~ /[^0-9]/) {
+		@number = (int($in{number} / 100) % 10, int(($in{number} / 10) % 10), int($in{number} % 10));
+		if($number[0] == $number[1] || $number[0] == $number[2] || $number[1] == $number[2]){
+			return ("同じ数字は二度使えません");
+		}
+	}
+	else {
+		return ("3つの異なる数字を入れてください");
+	}
+
+	my @members = ();
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($mname eq $m{name}) {
+			$mtime = $time;
+			$mturn = 1;
+			$mvalue = $number[0] * 100 + $number[1] * 10 + $number[2];
+			$mstock = 63;
+		}
+		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+	}
+
+	my ($state, $lastupdate, $participants, $rate) = split /<>/, $head_line;
+	my @participants = split /,/, $participants;
+
+	my $is_entry = 0;
+	my $is_entry_full = 0;
+	my $is_no_bet = 0;
+	if (@participants > 1) {
+		$is_entry_full = 1;
+	}
+	elsif (-1 < index($participants, "$m{name},")) {
+		$is_entry = 1;
+	}
+	elsif (!$state && $m{c_turn} == 0) { # 募集人数埋まっておらず未参加かつ開始前で対人ｶｼﾞﾉをやっていない
+		unless ($participants[0]) { # 参加者がいないなら親
+			$rate = $m{coin};
+			$participants .= "$m{name},";
+			$lastupdate = $time;
+		}
+		elsif ($in{bet}) { # 親がいて賭け金を設定しているなら
+			$rate = $in{bet} > $rate ? $rate : $in{bet} ;
+			$participants .= "$m{name},";
+			$lastupdate = $time;
+		}
+		else { # 親はいて子が賭け金を設定していない
+			$is_no_bet = 1;
+		}
+	}
+	unshift @members, "$state<>$lastupdate<>$participants<>$rate<>\n";
+
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	if ($state) {
+		return "すでにｹﾞｰﾑが始まっています";
+	}
+	elsif ($is_entry) {
+		return "すでに参加しています";
+	}
+	elsif ($is_entry_full) {
+		return "すでに参加者が集まっています";
+	}
+	elsif ($is_no_bet) {
+		return "子になるにはｺｲﾝをﾍﾞｯﾄしてください";
+	}
+	elsif ($m{c_turn}) {
+		return "対人ｶｼﾞﾉをﾌﾟﾚｲ中です";
+	}
+	else {
+		$m{c_turn} = 1;
+		&write_user;
+		return "$m{name} が席に着きました";
+	}
+}
+
+sub start_game_form {
+	my ($participants, @result_my_datas) = @_;
+	my @participants = split /,/, $participants;
+
+	print qq|<br>自分の番号:$result_my_datas[1]<br>|;
+	if (@participants == 2) {
+		print qq|<form method="$method" action="$this_script" name="form">|;
+		print qq|<input type="hidden" name="mode" value="start_game">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="開始する" class="button_s"></form>|;
+		print qq|<form method="$method" action="$this_script" name="form">|;
+		print qq|<input type="hidden" name="mode" value="observe">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="参加しない" class="button_s"></form>|;
+	}
+	else {
+		print qq|<form method="$method" action="$this_script" name="form">|;
+		print qq|<input type="hidden" name="mode" value="observe">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="参加しない" class="button_s"></form>|;
+	}
+}
+
+sub observe { # 「参加しない」処理
+	my @members = ();
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	while (my $line = <$fh>) {
+		push @members, $line;
+	}
+	my ($state, $lastupdate, $participants, $rate) = split /<>/, $head_line;
+
+	my $is_entry = 0;
+	my $index = index($participants, "$m{name},");
+	if (!$state && -1 < $index && $m{c_turn} == 1) { # 参加はしているがｹﾞｰﾑは開始していない
+		$is_entry = 1;
+		substr($participants, $index, length("$m{name},"), '');
+	}
+
+	my $is_reset = 0;
+	if (length($participants)) { # ﾒﾝﾊﾞｰが一人でもいるなら
+		my @participants = split /,/, $participants;
+		my %tmp_y = get_you_datas($participants[0]);
+		unshift @members, "$state<>$time<>$participants<>$tmp_y{coin}<>\n";
+	}
+	else { # ﾒﾝﾊﾞｰの最後の一人が席を離れたらﾘｾｯﾄ
+		unshift @members, "<><><><><><>\n";
+		$is_reset = GAME_RESET;
+	}
+
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	if ($state) {
+		return "すでにｹﾞｰﾑが始まっています";
+	}
+	elsif (!$is_entry) {
+		return "ｹﾞｰﾑに参加していません";
+	}
+	else {
+		$m{c_turn} = $m{c_value} = $m{c_stock} = '0';
+		&write_user;
+		my $result_mes = "$m{name} が席を離れました";
+		if ($is_reset eq GAME_RESET) {
+			&system_comment('参加者不在のためｹﾞｰﾑをﾘｾｯﾄしました');
+			$result_mes = '';
+		}
+		return $result_mes;
+	}
+}
+
+sub start_game {
+	my @members = ();
+	my @game_members = ();
+
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	my ($state, $lastupdate, $participants, $rate) = split /<>/, $head_line;
+	my @participants = split /,/, $participants;
+
+	my $is_start = 0;
+	if (@participants == 2 && !$state && -1 < index($participants, "$m{name},") && $m{c_turn} == 1) { # 参加者が自分を含め二人、ｹﾞｰﾑ開始前なら
+		$state = 1;
+		$is_start = 1;
+	}
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($is_start && -1 < index($participants, "$mname,")) {
+			push @game_members, $mname;
+			$mturn = 2;
+			$mtime = $time;
+		}
+		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+	}
+
+	unshift @members, "$state<>$time<>$participants<>$rate<>\n";
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	if ($is_start) {
+		for my $game_member (@game_members) {
+			if ($game_member eq $m{name}) {
+				$m{c_turn} = 2;
+				&write_user;
+			}
+			else {
+		 		&regist_you_data($game_member, 'c_turn', '2');
+			}
+		}
+		return '勝負！';
+	}
+}
+
+sub play_form {
+	my ($participants, @result_my_datas) = @_;
+	return unless index($participants, "$m{name},") == 0;
+
+	print qq|<form method="$method" action="$this_script" name="form">|;
+	print qq|<input type="text"  name="number" class="text_box_b"> 番号<input type="hidden" name="mode" value="play">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+	print qq|<input type="submit" value="番号を当てる" class="button_s"></form>|;
+
+	print qq|ｱｲﾃﾑ系未移植|;
+=pod
+	print qq|<form method="$method" action="$this_script" name="form">|;
+	print qq|<input type="hidden" name="mode" value="use_item">アイテム<input type="text"  name="number" class="text_box_b"> 番号<br>|;
+	if(int($result_my_datas[2] / 32) == 1){
+		print qq|<label>| unless $is_moble;
+		print qq|<input type="radio" name="itemno" value="1">DOUBLE<br>|;
+		print qq|</label>| unless $is_moble;
+	}
+	if(int($result_my_datas[2] / 16) % 2 == 1){
+		print qq|<label>| unless $is_moble;
+		print qq|<input type="radio" name="itemno" value="2">HIGH&LOW<br>|;
+		print qq|</label>| unless $is_moble;
+	}
+	if(int($result_my_datas[2] / 8) % 2 == 1){
+		print qq|<label>| unless $is_moble;
+		print qq|<input type="radio" name="itemno" value="3">TARGET<br>|;
+		print qq|</label>| unless $is_moble;
+	}
+	if(int($result_my_datas[2] / 4) % 2 == 1){
+		print qq|<label>| unless $is_moble;
+		print qq|<input type="radio" name="itemno" value="4">SLASH<br>|;
+		print qq|</label>| unless $is_moble;
+	}
+	if(int($result_my_datas[2] / 2) % 2 == 1){
+		print qq|<label>| unless $is_moble;
+		print qq|<input type="radio" name="itemno" value="5">SHUFFLE<br>|;
+		print qq|</label>| unless $is_moble;
+	}
+	if($result_my_datas[2] % 2 == 1){
+		print qq|<label>| unless $is_moble;
+		print qq|<input type="radio" name="itemno" value="6">CHANGE<br>|;
+		print qq|</label>| unless $is_moble;
+	}
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+	print qq|<input type="submit" value="アイテムを使う" class="button_s"></form>|;
+=cut
+}
+
+sub play {
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	my ($state, $lastupdate, $participants, $rate) = split /<>/, $head_line;
+	my @player = split /,/, $participants;
+	my ($e_name, $e_value);
+
+	my %sames = ();
+	my $is_find = 0;
+	my @members = ();
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock, $mhp, $mstr) = split /<>/, $line;
+		next if $sames{$mname}++; # 同じ人なら次
+
+		if ($mname eq $player[1]) {
+			$e_name = $mname;
+			$e_value = $mvalue;
+			$is_find = 1;
+		}
+		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+	}
+
+	my $result_mes = '';
+	my @game_member = ();
+	my $is_reset = 0;
+	if($in{number} > 0 && $in{number} !~ /[^0-9]/){
+		my($hit, $blow) = &hb_count($in{number}, $e_value);
+		$result_mes = "$in{number}:$hit イート $blow バイト";
+		if($hit == 3){
+			$result_mes .= "勝利";
+			@game_member = split /,/, $participants;
+			($state, $lastupdate, $participants, $rate) = ('', '', '', '');
+			$is_reset = 1;
+		}
+		$participants =~ s/^(.*?),(.*)/$2$1,/g if $is_find; # 操作中のﾌﾟﾚｲﾔｰを最後尾に移動
+	}
+
+	unshift @members, "$state<>$time<>$participants<>$rate<>\n"; # ﾍｯﾀﾞｰ
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	# 終了処理
+	if ($is_reset) {
+		for my $game_member (@game_members) {
+			if ($game_member eq $m{name}) {
+				$m{c_turn} = 0;
+				&write_user;
+			}
+			else {
+		 		&regist_you_data($game_member, 'c_turn', '0');
+			}
+		}
+		my $cv = -1 * &coin_move(-1 * $rate, $e_name);
+		&coin_move($cv, $m{name});
+	}
+
+	return $result_mes;
+#=====
+=pod
+	my $e_name;
+	my $e_value;
+	my $ret_mes = '';
+	my @members = ();
+	my $reset_flag = 0;
+	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+	my $head_line = <$fh>;
+	my($leader, $max_bet, $state) = split /<>/, $head_line;
+	while (my $line = <$fh>) {
+		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
+		push @members, $line;
+		if ($mturn > 0 && $mname ne $m{name}){
+			$e_name = $mname;
+			$e_value = $mvalue;
+		};
+	}
+	close $fh;
+
+	return("相手の番です") if $state ne $m{name}; # 動作未確認だけど、whileループ入る前に $state 代入された直後に close return した方が良いのでは
+
+	if($in{comment} > 0 && $in{comment} !~ /[^0-9]/){
+		my($hit, $blow) = &hb_count($in{comment}, $e_value);
+		$state = $e_name;
+		$ret_mes = "$in{comment}:$hit イート $blow バイト";
+		if($hit == 3){
+			$ret_mes .= "勝利";
+			my $cv = -1 * &coin_move(-1 * $max_bet, $e_name);
+			&coin_move($cv, $m{name});
+			$state = '';
+			$leader = '';
+			$max_bet = 0;
+			$reset_flag = 1;
+		}
+		unshift @members, "$leader<>$max_bet<>$state<>\n";
+		open my $fh, "> ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+		print $fh @members;
+		close $fh;
+	}
+
+	if($reset_flag){
+		&reset_game;
+	}
+
+	return ($ret_mes);
+=cut
+}
+
+sub hb_count {
+    my ($m_number, $y_number) = @_;
+	my @number = (int($m_number / 100), int($m_number / 10) % 10, $m_number % 10);
+	my @answer = (int($y_number / 100), int($y_number / 10) % 10, $y_number % 10);
+	my $hit = 0;
+	my $blow = 0;
+	for my $i (0..2) {
+		if($answer[$i] == $number[$i]){
+			$hit++;
+		}else{
+			my $d = 0;
+			for my $j (0..$i - 1){
+				if($number[$j] == $number[$i]) {
+					$d++;
+				}
+			}
+			if($d == 0){
+				for my $j (0..2){
+					if($answer[$j] == $number[$i]) {
+						$blow++;
+					}
+				}
+			}
+		}
+	}
+	return ($hit, $blow);
+}
+
+
+=pod
 sub run {
 	if ($in{mode} eq "play") {
 	    $in{comment} = &play_number;
@@ -195,7 +804,7 @@ sub get_member { # flock
 
 	return ($member_c, $member, $leader, $max_bet, $waiting, $state, $wmember);
 }
-
+=cut
 sub play_number {
 	my $e_name;
 	my $e_value;
@@ -489,7 +1098,7 @@ sub make_leader { # flock
 
 	return ("$leader が親です 賭け上限:$max_bet");
 }
-
+=pod
 sub start_game{
 	my @members = ();
 	
@@ -508,7 +1117,7 @@ sub start_game{
 	close $fh;
 	return ("勝負！");
 }
-
+=cut
 sub reset_game{ # flock
 	my $leave_name = shift;
 	my $is_find = 0; # $leave_name のﾌﾟﾚｲﾔｰが存在するか
@@ -630,34 +1239,6 @@ sub exit_game{
 	$m{c_turn} = 0;
 	&write_user;
 	return("$m{name} は やめました");
-}
-
-sub hb_count {
-    my ($m_number, $y_number) = @_;
-	my @number = (int($m_number / 100), int($m_number / 10) % 10, $m_number % 10);
-	my @answer = (int($y_number / 100), int($y_number / 10) % 10, $y_number % 10);
-	my $hit = 0;
-	my $blow = 0;
-	for my $i (0..2) {
-		if($answer[$i] == $number[$i]){
-			$hit++;
-		}else{
-			my $d = 0;
-			for my $j (0..$i - 1){
-				if($number[$j] == $number[$i]) {
-					$d++;
-				}
-			}
-			if($d == 0){
-				for my $j (0..2){
-					if($answer[$j] == $number[$i]) {
-						$blow++;
-					}
-				}
-			}
-		}
-	}
-	return ($hit, $blow);
 }
 
 1;#削除不可

@@ -1,6 +1,62 @@
 #================================================
 # ｶｼﾞﾉ共用関数
 #================================================
+
+use constant GAME_RESET => 1; # ｹﾞｰﾑの更新が止まっている
+use constant LEAVE_PLAYER => 2; # 参加者が非ｱｸﾃｨﾌﾞになっている
+
+$limit_think_time = 60 * 10; # 10分放置でﾌﾟﾚｲﾔｰ除外
+$limit_game_time = 60 * 20; # 30分放置でｹﾞｰﾑﾘｾｯﾄ
+
+#================================================
+# 対人ｶｼﾞﾉの基本的なﾒｲﾝ画面
+#================================================
+sub _default_run {
+#	my $_default = $_; # ﾁｬｯﾄ部分の有無
+	$in{comment} = &{$in{mode}} if $in{mode} && $in{mode} ne 'write'; # 各ｺﾏﾝﾄﾞに対応する関数へのﾛｰﾀﾞｰ
+	&write_comment if $in{comment};
+
+	my @datas = ();
+
+	my($member_c, $member, @datas) = &get_member;
+
+	if($m{c_turn} eq '0' || $m{c_turn} eq ''){
+		print qq|<form method="$method" action="$script">|;
+		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+		print qq|<input type="submit" value="戻る" class="button1"></form>|;
+	}
+
+	print qq|<h2>$this_title</h2>|;
+	print qq|$mes|;
+	print qq|<form method="$method" action="$this_script" name="form">|;
+	print qq|<input type="text"  name="comment" class="text_box_b"><input type="hidden" name="mode" value="write">|;
+	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
+	print qq|<input type="submit" value="発言" class="button_s"><br>|;
+	unless ($is_mobile) {
+		print qq|自動ﾘﾛｰﾄﾞ<select name="reload_time" class="select1"><option value="0">なし|;
+		for my $i (1 .. $#reload_times) {
+			print $in{reload_time} eq $i ? qq|<option value="$i" selected>$reload_times[$i]秒| : qq|<option value="$i">$reload_times[$i]秒|;
+		}
+		print qq|</select>|;
+	}
+	print qq|</form><font size="2">$member_c人:$member</font><br>|;
+
+	&show_game_info(@datas);
+
+	print qq|<hr>|;
+	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
+	while (my $line = <$fh>) {
+		my ($btime, $bdate, $bname, $bcountry, $bshogo, $baddr, $bcomment, $bicon) = split /<>/, $line;
+		$bname .= "[$bshogo]" if $bshogo;
+		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
+		print qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
+	}
+	close $fh;
+}
+
+#================================================
+# ｺｲﾝの増減
+#================================================
 sub coin_move{
 	my ($m_coin, $name, $no_system_comment) = @_;
 	my $ret_v;
@@ -109,7 +165,7 @@ sub system_comment{
 	my @lines = ();
 	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
 	eval { flock $fh, 2; };
-	
+
 	# ｵｰﾄﾘﾝｸ
 	$in{comment} =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\=\@\;\#\:\%]+)/$1<a href=\"link.cgi?$2\" target=\"_blank\">$2<\/a>/g;#"
 	my $head_line = <$fh>;
@@ -125,6 +181,9 @@ sub system_comment{
 	close $fh;
 }
 
+#================================================
+# 対人ｶｼﾞﾉ関係の変数を初期化
+#================================================
 sub you_c_reset {
 	my $name = shift;
 	if ($name eq $m{name}) {
@@ -136,6 +195,29 @@ sub you_c_reset {
 		&regist_you_data($name,'c_turn',0);
 		&regist_you_data($name,'c_value',0);
 		&regist_you_data($name,'c_stock',0);
+	}
+}
+
+#================================================
+# 対人ｶｼﾞﾉ関係の変数を初期化(複数ﾕｰｻﾞｰ)
+#================================================
+sub you_lot_c_reset {
+	my @names = @_;
+
+	my @data = (
+		['c_turn', 0],
+		['c_value', 0],
+		['c_stock', 0],
+	);
+
+	for $name (@names) {
+		if ($name eq $m{name}) {
+			$m{c_turn} = $m{c_value} = $m{c_stock} = 0;
+			&write_user;
+		}
+		else {
+			&regist_you_array($datas{name}, @data);
+		}
 	}
 }
 
