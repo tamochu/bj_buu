@@ -5,11 +5,10 @@ require './config_game.cgi';
 
 # 読み込み容量をオーバーした状態で cgi-lib.pl をロードするとそちらのエラーに巻き込まれて落ちる
 # エラーに巻き込まれるようであれば自分でエラー処理をする
-my $maxdata    = 131072;
 my $len  = $ENV{'CONTENT_LENGTH'};
-my $is_error = $len > $maxdata;
-if ($is_error) {
-	&decode;
+my $is_error = $len > 131072;
+if ($is_error) { # cgi-lib.plは128KBで引っかかる
+	&decode; 
 }
 else {
 	require './cgi-lib.pl';
@@ -39,14 +38,15 @@ if($in{back} eq '1'){
 		}
 
 		if (!-f $newfile) { # なぜか add_picture 外なら判別できる
-			$m{lib} = 'shopping_upload';
-			$m{tp} = 100;
-			&write_user;
 			&error("イメージファイルの作成に失敗しました");
 		}
 		else {
+			# 使った時点でﾍﾟｲﾝﾀｰ消失じゃなく画像がうｐできたら消失で
+			$m{lib} = 'shopping_upload';
+			$m{tp} = 400;
+			&write_user;
+
 			# ﾍﾟｲﾝﾀｰが効いた時にだけ upload_token.cgi を削除
-			# shopping_upload.cgi $m{tp} == 400 の時にこのﾌｧｲﾙが残っているなら失敗してると判断できる
 			unlink "$userdir/$id/upload_token.cgi";
 			&show_picture;
 			&footer;
@@ -79,9 +79,6 @@ sub add_picture {
 	my $newfile = "$path/_$time2$ext";
 
 	if (($ext eq 'NO') || ($ext eq '') || !defined($ext)) {
-		$m{lib} = 'shopping_upload';
-		$m{tp} = 100;
-		&write_user;
 		&error('不正な拡張子です');
 	} else {
 		open my $nfh,">$newfile" or &error("イメージファイルを作れません");
@@ -90,10 +87,7 @@ sub add_picture {
 		close $nfh;
 
 		if(-s $newfile > $size){
-			unlink $newfile;
-			$m{lib} = 'shopping_upload';
-			$m{tp} = 100;
-			&write_user;
+			unlink "$newfile";
 			&error("サイズ超過です(15KBまで)");
 		}
 	}

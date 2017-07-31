@@ -44,11 +44,11 @@ $layout = 2;
 	$mes .= qq|<input type=submit name=sub value="ˆÙ¢ŠE‚©‚ç“]‘—">|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|</form>|;
-	$m{tp} = 400;
 }
 
 sub tp_400 {
-	&remove_pet if !-f "$userdir/$in{id}/upload_token.cgi";
+#	&remove_pet if !-f "$userdir/$in{id}/upload_token.cgi";
+	&remove_pet;
 	&refresh;
 	&n_menu;
 }
