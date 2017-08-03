@@ -45,7 +45,7 @@ sub is_satisfy {
 #================================================
 sub tp_100 {
 	$mes .= "$c_yに着きました<br>";
-	
+
 	my $is_ambush = &_get_war_you_data; # 待ち伏せされてた場合戻り値あり
 
 	$y{hp} = $y{max_hp};
@@ -605,6 +605,9 @@ sub is_tokkou {
 sub get_wea_modify {
 	my $who = shift;
 	my ($wea, $lea) = (${$who}{wea}, ${$who}{lea});
+
+	# 自分の世代が3世代以下でｽｻﾉｵ装備時かつ統率300未満なら300に底上げ
+	$lea = 300 if $who eq 'm' && ${$who}{sedai} <= 3 && ${$who}{pet} eq '162' && ${$who}{lea} < 300;
 
 # ﾁｷﾝでやっぱりバグりそうだし可読性悪いしとりあえず無効
 #	my @weas_data = (6, 5); # 属性数、各属性の武器数 属性数や武器数を増やしたらここの数で調整する

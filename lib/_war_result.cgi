@@ -30,6 +30,10 @@ sub war_draw {
 	$mes .= "$vの$e2j{exp}を手に入れました<br>";
 	
 	my $is_rewrite = 0;
+
+	# ｽｻﾉｵによる増兵分を残存兵士として返させない
+	$m{sol} -= ($rank_sols[11] - $rank_sols[$m{rank}]) * $m{value} if $m{sedai} <= 3 && $m{pet} eq '162' && $m{rank} < 11;
+
 	if ($m{sol} > 0) {
 		$cs{soldier}[$m{country}] += $m{sol};
 		$is_rewrite = 1;
@@ -112,6 +116,10 @@ sub war_escape {
 	$mes .= "$m{name}に対する評価が下がりました<br>";
 	$m{rank_exp} -= int( (rand(6)+5) * $m{value} );
 	&write_yran('war', 1, 1);
+
+	# ｽｻﾉｵによる増兵分を残存兵士として返させない
+	$m{sol} -= ($rank_sols[11] - $rank_sols[$m{rank}]) * $m{value} if $m{sedai} <= 3 && $m{pet} eq '162' && $m{rank} < 11;
+	$m{sol} = 0 if $m{sol} < 0;
 
 	$cs{soldier}[$m{country}] += $m{sol};
 #	$cs{soldier}[$y{country}] += int($y{sol} / 3);
@@ -284,6 +292,10 @@ sub war_win {
 		&_penalty;
 	}
 	else {
+		# ｽｻﾉｵによる増兵分を残存兵士として返させない
+		$m{sol} -= ($rank_sols[11] - $rank_sols[$m{rank}]) * $m{value} if $m{sedai} <= 3 && $m{pet} eq '162' && $m{rank} < 11;
+		$m{sol} = 0 if $m{sol} < 0;
+
 		$cs{soldier}[$m{country}] += $m{sol};
 	}
 	if ($cs{disaster}[$y{country}] eq 'paper' && $cs{disaster_limit}[$y{country}] >= $time) {
@@ -601,14 +613,15 @@ sub _rescue {
 sub _touitu {
 	# すげー気持ち悪い多重統一処理防止
 	# 同年同情勢同一キャラによる統一がされてたらとりあえず情勢選択へ移行
-	open my $fh, "< $logdir/legend/touitu.cgi" or &error("$logdir/legend/touitu.cgi ﾌｧｲﾙが開けません");
-	my $line = <$fh>;
-	close $fh;
-	if ($line =~ /$world_name暦$w{year}年【$world_states[$w{world}]】.*$m{name}.*/) {
-		$m{lib} = 'world';
-		$m{tp}  = 100;
-		return;
-	}
+	# 文字コードの都合かなんか、たまにバグる（深淵）
+#	open my $fh, "< $logdir/legend/touitu.cgi" or &error("$logdir/legend/touitu.cgi ﾌｧｲﾙが開けません");
+#	my $line = <$fh>;
+#	close $fh;
+#	if ($line =~ /$world_name暦$w{year}年【$world_states[$w{world}]】.*$m{name}.*/) {
+#		$m{lib} = 'world';
+#		$m{tp}  = 100;
+#		return;
+#	}
 
 	&c_up('hero_c');
 #	&debug_log(\%w, 'touitsu_w');

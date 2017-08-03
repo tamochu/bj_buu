@@ -626,7 +626,7 @@ require './lib/system_game.cgi';
  	[159,	'Á¯Ìß',		'training',	sub{ return if $m{sedai} > 3; my $v = int($_[0] * 10 * (rand(2)+1) ); $m{money}+=$v; $mes.="$v G‚ğè‚É“ü‚ê‚Ü‚µ‚½!<br>"; }],
  	[160,	'Á®³±²',	'domestic',	sub{ return if $m{sedai} > 3; &special_money unless $w{world} eq '1'; }],
  	[161,	'Ì³Ï',		'military',	sub{ return if $m{sedai} > 3; $m{rank_exp} += int($_[0]*0.5); $mes.="$pets[$m{pet}][1]š$m{pet_c}‚Ì—Í‚É‚æ‚è $e2j{rank_exp} ‚ª‘½‚­‚ ‚½‚¦‚ç‚ê‚Ü‚µ‚½<br>"; }],
- 	[162,	'½»Éµ',		'war_begin',sub{ return if $m{sedai} > 3; $m{sol_lv} = 100; $y{sol_lv} = 50; $mes.="$pets[$m{pet}][1]š$m{pet_c}‚ÌŒø‰Ê‚É‚æ‚è©ŒR‚Ìm‹C‚ªã‚ª‚èA“GŒR‚Ìm‹C‚ª‰º‚ª‚è‚Ü‚µ‚½<br>";	}],
+ 	[162,	'½»Éµ',		'war_begin',sub{ return if $m{sedai} > 3; $m{sol_lv} = 100; $y{sol_lv} = 50; $m{sol} += ($rank_sols[11] - $rank_sols[$m{rank}]) * $m{value} if $m{rank} < 11; $mes.="$pets[$m{pet}][1]š$m{pet_c}‚ÌŒø‰Ê‚É‚æ‚è©ŒR‚Ìm‹C‚ªã‚ª‚èA“GŒR‚Ìm‹C‚ª‰º‚ª‚è‚Ü‚µ‚½<br>";	}],
  	[163,	'¸ÛÑ',		'war_win',	sub{ return if $m{sedai} > 3; ++$m{medal} }],
  	
  	[164,	'´Û½',		'marriage',	sub{},'‚È‚Ÿc½¹ÍŞ‚µ‚æ‚¤‚âcc'], # shopping_marriage.cgi‚É–„‚ß‚İˆ—
