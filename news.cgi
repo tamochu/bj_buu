@@ -34,9 +34,12 @@ sub run {
 			&show_page_switcher;
 		}
 		else {
-			print qq|<form method="$method" action="$script">|;
+			print qq|<div style="margin-bottom: 14px;">|;
+			print qq|<form method="$method" action="$script" style="display: inline;">|;
 			print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}">|;
 			print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
+			&show_wait;
+			print qq|</div>|;
 		}
 	}
 	else {
@@ -55,4 +58,115 @@ sub run {
 	open my $fh, "< $logdir/$files[$in{no}][1].cgi" or &error("$logdir/$files[$in{no}][1].cgiÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
 	print qq|<li>$_</li><hr size="1">\n| while <$fh>;
 	close $fh;
+}
+
+sub show_wait {
+	&read_user;
+#	my %p = get_you_datas($in{id}, 1);
+	my $state = '';
+	if ($m{lib} eq 'domestic') {
+		if($m{tp} eq '110'){
+			if($m{turn} eq '1'){
+				$state = "¬‹K–Í";
+			}elsif($m{turn} eq '3'){
+				$state = "‘å‹K–Í";
+			}else{
+				$state = "’†‹K–Í";
+			}
+			$state .= "”_‹Æ’†‚Å‚·";
+		}elsif($m{tp} eq '210'){
+			if($m{turn} eq '1'){
+				$state = "¬‹K–Í";
+			}elsif($m{turn} eq '3'){
+				$state = "‘å‹K–Í";
+			}else{
+				$state = "’†‹K–Í";
+			}
+			$state .= "¤‹Æ’†‚Å‚·";
+		}elsif($m{tp} eq '310'){
+			if($m{turn} eq '1'){
+				$state = "¬‹K–Í";
+			}elsif($m{turn} eq '3'){
+				$state = "‘å‹K–Í";
+			}else{
+				$state = "’†‹K–Í";
+			}
+			$state .= "’¥•º’†‚Å‚·";
+		}elsif($m{tp} eq '410'){
+			if($m{turn} eq '1'){
+				$state = "¬‹K–Í";
+			}elsif($m{turn} eq '3'){
+				$state = "‘å‹K–Í";
+			}elsif($m{turn} eq '4'){
+				$state = "’´‹K–Í";
+			}else{
+				$state = "’†‹K–Í";
+			}
+			$state .= "’·Šú“à­’†‚Å‚·";
+		}
+	}elsif($m{lib} eq 'military'){
+		$state = "ˆÚ“®’†‚Å‚·";
+		if($m{tp} eq '110'){
+			$state .= "(‹­’D)";
+		}elsif($m{tp} eq '210'){
+			$state .= "(’³•ñ)";
+		}elsif($m{tp} eq '310'){
+			$state .= "(ô”])";
+		}elsif($m{tp} eq '410'){
+			$state .= "(’ã@)";
+		}elsif($m{tp} eq '510'){
+			$state .= "(‹UŒv)";
+		}elsif($m{tp} eq '610'){
+			$state .= "(Ué)";
+		}elsif($m{tp} eq '710'){
+			if($m{value} eq 'military_ambush'){
+				$state = "ŒR–";
+			}else{
+				$state = "iŒR";
+			}
+			$state .= "‘Ò‚¿•š‚¹’†‚Å‚·";
+		}elsif($m{tp} eq '810'){
+			$state .= "(’·Šú‹­’D)";
+		}elsif($m{tp} eq '910'){
+			$state .= "(’·Šú’³•ñ)";
+		}elsif($m{tp} eq '1010'){
+			$state .= "(’·Šúô”])";
+		}
+	}elsif($m{lib} eq 'prison'){
+		$state = "˜S–‚Å—H•Â’†‚Å‚·";
+	}elsif($m{lib} eq 'promise'){
+		$state = "ˆÚ“®’†‚Å‚·";
+		if($m{tp} eq '110'){
+			$state .= "(—FD)";
+		}elsif($m{tp} eq '210'){
+			$state .= "(’âí)";
+		}elsif($m{tp} eq '310'){
+			$state .= "(éí•z)";
+		}elsif($m{tp} eq '410'){
+			$state .= "(“¯–¿ŒğÂ)";
+		}elsif($m{tp} eq '510'){
+			$state .= "(“¯–¿”jŠü)";
+		}elsif($m{tp} eq '610'){
+			$state .= "(H—¿—A‘—)";
+		}elsif($m{tp} eq '710'){
+			$state .= "(‘‹à—A‘—)";
+		}elsif($m{tp} eq '810'){
+			$state .= "(•ºm—A‘—)";
+		}
+	}elsif($m{lib} eq 'war'){
+		$state = "ˆÚ“®’†‚Å‚·";
+		if($m{value} eq '0.5'){
+			$state .= "(­”iŒR)";
+		}elsif($m{value} eq '1'){
+			$state .= "(iŒR)";
+		}elsif($m{value} eq '1.5'){
+			$state .= "(’·Šú‰“ª)";
+		}
+	}
+
+	if ($state) {
+		my $next_time_mes = sprintf("%d•ª%02d•b", int($m{wt} / 60), int($m{wt} % 60) );
+		print qq| $state|;
+		print qq| <span id="nokori_time">$next_time_mes</span>| if 0 < $m{wt};
+	}
 }
