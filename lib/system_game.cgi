@@ -1715,6 +1715,7 @@ sub cs_data_repair{
 # 相場ビッグデータ
 #================================================
 sub sale_data_log {
+	return;
 	my ($kind, $item_no, $item_c, $item_lv, $price, $place) = @_;
 	
 	my $sale_data_file = "$logdir/shop_big_data.cgi";
@@ -1726,6 +1727,7 @@ sub sale_data_log {
 # 相場ビッグデータ取得
 #================================================
 sub get_sale_data_log {
+	return;
 	my ($k, $n) = @_;
 	my @lines = ();
 	
@@ -1745,6 +1747,7 @@ sub get_sale_data_log {
 # 相場ビッグデータHTML出力
 #================================================
 sub create_sale_data_chart {
+	return;
 	my ($k, $n) = @_;
 	my @lines = &get_sale_data_log($k, $n);
 	
