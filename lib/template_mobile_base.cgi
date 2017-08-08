@@ -5,7 +5,7 @@
 #================================================
 # Ò²Ý
 #================================================
-print qq|Ž‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/;
+print qq|Ž‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/ || $m{lib_r} =~ /^shopping/;
 #print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
 print qq|<a name="menu">$menu_cmd</a>$mes$tutorial_mes|;
 

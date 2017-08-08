@@ -4,13 +4,23 @@ my $shop_list_file = "$logdir/shop_list_$goods_dir.cgi";
 #================================================
 # ¦‚±‚ÌCGI’P‘Ì‚Å‚Í“®‚«‚Ü‚¹‚ñ shopping_akindo_book.cgi,shopping_akindo_picture.cgi‚ğQÆ
 
+# S‘©’†‚Ìs“®—pŠÖ”
+sub is_rest { return $m{lib_r} eq 'shopping_akindo_book' || $m{lib_r} eq 'shopping_akindo_picture'; } # S‘©’†‚Ìs“®‚©
+sub set_tp { (&is_rest ? $m{tp_r} : $m{tp}) = shift; } # S‘©’†E”ñS‘©’†‚Ìtp¾¯À°
+sub get_tp { return &is_rest ? $m{tp_r} : $m{tp}; } # S‘©’†E”ñS‘©’†‚Ì¹Ş¯À°
+sub refresh_r { $m{lib_r} = $m{tp_r} = ''; } # refresh‚ÌS‘©’†”Å
+
+# S‘©’†‚Æ“¯‚¶s“®‚ğ”ñS‘©’†‚É‚µ‚½ê‡AS‘©’†‚Ì•û‚ğ·¬İ¾Ù
+&refresh_r if $m{lib_r} eq $m{lib};
+
 #================================================
 # ‚¨“X‚Ì–¼‘Oˆê——•\¦
 #================================================
 sub begin {
 	$layout = 2;
-	
-	$m{tp} = 1 if $m{tp} > 1;
+
+#	$m{tp} = 1 if $m{tp} > 1;
+	&set_tp(1) if &get_tp > 1;
 	$mes .= "‚Ç‚Ì‚¨“X‚Å”ƒ•¨‚µ‚Ü‚·‚©?<br>";
 	
 	$mes .= qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
@@ -100,7 +110,8 @@ sub tp_1 {
 		
 		$mes .= qq|</table><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		$mes .= qq|<p><input type="submit" value="”ƒ‚¤" class="button1"></p></form>|;
-		$m{tp} = 100;
+#		$m{tp} = 100;
+		&set_tp(100);
 	}
 	else {
 #		$mes .= "y$y{name}z€”õ’†<br>";
@@ -196,7 +207,7 @@ sub tp_100 {
 	}
 	else {
 		$mes .= '‚â‚ß‚Ü‚µ‚½<br>';
-		&begin
+		&begin;
 	}
 }
 

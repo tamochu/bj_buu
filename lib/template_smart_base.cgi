@@ -5,9 +5,9 @@
 #================================================
 # Ò²İ
 #================================================
-print qq|‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/;
+print qq|‘‹à $m{money} G<br>| if $m{lib} =~ /^shopping/ || $m{lib_r} =~ /^shopping/;
 #if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
-if ( ($mes && $m{wt} > 1) || (!$mes && $m{lib} eq '') ) {
+if ($m{lib_r} eq '' && ($mes && $m{wt} > 1) || (!$mes && $m{lib} eq '') ) {
 #if (!$mes && ($is_battle ne 1 && $is_battle ne 2) ) {
 	# ÅVî•ñ
 	open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
@@ -32,7 +32,8 @@ if ( ($mes && $m{wt} > 1) || (!$mes && $m{lib} eq '') ) {
 }
 #print qq|<a name="menu">$menu_cmd</a><br>$mes<br>|;
 print qq|$menu_cmd|;
-print qq|<br>$mes$tutorial_mes| if $mes;
+print qq|<br>| unless $menu_cmd;
+print qq|$mes$tutorial_mes| if $mes;
 
 if ($is_battle eq '1') {
 	&battle_html;

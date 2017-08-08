@@ -122,7 +122,7 @@ sub write_user {
 	# -------------------
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可(login_time以外))
 	my @keys = (qw/
-		login_time ldate start_time mail_address name pass lib tp wt act sex shogo sedai vote vote_year
+		login_time ldate start_time mail_address name pass lib tp lib_r tp_r wt act sex shogo sedai vote vote_year
 		country job seed lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
 		max_hp hp max_mp mp at df mat mdf ag cha lea wea wea_c wea_lv wea_name gua egg egg_c pet pet_c shuffle master master_c boch_pet
 		marriage lot is_full next_salary icon icon_pet icon_pet_lv icon_pet_exp mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
@@ -137,7 +137,7 @@ sub write_user {
 		win_c lose_c draw_c hero_c huk_c met_c war_c dom_c mil_c pro_c esc_c res_c fes_c war_c_t dom_c_t mil_c_t pro_c_t boch_c storm_c
 		shogo_t icon_t breed breed_c depot_bonus akindo_guild silent_kind silent_tail guild_number disp_casino chat_java disp_top disp_news disp_chat disp_ad disp_daihyo salary_switch no_boss incubation_switch disp_gacha_time delete_shield
 		valid_blacklist pet_icon_switch tutorial_switch
-		c_turn c_stock c_value c_type tp_r cataso_ratio
+		c_turn c_stock c_value c_type cataso_ratio
 		no1_c money_overflow random_migrate ceo_c tam_c ban_c wt_c wt_c_latest
 		
 		sox_kind sox_no exchange_count
@@ -188,7 +188,8 @@ sub write_user {
 #================================================
 # 待ち時間を秒に変換 + 次へ
 sub wait {
-	$m{wt} = $config_test ? 10 : $GWT * 60;
+#	$m{wt} = $config_test ? 10 : $GWT * 60;
+	$m{wt} = $GWT * 60;
 	$m{wt_c} += $m{wt};
 	&n_menu;
 	$m{is_playing} = 0;
@@ -231,27 +232,42 @@ sub is_ng_cmd {
 #================================================
 sub b_menu {
 	my @menus = @_;
-	
-	if (!$m{is_playing} && $w{playing} >= $max_playing) {
-		$mes .= qq|<font color="#FFFF00">ﾌﾟﾚｲ規制中 $w{playing}/$max_playing人</font><br>しばらくお待ちください|;
-		&begin;
-	}
-	elsif (defined $menus[$cmd]) {
-		$m{lib} = $menus[$cmd][1];
-		$m{tp}   = 1;
-		require "./lib/$m{lib}.cgi";
-		
-		# lib実行条件okならbeginﾒﾆｭｰ
-		&begin if &is_satisfy;
-		
-		unless ($m{is_playing}) {
-			$m{is_playing} = 1;
-			++$w{playing};
-			&write_cs;
+
+	if ($m{wt} > 0) {
+		if (defined $menus[$cmd]) {
+			$m{lib_r} = $menus[$cmd][1];
+			$m{tp_r}   = 1;
+			require "./lib/$m{lib_r}.cgi";
+
+			# lib_r実行条件okならbeginﾒﾆｭｰ
+			&begin if &is_satisfy;
+		}
+		else {
+			&begin;
 		}
 	}
 	else {
-		&begin;
+		if (!$m{is_playing} && $w{playing} >= $max_playing) {
+			$mes .= qq|<font color="#FFFF00">ﾌﾟﾚｲ規制中 $w{playing}/$max_playing人</font><br>しばらくお待ちください|;
+			&begin;
+		}
+		elsif (defined $menus[$cmd]) {
+			$m{lib} = $menus[$cmd][1];
+			$m{tp}   = 1;
+			require "./lib/$m{lib}.cgi";
+			
+			# lib実行条件okならbeginﾒﾆｭｰ
+			&begin if &is_satisfy;
+			
+			unless ($m{is_playing}) {
+				$m{is_playing} = 1;
+				++$w{playing};
+				&write_cs;
+			}
+		}
+		else {
+			&begin;
+		}
 	}
 }
 #================================================
@@ -259,8 +275,75 @@ sub b_menu {
 #================================================
 sub menu {
 	my @menus = @_;
-	if($is_smart){
+	my $rest = $m{wt} > 0 ? 1 : 0;
+	if ($is_smart) {
+		$menu_cmd .= qq|<table boder=0 cols=4 width=110 height=110>|;
+		for my $i (0 .. $#menus) {
+			if($i % 4 == 0){
+				$menu_cmd .= qq|<tr>|;
+			}
+			next if $menus[$i] eq '';
+			my $mline = '';
+			my $mpos = 0;
+			while (1) {
+				my $char_num = 10;
+				if ($mpos + $char_num >= length($menus[$i])) {
+					$mline .= substr($menus[$i], $mpos);
+					last;
+				}
+				my $last_char = substr($menus[$i], $mpos + $char_num - 1, 2);
+				$last_char =~ s/([^0-9A-Za-z_ ])/'%'.unpack('H2', $1)/ge;
+				my $first1 = substr($last_char, 0, 1);
+				my $first2 = substr($last_char, 3, 1);
+				if ($first1 eq '%' && $first2 ne '%') {
+					$char_num--;
+				}
+				$mline .= substr($menus[$i], $mpos, $char_num) . "&#13;&#10;";
+				$mpos += $char_num;
+			}
+			$menu_cmd .= qq|<td><form method="$method" action="$script">|;
+			$menu_cmd .= qq|<input type="submit" value="$mline" class="button1s"><input type="hidden" name="cmd" value="$i">|;
+			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+#			$menu_cmd .= qq|<input type="hidden" name="rest" value="$rest">| if $rest; # 拘束中のコマンド入力であることを伝える 飛んだ先で $m{wt} も判定すること
+			$menu_cmd .= qq|</form>|;
+			$menu_cmd .= qq|</td>|;
+			if($i % 4 == 3){
+				$menu_cmd .= qq|</tr>|;
+			}
+		}
+		if($#menus % 4 != 3){
+			$menu_cmd .= qq|</tr>|;
+		}
+		$menu_cmd .= qq|</table>|;
+
+	}
+	elsif ($is_appli) {
+		$menu_cmd .= qq|<div align="left" id="commands">|;
+		for my $i (0 .. $#menus) {
+			next if $menus[$i] eq '';
+			$menu_cmd .= qq|<form method="$method" action="$script">|;
+			$menu_cmd .= qq|<input type="submit" value="$menus[$i]" class="button2s"><input type="hidden" name="cmd" value="$i">|;
+			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+#			$menu_cmd .= qq|<input type="hidden" name="rest" value="$rest">| if $rest; # 拘束中のコマンド入力であることを伝える 飛んだ先で $m{wt} も判定すること
+			$menu_cmd .= qq|</form>|;
+			$menu_cmd .= qq|<br class="cmd_br" />| if ($i+1) % 7 == 0;
+		}
+		$menu_cmd .= qq|<br class="cmd_br" /></div>|;
+	}
+	else{
+		$menu_cmd .= qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
+		for my $i (0 .. $#menus) {
+			next if $menus[$i] eq '';
+			$menu_cmd .= qq|<option value="$i">$menus[$i]</option>|;
+		}
+		$menu_cmd .= qq|</select><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+#		$menu_cmd .= qq|<input type="hidden" name="rest" value="$rest">| if $rest; # 拘束中のコマンド入力であることを伝える 飛んだ先で $m{wt} も判定すること
+		$menu_cmd .= $is_mobile ? qq|<br><input type="submit" value="決 定" class="button1" accesskey="#"><input type="hidden" name="guid" value="ON"></form>|: qq|<br><input type="submit" value="決 定" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
+	}
+
+#	return $menu_cmd if $rest; # 拘束中は $menu_cmd が表示されないルートを通るので、とりあえず拘束中のコマンドはここで返る文字列を $mes に足して表示する
 =pod
+	if($is_smart){
 		$menu_cmd .= qq|<div>|;
 #		$menu_cmd .= qq|<div style="float:right;">|;
 		for my $i (0 .. $#menus) {
@@ -299,68 +382,9 @@ sub menu {
 		}
 		$menu_cmd .= qq|</div>|;
 #		$menu_cmd .= qq|<br style="display:none;">|;
+	}
 =cut
 
-		$menu_cmd .= qq|<table boder=0 cols=4 width=110 height=110>|;
-		for my $i (0 .. $#menus) {
-			if($i % 4 == 0){
-				$menu_cmd .= qq|<tr>|;
-			}
-			next if $menus[$i] eq '';
-			my $mline = '';
-			my $mpos = 0;
-			while (1) {
-				my $char_num = 10;
-				if ($mpos + $char_num >= length($menus[$i])) {
-					$mline .= substr($menus[$i], $mpos);
-					last;
-				}
-				my $last_char = substr($menus[$i], $mpos + $char_num - 1, 2);
-				$last_char =~ s/([^0-9A-Za-z_ ])/'%'.unpack('H2', $1)/ge;
-				my $first1 = substr($last_char, 0, 1);
-				my $first2 = substr($last_char, 3, 1);
-				if ($first1 eq '%' && $first2 ne '%') {
-					$char_num--;
-				}
-				$mline .= substr($menus[$i], $mpos, $char_num) . "&#13;&#10;";
-				$mpos += $char_num;
-			}
-			$menu_cmd .= qq|<td><form method="$method" action="$script">|;
-			$menu_cmd .= qq|<input type="submit" value="$mline" class="button1s"><input type="hidden" name="cmd" value="$i">|;
-			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-			$menu_cmd .= qq|</form>|;
-			$menu_cmd .= qq|</td>|;
-			if($i % 4 == 3){
-				$menu_cmd .= qq|</tr>|;
-			}
-		}
-		if($#menus % 4 != 3){
-			$menu_cmd .= qq|</tr>|;
-		}
-		$menu_cmd .= qq|</table>|;
-
-	}
-	elsif ($is_appli) {
-		$menu_cmd  = qq|<div id="commands">|;
-		for my $i (0 .. $#menus) {
-			next if $menus[$i] eq '';
-			$menu_cmd .= qq|<form method="$method" action="$script">|;
-			$menu_cmd .= qq|<input type="submit" value="$menus[$i]" class="button2s"><input type="hidden" name="cmd" value="$i">|;
-			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-			$menu_cmd .= qq|</form>|;
-			$menu_cmd .= qq|<br class="cmd_br" />| if ($i+1) % 7 == 0;
-		}
-		$menu_cmd .= qq|<br class="cmd_br" /></div>|;
-	}
-	else{
-		$menu_cmd  = qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
-		for my $i (0 .. $#menus) {
-			next if $menus[$i] eq '';
-			$menu_cmd .= qq|<option value="$i">$menus[$i]</option>|;
-		}
-		$menu_cmd .= qq|</select><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-		$menu_cmd .= $is_mobile ? qq|<br><input type="submit" value="決 定" class="button1" accesskey="#"><input type="hidden" name="guid" value="ON"></form>|: qq|<br><input type="submit" value="決 定" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
-	}
 }
 #================================================
 # Nextﾒﾆｭｰ

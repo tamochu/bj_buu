@@ -3,39 +3,75 @@
 #================================================
 require "$datadir/buyable.cgi";
 
+# S‘©’†‚Ìs“®—pŠÖ”
+sub is_rest { return $m{lib_r} eq 'shopping_akindo'; } # S‘©’†‚Ìs“®‚©
+sub set_tp { (&is_rest ? $m{tp_r} : $m{tp}) = shift; } # S‘©’†E”ñS‘©’†‚Ìtp¾¯À°
+sub get_tp { return &is_rest ? $m{tp_r} : $m{tp}; } # S‘©’†E”ñS‘©’†‚Ì¹Ş¯À°
+sub refresh_r { $m{lib_r} = $m{tp_r} = ''; } # refresh‚ÌS‘©’†”Å
+
+# S‘©’†‚Æ“¯‚¶s“®‚ğ”ñS‘©’†‚É‚µ‚½ê‡AS‘©’†‚Ì•û‚ğ·¬İ¾Ù
+&refresh_r if $m{lib_r} eq $m{lib};
+
 sub begin {
 	$layout = 2;
 #	&confiscate_shop(1);
 #	&confiscate_shop(2);
-	
-	$m{tp} = 1 if $m{tp} > 1;
+
+	&set_tp(1) if &get_tp > 1;
+
 	$mes .= "‚Ç‚Ì‚¨“X‚Å”ƒ•¨‚µ‚Ü‚·‚©?<br>";
-	
-	my $count = 0;
 	$mes .= qq|<form method="$method" action="$script"><input type="radio" id="no_0" name="cmd" value="0" checked><label for="no_0">‚â‚ß‚é</label><br>|;
 	$mes .= qq|<input type="radio" id="total_list" name="cmd" value="total_list"><label for="total_list">¤•iˆê——</label><br>| unless $is_mobile;
+
+	my $count = 0;
 	$mes .= qq|<table class="table1"><tr><th>“X–¼</th><th>“X’·</th><th>Ğ‰î•¶</th></tr>| unless $is_mobile;
 	
 	open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ');
 	while (my $line = <$fh>) {
 		my($shop_name, $name, $message, $sale_c, $sale_money, $display, $guild_number) = split /<>/, $line;
-		
+
 		# ¤•i‚ª‚È‚¢“X‚Í”ñ•\¦
 		my $shop_id = unpack 'H*', $name;
 		next unless -s "$userdir/$shop_id/shop.cgi";
-		
+
 		my $gc = "#ffffff";
 		$mes .= $is_mobile ? qq|<input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font><br>|
-			 : qq|<tr><td><input type="radio" id="$name" name="cmd" value="$name"><font color="$gc"><label for="$name">$shop_name</label></font></td><td>$name</td><td>$message<br></td></tr>|;
+#			 : qq|<tr><td><input type="radio" id="$name" name="cmd" value="$name"><font color="$gc"><label for="$name">$shop_name</label></font></td><td>$name</td><td>$message<br></td></tr>|;
+			 : qq|<tr><td><label><input type="radio" name="cmd" value="$name"><font color="$gc">$shop_name</font></label></td><td>$name</td><td>$message<br></td></tr>|;
 		$count++;
 	}
 	close $fh;
 
 	$m{stock} = $count;
-	
+
+	$mes .= qq|</table>| unless $is_mobile;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+#	$mes .= qq|<input type="hidden" name="rest" value="shopping_akindo">| if &is_rest;
+	$mes .= qq|<p><input type="submit" value="‚¨“X‚É“ü‚é" class="button1"></p></form>|;
+
+=pod
 	$mes .= qq|</table>| unless $is_mobile;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="‚¨“X‚É“ü‚é" class="button1"></p></form>|;
+	$mes .= qq|<br><form method="$method" action="$script">|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<p><input type="submit" value="‚â‚ß‚é" class="button1"></p></form>|;
+	
+	$mes .= qq|<form method="$method" action="$script_r">|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<input type="hidden" name="cmd" value="shop_auction">|;
+	$mes .= qq|<p><input type="submit" value="µ°¸¼®İ‰ïê" class="button1"></p></form>|;
+	
+	$mes .= qq|<form method="$method" action="$script_r">|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<input type="hidden" name="cmd" value="shop_book">|;
+	$mes .= qq|<p><input type="submit" value="ÌŞ¯¸Ï°¹¯Ä" class="button1"></p></form>|;
+	
+	$mes .= qq|<form method="$method" action="$script_r">|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<input type="hidden" name="cmd" value="shop_picture">|;
+	$mes .= qq|<p><input type="submit" value="”ü‚Ì‰æ”ŒŠÙ" class="button1"></p></form>|;
+=cut
 }
 
 #================================================
@@ -48,14 +84,20 @@ sub tp_1 {
 		return;
 	}
 	if ($cmd eq 'total_list') {
-		$m{tp} = 200;
-		&menu('ãŒÀ‚È‚µ','Š‹àˆÈ‰º');
+		&set_tp(200);
+#		unless (&is_rest) {
+			&menu('ãŒÀ‚È‚µ','Š‹àˆÈ‰º');
+#		}
+#		else {
+#			$mes .= &menu('ãŒÀ‚È‚µ','Š‹àˆÈ‰º');
+#		}
 		return;
 	}
-	
+
 	$layout = 2;
+
 	my $shop_id = unpack 'H*', $y{name};
-	
+
 	my $shop_message = '';
 	my $is_find = 0;
 	open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ');
@@ -99,7 +141,8 @@ sub tp_1 {
 		
 		$mes .= qq|</table><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 		$mes .= qq|<p><input type="submit" value="”ƒ‚¤" class="button1"></p></form>|;
-		$m{tp} = 100;
+		&set_tp(100);
+#		$m{tp} = 100;
 	}
 	else {
 #		$mes .= "y$cmdz€”õ’†<br>";
@@ -190,7 +233,7 @@ sub tp_100 {
 	}
 	else {
 		$mes .= '‚â‚ß‚Ü‚µ‚½<br>';
-		&begin
+		&begin;
 	}
 }
 
@@ -201,61 +244,140 @@ sub tp_100 {
 sub tp_200 {
 	$layout = 2;
 
-	$m{tp} = 1 if $m{tp} > 1;
-
-	my @item_list = ();
-	open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ');
-	while (my $line = <$fh>) {
-		my($shop_name, $name, $message, $sale_c, $sale_money, $display, $guild_number) = split /<>/, $line;
-		next if $display ne '1';
-
-		# ¤•i‚ª‚È‚¢“X‚Í”ñ•\¦
-		my $shop_id = unpack 'H*', $name;
-		next unless -s "$userdir/$shop_id/shop.cgi";
-
-		if (-s "$userdir/$shop_id/shop.cgi") {
-			open my $ifh, "< $userdir/$shop_id/shop.cgi" or &error("$shop_name‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
-			while (my $iline = <$ifh>) {
-				my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
-				$item_no = 42 if ($kind == 2 && $item_no == 53);
-				$item_no = 76 if ($kind == 3 && $item_no == 180);
-				$item_no = 77 if ($kind == 3 && $item_no == 181);
-				$item_no = 194 if ($kind == 3 && $item_no == 195);
-				next if (($cmd eq '1' && $price > $m{money}) || $price == 5000000);
-				push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>$name<>$display<>$guild_number<>\n";
-			}
-			close $ifh;
-		}
-	}
-	close $fh;
+	if ($is_mobile) {
+		$m{tp_r} = 210;
+		my $num = 0;
+		my @item_list = ();
+		open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ');
+		while (my $line = <$fh>) {
+			my($shop_name, $name, $message, $sale_c, $sale_money, $display) = split /<>/, $line;
+			
+			# ¤•i‚ª‚È‚¢“X‚Í”ñ•\¦
+			my $shop_id = unpack 'H*', $name;
+			next unless -s "$userdir/$shop_id/shop.cgi";
 	
-	@item_list = map { $_->[0] }
-				sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
-					map { [$_, split /<>/ ] } @item_list;
-	$mes .= qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
-	$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>“Xå</th><th>‰¿Ši<br></th></tr>|;
-	my $b_name = -1;
-	my $b_kind = -1;
-	my $b_item_no = -1;
-	for my $line (@item_list) {
-		my($kind, $item_no, $item_c, $item_lv, $price, $name, $display, $guild_number) = split /<>/, $line;
-		if($name eq $b_name && $kind == $b_kind && $item_no == $b_item_no){
-			next;
+			if (-s "$userdir/$shop_id/shop.cgi") {
+				open my $ifh, "< $userdir/$shop_id/shop.cgi" or &error("$shop_name‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
+				while (my $iline = <$ifh>) {
+					my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
+					next if ($price == 5000000);
+					$price = 99999999 if $display ne '1';
+					$item_no = 42 if ($kind == 2 && $item_no == 53);
+					$item_no = 76 if ($kind == 3 && $item_no == 180);
+					$item_no = 77 if ($kind == 3 && $item_no == 181);
+					$item_no = 194 if ($kind == 3 && $item_no == 195);
+					push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>$name<>\n";
+				}
+				close $ifh;
+			}
 		}
-		my $gc = "#ffffff";
-		$mes .= qq|<tr><td><input type="radio" id="$name$item_no" name="cmd" value="$name">|;
-		$mes .= qq|<label for="$name$item_no">| unless $is_mobile;
-		$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # í—Ş”ñ•\¦
-		$price = '”ñ•\¦' if $price == 99999999;
-		$mes .= qq|</label>| unless $is_mobile;
-		$mes .= qq|</td><td><font color="$gc">$name</font></td><td>$price<br></td></tr>|;
-		$b_name = $name;
-		$b_kind = $kind;
-		$b_item_no = $item_no;
+		close $fh;
+	
+		@item_list = map { $_->[0] }
+					sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
+						map { [$_, split /<>/ ] } @item_list;
+		
+		$mes .= qq|<form method="$method" action="$script_r"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+		$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>“Xå</th><th>‰¿Ši<br></th></tr>|;
+		my $b_name = -1;
+		my $b_kind = -1;
+		my $b_item_no = -1;
+		for my $line (@item_list) {
+			my($kind, $item_no, $item_c, $item_lv, $price, $name, $display) = split /<>/, $line;
+			if($name eq $b_name && $kind == $b_kind && $item_no == $b_item_no){
+				next;
+			}
+			$num++;
+			if ($num >= $cmd * $mobile_max && $num < ($cmd + 1) * $mobile_max){
+				$mes .= qq|<tr><td><input type="radio" name="cmd" value="$name">|;
+				$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # í—Ş”ñ•\¦
+				$price = '”ñ•\¦' if $price == 99999999;
+				$mes .= qq|</td><td>$name</td><td>$price<br></td></tr>|;
+			}
+			$b_name = $name;
+			$b_kind = $kind;
+			$b_item_no = $item_no;
+		}
+		$mes .= qq|</table>| unless $is_mobile;
+		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$mes .= qq|<p><input type="submit" value="‚¨“X‚É“ü‚é" class="button1"></p></form><br>|;
+	
+		$mes  .= qq|<form method="$method" action="$script_r"><select name="cmd" class="menu1">|;
+		$pre = $cmd-1;
+		$nex = $cmd+1;
+		$mes .= qq|<option value="$pre">‘O‚Ö</option>|;
+		$mes .= qq|<option value="$nex">Ÿ‚Ö</option>|;
+		$mes .= qq|</select><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="mode" value="list">|;
+		$mes .= qq|<br><input type="submit" value="Œˆ ’è" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
 	}
-	$mes .= qq|</table>| unless $is_mobile;
-	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-	$mes .= qq|<p><input type="submit" value="‚¨“X‚É“ü‚é" class="button1"></p></form>|;
+	else {
+		&set_tp(1) if &get_tp > 1;
+	#	$m{tp} = 1 if $m{tp} > 1;
+	
+		my @item_list = ();
+		open my $fh, "< $logdir/shop_list.cgi" or &error('¼®¯ÌßØ½ÄÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ');
+		while (my $line = <$fh>) {
+			my($shop_name, $name, $message, $sale_c, $sale_money, $display, $guild_number) = split /<>/, $line;
+			next if $display ne '1';
+	
+			# ¤•i‚ª‚È‚¢“X‚Í”ñ•\¦
+			my $shop_id = unpack 'H*', $name;
+			next unless -s "$userdir/$shop_id/shop.cgi";
+	
+			if (-s "$userdir/$shop_id/shop.cgi") {
+				open my $ifh, "< $userdir/$shop_id/shop.cgi" or &error("$shop_name‚Ì¤•i‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
+				while (my $iline = <$ifh>) {
+					my($no, $kind, $item_no, $item_c, $item_lv, $price) = split /<>/, $iline;
+					$item_no = 42 if ($kind == 2 && $item_no == 53);
+					$item_no = 76 if ($kind == 3 && $item_no == 180);
+					$item_no = 77 if ($kind == 3 && $item_no == 181);
+					$item_no = 194 if ($kind == 3 && $item_no == 195);
+					next if (($cmd eq '1' && $price > $m{money}) || $price == 5000000);
+					push @item_list, "$kind<>$item_no<>$item_c<>$item_lv<>$price<>$name<>$display<>$guild_number<>\n";
+				}
+				close $ifh;
+			}
+		}
+		close $fh;
+		
+		@item_list = map { $_->[0] }
+					sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] || $a->[5] <=> $b->[5]}
+						map { [$_, split /<>/ ] } @item_list;
+		$mes .= qq|<form method="$method" action="$script"><input type="radio" name="cmd" value="0" checked>‚â‚ß‚é<br>|;
+		$mes .= qq|<table class="table1"><tr><th>¤•i–¼</th><th>“Xå</th><th>‰¿Ši<br></th></tr>|;
+		my $b_name = -1;
+		my $b_kind = -1;
+		my $b_item_no = -1;
+		for my $line (@item_list) {
+			my($kind, $item_no, $item_c, $item_lv, $price, $name, $display, $guild_number) = split /<>/, $line;
+			if($name eq $b_name && $kind == $b_kind && $item_no == $b_item_no){
+				next;
+			}
+			my $gc = "#ffffff";
+			$mes .= qq|<tr><td><input type="radio" id="$name$item_no" name="cmd" value="$name">|;
+			$mes .= qq|<label for="$name$item_no">| unless $is_mobile;
+			$mes .= &get_item_name($kind, $item_no, $item_c, $item_lv, 1); # í—Ş”ñ•\¦
+			$price = '”ñ•\¦' if $price == 99999999;
+			$mes .= qq|</label>| unless $is_mobile;
+			$mes .= qq|</td><td><font color="$gc">$name</font></td><td>$price<br></td></tr>|;
+			$b_name = $name;
+			$b_kind = $kind;
+			$b_item_no = $item_no;
+		}
+		$mes .= qq|</table>| unless $is_mobile;
+		$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+		$mes .= qq|<p><input type="submit" value="‚¨“X‚É“ü‚é" class="button1"></p></form>|;
+	}
+}
+
+sub tp_210 {
+	if ($in{mode} eq 'list') {
+		&tp_200;
+	}
+	else {
+		$m{tp_r} = 1;
+		&tp_1;
+	}
 }
 
 sub is_buyable{

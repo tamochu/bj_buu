@@ -11,12 +11,44 @@ require 'config_game.cgi';
 &error("Œ»İÒİÃÅİ½’†‚Å‚·B‚µ‚Î‚ç‚­‚¨‘Ò‚¿‚­‚¾‚³‚¢(–ñ $mente_min •ªŠÔ)") if ($mente_min);
 &before_bj;
 if ($m{wt} > 0) { # S‘©ŠÔ
-	if ($is_mobile) {
+	# S‘©’†‚É‚Å‚«‚és“®‚ÆÌ§²Ù‚Ì’è‹`
+	my @menus = (
+		['¤l‚Ì‚¨“X',	'shopping_akindo'],
+		['µ°¸¼®İ‰ïê',	'shopping_auction'],
+		['ÌŞ¯¸Ï°¹¯Ä',	'shopping_akindo_book'],
+		['”ü‚Ì‰æ”ŒŠÙ',	'shopping_akindo_picture'],
+	);
+
+	# S‘©’†‚Ìs“®
+	if ($m{lib_r} ne '' && -f "./lib/$m{lib_r}.cgi") { # lib_r ŒÄ‚Ño‚µ
+		if ($m{tp_r} eq '1' && $cmd eq '0') { # beginÒÆ­°‚Å0(‚â‚ß‚é)‚ğ‘I‘ğ·¬İ¾Ù
+			$m{lib_r} = $m{tp_r} = '';
+		}
+		else {
+			if ($m{tp_r}) { # lib_r ˆ—
+				require "./lib/$m{lib_r}.cgi";
+				&{ 'tp_'.$m{tp_r} } if &is_satisfy; # is_satisfy‚ª1(true)‚È‚çˆ—‚·‚é
+			}
+			else { # begin ÒÆ­°
+				&b_menu(@menus);
+			}
+		}
+	}
+	else {
+		&b_menu(@menus) if defined($cmd);
+	}
+
+	# ƒeƒXƒgI—p‚ÌS‘©‰ğœ
+	if ($config_test && $in{wt_refresh}) {
+		$m{wt} = 0;
+	}
+	# ˆÈ‰º’Êí‚ÌS‘©’†‰æ–Ê
+	elsif ($is_mobile && $m{lib_r} eq '') {
 		my $next_time_mes = sprintf("Ÿ‚És“®‚Å‚«‚é‚Ü‚Å %d•ª%02d•b<br>", int($m{wt} / 60), int($m{wt} % 60) );
 		$mes .= &disp_now();
 		$mes .= $next_time_mes;
 	}
-	elsif($is_smart) {
+	elsif($is_smart && $m{lib_r} eq '') {
 		my $next_time_mes = sprintf("%d•ª%02d•b", int($m{wt} / 60), int($m{wt} % 60) );
 		my $reset_rest = int($w{reset_time} - $time);
 		my $nokori_time = $m{next_salary} - $time;
@@ -28,7 +60,7 @@ if ($m{wt} > 0) { # S‘©ŠÔ
 		$mes .= qq|“G‘[‘O‰ñF<font color="$cs{color}[$m{renzoku}]">$cs{name}[$m{renzoku}]</font> ˜A‘±<b>$m{renzoku_c}</b>‰ñ]<br>| if $m{renzoku_c};
 		$mes .= qq|Ÿ‚Ì‹‹—¿‚Ü‚Å $nokori_time_mes|;
 	}
-	else{
+	elsif ($m{lib_r} eq '') {
 		my $head_mes = '';
 		if (-f "$userdir/$id/letter_flag.cgi") {
 			$main_screen .= qq|<font color="#FFCC66">è†‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
@@ -55,11 +87,21 @@ if ($m{wt} > 0) { # S‘©ŠÔ
 		require "$datadir/twitter_bots.cgi";
 		$main_screen .= &{$twitter_bots[6]};
 	}
-	&n_menu;
-	$menu_cmd .= qq|<form method="$method" action="bj_rest_shop.cgi">|;
-	$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-	$menu_cmd .= $is_mobile ? qq|<input type="submit" value="“X‚És‚­" class="button1" accesskey="#"><input type="hidden" name="guid" value="ON"></form>|: qq|<input type="submit" value="“X‚És‚­" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
+#	$menu_cmd .= qq|<form method="$method" action="bj_rest_shop.cgi">|;
+#	$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="pass" value="$pass">|;
+#	$menu_cmd .= $is_mobile ? qq|<input type="submit" value="“X‚És‚­" class="button1" accesskey="#"><input type="hidden" name="guid" value="ON"></form>|: qq|<input type="submit" value="“X‚És‚­" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
 
+	# S‘©’†‚És“®‚µ‚Ä‚È‚¢
+	unless ($m{lib_r}) {
+		&n_menu;
+		&menu( map { $_->[0] } @menus );
+	}
+
+	if ($config_test) {
+		$menu_cmd .= qq|<form method="$method" action="$script">|;
+		$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="wt_refresh" value="1">|;
+		$menu_cmd .= $is_mobile ? qq|<input type="submit" value="S‘©‰ğœ" class="button1" accesskey="#"><input type="hidden" name="guid" value="ON"></form>|: qq|<input type="submit" value="S‘©‰ğœ" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
+	}
 }
 else {
 	if (-f "./lib/$m{lib}.cgi") { # lib ŒÄ‚Ño‚µ

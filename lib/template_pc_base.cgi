@@ -130,7 +130,7 @@ sub framework {
 	}
 	elsif ($layout ne '2') { # ’Êí
 		print qq|<td valign="top">|;
-		if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
+		if (!$mes && $m{lib_r} eq '' && ($m{wt} > 1 || $m{lib} eq '') ) {
 			# ÅVî•ñ
 			open my $fh, "< $logdir/world_news.cgi" or &error("$logdir/world_news.cgiÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
 			my $line = <$fh>;
@@ -164,7 +164,7 @@ sub framework {
 	}
 	print qq|</tr><tr><td colspan="2">|;
 
-	if (!$mes && ($m{wt} > 1 || $m{lib} eq '') ) {
+	if (!$mes && $m{lib_r} eq '' && ($m{wt} > 1 || $m{lib} eq '') ) {
 		# ‘Ã°ÌŞÙ
 		&countries_html;
 		&world_info;

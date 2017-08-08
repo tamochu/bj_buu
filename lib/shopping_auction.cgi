@@ -4,6 +4,15 @@ my $this_file = "$logdir/auction.cgi";
 #=================================================
 require "$datadir/buyable.cgi";
 
+# S‘©’†‚Ìs“®—pŠÖ”
+sub is_rest { return $m{lib_r} eq 'shopping_auction'; } # S‘©’†‚Ìs“®‚©
+sub set_tp { (&is_rest ? $m{tp_r} : $m{tp}) = shift; } # S‘©’†E”ñS‘©’†‚Ìtp¾¯À°
+sub get_tp { return &is_rest ? $m{tp_r} : $m{tp}; } # S‘©’†E”ñS‘©’†‚Ì¹Ş¯À°
+sub refresh_r { $m{lib_r} = $m{tp_r} = ''; } # refresh‚ÌS‘©’†”Å
+
+# S‘©’†‚Æ“¯‚¶s“®‚ğ”ñS‘©’†‚É‚µ‚½ê‡AS‘©’†‚Ì•û‚ğ·¬İ¾Ù
+&refresh_r if $m{lib_r} eq $m{lib};
+
 # —DŠÔ(“ú)
 my $auction_limit_day = 3;
 
@@ -27,8 +36,15 @@ my %taboo_items = (
 sub is_satisfy {
 	if ($m{shogo} eq $shogos[1][0] || $m{shogo_t} eq $shogos[1][0]) {
 		$mes .= "$shogos[1][0]‚Ì•û‚Í‚¨’f‚è‚µ‚Ä‚¢‚Ü‚·<br>";
-		&refresh;
-		$m{lib} = 'shopping';
+
+		if (&is_rest) {
+			&refresh_r;
+		}
+		else {
+			&refresh;
+			$m{lib} = 'shopping';
+		}
+
 		&n_menu;
 		return 0;
 	}
@@ -37,20 +53,25 @@ sub is_satisfy {
 
 #=================================================
 sub begin {
-	if ($m{tp} > 1) {
+	if (&get_tp > 1) {
 		$mes .= '‘¼‚É‰½‚©‚µ‚Ü‚·‚©?<br>';
-		$m{tp} = 1;
+		&set_tp(1);
 	}
 	else {
 		$mes .= 'µ°¸¼®İ‰ïê‚É—ˆ‚Ü‚µ‚½<br>‰½‚ğ‚µ‚Ü‚·‚©?<br>';
 	}
-	&menu('‚â‚ß‚é','“üD‚·‚é','o•i‚·‚é');
+	if (&is_rest) {
+		&menu('‚â‚ß‚é','“üD‚·‚é');
+	}
+	else {
+		&menu('‚â‚ß‚é','“üD‚·‚é','o•i‚·‚é');
+	}
 }
 sub tp_1 {
 	return if &is_ng_cmd(1,2);
 	
-	$m{tp} = $cmd * 100;
-	&{ 'tp_'.$m{tp} };
+	&set_tp($cmd * 100);
+	&{ 'tp_'.&get_tp };
 }
 
 #=================================================
@@ -87,7 +108,7 @@ sub tp_100 {
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="“üD‚·‚é" class="button1"></p></form>|;
 	
-	$m{tp} += 10;
+	&set_tp(&get_tp + 10);
 }
 sub tp_110 {
 	$in{money} = int($in{money});
@@ -182,6 +203,11 @@ sub tp_110 {
 # o•i
 #=================================================
 sub tp_200 {
+	if (&is_rest) {
+		$mes .= 'S‘©’†‚Éo•i‚·‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñ';
+		&refresh_r;
+		return;
+	}
 	$layout = 1;
 	$mes .= '‚Ç‚ê‚ğo•i‚µ‚Ü‚·‚©?<br>';
 
@@ -200,7 +226,7 @@ sub tp_200 {
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="o•i‚·‚é" class="button1"></p></form>|;
 	
-	$m{tp} += 10;
+	&set_tp(&get_tp + 10);
 }
 sub tp_210 {
 	return if &is_ng_cmd(1..4);
