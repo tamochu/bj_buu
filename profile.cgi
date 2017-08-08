@@ -39,7 +39,16 @@ sub status_mobile {
 		$skill_info .= "[$skills[$m_skill][2]]$skills[$m_skill][1]<br>";
 	}
 
-	print qq|<br>更新日時 $m{ldate}<hr>|;
+	my ($day, $mon, $year) = (localtime($m{start_time}))[3..5];
+	my ($day2, $mon2, $year2) = (localtime($time))[3..5];
+	my $start_day = sprintf('%04d/%02d/%02d', $year + 1900, $mon + 1, $day);
+	my $time1 = timelocal(0, 0, 0, $day, $mon, $year);
+	my $time2 = timelocal(0, 0, 0, $day2, $mon2, $year2);
+	my $gaming_day = int(($time2 - $time1) / (60*60*24));
+
+	print qq|更新日時 $m{ldate}<br>|;
+	print qq|参入日 $start_day($gaming_day日)<hr>|;
+
 	print qq|<img src="$icondir/$m{icon}" style="vertical-align: middle;" $mobile_icon_size>| if $m{icon};
 	print qq|<img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;" $mobile_icon_size>>| if $m{icon_pet};
 	print qq|$m{name}<br>|;
@@ -177,6 +186,12 @@ sub status_pc {
 		}
 	}
 	my $pet_icon = qq|<p><img src="$icondir/pet/$m{icon_pet}" style="vertical-align: middle;"></p>| if $m{icon_pet};
+	my ($day, $mon, $year) = (localtime($m{start_time}))[3..5];
+	my ($day2, $mon2, $year2) = (localtime($time))[3..5];
+	my $start_day = sprintf('%04d/%02d/%02d', $year + 1900, $mon + 1, $day);
+	my $time1 = timelocal(0, 0, 0, $day, $mon, $year);
+	my $time2 = timelocal(0, 0, 0, $day2, $mon2, $year2);
+	my $gaming_day = int(($time2 - $time1) / (60*60*24));
 	print <<"EOM";
 		<font color="$cs{color}[$m{country}]">$cs{name}[$m{country}]</font> $rank_name<br>
 		$units[$m{unit}][1]
@@ -193,7 +208,7 @@ sub status_pc {
 			<hr size="1">
 			勲　章　<b>$m{medal}</b>個<br>
 			ｶｼﾞﾉｺｲﾝ <b>$m{coin}</b>枚<br>
-			<p>更新日時 $m{ldate}</p>
+			<p>更新日時 $m{ldate}<br>$start_day $gaming_day日</p>
 			$pet_icon
 		</tt></td></tr></table>
 		<tt>
