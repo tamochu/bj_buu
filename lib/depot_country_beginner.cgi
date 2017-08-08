@@ -5,7 +5,7 @@ my $this_log = "$logdir/$m{country}/depot_b_log.cgi";
 #=================================================
 
 # ç≈ëÂï€ë∂êî
-my $max_depot = 10;
+my $max_depot = 15;
 
 # óaÇØÇÁÇÍÇ»Ç¢±≤√—
 my %taboo_items = (
