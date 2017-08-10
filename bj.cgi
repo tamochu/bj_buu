@@ -71,6 +71,15 @@ if ($m{wt} > 0) { # S‘©ŠÔ
 		if (-f "$userdir/$id/goods_flag.cgi") {
 			$main_screen .= qq|<font color="#FFCC99">Ï²Ù°Ñ‚É‰×•¨‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
 		}
+		my $is_breeder_find = 0;
+		for my $bi (0 .. 2) {
+			if (-f "$userdir/$id/shopping_breeder_$bi.cgi") {
+				if ((stat "$userdir/$in{id}/shopping_breeder_$bi.cgi")[9] < $time) {
+					$is_breeder_find = 1;
+				}
+			}
+		}
+		$main_screen .= qq|<font color="#FF66CC">ˆç‚Ä‰®‚Ì—‘‚ª›z‰»‚µ‚Ä‚¢‚Ü‚·</font><br>| if $is_breeder_find;
 		my $next_time_mes = sprintf("%d•ª%02d•b", int($m{wt} / 60), int($m{wt} % 60) );
 		my $reset_rest = int($w{reset_time} - $time);
 		my $nokori_time = $m{next_salary} - $time;

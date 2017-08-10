@@ -201,7 +201,16 @@ sub status_html {
 	if (-f "$userdir/$id/goods_flag.cgi") {
 		$head_mes .= qq|<font color="#FFCC99">Ï²Ù°Ñ‚É‰×•¨‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
 	}
-	
+	my $is_breeder_find = 0;
+	for my $bi (0 .. 2) {
+		if (-f "$userdir/$id/shopping_breeder_$bi.cgi") {
+			if ((stat "$userdir/$in{id}/shopping_breeder_$bi.cgi")[9] < $time) {
+				$is_breeder_find = 1;
+			}
+		}
+	}
+	$head_mes .= qq|<font color="#FF66CC">ˆç‚Ä‰®‚Ì—‘‚ª›z‰»‚µ‚Ä‚¢‚Ü‚·</font><br>| if $is_breeder_find;
+
 	my $country_info = '';
 	if ($m{country}) {
 		my $next_rank = $m{rank} * $m{rank} * 10;
