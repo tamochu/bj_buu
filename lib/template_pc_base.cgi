@@ -204,7 +204,7 @@ sub status_html {
 	my $is_breeder_find = 0;
 	for my $bi (0 .. 2) {
 		if (-f "$userdir/$id/shopping_breeder_$bi.cgi") {
-			if ((stat "$userdir/$in{id}/shopping_breeder_$bi.cgi")[9] < $time) {
+			if ((stat "$userdir/$id/shopping_breeder_$bi.cgi")[9] < $time) {
 				$is_breeder_find = 1;
 			}
 		}
