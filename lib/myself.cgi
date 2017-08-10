@@ -42,6 +42,9 @@ sub tp_1 {
 		&refresh;
 		&n_menu;
 
+		require './lib/_use_pet_log.cgi';
+		&write_use_pet_log($id, $m{pet});
+
 		# ÏÓÉÉÀÈ‚Ìê‡
 		if ($m{pet} >= 128 && $m{pet} <= 130) {
 			$mes .= "$pets[$m{pet}][1]š$m{pet_c}‚ÍA$m{name}‚Ì‚±‚Æ‚ğ‚¶‚Á‚ÆŒ©‚Ä‚¢‚éc<br>";

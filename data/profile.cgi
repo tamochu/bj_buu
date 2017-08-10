@@ -51,6 +51,7 @@ sub header_profile {
 	print qq|<a href="profile.cgi?id=$in{id}&country=$in{country}&mode=profile&title=Profile">ÌßÛÌ¨°Ù</a>/| if -s "$userdir/$in{id}/profile.cgi";
 	print qq|<a href="blog.cgi?id=$in{id}&country=$in{country}&title=Blog">“ú‹L</a>/| if -s "$userdir/$in{id}/blog.cgi";
 	print qq|<a href="memory.cgi?id=$in{id}&country=$in{country}&title=Memory">í—ğ</a>/|;
+	print qq|<a href="sacrifice.cgi?id=$in{id}&country=$in{country}&title=Sacrifice">¶æÑ</a>/| if -f "$userdir/$in{id}/use_pet_log.cgi";
 	print qq|<a href="breeder.cgi?id=$in{id}&country=$in{country}&title=Breeder">ÌŞØ°ÀŞ°</a>/| if -f "$userdir/$in{id}/pet_icon.cgi";
 	print qq|<hr><br>|;
 }
