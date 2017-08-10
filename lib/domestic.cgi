@@ -54,7 +54,7 @@ sub begin {
 }
 sub tp_1 {
 	return if &is_ng_cmd(1..4);
-	
+
 	if    ($cmd eq '1') { $mes .= "’•¨‚ğÌæ‚µ‚Ä‘‚Ì$e2j{food}‚ğ‘‚â‚µ‚Ü‚·<br>"; }
 	elsif ($cmd eq '2') { $mes .= "‘–¯‚©‚ç‚¨‹à‚ğ’¥Å‚ğ‚µ‚Ä$e2j{money}‚ğ‘‚â‚µ‚Ü‚·<br>"; }
 	elsif ($cmd eq '3') { $mes .= "•ºm‚ğ•åW‚µ‚Ä‘‚Ì$e2j{soldier}‚ğ‘‚â‚µ‚Ü‚·<br>¦1l‚É‚Â‚«1G<br>"; }
@@ -63,8 +63,7 @@ sub tp_1 {
 	$m{tp} = $cmd * 100;
 	$mes .= '‚Ç‚Ì‚­‚ç‚¢s‚¢‚Ü‚·‚©?<br>';
 
-	my @size = ('‚â‚ß‚é', "¬‹K–Í    ($GWT_s•ª)", "’†‹K–Í    ($GWT•ª)", "‘å‹K–Í    ($GWT_b•ª)");
-	push @size, "’´‹K–Í    ($GWT_l•ª)" if ($cmd eq '4');
+	my @size = ('‚â‚ß‚é', "¬‹K–Í    ($GWT_s•ª)", "’†‹K–Í    ($GWT•ª)", "‘å‹K–Í    ($GWT_b•ª)", "’´‹K–Í    ($GWT_l•ª)");
 	&menu(@size);
 }
 
@@ -76,18 +75,15 @@ sub tp_200 { &exe1('‚¨‹à‚ğ’¥Å‚µ‚Ü‚·<br>') }
 sub tp_300 { &exe1('•ºm‚ğŒÙ—p‚µ‚Ü‚·<br>') }
 sub tp_400 { &exe1('‚Ü‚Æ‚ß‚Ä“à­‚ğs‚¢‚Ü‚·<br>') }
 sub exe1 {
+	return if &is_ng_cmd(1..4);
 	my $i = 1;
 	if ($m{tp} == 400) { # ’·Šú“à­
-		return if &is_ng_cmd(1..4);
 		unless ($m{nou_c} >= 5 && $m{sho_c} >= 5 && $m{hei_c} >= 5) {
 			$mes .= "’·Šú“à­‚ğs‚¤‚É‚ÍA”_‹Æ,¤‹Æ,’¥•º‚Ìn—û“x‚ª5‰ñˆÈã‚Å‚È‚¢‚Æ‚Å‚«‚Ü‚¹‚ñ<br>";
 			&begin;
 			return;
 		}
 		$i = 3; # “à­ 3 í
-	}
-	else {
-		return if &is_ng_cmd(1..3);
 	}
 
 	$GWT =  $cmd eq '1' ? $GWT_s * $i
@@ -155,6 +151,7 @@ sub tp_110 {
 	return if $m{tp} eq '410';
 
 	&after1;
+	$m{turn} = 5 if $m{turn} eq '4';
 	&after2;
 }
 #=================================================
@@ -184,6 +181,7 @@ sub tp_210 {
 	return if $m{tp} eq '410';
 
 	&after1;
+	$m{turn} = 5 if $m{turn} eq '4';
 	&after2;
 }
 #=================================================
@@ -219,6 +217,7 @@ sub tp_310 {
 
 	&after1;
 	# ’¥•º‚Í‚¨‹à‚ª‚©‚©‚é‚Ì‚ÅAŒoŒ±’l‚Æ•]‰¿‚ğ‚¿‚å‚Á‚ÆÌß×½
+	$m{turn} = 5 if $m{turn} eq '4';
 	$m{turn} += 2 if 0 < $v && 0 < $m{money};
 	&after2;
 }
