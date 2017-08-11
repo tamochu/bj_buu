@@ -4,11 +4,15 @@
 
 # require './lib/_use_pet_log.cgi';
 
+# 23 ｱﾏﾂﾐ、ｾﾞｳｽ、ｸｯｷｰ、ﾏﾙｽ、ｴﾋﾞｽ、ﾉｱ、ﾒｼｱ、ｼｸﾞﾏ、ﾛﾌﾟﾄ、ﾕﾀﾞ、ﾌｪﾝﾘﾙ、
+# ﾒﾃｵ、ﾍﾟｽﾄ、ﾍﾞﾙﾌｪ、ﾘｳﾞｧ、ﾍﾞﾙｾﾞ、ﾏﾓﾝ、ｱｽﾓ、ﾂｸﾖﾐ、ｱﾎﾟﾛﾝ、ｱﾙｶ、ｲｰｽﾀｰ、ﾛｽﾀｲﾑ
+@country_pets = (61, 64..71, 134..145, 151..152);
+
 #================================================
 # ﾍﾟｯﾄの生け贄ﾛｸﾞを取得
 #================================================
 sub read_use_pet_log {
-	my $id = shift;
+	my ($id, $pet) = @_;
 	my $this_file = "$userdir/$id/use_pet_log.cgi";
 	my %pet_logs;
 
@@ -23,10 +27,10 @@ sub read_use_pet_log {
 
 	for my $hash (split /<>/, $line) {
 		my($k, $v) = split /;/, $hash;
-		$pet_logs{$k} = $v;
+		$pet_logs{$k} = $v if $pet && $pet == $k;
 	}
 
-	return %pet_logs;
+	return $pet ? $pet_logs{$pet} : %pet_logs;
 }
 
 #================================================

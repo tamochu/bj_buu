@@ -18,6 +18,7 @@ my @rank_status = (
     ['cho_c','’³•ñ',500,0],
     ['sen_c','ô”]',400,0],
     ['gik_c','‹UŒv',100,0],
+    ['kou_c','Ué',100,0],
     ['tei_c','’ã@',70,0],
     ['mat_c','‘Ò•š',100,0],
     ['cas_c','¶¼ŞÉ',4000,0],
@@ -67,6 +68,8 @@ sub run {
 	for my $i (0 .. $#rank_status) {
 		print $i eq $in{no} ? qq|$rank_status[$i][1] / | : qq|<a href="?no=$i">$rank_status[$i][1]</a> / |;
 	}
+	print qq|<a href="use_pet_ranking.cgi?no=0">‘Íß×İ·İ¸Ş</a> / |;
+
 	print qq|<h1>$rank_status[$in{no}][1]”pl×İ·İ¸Ş</h1>|;
 	print qq|<div class="mes"><ul><li>×İ·İ¸Ş‚Í$player_ranking_cycle_day“ú‚²‚Æ‚ÉØ¾¯Ä‚³‚êXV‚³‚ê‚Ü‚·</ul></div><br>|;
 
