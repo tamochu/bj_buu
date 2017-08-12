@@ -2,11 +2,12 @@
 # [暗黒]NPC戦用ﾌﾟﾛｸﾞﾗﾑ Created by Merino
 #=================================================
 # 何度も同じ人がNPC国に仕官しないように仕官ログ(人)
-$max_npc_old_member = $w{player} * 0.2 > 10 ? 10: $w{player} * 0.2;
+$max_npc_old_member = 6; # $w{player} * 0.2 > 10 ? 10: $w{player} * 0.2;
 # NPC名(先頭5名は戦争したときに出現する)
 my @npc_names = (qw/vipqiv(NPC) kirito(NPC) 亀の家庭医学(NPC) pigure(NPC) ウェル(NPC) vipqiv(NPC) DT(NPC) ハル(NPC) アシュレイ(NPC) ゴミクズ(NPC)/);
 #                   0             1          2           3         4
 my $npc_cap = 6;# 完全なNPC国にしたい場合は ←の数字を 0 にする
+
 # NPC反撃率
 # 調整用変数
 my $ave_add = 0; # 定員数計算の下駄（増やすと暗黒が強くなります。変更非推奨）
@@ -323,7 +324,11 @@ sub npc_use_pet_fenrir { # ﾌｪﾝﾘﾙ
 		next if $cs{is_die}[$i];
 		next if $cs{strong}[$i] < 1000;
 		$cs{strong}[$i] -= $touitu_strong * 0.6 > $cs{strong}[$w{country}] ? int(rand(400)+400) : int(rand(200)+200);
+#		$cs{barrier}[$i] -= 10;
+#		$cs{barrier}[$i] = 0 if $cs{barrier}[$i] < 0;
 	}
+	$cs{barrier}[$w{country}] += 10;
+	$cs{barrier}[$w{country}] = 200 if $cs{barrier}[$w{country}] > 200;
 	
 	$touitu_strong * 0.6 > $cs{strong}[$w{country}] ? 
 		&write_world_news("$cs{name}[$w{country}]の$npcs[0]{name}の魔神の閃光!各国の$e2j{strong}が削られました"):
@@ -434,6 +439,15 @@ sub npc_get_strong { # 奪国
 #=================================================
 sub is_move_npc_country {
 	return 1 if $config_test;
+
+	# 君主時に仕官しようとすると仕官できないにも関わらず仕官ログには載り、君主を辞任して仕官しようとしてもログに載っているので仕官できない
+	# バグではなく、暗黒の同盟国が君主を何人も立てて暗黒に無駄に仕官しまくると暗黒の仕官ログを流せるという裏技な気もする
+	if ($m{name} eq $cs{ceo}[$m{country}]) {
+		$mes .= "$c_mの$e2j{ceo}を辞任する必要があります<br>";
+		&begin;
+		return 0;
+	}
+
 	my @lines = ();
 	open my $fh, "+< $logdir/$w{country}/old_member.cgi" or &error("$logdir/$w{country}/old_member.cgiﾌｧｲﾙが開けません");
 	eval { flock $fh, 2; };
@@ -452,13 +466,14 @@ sub is_move_npc_country {
 	truncate $fh, 0;
 	print $fh @lines;
 	close $fh;
-	
-	if ($m{name} eq $cs{ceo}[$m{country}]) {
-		$mes .= "$c_mの$e2j{ceo}を辞任する必要があります<br>";
-		&begin;
-		return 0;
-	}
-	
+
+	# バグじゃなく暗黒の仕官ログをﾌﾟﾚｲﾔｰが自由に流せるようにしてる？
+#	if ($m{name} eq $cs{ceo}[$m{country}]) {
+#		$mes .= "$c_mの$e2j{ceo}を辞任する必要があります<br>";
+#		&begin;
+#		return 0;
+#	}
+
 	# 代表ﾎﾟｲﾝﾄ0
 	for my $k (qw/war dom mil pro/) {
 		$m{$k.'_c'} = int($m{$k.'_c'} * 0);
