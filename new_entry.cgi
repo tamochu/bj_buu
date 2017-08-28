@@ -179,7 +179,7 @@ sub create_user {
 	
 	# Ì«ÙÀŞÌ§²Ùì¬
 	mkdir "$userdir/$id" or &error("‚»‚Ì–¼‘O‚Í‚·‚Å‚É“o˜^‚³‚ê‚Ä‚¢‚Ü‚·");
-	for my $file_name (qw/blog collection depot letter letter_log memory money profile proposal skill user/) {
+	for my $file_name (qw/blog collection depot letter letter_log memory money profile proposal skill user summer tutorial/) {
 		my $output_file = "$userdir/$id/$file_name.cgi";
 		open my $fh, "> $output_file" or &error("$output_file Ì§²Ù‚ªì‚ê‚Ü‚¹‚ñ‚Å‚µ‚½");
 		close $fh;

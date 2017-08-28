@@ -120,9 +120,9 @@ sub run_tutorial_quest {
 
 # Õ°»Ş°‚ÌÁ­°ÄØ±ÙÃŞ°À‚Ì“Ç‚İ‚İ
 sub read_tutorial {
-	&write_tutorial unless -f "$userdir/$id/tutorial.cgi"; # ‰Šú‰»
+#	&write_tutorial unless -f "$userdir/$id/tutorial.cgi"; # ‰Šú‰»
 
-	open my $fh, "< $userdir/$id/tutorial.cgi" or &error("‚»‚Ì‚æ‚¤‚È–¼‘O$in{login_name}‚ÌÌßÚ²Ô°‚ª‘¶İ‚µ‚Ü‚¹‚ñ");
+	open my $fh, "< $userdir/$id/tutorial.cgi" or &error("Á­°ÄØ±ÙÌ§²Ù‚ª‘¶İ‚µ‚Ü‚¹‚ñ");
 	my $line = <$fh>;
 	close $fh;
 

@@ -853,11 +853,11 @@ sub get_you_datas {
 
 	# 夏祭り用
 	if (&on_summer) {
-		unless (-f "$userdir/$y_id/summer.cgi") {
-			open my $fh, "> $userdir/$y_id/summer.cgi";
-			close $fh;
-		}
-		open my $fh, "< $userdir/$y_id/summer.cgi" or &error("そのような名前のﾌﾟﾚｲﾔｰが存在しません");
+#		unless (-f "$userdir/$y_id/summer.cgi") {
+#			open my $fh, "> $userdir/$y_id/summer.cgi";
+#			close $fh;
+#		}
+		open my $fh, "< $userdir/$y_id/summer.cgi" or &error("夏祭り用ﾌｧｲﾙが存在しません");
 		my $line = <$fh>;
 		close $fh;
 
@@ -1392,14 +1392,19 @@ sub before_bj {
 	}
 
 	if ($w{half_hour_time} < $time) {
-		# 前回の処理から30分経過毎に -1% を一括処理というか累計というか
-		my $span = 30 * 60; # 30分毎に -1%
-		my $t = $time;
-		my $v = ($t - $w{half_hour_time} + $span) / $span;
-		$w{half_hour_time} = $t + $span;
-		require './lib/_rampart.cgi'; # 城壁
-		for my $i (1 .. $w{country}) {
-			&change_barrier($i, -$v);
+		if ($w{reset_time}) { # 終戦期間中
+			$w{half_hour_time} = $time + $w{reset_time}; # 2017/08/10 終戦期間終わるまで劣化ストップ 内政回復無しと待ち伏せ20%固定の調整に合わせ
+		}
+		else {
+			my $span = 30 * 60; # 30分毎に -1%
+			# 前回の処理から30分経過毎に -1% を一括処理というか累計というか
+			my $t = $time;
+			my $v = ($t - $w{half_hour_time} + $span) / $span;
+			$w{half_hour_time} = $t + $span;
+			require './lib/_rampart.cgi'; # 城壁
+			for my $i (1 .. $w{country}) {
+				&change_barrier($i, -$v) unless $cs{is_die}[$i];
+			}
 		}
 		&write_cs;
 	}
