@@ -12,7 +12,7 @@ require "$datadir/casino.cgi";
 &access_check;
 &read_cs;
 
-if(defined $in{no}){
+if ($m{c_turn} == 0 && defined $in{no}) {
 	$m{c_type} = int($in{no});
 	$m{c_turn} = 0;
 	$m{c_value} = 0;
@@ -25,7 +25,7 @@ if($m{c_type} < 0 || $m{c_type} > $#files){
 	&write_user;
 }
 
-$this_title  = "$files[$m{c_type}][1]";
+$this_title  = "$files[$m{c_type}][0]";
 $this_file   = "$logdir/chat_casino$files[$m{c_type}][2]";
 $this_script = 'chat_casino.cgi';
 
@@ -81,6 +81,7 @@ function textfocus() {
 $auto_loader_head
 <script type="text/javascript" src="$htmldir/enchant.js"></script>
 $enchant_game
+<script type="text/javascript" src="$htmldir/nokori_time.js?201703170225"></script>
 </head>
 <body $body>
 EOM
@@ -118,13 +119,27 @@ sub write_comment {
 }
 
 #=================================================
-
 if(($m{c_turn} eq '0' || $m{c_turn} eq '') && ($in{mode} eq 'write' || $in{mode} eq '')){
 	for my $i (0 .. $#files) {
 		print $i eq $m{c_type} ? qq|$files[$i][0] / | : qq|<a href="?id=$id&pass=$pass&no=$i">$files[$i][0]</a> / |;
 	}
+	print qq|<br>対人ｶｼﾞﾉでの新仕様（できるだけすべて以下のような仕様にしたい）<br>|;
+	print qq|ﾌﾟﾚｲ中に参加者が10分放置し(思考猶予\を超え)ているのを他の参加者が閲覧すると放置ﾌﾟﾚｲﾔｰが負け<br>|;
+	print qq|ｹﾞｰﾑの最終ﾌﾟﾚｲから20分放置されているのをｹﾞｰﾑに参加していない閲覧者が閲覧すると流れ<br><br>|;
 }
-print qq|<br>ｺｲﾝ：$m{coin}枚|;
+print qq|ｺｲﾝ：$m{coin}枚|;
+
+my $next_time_mes = sprintf("%d分%02d秒", int($m{wt} / 60), int($m{wt} % 60) );
+if ($is_mobile) {
+	print qq|<br>BJ拘束時間：<span id="nokori_time">$next_time_mes</span>|;
+}
+else {
+	my $reset_rest = int($w{reset_time} - $time);
+	print qq|<br>BJ拘束時間：<span id="nokori_time">$next_time_mes</span>|;
+	print qq|<script type="text/javascript"><!--\n nokori_time($m{wt}, $reset_rest);\n// --></script>|;
+	print qq|<noscript>$next_time_mes</noscript>|;
+}
+
 &run;
 &footer;
 exit;

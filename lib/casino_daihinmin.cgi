@@ -3,1171 +3,703 @@
 #================================================
 require './lib/_casino_funcs.cgi';
 
-my $set_flag = 0;
-my @rates = (100, 1000, 10000);
+$header_size = 7; # 大貧民用のﾍｯﾀﾞｰｻｲｽﾞ 親、場のｶｰﾄﾞ、ﾊﾟｽ回数、複数出し・階段の縛り、スート縛り、革命、イレバ
+($_leader, $_field_card, $_winner, $_bind_m, $_bind_s, $_revo, $_back) = ($_header_size .. $_header_size + $header_size - 1); # ﾍｯﾀﾞｰ配列のｲﾝﾃﾞｯｸｽ
+$coin_lack = 0; # 0 ｺｲﾝがﾚｰﾄに足りないと参加できない 1 ｺｲﾝがﾚｰﾄに足りなくても参加できる
+$min_entry = 2; # 最低2人
+$max_entry = 8; # 最高8人
+
+my @nums = ('3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2', 'Jo'); # 低い順
+my @suits = $is_mobile ? ('S', 'H', 'C', 'D', '') : ('&#9824;', '&#9825;', '&#9827;', '&#9826;', '');
+
+my @rates = (0, 100, 1000, 3000, 10000, 30000);
 
 sub run {
-	if ($in{mode} eq "play") {
-	    $in{comment} = &play_card;
-	    &write_comment if $in{comment};
-	}
-	elsif ($in{mode} eq "start") {
-	    $in{comment} = &deal_card;
-	    &write_comment if $in{comment};
-	}
-	elsif ($in{mode} eq "participate") {
-	    $in{comment} = &participate;
-	    &write_comment if $in{comment};
-	}
-	elsif ($in{mode} eq "exit") {
-	    $in{comment} = &exit_game;
-	    &write_comment if $in{comment};
-	}elsif($in{mode} eq "write" &&$in{comment}){
-		&write_comment;
-	}
-	my ($member_c, $member, $turn, $rate, $state_c, $state_n, $players, $pmember, $c_player) = &get_member;
 
-	if($m{c_turn} eq '0' || $m{c_turn} eq ''){
-		print qq|<form method="$method" action="$script">|;
-		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-		print qq|<input type="submit" value="戻る" class="button1"></form>|;
-	}else {
-		print qq|<form method="$method" action="$this_script" name="form">|;
-		print qq|<input type="hidden" name="mode" value="exit">|;
-		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-		print qq|<input type="submit" value="やめる" class="button_s"></form><br>|;
-	}
-	print qq|<h2>$this_title</h2>|;
+	&_default_run;
+}
 
+#================================================
+# ｹﾞｰﾑ画面に表示される情報の定義
+#================================================
+sub show_game_info { # 親やﾍﾞｯﾄ額などの表示 参加者より前に表示される
+	my ($m_turn, $m_value, $m_stock, @head) = @_;
+	print qq|親:$head[$_leader] ﾚｰﾄ:$head[$_rate]|;
+}
+#sub show_start_info { } # 募集中のｹﾞｰﾑに参加しているﾌﾟﾚｲﾔｰに表示したい情報 _start_game_form の上に表示される 定義してなくても動作に問題ない
+sub show_started_game { # 始まっているｹﾞｰﾑの表示 参加者かそうでないかは is_member で判別し切り替える
+	my ($m_turn, $m_value, $m_stock, @head) = @_;
+	my @members = &get_members($head[$_participants]);
+	my @winners = &get_members($head[$_winner]);
+	print "<br>";
+	for my $i (1 .. @members) {
+		print "$i位 $winners[$i-1],";
+	}
+	&show_status(@head);
+	&play_form($m_turn, $m_value, $m_stock, $head[$_participants], $head[$_field_card], $head[$_winner]) if &is_member($head[$_participants], "$m{name}"); # ｹﾞｰﾑに参加している
+#	&show_members_hand($head[$_participants_datas]);
+}
+#sub show_tale_info { # 定義してなくても動作に問題ない
+#	my ($m_turn, $m_value, $m_stock, @head) = @_;
+#	&show_status($head[$_participants_datas]) if $head[$_participants];
+#}
+
+#================================================
+# 参加するﾌｫｰﾑ
+#================================================
+sub participate_form {
+	my ($leader) = @_;
+	my $button = $leader ? "参加する" : "親になる";
+	# ｶｼﾞﾉ毎の処理
 	print qq|<form method="$method" action="$this_script" name="form">|;
-	print qq|<input type="text"  name="comment" class="text_box_b"><input type="hidden" name="mode" value="write">|;
-	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-	print qq|<input type="submit" value="発言" class="button_s"><br>|;
+	print "レート：".&create_select_menu("rate", @rates) unless $leader;
+	print &create_submit("participate", "$button");
+	print qq|</form>|;
+}
 
-	unless ($is_mobile) {
-		print qq|自動ﾘﾛｰﾄﾞ<select name="reload_time" class="select1"><option value="0">なし|;
-		for my $i (1 .. $#reload_times) {
-			print $in{reload_time} eq $i ? qq|<option value="$i" selected>$reload_times[$i]秒| : qq|<option value="$i">$reload_times[$i]秒|;
+#================================================
+# 参加する処理 ﾚｰﾄのためのﾜﾝｸｯｼｮﾝ
+#================================================
+sub participate {
+	&_participate($rates[$in{rate}], 0, '');
+}
+
+#================================================
+# 開始する処理 実際のファイル操作は _casino_funcs.cgi _start_game
+#================================================
+sub start_game {
+	my ($fh, $head_line, $ref_members, $ref_game_members) = @_;
+	my @head = split /<>/, $$head_line; # ﾍｯﾀﾞｰ
+	my @participants = &get_members($head[$_participants]);
+	my $is_start = 0;
+	# ｶｼﾞﾉ毎の処理
+	my @cards;
+	my $leader_i = 0; # ﾀﾞｲﾔの3を持っている参加者のｲﾝﾃﾞｯｸｽ
+
+	if ($min_entry <= @participants && @participants <= $max_entry && !$head[$_state] && &is_member($head[$_participants], "$m{name}") && $m{c_turn} == 1) { # 参加者が必要十分、ｹﾞｰﾑ開始前なら
+		($is_start, $head[$_state], $head[$_lastupdate], $head[$_field_card]) = (1, 1, $time, '');
+		# ｶｼﾞﾉ毎の処理
+		my $size = @participants;
+		my @deck = &shuffled_deck($size);
+		my $i = 0;
+		while (@deck) {
+			my $c = shift @deck;
+			$leader_i = $i if $c == 40; # ﾀﾞｲﾔの3
+			push @{$cards[$i]}, $c;
+			$i = $#participants <= $i ? 0 : $i + 1;
 		}
-		print qq|</select>|;
 	}
-	print qq|</form><font size="2">$member_c人:$member</font><br>|;
-	print $turn eq '' ? qq|準備中 レート:$rate<br>$pmember<br>|:qq|ターン:$turn レート:$rate プレイ人数:$players<br><br>$pmember<br>|;
+	my $c = 0;
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($is_start && &is_member($head[$_participants], "$mname")) {
+			# ｶｼﾞﾉ毎の処理
+			@{$cards[$c]} = sort { $a <=> $b } @{$cards[$c]};
+			${"card_$_"} = '' for (0 .. 13);
+			for my $i (0 .. $#{$cards[$c]}) {
+				my $j = ${$cards[$c]}[$i];
+				if ($j == 53 || $j == 54) {
+					${"card_13"} .= "$j,";
+				}
+				else {
+					${"card_".($j-1)%13} .= "$j,";
+				}
+			}
+			$mstock .= ${"card_$_"} for (0 .. 13);
+			($mtime, $mturn) = ($time, 2);
+			if ($leader_i == $c) { # ﾀﾞｲﾔの3を持っている参加者を一番に移動
+				$head[$_leader] = $mname;
+			}
+			$c++;
 
-	if($m{c_turn} == 0 || ($m{c_turn} > 2 && $players == 0)){
+			push @$ref_game_members, $mname;
+		}
+		push @$ref_members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+	}
+	$head[$_participants] = &change_turn($head[$_participants]) for (0 .. $leader_i-1);#while (!&is_my_turn($head[$_participants], $mname));
+
+	$$head_line = &h_to_s(@head);
+}
+
+#================================================
+# ﾌﾟﾚｲのﾌｫｰﾑ 基本ｶｼﾞﾉ毎に丸々書き換える必要がある
+#================================================
+sub play_form {
+	my ($m_turn, $m_value, $m_stock, $participants, $field_cards, $pass) = @_;
+	my @hand_cards = split /,/, $m_stock;
+	my @participants = &get_members($participants);
+
+	if ($participants[0] eq $m{name}) {
+		my $is_joker = 0;
+		print "<br>手札：".@hand_cards."枚<br>";
 		print qq|<form method="$method" action="$this_script" name="form">|;
-		print qq|<input type="hidden" name="mode" value="participate">|;
-		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-		print qq|<input type="submit" value="ｹﾞｰﾑに参加" class="button_s"></form><br>|;		
-	}
-
-	if($turn && !$set_flag){
-		if($m{name} eq $turn){
-			print qq|<form method="$method" action="$this_script" name="form">|;
-			print qq|<input type="hidden" name="mode" value="play">|;
-			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-			&print_checkbox;
-			print qq|<input type="submit" value="カードを出す" class="button_s"></form><br>|;
-		}else{
-			print qq|<form method="$method" action="$this_script" name="form">|;
-			print qq|<input type="hidden" name="mode" value="write">|;
-			print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-			&print_checkbox if $m{c_turn} == 2;
-			print qq|</form><br>|;
+		unless (0 < $m_value && 0 < $pass) {
+#			my $old_suit = -1;
+#			print qq|<table border="0"><tr>|;
+			for my $hand_card (@hand_cards) {
+				my ($num, $suit) = &get_card($hand_card);
+				if ($old_suit != $suit) {
+					$old_suit = $suit;
+#					print qq|</tr><tr>|;
+				}
+				$is_joker = 1 if $num == 13;
+#				print qq|<td>|;
+				print &create_check_box("card_$hand_card", "$hand_card", "$suits[$suit]$nums[$num]<br>");
+#				print qq|</td>|;
+			}
+#			print qq|</tr></table>|;
+			if ($field_cards eq '' && $is_joker) { # 場札がなく、手札にｼﾞｮｰｶｰがあるとき
+				print &create_radio_button('joker', 1, '複数枚出し');
+				print ' ';
+				print &create_radio_button('joker', 2, '階段出し<br>');
+			}
 		}
-	}elsif($m{c_turn} == 1) {
-		print qq|<form method="$method" action="$this_script" name="form">|;
-		print qq|<input type="hidden" name="mode" value="start">|;
-		print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-		print qq|レート<select name="rate" class="menu1">|;
-		for my $i(0..$#rates){
-			print qq|<option value="$i">$rates[$i]</option>|;
+		print &create_submit("play", "ｶｰﾄﾞを出す");
+		print qq|</form>|;
+	}
+	else {
+		my @cards = ();
+		print qq|<br>$participants[0]が思考中です<br>|;
+		for my $hand_card (@hand_cards) {
+			my ($num, $suit) = &get_card($hand_card);
+			push @cards, "$suits[$suit]$nums[$num]";
 		}
-		print qq|<br><input type="submit" value="ｹﾞｰﾑを始める" class="button_s"></form><br>|;
-	}
-	print qq|<hr>|;
-
-	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
-	while (my $line = <$fh>) {
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
-		$bname .= "[$bshogo]" if $bshogo;
-		$is_mobile ? $bcomment =~ s|ハァト|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ハァト|<font color="#FFB6C1">&hearts;</font>|g;
-		print qq|<font color="$cs{color}[$bcountry]">$bname：$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
-	}
-	close $fh;
-	if($set_flag){
-		&game_set;
+		print "手札：".@hand_cards."枚 ".&create_select_menu("card", @cards);
+		print "<br>";
 	}
 }
 
-sub get_member {
-	my $is_find = 0;
-	my $member  = '';
+#================================================
+# ﾌﾟﾚｲの処理
+#================================================
+sub play {
 	my @members = ();
-	my %sames = ();
-	my $players = 0;
-	my $pmember = '';
-	my $f_player = '';
-	my $nt_flag = 0;
-	my $this_set_flag = 0;
-	my $turn_error = 1;
-	my $turn_error_c = 1;
-    my @num = ('3','4','5','6','7','8','9','10','J','Q','K','A','2'); # 低い順
-    my @suit = $is_mobile ? ('S','H','C','D'):('&#9824','&#9825','&#9827','&#9826');
-	
+	my $result_mes = '';
+	my $winner = '';
+	my $is_reset = 0;
+
+	# ｶｼﾞﾉ毎の処理
+	my @play_cards = ();
+	my $is_joker = 0;
+	for my $i (1 .. 54) {
+		if ($in{"card_$i"}) {
+			$is_joker = 1 if $i == 53 || $i == 54;
+			push @play_cards, $in{"card_$i"} ;
+		}
+	}
+
+	my ($is_playable, $play_mes, $is_sequence, $is_double) = (0, '', 0, 0);
+	my $is_pass = 0;
+	my ($is_eight_cut, $is_s3_cut, $is_pass_cut) = (0, 0, 0);
+
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	$pmember .= "場のカード：$num[$state_n] ";
-	$pmember .= $state_c == 1 ? "一枚 ":
-				$state_c == 2 ? "ダブル ":
-				$state_c == 3 ? "トリプル ":
-				$state_c == 4 ? "革命 ":
-				"その他 ";
-	$pmember .= "($c_player)<br>";
-	$pmember .= "状態：";
-	$pmember .= "革命 " if $revolution;
-	$pmember .= "イレバ " if $back;
-	$pmember .= "縛り(スペード) " if $bind_s == 2;
-	$pmember .= "縛り(ハート) " if $bind_h == 2;
-	$pmember .= "縛り(クラブ) " if $bind_c == 2;
-	$pmember .= "縛り(ダイヤ) " if $bind_d == 2;
-	$pmember .= "<br>";
-	
+	my @head = split /<>/, $head_line; # ﾍｯﾀﾞｰ
+	my @participants = &get_members($head[$_participants]);
+	my @winners = &get_members($head[$_winner]);
+	my %pass_datas = (); # 参加者のパス情報を持つ
+	my $is_my_turn = $head[$_state] && &is_my_turn($head[$_participants], $m{name}) && 2 <= $m{c_turn}; # 開始しているｹﾞｰﾑに参加していて自分のﾀｰﾝ
 	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		if ($time - $limit_member_time > $mtime) {
-			if($mturn > 0 && $mturn <= 2){
-				if($mname eq $m{name}){
-					$m{c_turn} = 0;
-					$m{c_value} = 0;
-					&write_user;
-				}
-				$mturn = 4;
-				$mvalue = &lose_player;
-				if($turn eq $mname){
-					$nt_flag = 1;
-				}
-				&regist_you_data($mname,'c_turn',$mturn);
-				&regist_you_data($mname,'c_value',$mvalue);
-			}elsif($mturn == 0) {
-				next;
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($is_my_turn && $mname eq $m{name}) {
+			$head[$_lastupdate] = $time;
+			$mtime = $time;
+
+			unless (@play_cards) { # パス
+				$mvalue = 1;
+				$is_pass = 1;
 			}
-		}else{
-			if($f_player eq ''){
-				$f_player = $mname;
-			}
-			if($nt_flag){
-				$turn = $mname;
-			}
-		}
-		next if $sames{$mname}++; # 同じ人なら次
-		
-		if ($mname eq $m{name}) {
-			push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$m{c_value}<>\n";
-			$is_find = 1;
-		}
-		else {
-			push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-		}
-		if ($mturn == 2) {
-			$pmember .= "$mname";
-			my @mhand = &v_to_hj($mvalue);
-			my $hands = @mhand;
-			$pmember .= "：$hands枚";
-			if($turn eq $mname){
-				$pmember .= "★";
-				$turn_error = 0;
-			}
-			if($c_player eq $mname || $c_player eq ''){
-				$turn_error_c = 0;
-			}
-			$pmember .= "<br>";
-			$players++;
-		}elsif($mturn >= 3){
-				$pmember .= "$mname";
-				my $rank = $mvalue;
-				$pmember .= "：$rank位<br>";
-		}elsif($mturn == 1){
-			$pmember .= "$mname：待機中";
-			$pmember .= $mvalue == 1 ? "大富豪":
-						$mvalue == 2 ? "富豪":
-						$mvalue == -1 ? "大貧民":
-						$mvalue == -2 ? "貧民":
-										"平民";
-			$pmember .= "<br>";
-		}
-		$member .= "$mname,";
-	}
-	unless ($is_find) {
-		push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$m{c_value}<>\n";
-		$member .= "$m{name},";
-	}
-	if($nt_flag){
-		$turn = $f_player;
-		if($f_player eq ''){
-			$this_set_flag = 1;
-		}
-	}
-	unshift @members, "$turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-
-
-	if($turn && ($turn_error || $turn_error_c) && !$set_flag){
-		&system_comment("ターン異常修正しました $turn_error $turn_error_c");
-		my $next_flag = 1;
-		my $next_turn = '';
-		my $err_set_flag = 1;
-		my @e_members = ();
-		open my $efh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-		eval { flock $efh, 2; };
-		my $head_line = <$efh>;
-		my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-		while (my $line = <$efh>) {
-			my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-			push @e_members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-			if($mturn == 2 && $next_flag == 1){
-				$next_turn = $mname;
-				$next_flag = 0;
-				$c_player = '';
-				$bind_s = 0;
-				$bind_h = 0;
-				$bind_c = 0;
-				$bind_d = 0;
-				$err_set_flag = 0;
-			}
-			if($turn eq $mname){
-				$next_flag = 1;
-			}
-		}
-		unshift @e_members, "$next_turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-		seek  $efh, 0, 0;
-		truncate $efh, 0;
-		print $efh @e_members;
-		close $efh;
-		if($err_set_flag){
-			#&game_set;
-		}
-	}
-
-	if($this_set_flag){
-		&game_set;
-	}
-
-	my $member_c = @members - 1;
-
-	return ($member_c, $member, $turn, $rate, $state_c, $state_n, $players, $pmember, $c_player);
-}
-
-sub play_card {
-	my @members = ();
-	my %sames = ();
-	my $play_flag = 0;
-	my $p_set_flag = 0;
-	
-	return("参加してません") if $m{c_turn} <= 1;
-	my @hand = &v_to_hj($m{c_value});
-	my @new_hand= ();
-	my @play_card = ();
-	
-	my @seven_g = ();
-	
-	open my $ifh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$ifh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back) = split /<>/, $head_line;
-	close $ifh;
-	return("あなたの順番ではありません") if $turn ne $m{name};
-	
-	for my $i (0..$#hand){
-		if($in{"play_$i"}){
-			push @play_card, $hand[$i];
-			if($in{"play_$i"} && defined($in{"sub_$i"})){
-				if($hand[$i] % 13 == 4){
-					push @seven_g, $in{"sub_$i"};
-				}
-				if($hand[$i] % 13 == 7){
-					push @ten_g, $in{"sub_$i"};
-				}
-			}
-		}else{
-			push @new_hand, $hand[$i];
-		}
-	}
-	
-	
-	my ($n, $sn, $sc, @flags) = &w_pair(@play_card);
-	
-	if($n ne 'パス'){
-		my $nhands = @new_hand;
-		if($nhands == 0){
-			$n = "あがり " . $n;
-			$m{c_value} = &win_player;
-			$m{c_turn} = 3;
-			$p_set_flag = 1;
-		}else{
-			$m{c_value} = &h_to_vj(@new_hand);
-		}
-		$play_flag = 1;
-	}
-	&write_user;
-
-	my $next_flag = 1;
-	my $next_turn = '';
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mname eq $m{name}){
-			$mturn = $m{c_turn};
-			$mvalue = $m{c_value};
-		}
-		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-		if($mturn == 2 && $next_flag == 1){
-			$next_turn = $mname;
-			$next_flag = 0;
-		}
-		if($turn eq $mname){
-			$next_flag = 1;
-		}
-	}
-	if($play_flag){
-		$state_c = $sc;
-		$state_n = $sn;
-		$c_player = $m{name};
-		$bind_s = $flags[13];
-		$bind_h = $flags[14];
-		$bind_c = $flags[15];
-		$bind_d = $flags[16];
-		
-		if($flags[5] && !$p_set_flag){#八切
-			$next_turn = $m{name};
-			$c_player = '';
-			$bind_s = 0;
-			$bind_h = 0;
-			$bind_c = 0;
-			$bind_d = 0;
-		}
-		if($flags[8]){#イレブンバック
-			$back = 1;
-		}else{
-			$back = 0;
-		}
-		if($flags[12] && !$p_set_flag){#２切（暫定）
-			$next_turn = $m{name};
-			$c_player = '';
-			$bind_s = 0;
-			$bind_h = 0;
-			$bind_c = 0;
-			$bind_d = 0;
-		}
-		if($state_c == 4 || ($state_c >= 6 && $state_c <= 9)){#革命
-			$revolution = $revolution ? 0 : 1;
-		}
-	}elsif($next_turn eq $c_player){#一巡
-		$c_player = '';
-		$bind_s = 0;
-		$bind_h = 0;
-		$bind_c = 0;
-		$bind_d = 0;
-	}
-	if($turn eq $next_turn || $p_set_flag){#1人または上がり流し
-		$c_player = '';
-		$bind_s = 0;
-		$bind_h = 0;
-		$bind_c = 0;
-		$bind_d = 0;
-	}
-	unshift @members, "$next_turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-	
-	if($flags[4] && $play_flag && !$p_set_flag){#七渡し
-		&give(@seven_g);
-	}
-	if($flags[7] && $play_flag && !$p_set_flag){#十捨て
-		&release(@ten_g);
-	}
-
-	return $n;
-}
-
-sub deal_card {
-	my $a_players;
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		if ($mturn == 1) {
-			$a_players++;
-		}
-	}
-	close $fh;
-
-	my @members = ();
-	my %sames = ();
-	my @g_deck = &shuffled_deck;
-	my @d_player = ();
-	my $d_mes = '';
-	for my $i (@g_deck){
-		$d_mes .= "$i,";
-	}
-	my $card_no = 0;
-	my $plcards = int(52 / $a_players) - 1;
-	$plcards = $plcards > 7 ? 7 : $plcards;
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	if($turn eq ''){
-		$turn = $m{name};
-		$rate = $rates[$in{rate}];
-		$state_n = 0;
-		$state_c = 1;
-		$c_player = '';
-		$revolution = 0;
-		$back = 0;
-		$bind_s = 0;
-		$bind_h = 0;
-		$bind_c = 0;
-		$bind_d = 0;
-		$m{c_turn} = 2;
-		my @phand = ();
-		for my $i ($card_no..$card_no+$plcards-1){
-			push @phand, $g_deck[$i];
-			if(int($g_deck[$i] / 13) == 3){
-				$d_player[$g_deck[$i] % 13] = $m{name};
-			}
-		}
-		
-		@phand = sort { $a%13 <=> $b%13 || $a/13 <=> $b/13 } @phand;
-		$card_no += $plcards;
-		$m{c_value} = &h_to_vj(@phand);
-		&write_user;
-		&coin_move(-1 * $rate, $m{name}, 1);
-	}
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $time - $limit_member_time > $mtime;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mturn == 1){
-			if($mname eq $m{name}){
-				&coin_move(-1 * $rate, $m{name}, 1);
-				push @members, "$mtime<>$mname<>$maddr<>$m{c_turn}<>$m{c_value}<>\n";
-			}else{
-				my @phand = ();
-				for my $i ($card_no..$card_no+$plcards-1){
-					push @phand, $g_deck[$i];
-					if(int($g_deck[$i] / 13) == 3){
-						$d_player[$g_deck[$i] % 13] = $mname;
+			else { # カードを出している
+				# 出したｶｰﾄﾞすべてが手札にあるか 八切りなどﾀｰﾝを変更しないｶｰﾄﾞを出して「戻る」をし、再度今出した八切りなどﾀｰﾝを変更しないｶｰﾄﾞを再度出せる（同じｶｰﾄﾞを延々出せるだけで実害はない）
+				my $eq_num = 0;
+				my @hand_cards = split /,/, $mstock;
+				for my $hand_card (@hand_cards) {
+					for my $play_card (@play_cards) {
+						$eq_num ++ if $hand_card == $play_card;
 					}
 				}
-				@phand = sort { $a%13 <=> $b%13 || $a/13 <=> $b/13 } @phand;
-				$card_no += $plcards;
-				my $d_hand = &h_to_vj(@phand);
-				&regist_you_data($mname,'c_turn',2);
-				&regist_you_data($mname,'c_value',$d_hand);
-				&coin_move(-1 * $rate, $mname, 1);
-				push @members, "$mtime<>$mname<>$maddr<>2<>$d_hand<>\n";
-			}
-		}else {
-			&you_c_reset($mname);
-			push @members, "$mtime<>$mname<>$maddr<>0<>0<>\n";
-		}
-	}
-	for my $i (0..12){
-		next unless defined($d_player[$i]);
-		$turn = $d_player[$i];
-		last;
-	}
-	unshift @members, "$turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-
-
-
-#	return ("ｹﾞｰﾑを始めます$turnの番です<br>$d_mes");
-	return ("ｹﾞｰﾑを始めます$turnの番です");
-}
-
-sub participate{
-	return("ｺｲﾝがありません") if $m{coin} <= 0;
-	open my $ifh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$ifh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	close $ifh;
-	return("次のゲームに参加したいです") if $turn;
-	$m{c_turn} = 1;
-	$m{c_value} = 0;
-	&write_user;
-	return("$m{name} が参加します");
-}
-
-sub exit_game{
-	if ($m{c_turn} == 1){
-		$m{c_turn} = 0;
-	}else {
-		return("ｹﾞｰﾑが始まっています");
-	}
-	&write_user;
-	return("$m{name} は やめました");
-}
-
-sub win_player{
-	my @members = ();
-	my %sames = ();
-
-	my $players = 0;
-	my $w_players = 1;
-	my $l_players = 0;
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		
-		if ($mturn >= 2) {
-			$players++;
-			if($mturn == 3){
-				$w_players++;
-			}
-			if($mturn == 4){
-				$l_players++;
-			}
-		}
-	}
-	close $fh;
-	
-	if(($rate == 0 && $players == $w_players + $l_players) || ($rate != 0 && ($players == $w_players + $l_players || $w_players >= 2))){
-		$set_flag = 1;
-	}
-	return $w_players;
-}
-
-sub lose_player {
-	my @members = ();
-	my %sames = ();
-
-	my $players = 0;
-	my $w_players = 1;
-	my $l_players = 0;
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	push @members, "$turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		
-		if ($mturn >= 2) {
-			$players++;
-			if($mturn == 3){
-				$w_players++;
-			}
-			if($mturn == 4){
-				$l_players++;
-			}
-		}
-	}
-	my $l_value = $players - $l_players;
-	close $fh;
-
-	if($players == $w_players + $l_players){
-		$set_flag = 1;
-	}
-	return $l_value;
-}
-
-sub error_lose{
-	my $pname = shift;
-	
-	my @members = ();
-	my %sames = ();
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mname eq $pname){
-			$mturn = 4;
-			$mvalue = &lose_player;
-			&regist_you_data($mname,'c_turn',4);
-			&regist_you_data($mname,'c_value',$mvalue);
-		}
-		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-	}
-	unshift @members, "$next_turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-}
-
-sub w_pair{
-    my @num = ('3','4','5','6','7','8','9','10','J','Q','K','A','2'); # 低い順
-    my @suit = $is_mobile ? ('S','H','C','D'):('&#9824','&#9825','&#9827','&#9826');
-	my @pair = @_;
-	my @flags = ();
-	my $h_mes = '';
-	my $h_state;
-	my @b_suit = ();
-	my $miss_bind = 0;
-	my $one_suit_flag = 0;
-	my $step_flag = 1;
-
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	close $fh;
-	
-	for my $i(@pair){
-		$flags[$i%13]++;
-		$b_suit[int($i/13)]++;
-	}
-	
-	if($b_suit[0]){
-		if($bind_s == 0 || $bind_s == 1){
-			$bind_s++;
-		}
-		$one_suit_flag++;
-	}else{
-		if($bind_s == 2){
-			$miss_bind = 1;
-		}else{
-			$bind_s = 0;
-		}
-	}
-	if($b_suit[1]){
-		if($bind_h == 0 || $bind_h == 1){
-			$bind_h++;
-		}
-		$one_suit_flag++;
-	}else{
-		if($bind_h == 2){
-			$miss_bind = 1;
-		}else{
-			$bind_h = 0;
-		}
-	}
-	if($b_suit[2]){
-		if($bind_c == 0 || $bind_c == 1){
-			$bind_c++;
-		}
-		$one_suit_flag++;
-	}else{
-		if($bind_c == 2){
-			$miss_bind = 1;
-		}else{
-			$bind_c = 0;
-		}
-	}
-	if($b_suit[3]){
-		if($bind_d == 0 || $bind_d == 1){
-			$bind_d++;
-		}
-		$one_suit_flag++;
-	}else{
-		if($bind_d == 2){
-			$miss_bind = 1;
-		}else{
-			$bind_d = 0;
-		}
-	}
-	
-	for my $j (2..$#pair){
-		if($pair[0]%13 + $j * ($pair[1]%13 - $pair[0]%13) != $pair[$j]%13){
-			$step_flag = 0;
-		}
-	}
-	
-	if($miss_bind){
-		return ('パス', 0, 0, @flags);
-	}else{
-		$flags[13] = $bind_s;
-		$flags[14] = $bind_h;
-		$flags[15] = $bind_c;
-		$flags[16] = $bind_d;
-	}
-	
-	if($flags[4]){
-		$h_mes .= "七渡し ";
-	}
-	if($flags[5]){
-		$h_mes .= "八切 ";
-	}
-	if($flags[7]){
-		$h_mes .= "十\捨て ";
-	}
-	if($flags[8]){
-		$h_mes .= "イレブンバック ";
-	}
-
-	if(@pair == 1){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13]一枚";
-		$h_state = 1;
-	}elsif(@pair == 2 && $pair[0]%13 == $pair[1]%13){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13]ダブル";
-		$h_state = 2;
-	}elsif(@pair == 3 && $pair[0]%13 == $pair[1]%13 && $pair[0]%13 == $pair[2]%13){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13] $suit[$pair[2]/13] $num[$pair[2]%13]トリプル";
-		$h_state = 3;
-	}elsif(@pair == 4 && $pair[0]%13 == $pair[1]%13 && $pair[0]%13 == $pair[2]%13 && $pair[0]%13 == $pair[3]%13){
-		$h_mes .= "$num[$pair[0]%13] 革命";
-		$h_state = 4;
-	}elsif(@pair == 3 && $one_suit_flag == 1 && $step_flag == 1){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13] $suit[$pair[2]/13] $num[$pair[2]%13] 3枚階段";
-		$h_state = 5;
-	}elsif(@pair == 4 && $one_suit_flag == 1 && $step_flag == 1){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13] $suit[$pair[2]/13] $num[$pair[2]%13] $suit[$pair[3]/13] $num[$pair[3]%13] 4枚階段";
-		$h_state = 6;
-	}elsif(@pair == 5 && $one_suit_flag == 1 && $step_flag == 1){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13] $suit[$pair[2]/13] $num[$pair[2]%13] $suit[$pair[3]/13] $num[$pair[3]%13] $suit[$pair[4]/13] $num[$pair[4]%13] 5枚階段";
-		$h_state = 7;
-	}elsif(@pair == 6 && $one_suit_flag == 1 && $step_flag == 1){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13] $suit[$pair[2]/13] $num[$pair[2]%13] $suit[$pair[3]/13] $num[$pair[3]%13] $suit[$pair[4]/13] $num[$pair[4]%13] $suit[$pair[5]/13] $num[$pair[5]%13] 6枚階段";
-		$h_state = 8;
-	}elsif(@pair == 7 && $one_suit_flag == 1 && $step_flag == 1){
-		$h_mes .= "$suit[$pair[0]/13] $num[$pair[0]%13] $suit[$pair[1]/13] $num[$pair[1]%13] $suit[$pair[2]/13] $num[$pair[2]%13] $suit[$pair[3]/13] $num[$pair[3]%13] $suit[$pair[4]/13] $num[$pair[4]%13] $suit[$pair[5]/13] $num[$pair[5]%13] $suit[$pair[6]/13] $num[$pair[6]%13] 7枚階段";
-		$h_state = 9;
-	}else{
-		return ('パス', 0, 0, @flags);
-	}
-
-
-	if($c_player eq ''){
-		if($h_state != 0){
-			return ($h_mes, $pair[0]%13, $h_state, @flags);
-		}else{
-			return ('パス', 0, 0, @flags);
-		}
-	}elsif(($state_n < $pair[0]%13 && $revolution == $back) || ($state_n > $pair[0]%13 && $revolution != $back)){
-		if($h_state == $state_c){
-			return ($h_mes, $pair[0]%13, $h_state, @flags);
-		}else{
-			return ('パス', 0, 0, @flags);
-		}
-	}else {
-		return ('パス', 0, 0, @flags);
-	}
-}
-
-sub game_set{
-	my @members = ();
-	my %sames = ();
-	my @ranks = ();
-	my $r_mes = '';
-	my $err_flag = 0;
-	my $blank_player = '';
-	my $eplayers = 0;
-
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mturn > 2){
-			$ranks[$mvalue-1] = $mname;
-			$eplayers++;
-		}elsif($mturn == 2){
-			$blank_player = $mname;
-			$eplayers++;
-		}
-	}
-	close $fh;
-	$r_mes .= "<br>結果：<br>";
-	for my $i(0..$eplayers-1){
-		if($ranks[$i] eq ''){
-			$err_flag = 1;
-		}
-		my $ir = $i + 1;
-		$r_mes .= "$ir位：$ranks[$i]<br>";
-	}
-	if($blank_player ne ''){
-		&error_lose($blank_player);
-		&game_set;
-	}elsif($err_flag){
-		&system_comment("順位異常");
-		&all_reset;
-	}else{
-		&system_comment($r_mes);
-		&get_coin;
-		&all_reset($eplayers);
-	}
-}
-
-sub all_reset{
-	my $all_players = shift;
-	my @members = ();
-	my %sames = ();
-	my @ranks = ();
-	my $r_mes = '';
-	my $err_flag = 0;
-
-	if($m{c_turn} >= 2){
-		$m{c_turn} = 1;
-		if($all_players < 4){
-			if($m{c_value} == $all_players){
-				$m{c_value} = -2;
-			}elsif($m{c_value} == 1){
-				$m{c_value} = 2;
-			}else{
-				$m{c_value} = 0;
-			}
-		}else{
-			if($m{c_value} == $all_players){
-				$m{c_value} = -1;
-			}elsif($m{c_value} == $all_players-1){
-				$m{c_value} = -2;
-			}elsif($m{c_value} != 1 && $m{c_value} != 2){
-				$m{c_value} = 0;
-			}
-		}
-	}else{
-		$m{c_turn} = 0;
-		$m{c_value} = 0;
-	}
-	&write_user;
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	push @members, "<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mturn >= 2){
-			if($all_players < 4){
-				if($mvalue == $all_players){
-					$mvalue = -2;
-				}elsif($mvalue == 1){
-					$mvalue = 2;
-				}else{
-					$mvalue = 0;
+				unless ($eq_num == @play_cards) { # 出したｶｰﾄﾞが手札になかったらスルー
+					$mes .= '<p>不正処理 手札にないｶｰﾄﾞを出そうとしています</p>';
+					push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+					next;
 				}
-			}else{
-				if($mvalue == $all_players){
-					$mvalue = -1;
-				}elsif($mvalue == $all_players-1){
-					$mvalue = -2;
-				}elsif($mvalue != 1 && $mvalue != 2){
+
+				my $play_cards = join(",", @play_cards);
+
+				# 出したカードがﾙｰﾙに則っているか
+				($is_playable, $result_mes, $is_sequence, $is_double) = &is_playable($play_cards, $head[$_field_card], $head[$_bind_m], $head[$_bind_s], $head[$_revo]);
+
+				# ｼﾞｮｰｶｰを含む2枚以上のｶｰﾄﾞ
+				if ($head[$_field_card] eq '' && 1 < @play_cards && $is_joker) {
+					$is_joker = $in{joker}; # 1 複数枚出し 2 階段出し
+					unless ($is_joker) {
+						$mes .= '<p>ﾙｰﾙ違反 ｼﾞｮｰｶｰを出すときは役を宣言してください</p>';
+						($is_playable, $play_mes) = (0, '');
+					}
+				}
+
+				if ($is_playable) { # 出したｶｰﾄﾞがﾙｰﾙ上認められている
+					# 複数枚出し・階段出しの縛り設定
+					if ($head[$_field_card] eq '' && 1 < @play_cards) { # 初手にのみ複数枚などの縛り発生
+						if ($is_joker) {
+							$mes .= "is_joker $is_joker is_sequence $is_sequence is_double $is_double";
+							$head[$_bind_m] = $is_joker; # 1 複数枚出し 2 階段出し
+						}
+						else {
+							$head[$_bind_m] = 1 if $is_double; # 複数枚出し;
+							$head[$_bind_m] = 2 if $is_sequence; # 階段出し
+						}
+					}
+
+					# 革命設定 複数枚出しで革命 階段では発生しない
+ 					if (3 < @play_cards && $head[$_bind_m] == 1 && !$is_sequence) {
+						$head[$_revo] = !$head[$_revo];
+						$result_mes .= '<br>革命を起こしました';
+					}
+
+					# ｽｰﾄ縛りの設定 ｼﾞｮｰｶｰが含まれていない場札があり、出したｶｰﾄﾞにもｼﾞｮｰｶｰが含まれていないなら縛りﾁｪｯｸ
+					if ($head[$_bind_s] eq '' && $head[$_field_card] && $head[$_field_card] !~ /53/ && $head[$_field_card] !~ /54/ && $is_joker == 0) {
+						my $is_suit_lock = 1;
+						my @suit_lock = ();
+						my @field_cards = split /,/, $head[$_field_card];
+						for my $i (0 .. $#play_cards) { # 出したｶｰﾄﾞと場のｶｰﾄﾞすべてを走査 出したｶｰﾄﾞと場札の数は同じ
+							my @suit = ( (&get_card($play_cards[$i]))[1], (&get_card($field_cards[$i]))[1] );
+							if ($suit[0] == $suit[1]) { # 出したｶｰﾄﾞと場のｶｰﾄﾞのｽｰﾄが同じ
+								$suit_lock[$suit[0]] = 1;
+							}
+							else {
+								$is_suit_lock = 0;
+								last; # ｽｰﾄが違う時点でﾛｯｸされないことが確定
+							}
+						}
+						if ($is_suit_lock) {
+							$head[$_bind_s] = 0; # 初期化
+							$head[$_bind_s] |= $suit_lock[$_] << $_ for (0 .. 3);
+							$result_mes .= '<br>ｽｰﾄ縛りが発生しました';
+						}
+					}
+
+					# 八切り
+					if ($head[$_bind_m] != 2 || $is_double) {
+						for my $play_card (@play_cards) {
+							unless ($play_card == 53 || $play_card == 54) {
+								$is_eight_cut = 1 if ($play_card-1) % 13 == 5; # 1～52 の値から -1 したものを 13 で割った余りが 0～12 になる
+							}
+						}
+					}
+
+					# スペ3返し
+					$is_s3_cut = 1 if (@play_cards == 1 && $play_cards[0] == 1 && ($head[$_field_card] =~ /^53/ || $head[$_field_card] =~ /^54/));
+
+					my @new_hand_cards = ();
+					for my $hand_card (@hand_cards) {
+						my $is_eq = 0;
+						for my $play_card (@play_cards) {
+							if ($hand_card == $play_card) {
+								$is_eq = 1;
+								last;
+							}
+						}
+						push @new_hand_cards, $hand_card unless $is_eq;
+					}
 					$mvalue = 0;
+					$mstock = join(",", @new_hand_cards);
+					$head[$_field_card] = $play_cards;
+
+					unless ($mstock) {
+						my $is_find = 0;
+						if ($is_eight_cut || # 八切り上がり
+							$is_s3_cut || # ｽﾍﾟ3返し上がり
+							($is_double && (($head[$_field_card]-1) % 13) == 0) || # 革命中の ﾏﾙﾁ3 か
+							($is_double && (($head[$_field_card]-1) % 13) == 12) || # 非革命中の ﾏﾙﾁ2 か
+							(@play_cards == 1 && ( # 出したｶｰﾄﾞが1枚かつ
+							($head[$_revo] && (($head[$_field_card]-1) % 13) == 0) || # 革命中の 3 か
+							(!$head[$_revo] && (($head[$_field_card]-1) % 13) == 12) || # 非革命中の 2 か
+							$head[$_field_card] eq '53' || $head[$_field_card] eq '54') ) ) { # ｼﾞｮｰｶｰ
+							for my $i (0 .. @participants-1) {
+								unless ($winners[$#participants-$i] || $is_find) {
+									$winners[$#participants-$i] = $m{name};
+									$is_find = 1;
+								}
+							}
+							$result_mes .= "<br>禁止上がり";
+							$is_eight_cut = $is_s3_cut = 0;
+						}
+						else {
+							for my $i (0 .. $#participants) {
+								unless ($winners[$i] || $is_find) {
+									$winners[$i] = $m{name};
+									$is_find = 1;
+								}
+							}
+							$result_mes .= "<br>上がり";
+						}
+						$head[$_winner] = join(",", @winners);
+						$winner = $m{name};
+						$mvalue = 2;
+					}
 				}
 			}
-			push @members, "$mtime<>$mname<>$maddr<>1<>$mvalue<>\n";
-			if($mname ne $m{name}){
-				&regist_you_data($mname,'c_turn',1);
-				&regist_you_data($mname,'c_value',$mvalue);
-			}
-		}else{
-			push @members, "$mtime<>$mname<>$maddr<>0<>0<>\n";
-			if($mname ne $m{name}){
-				&regist_you_data($mname,'c_turn',0);
-				&regist_you_data($mname,'c_value',0);
+		}
+		$pass_datas{$mname} = $mvalue if 1 < $mturn; # 参加者のﾊﾟｽ情報の取得
+		$is_reset++ if 1 < $mturn && 1 < $mvalue;
+		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+	}
+
+	if ($is_playable || $is_pass || $is_eight_cut || $is_s3_cut) {
+		my $pass_num = 0;
+		my @next_num = (0, 0);
+		my $refresh_num = 0;
+		my $is_find = 0;
+		unless ($is_eight_cut || $is_s3_cut) {
+			for my $i (0 .. $#participants) {
+				if ($next_num[0] == 0 && $participants[$i] ne $m{name} && $pass_datas{$participants[$i]} == 0) { # ﾊﾟｽをしていない直近のﾌﾟﾚｲﾔｰ
+					$next_num[0] = $i;
+					$is_find = 1;
+				}
+				elsif ($pass_datas{$participants[$i]} == 1) { # ﾊﾟｽをしているﾌﾟﾚｲﾔｰ
+					$next_num[1] = $i if $next_num[1] == 0 && $participants[$i] ne $m{name}; # ﾊﾟｽをしている直近のﾌﾟﾚｲﾔｰ
+					$pass_num++;
+				}
+				elsif ($participants[$i] ne $m{name} && $pass_datas{$participants[$i]} == 2) { # 上がっているﾌﾟﾚｲﾔｰ
+					$refresh_num++;
+				}
 			}
 		}
+
+		$result_mes .= 'パス' if $is_pass;
+		if ( $is_eight_cut || $is_s3_cut || ($is_find && @participants == ($pass_num+$refresh_num+1)) || (@participants == ($pass_num+$refresh_num))) { 
+			($head[$_field_card], $head[$_bind_m], $head[$_bind_s]) = ('', '', '');
+			$result_mes .= '<br>八切り' if $is_eight_cut;
+			$result_mes .= '<br>スペ3返し' if $is_s3_cut;
+			$result_mes .= ' 場を流しました';
+			for my $i (0 .. $#members) {
+				my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $members[$i];
+				next if $mturn < 2 || 1 < $mvalue;
+				$members[$i] = "$mtime<>$mname<>$maddr<>$mturn<>0<>$mstock<>\n";
+			}
+		}
+		if ($is_find) { # ﾊﾟｽをしていないﾌﾟﾚｲﾔｰがいる
+			$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[0]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
+		}
+		else { # 全員がﾊﾟｽしている
+			$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[1]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
+		}
 	}
+
+	my $penalty_coin = 0;
+	if ($is_reset == @participants) {
+		$penalty_coin = $head[$_rate];
+		&init_header(\@head);
+		&reset_members(\@members);
+	}
+	else { $is_reset = 0; }
+
+	unshift @members, &h_to_s(@head); # ﾍｯﾀﾞｰ
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
-}
 
-sub get_coin{
-	my @members = ();
-	my %sames = ();
-	my @ranks = ();
-	my $total_coin = 0;
+	# 終了処理
+	if ($is_reset) {
+		my $winner_mes = '';
+		my $loser_mes = '';
+		my $move_c = 2 <= (@winners / 2) ? 2 : 1; # 4人以上でｺｲﾝの移動が2回起きる 大富豪<->大貧民 富豪<->貧民 3人以下では 大富豪<->大貧民 の1回
+		for my $i (0 .. $#winners) {
+			if ($winners[$i] eq $m{name}) {
+				$m{c_turn} = 0;
+				&write_user;
+			}
+			else {
+		 		&regist_you_data($winners[$i], 'c_turn', '0');
+			}
 
-	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mturn >= 2){
-			$total_coin += $rate;
+			if ($i < $move_c) {
+				&coin_move($penalty_coin / (1 + $i), $winners[$i], 1);
+				$winner_mes .= "$winners[$i] は ".($penalty_coin / (1 + $i))." ｺｲﾝ得ました<br>";
+
+				&coin_move(-1 * $penalty_coin / (1 + $i), $winners[$#winners-$i], 1);
+				$loser_mes = "$winners[$#winners-$i] は ".($penalty_coin / (1 + $i))." ｺｲﾝ払いました<br>" . $loser_mes;
+			}
+			elsif ($i < @winners-$move_c) {
+				$winner_mes .= "$winners[$i] は 0 ｺｲﾝ得ました<br>";
+			}
 		}
-		if($mturn > 2){
-			$ranks[$mvalue-1] = $mname;
+		&system_comment("$winner_mes$loser_mes");
+	}
+
+	return $result_mes; # ﾌﾟﾚｲの報告
+}
+
+sub show_status {
+	my @head = @_;
+
+	my @field_cards = split /,/, $head[$_field_card];
+	my $field_num = @field_cards;
+
+	print "<br>状態：";
+
+	if ($head[$_revo]) {
+		print "革命 ";
+	}
+
+	# 複数枚・階段出し縛り表示
+	if ($field_num) {
+		if ($head[$_bind_m] == 2) {
+			print "$field_num枚階段縛り";
+		}
+		else {
+			print "$field_num枚縛り";
 		}
 	}
-	close $fh;
-	if($ranks[0] ne ''){
-		my $temp = int($total_coin * 0.7);
-		&coin_move($temp, $ranks[0]);
-	}
-	if($ranks[1] ne ''){
-		$temp = int($total_coin * 0.3);
-		&coin_move($temp, $ranks[1]);
-	}
-}
 
-sub g_end_flag {
-	my @members = ();
-	my %sames = ();
-
-	my $players = 0;
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	my $head_line = <$fh>;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if ($mturn == 2) {
-			$players++;
+	# ｽｰﾄ縛り表示
+	if ($head[$_bind_s]) {
+		print " ｽｰﾄ縛り(";
+		my @suit_lock = ();
+		for my $i (0 .. 3) {
+			push @suit_lock, $suits[$i] if 1 & ($head[$_bind_s] >> $i);
 		}
+		print join " ", @suit_lock;
+		print ")";
 	}
-	close $fh;
 
-	if($players > 0){
-		return 1;
-	}else {
-		return 0;
+#	print $field_num < 4 ? "<br>状態：$double_names[$field_num]" : "<br>状態：革命";
+
+	print "<br>場札：";
+	for my $i (0 .. $#field_cards) {
+		my ($num, $suit) = &get_card($field_cards[$i]);
+		print " " if $i != 0;
+		print "$suits[$suit]$nums[$num]";
+	}
+
+	print "<br>手札：";
+	my @participants_datas = split /;/, $head[$_participants_datas];
+	for my $i (0 .. $#participants_datas) {
+		my @datas = split /:/, $participants_datas[$i];
+		my @hand_cards = split /,/, $datas[2];
+		my $size = @hand_cards;
+		print "$datas[0]：$size枚 ";
+		print " ";
 	}
 }
 
-sub system_comment{
-	my $s_mes = shift;
-
-	my @lines = ();
-	open my $fh, "+< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
-	eval { flock $fh, 2; };
-	
-	# ｵｰﾄﾘﾝｸ
-	$in{comment} =~ s/([^=^\"]|^)(https?\:[\w\.\~\-\/\?\&\=\@\;\#\:\%]+)/$1<a href=\"link.cgi?$2\" target=\"_blank\">$2<\/a>/g;#"
-	my $head_line = <$fh>;
-	push @lines, $head_line;
-	while (my $line = <$fh>) {
-		push @lines, $line;
-		last if @lines >= $max_log-1;
-	}
-	unshift @lines, "$time<>$date<>システムメッセージ<>0<><>$addr<>$s_mes<>$default_icon<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @lines;
-	close $fh;
-}
-
-sub shuffled_deck{
+sub shuffled_deck {
+	my $participants = shift;
+	my $size = 51; # ｶｰﾄﾞ枚数 54枚 Joker 2枚有
 	my @deck;
-	for my $i (0..51){
-		push @deck, $i;
-	}
-	for my $i (0..51){
-		my $j = int(rand(@deck));
+
+	@deck[$_] = $_+1 for (0 .. $size);
+	for my $i (0 .. $size) {
+		my $j = int(rand($i + 1)); # 周回する度に乱数範囲を広げる
 		my $temp = $deck[$i];
- 		$deck[$i] = $deck[$j];
- 		$deck[$j] = $temp;
+		$deck[$i] = $deck[$j];
+		$deck[$j] = $temp;
 	}
+
+	my $blind_num = 54 % $participants;
+	shift(@deck) for (0 .. $blind_num-1);
+	splice(@deck, int(rand(@deck)), 0, "$_") for (53 .. 54);
+
 	return @deck;
 }
 
-sub print_checkbox{
-    my @num = ('3','4','5','6','7','8','9','10','J','Q','K','A','2'); # 低い順
-    my @suit = $is_mobile ? ('S','H','C','D'):('&#9824','&#9825','&#9827','&#9826');
-	my @hand = &v_to_hj($m{c_value});
-	for my $i(0..$#hand){
-		my $si = $i+1;
-		print qq|<input type="checkbox" name="play_$i" value="1">$si枚目($suit[$hand[$i] / 13] $num[$hand[$i] % 13])を出す|;
-		if($hand[$i] % 13 == 4 || $hand[$i] % 13 == 7){
-			print qq|<select name="sub_$i" class="menu1">|;
-			for my $j(0..$#hand){
-				next if($j == $i);
-				print qq|<option value="$hand[$j]">$suit[$hand[$j] / 13] $num[$hand[$j] % 13]</option>|;
-			}
-			print qq|</select>|;
-		}
-		print qq|<br>|;
+sub get_card {
+	my $card = shift;
+	my ($num, $suit) = ('', '');
+	if ($card == 53 || $card == 54) {
+		($num, $suit) = (13, 4);
 	}
+	else {
+		$num = ($card-1) % 13; # 1～52 の値から -1 したものを 13 で割った余りが 0～12 になる
+		$suit = int(($card-1)/13); # 0ｽﾍﾟｰﾄﾞ 1ﾊｰﾄ 2ｸﾗﾌﾞ 3ﾀﾞｲﾔ
+	}
+	return ($num, $suit);
 }
 
-sub give {
-	my @g_cards = @_;
-	my @members = ();
-	my %sames = ();
-	my $give_flag = 0;
-	my $first_player;
-	my $index = 0;
-	my @g_hands = ();
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mturn == 2){
-			if(!defined($first_player)){
-				$first_player = $index;
-			}
-			if($mname eq $m{name}){
-				my @hand = &v_to_hj($m{c_value});
-				my @my_hand = ();
-
-				for my $i (@hand){
-					my $gc_flag = 1;
-					for my $j (@g_cards){
-						if($i == $j){
-							push @g_hands, $i;
-							$gc_flag = 0;
-							last;
-						}
-					}
-					if($gc_flag){
-						push @my_hand, $i;
-					}
-				}
-				my $m_hands = @my_hand;
-				if($m_hands == 0){
-					$m{c_value} = &win_player;
-					$m{c_turn} = 3;
-					$c_player = '';
-					$bind_s = 0;
-					$bind_h = 0;
-					$bind_c = 0;
-					$bind_d = 0;
-					&system_comment("七上がり");
-				}else{
-					$m{c_value} = &h_to_vj(@my_hand);
-				}
-				&write_user;
-				push @members, "$mtime<>$mname<>$maddr<>$m{c_turn}<>$m{c_value}<>\n";
-				$give_flag = 1;
-			}elsif($give_flag){
-				my @phand = &v_to_hj($mvalue);
-				push @phand, @g_hands;
-				@phand = sort { $a%13 <=> $b%13 || $a/13 <=> $b/13 } @phand;
-				my $d_hand = &h_to_vj(@phand);
-				&regist_you_data($mname,'c_value',$d_hand);
-				push @members, "$mtime<>$mname<>$maddr<>$mturn<>$d_hand<>\n";
-				$give_flag = 0;
-			}else {
-				push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-			}
-		}else {
-			push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-		}
-		$index++;
+sub is_playable {
+	my ($play_cards, $field_cards, $bind_m, $bind_s, $revo) = @_;
+	my @play_cards = split /,/, $play_cards; # 出したｶｰﾄﾞ
+	my @field_cards = split /,/, $field_cards; # 場のｶｰﾄﾞ
+	unless (@field_cards == 0 || @play_cards == @field_cards) { # ｶｰﾄﾞの枚数が揃っていない
+		$mes .= '<p>ﾙｰﾙ違反 出すカードを'. @field_cards .'枚にしてください</p>';
+		return (0, '');
 	}
-	if($give_flag){
-		my $line = $members[$first_player];
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		if($mname ne $m{name}){
-			my @phand = &v_to_hj($mvalue);
-			push @phand, @g_hands;
-			@phand = sort { $a%13 <=> $b%13 || $a/13 <=> $b/13 } @phand;
-			my $d_hand = &h_to_vj(@phand);
-			&regist_you_data($mname,'c_value',$d_hand);
-			$members[$first_player] =  "$mtime<>$mname<>$maddr<>$mturn<>$d_hand<>\n";
-		}
+
+	my @play_card_datas = (); # 出したｶｰﾄﾞの詳細
+	($play_card_datas[$_*2], $play_card_datas[$_*2+1]) = &get_card($play_cards[$_]) for (0 .. $#play_cards);
+	my @field_card_datas = (); # 場のｶｰﾄﾞの詳細
+	($field_card_datas[$_*2], $field_card_datas[$_*2+1]) = &get_card($field_cards[$_]) for (0 .. $#field_cards);
+
+	# 数字縛り
+	my @num = ($play_card_datas[0], $field_card_datas[0]);
+	unless ($revo) {
+#		@num = ;
+		$num[0] = 14 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13;
 	}
-	unshift @members, "$turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-}
-
-sub release {
-	my @g_cards = @_;
-	my @members = ();
-	my %sames = ();
-	my @g_hands = ();
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($turn, $rate, $state_c, $state_n, $c_player, $revolution, $back, $bind_s, $bind_h, $bind_c, $bind_d) = split /<>/, $head_line;
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # 同じ人なら次
-		if($mturn == 2){
-			if($mname eq $m{name}){
-				my @hand = &v_to_hj($m{c_value});
-				my @my_hand = ();
-
-				for my $i (@hand){
-					my $gc_flag = 1;
-					for my $j (@g_cards){
-						if($i == $j){
-							push @g_hands, $i;
-							$gc_flag = 0;
-							last;
-						}
-					}
-					if($gc_flag){
-						push @my_hand, $i;
-					}
-				}
-				my $m_hands = @my_hand;
-				if($m_hands == 0){
-					$m{c_value} = &win_player;
-					$m{c_turn} = 3;
-					$c_player = '';
-					$bind_s = 0;
-					$bind_h = 0;
-					$bind_c = 0;
-					$bind_d = 0;
-					&system_comment("十\上がり");
-				}else{
-					$m{c_value} = &h_to_vj(@my_hand);
-				}
-				&write_user;
-				push @members, "$mtime<>$mname<>$maddr<>$m{c_turn}<>$m{c_value}<>\n";
-				$give_flag = 1;
-			}else {
-				push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
+	else {
+#		@num = ($play_card_datas[0], $field_card_datas[0]);
+		$num[0] = -2 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13;
+		$num[0] = -1 if $play_card_datas[0] == 13;
+		$num[1] = -1 if $field_card_datas[0] == 13;
+=pod
+		my $is_joker = 0;
+		for my $i (0 .. $#play_cards) {
+			if ($play_card_datas[($#play_cards-$i)*2] == 13) {
+				$is_joker = 1;
+				next;
 			}
-		}else {
-			push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
+			else {
+				if ($is_joker) {
+					$num[0] = $play_card_datas[($#play_cards-$i)*2] + 1;
+				}
+				else {
+					$num[0] = $play_card_datas[($#play_cards-$i)*2];
+				}
+				last;
+			}
+		}
+		$mes .= "joker" if $is_joker;
+		$is_joker = 0;
+		for my $i (0 .. $#field_cards) {
+			if ($field_card_datas[($#field_cards-$i)*2] == 13) {
+				$is_joker = 1;
+				next;
+			}
+			else {
+				if ($is_joker) {
+					$num[1] = $field_card_datas[($#field_cards-$i)*2] + 1;
+				}
+				else {
+					$num[1] = $field_card_datas[($#field_cards-$i)*2];
+				}
+				last;
+			}
+		}
+=cut
+	}
+
+	if (0 < @field_cards && $num[$revo] <= $num[!$revo]) { # 革命時は比較対象を入れ替える $revo でｽｲｯﾁ
+		$mes .= '<p>ﾙｰﾙ違反 場札より強いｶｰﾄﾞを出してください</p>';
+		return (0, '');
+	}
+
+	# ｽﾍﾟ3返しはｽｰﾄ縛り無視
+	if (!(@play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13) && $bind_s) {
+		my $play_suits = 0;
+		my @play_suits = ();
+		$play_suits[$play_card_datas[$_*2+1]] = 1 for (0 .. $#play_cards); # 出したｶｰﾄﾞすべてのｽｰﾄを取得
+		$play_suits |= $play_suits[$_] << $_ for (0 .. 3); # ｽｰﾄ情報をビットフラグに変換
+		unless ($bind_s == $play_suits) { # 縛りのビットフラグと同一ではない
+			my $suit_xmatch = $bind_s ^ $play_suits;
+			my $xmatch_num = 0;
+			$xmatch_num += 1 & ($suit_xmatch >> $_) for (0 .. 3);
+
+			my $joker_num = 0;
+			for my $i (0 .. $#play_cards) {
+				$joker_num++ if $play_card_datas[$i*2] == 13;
+			}
+
+			unless (($xmatch_num - $joker_num) == 0) {
+				$mes .= '<p>ﾙｰﾙ違反 場札と同じｽｰﾄのｶｰﾄﾞを出してください</p>';
+				return (0, '');
+			}
 		}
 	}
-	unshift @members, "$turn<>$rate<>$state_c<>$state_n<>$c_player<>$revolution<>$back<>$bind_s<>$bind_h<>$bind_c<>$bind_d<>\n";
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
+
+	my @is_sequence = (); # [0] 出したｶｰﾄﾞが階段か [1] 場のｶｰﾄﾞが階段か
+	my @is_double = (); # [0] 出したｶｰﾄﾞがﾀﾞﾌﾞﾙ以上か [1] 場のｶｰﾄﾞがﾀﾞﾌﾞﾙ以上か
+	if (1 < @play_cards) { # 同位複数枚・階段ﾁｪｯｸ
+		$is_sequence[0] = &is_sequence(@play_card_datas); # 階段ﾁｪｯｸ
+		$is_double[0] = &is_double(@play_card_datas); # 同位札複数枚ﾁｪｯｸ
+		unless ($is_sequence[0] || $is_double[0]) {
+			$mes .= '<p>ﾙｰﾙ違反 複数枚出すときは同位で揃えるか階段にしてください</p>';
+			return (0, '');
+		}
+	}
+	if (0 < @field_cards && (($bind_m == 1 && !$is_double[0]) || ($bind_m == 2 && !$is_sequence[0])) ) {
+		if ($bind_m == 1) {
+			$mes .= (0, '<p>ﾙｰﾙ違反 出すカードを'. @field_cards .'枚にしてください</p>');
+		}
+		else {
+			$mes .= (0, '<p>ﾙｰﾙ違反 出すカードを階段にしてください</p>');
+		}
+		return (0, '');
+	}
+
+	my $result_mes = '';
+	$result_mes .= "$suits[$play_card_datas[$_*2+1]]$nums[$play_card_datas[$_*2]] " for (0 .. $#play_cards);
+	$result_mes .= "を出しました";
+
+	return (1, $result_mes, $is_sequence[0], $is_double[0]);
 }
 
-sub h_to_vj {
-    my $i = 0;
-    my $v = 0;
-    my $k = 1;
-    until ($_[$i] eq ''){
-    	  $v += ($_[$i] + 1) * $k;
-	  $k *= 53;
-	  $i++;
-    }
-    return $v;
+sub is_sequence {
+	my @card_datas = @_;
+	my $size = @card_datas / 2;
+	my $is_sequence = 0;
+
+	if (2 < $size) { # 3枚以上から階段 上限なし
+		my ($is_suit, $is_joker) = (1, 0);
+		my ($e_max, $e_min) = ($card_datas[0*2], $card_datas[1*2]); # 1枚目と2枚目を初期値に
+		my @suit = ();
+		$suit[0] = $card_datas[0*2+1]; # 1枚目のスートを取得
+		for my $i (0 .. $size - 1) { # 最大値と最低値の取得
+			$suit[1] = $card_datas[$i*2+1];
+			$is_joker++ if $suit[1] == 4;
+			if ($is_joker < 1 && $suit[0] != $suit[1]) {
+				$is_suit = 0;
+				last;
+			}
+			next if $is_joker; # ｼﾞｮｰｶｰは最大値として数えない
+			$e_max = $card_datas[$i*2] if $e_max < $card_datas[$i*2];
+			$e_min = $card_datas[$i*2] if $card_datas[$i*2] < $e_min;
+		}
+
+		# 札 4枚 0をｼﾞｮｰｶｰとする 0～2 になる
+		# 4007 = 7 - 4 + 1 = 4
+		# 4060 = 6 - 4 + 1 = 3
+		# 4500 = 5 - 4 + 1 = 2
+		# 札 5枚 0をｼﾞｮｰｶｰとする
+		# 45008 = 8 - 4 + 1 = 5
+		# 45070 = 7 - 4 + 1 = 4
+		# 45600 = 6 - 4 + 1 = 3
+		my $diff = ($e_max - $e_min + 1);
+		if ($is_joker < 2) { # ｼﾞｮｰｶｰが1枚以下含まれる階段
+			if ($is_joker) {							# ｼﾞｮｰｶｰが1枚含まれる階段ならば、
+				my $diff2 = $size - $diff;			# ｶｰﾄﾞ枚数から (最高値 - 最低値 + 1) を引くと 0 ～ 1 になる
+				$is_sequence = 1 if ($diff2 == 0 || $diff2 == 1) && $is_suit; # （最高位をJokerで代替すると 1、下位だと 0）
+			}
+			else { # ｼﾞｮｰｶｰが含まれない階段
+				$is_sequence = 1 if $diff == $size && $is_suit; # (最高値 - 最低値 + 1) == 出した枚数 && スート揃ってる
+			}
+		}
+		else { # ｼﾞｮｰｶｰが2枚含まれる階段
+			if ($size == 3) { $is_sequence = 1; } # ｼﾞｮｰｶｰ以外が1枚しかない階段
+			else {											# ｼﾞｮｰｶｰが2枚含まれる4枚以上の階段ならば、
+				my $diff2 = $size - $diff;				 # 出したｶｰﾄﾞ枚数から (最高値 - 最低値 + 1) を引くと 0 ～ 2 になる
+				$is_sequence = 1 if (-1 < $diff2 && $diff2 < 3) && $is_suit; # （最高位をJokerで代替すると 2、下位になるにつれ 1、0 となる）
+			}
+		}
+	}
+	return $is_sequence;
 }
 
-sub v_to_hj {
-    my $v = $_[0];
-    my $i = 0;
-    my @h = ();
-    until ($v <= 0){
-    	  $h[$i] = ($v % 53) - 1;
-	  $v -= $v % 53;
-	  $v /= 53;
-	  $i++;
-    }
-    return @h;
+sub is_double {
+	my @card_datas = @_;
+	my $size = @card_datas / 2;
+	my $is_double = 1;
+	my @num = ($card_datas[0*2], '');
+	for my $i (0 .. $size - 1) {
+		$num[1] = $card_datas[$i*2];
+		if ($num[1] != 13 && $num[0] != $num[1]) {
+			$is_double = 0;
+			last;
+		}
+	}
+	return $is_double;
 }
 
 1;#削除不可
