@@ -1,6 +1,13 @@
 #================================================
 # 大貧民
 #================================================
+=pod
+ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：ほとんど読めねーですけどざーっと流れ追った感じ、確かに参加する周りが怪しそう (海底都市ﾙﾙｲｴ : 9/1 23:19)
+ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：思い付いたこと3 人数多いと後ろの方のプレイヤーに10分放置がかかる？(ねーか？) (海底都市ﾙﾙｲｴ : 9/1 23:15)
+ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：思い付いたこと2 中断されたプレイの10分放置でリセットかかってないか (海底都市ﾙﾙｲｴ : 9/1 23:13)
+ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：思い付いたこと1 プレイ中に未参加者が親になるボタン押したときのメンバーファイル操作 (海底都市ﾙﾙｲｴ : 9/1 23:12)
+=cut
+
 require './lib/_casino_funcs.cgi';
 
 $header_size = 7; # 大貧民用のﾍｯﾀﾞｰｻｲｽﾞ 親、場のｶｰﾄﾞ、ﾊﾟｽ回数、複数出し・階段の縛り、スート縛り、革命、イレバ
@@ -44,6 +51,25 @@ sub show_started_game { # 始まっているｹﾞｰﾑの表示 参加者かそうでないかは is_membe
 #	&show_status($head[$_participants_datas]) if $head[$_participants];
 #}
 
+=pod
+#================================================
+# 親になるﾌｫｰﾑ
+#================================================
+sub participants_form {
+	# ｶｼﾞﾉ毎の処理
+	print qq|<form method="$method" action="$this_script" name="form">|;
+	print "レート：".&create_select_menu("rate", @rates);
+	print &create_submit("leader", "親になる");
+	print qq|</form>|;
+}
+
+#================================================
+# 親になる処理
+#================================================
+sub leader {
+	&_participate(0, 0, '');
+}
+=cut
 #================================================
 # 参加するﾌｫｰﾑ
 #================================================
@@ -116,7 +142,7 @@ sub start_game {
 		}
 		push @$ref_members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
 	}
-	$head[$_participants] = &change_turn($head[$_participants]) for (0 .. $leader_i-1);#while (!&is_my_turn($head[$_participants], $mname));
+	$head[$_participants] = &change_turn($head[$_participants]) for (0 .. $leader_i-1);
 
 	$$head_line = &h_to_s(@head);
 }
@@ -144,7 +170,7 @@ sub play_form {
 				}
 				$is_joker = 1 if $num == 13;
 #				print qq|<td>|;
-				print &create_check_box("card_$hand_card", "$hand_card", "$suits[$suit]$nums[$num]<br>");
+				print &create_check_box("card_$hand_card", "$hand_card", "$suits[$suit]$nums[$num] を出す<br>");
 #				print qq|</td>|;
 			}
 #			print qq|</tr></table>|;
@@ -179,19 +205,26 @@ sub play {
 	my $is_reset = 0;
 
 	# ｶｼﾞﾉ毎の処理
+	$mes .= "play card get<br>";
 	my @play_cards = ();
 	my $is_joker = 0;
 	for my $i (1 .. 54) {
 		if ($in{"card_$i"}) {
-			$is_joker = 1 if $i == 53 || $i == 54;
+			$is_joker++ if $i == 53 || $i == 54;
 			push @play_cards, $in{"card_$i"} ;
 		}
 	}
+
+	# 謎の強制終了時 ﾌｧｲﾙｵｰﾌﾟﾝから while ﾙｰﾌﾟの間がゴッソリ抜けてる
+	# 同時書き込みでファイルが壊れたとかファイルの中身を読み取れなかったか？
+	# でもこの程度でそんなことになるなら国ファイルもっとヤバいはず
+	#play card get game data open field refresh check header <><><><><><><><><><><><>
 
 	my ($is_playable, $play_mes, $is_sequence, $is_double) = (0, '', 0, 0);
 	my $is_pass = 0;
 	my ($is_eight_cut, $is_s3_cut, $is_pass_cut) = (0, 0, 0);
 
+	$mes .= "game data open<br>";
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
@@ -199,18 +232,21 @@ sub play {
 	my @participants = &get_members($head[$_participants]);
 	my @winners = &get_members($head[$_winner]);
 	my %pass_datas = (); # 参加者のパス情報を持つ
-	my $is_my_turn = $head[$_state] && &is_my_turn($head[$_participants], $m{name}) && 2 <= $m{c_turn}; # 開始しているｹﾞｰﾑに参加していて自分のﾀｰﾝ
+	my $is_my_turn = $head[$_state] && $participants[0] eq $m{name} && 2 <= $m{c_turn}; # 開始しているｹﾞｰﾑに参加していて自分のﾀｰﾝ
 	while (my $line = <$fh>) {
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		if ($is_my_turn && $mname eq $m{name}) {
 			$head[$_lastupdate] = $time;
 			$mtime = $time;
 
+			$mes .= "pass or play check<br>";
 			unless (@play_cards) { # パス
+				$mes .= "pass<br>";
 				$mvalue = 1;
 				$is_pass = 1;
 			}
 			else { # カードを出している
+				$mes .= "play card check<br>";
 				# 出したｶｰﾄﾞすべてが手札にあるか 八切りなどﾀｰﾝを変更しないｶｰﾄﾞを出して「戻る」をし、再度今出した八切りなどﾀｰﾝを変更しないｶｰﾄﾞを再度出せる（同じｶｰﾄﾞを延々出せるだけで実害はない）
 				my $eq_num = 0;
 				my @hand_cards = split /,/, $mstock;
@@ -221,6 +257,8 @@ sub play {
 				}
 				unless ($eq_num == @play_cards) { # 出したｶｰﾄﾞが手札になかったらスルー
 					$mes .= '<p>不正処理 手札にないｶｰﾄﾞを出そうとしています</p>';
+#					$pass_datas{$mname} = $mvalue if 1 < $mturn; # 参加者のﾊﾟｽ情報の取得
+#					$is_reset++ if 1 < $mturn && 1 < $mvalue;
 					push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
 					next;
 				}
@@ -228,18 +266,23 @@ sub play {
 				my $play_cards = join(",", @play_cards);
 
 				# 出したカードがﾙｰﾙに則っているか
+				$mes .= "playable check<br>";
 				($is_playable, $result_mes, $is_sequence, $is_double) = &is_playable($play_cards, $head[$_field_card], $head[$_bind_m], $head[$_bind_s], $head[$_revo]);
 
+				$mes .= "joker check<br>";
 				# ｼﾞｮｰｶｰを含む2枚以上のｶｰﾄﾞ
 				if ($head[$_field_card] eq '' && 1 < @play_cards && $is_joker) {
 					$is_joker = $in{joker}; # 1 複数枚出し 2 階段出し
 					unless ($is_joker) {
 						$mes .= '<p>ﾙｰﾙ違反 ｼﾞｮｰｶｰを出すときは役を宣言してください</p>';
-						($is_playable, $play_mes) = (0, '');
+						($is_playable, $result_mes) = (0, '');
 					}
 				}
 
 				if ($is_playable) { # 出したｶｰﾄﾞがﾙｰﾙ上認められている
+					$mes .= "playable ok<br>";
+
+					$mes .= "multi or sequence check<br>";
 					# 複数枚出し・階段出しの縛り設定
 					if ($head[$_field_card] eq '' && 1 < @play_cards) { # 初手にのみ複数枚などの縛り発生
 						if ($is_joker) {
@@ -252,12 +295,14 @@ sub play {
 						}
 					}
 
+					$mes .= "revolution check<br>";
 					# 革命設定 複数枚出しで革命 階段では発生しない
  					if (3 < @play_cards && $head[$_bind_m] == 1 && !$is_sequence) {
 						$head[$_revo] = !$head[$_revo];
 						$result_mes .= '<br>革命を起こしました';
 					}
 
+					$mes .= "suit check<br>";
 					# ｽｰﾄ縛りの設定 ｼﾞｮｰｶｰが含まれていない場札があり、出したｶｰﾄﾞにもｼﾞｮｰｶｰが含まれていないなら縛りﾁｪｯｸ
 					if ($head[$_bind_s] eq '' && $head[$_field_card] && $head[$_field_card] !~ /53/ && $head[$_field_card] !~ /54/ && $is_joker == 0) {
 						my $is_suit_lock = 1;
@@ -280,8 +325,9 @@ sub play {
 						}
 					}
 
+					$mes .= "eight cut check<br>";
 					# 八切り
-					if ($head[$_bind_m] != 2 || $is_double) {
+					if ($head[$_bind_m] != 2 || $is_double && !$is_sequence) {
 						for my $play_card (@play_cards) {
 							unless ($play_card == 53 || $play_card == 54) {
 								$is_eight_cut = 1 if ($play_card-1) % 13 == 5; # 1～52 の値から -1 したものを 13 で割った余りが 0～12 になる
@@ -289,9 +335,11 @@ sub play {
 						}
 					}
 
+					$mes .= "s3 check<br>";
 					# スペ3返し
-					$is_s3_cut = 1 if (@play_cards == 1 && $play_cards[0] == 1 && ($head[$_field_card] =~ /^53/ || $head[$_field_card] =~ /^54/));
+					$is_s3_cut = 1 if (@play_cards == 1 && $play_cards[0] == 1 && ($head[$_field_card] == 53 || $head[$_field_card] == 54));
 
+					$mes .= "new hand create<br>";
 					my @new_hand_cards = ();
 					for my $hand_card (@hand_cards) {
 						my $is_eq = 0;
@@ -307,6 +355,7 @@ sub play {
 					$mstock = join(",", @new_hand_cards);
 					$head[$_field_card] = $play_cards;
 
+					$mes .= "win check<br>";
 					unless ($mstock) {
 						my $is_find = 0;
 						if ($is_eight_cut || # 八切り上がり
@@ -317,6 +366,7 @@ sub play {
 							($head[$_revo] && (($head[$_field_card]-1) % 13) == 0) || # 革命中の 3 か
 							(!$head[$_revo] && (($head[$_field_card]-1) % 13) == 12) || # 非革命中の 2 か
 							$head[$_field_card] eq '53' || $head[$_field_card] eq '54') ) ) { # ｼﾞｮｰｶｰ
+							$mes .= "taboo win<br>";
 							for my $i (0 .. @participants-1) {
 								unless ($winners[$#participants-$i] || $is_find) {
 									$winners[$#participants-$i] = $m{name};
@@ -327,6 +377,7 @@ sub play {
 							$is_eight_cut = $is_s3_cut = 0;
 						}
 						else {
+							$mes .= "win<br>";
 							for my $i (0 .. $#participants) {
 								unless ($winners[$i] || $is_find) {
 									$winners[$i] = $m{name};
@@ -342,17 +393,21 @@ sub play {
 				}
 			}
 		}
-		$pass_datas{$mname} = $mvalue if 1 < $mturn; # 参加者のﾊﾟｽ情報の取得
-		$is_reset++ if 1 < $mturn && 1 < $mvalue;
+		if ($is_my_turn) {
+			$pass_datas{$mname} = $mvalue if 1 < $mturn; # 参加者のﾊﾟｽ情報の取得
+			$is_reset++ if 1 < $mturn && 1 < $mvalue; # 参加者かつ上がり
+		}
 		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
 	}
 
-	if ($is_playable || $is_pass || $is_eight_cut || $is_s3_cut) {
+	$mes .= "field refresh check<br>";
+	if ($is_my_turn && ($is_playable || $is_pass || $is_eight_cut || $is_s3_cut)) {
 		my $pass_num = 0;
 		my @next_num = (0, 0);
 		my $refresh_num = 0;
 		my $is_find = 0;
 		unless ($is_eight_cut || $is_s3_cut) {
+			$mes .= "turn change1<br>";
 			for my $i (0 .. $#participants) {
 				if ($next_num[0] == 0 && $participants[$i] ne $m{name} && $pass_datas{$participants[$i]} == 0) { # ﾊﾟｽをしていない直近のﾌﾟﾚｲﾔｰ
 					$next_num[0] = $i;
@@ -369,7 +424,8 @@ sub play {
 		}
 
 		$result_mes .= 'パス' if $is_pass;
-		if ( $is_eight_cut || $is_s3_cut || ($is_find && @participants == ($pass_num+$refresh_num+1)) || (@participants == ($pass_num+$refresh_num))) { 
+		if ($is_eight_cut || $is_s3_cut || ($is_find && @participants == ($pass_num+$refresh_num+1)) || (@participants == ($pass_num+$refresh_num))) { 
+			$mes .= "turn change2<br>";
 			($head[$_field_card], $head[$_bind_m], $head[$_bind_s]) = ('', '', '');
 			$result_mes .= '<br>八切り' if $is_eight_cut;
 			$result_mes .= '<br>スペ3返し' if $is_s3_cut;
@@ -380,23 +436,24 @@ sub play {
 				$members[$i] = "$mtime<>$mname<>$maddr<>$mturn<>0<>$mstock<>\n";
 			}
 		}
-		if ($is_find) { # ﾊﾟｽをしていないﾌﾟﾚｲﾔｰがいる
-			$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[0]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
-		}
-		else { # 全員がﾊﾟｽしている
-			$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[1]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
-		}
+
+		# ﾊﾟｽをしていないﾌﾟﾚｲﾔｰがいるなら直近のﾊﾟｽをしていないﾌﾟﾚｲﾔｰのﾀｰﾝ
+		# 全員がﾊﾟｽしているなら直近のﾊﾟｽをしているﾌﾟﾚｲﾔｰのﾀｰﾝ
+		$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[!$is_find]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
 	}
 
 	my $penalty_coin = 0;
-	if ($is_reset == @participants) {
+	if ($is_my_turn && $is_reset == @participants) {
+		$mes .= "reset1<br>";
 		$penalty_coin = $head[$_rate];
 		&init_header(\@head);
 		&reset_members(\@members);
 	}
 	else { $is_reset = 0; }
 
-	unshift @members, &h_to_s(@head); # ﾍｯﾀﾞｰ
+	my $header = &h_to_s(@head);
+	$mes .= "header $header<br>";
+	unshift @members, $header; # ﾍｯﾀﾞｰ
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
@@ -404,6 +461,7 @@ sub play {
 
 	# 終了処理
 	if ($is_reset) {
+		$mes .= "reset2<br>";
 		my $winner_mes = '';
 		my $loser_mes = '';
 		my $move_c = 2 <= (@winners / 2) ? 2 : 1; # 4人以上でｺｲﾝの移動が2回起きる 大富豪<->大貧民 富豪<->貧民 3人以下では 大富豪<->大貧民 の1回
@@ -533,17 +591,15 @@ sub is_playable {
 	my @field_card_datas = (); # 場のｶｰﾄﾞの詳細
 	($field_card_datas[$_*2], $field_card_datas[$_*2+1]) = &get_card($field_cards[$_]) for (0 .. $#field_cards);
 
-	# 数字縛り
+	# 数字縛り 革命関係なくｼﾞｮｰｶｰは常に最強かつｼﾞｮｰｶｰに対してｽﾍﾟ3も強い
 	my @num = ($play_card_datas[0], $field_card_datas[0]);
-	unless ($revo) {
-#		@num = ;
-		$num[0] = 14 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13;
+	unless ($revo) { # 非革命中
+		$num[0] = 14 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13; # ｽﾍﾟ3
 	}
-	else {
-#		@num = ($play_card_datas[0], $field_card_datas[0]);
-		$num[0] = -2 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13;
-		$num[0] = -1 if $play_card_datas[0] == 13;
-		$num[1] = -1 if $field_card_datas[0] == 13;
+	else { # 革命中
+		$num[0] = -2 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13; # ｽﾍﾟ3
+		$num[0] = -1 if $play_card_datas[0] == 13; # 手札のｼﾞｮｰｶｰ
+		$num[1] = -1 if $field_card_datas[0] == 13; # 場のｼﾞｮｰｶｰ
 =pod
 		my $is_joker = 0;
 		for my $i (0 .. $#play_cards) {
@@ -599,10 +655,10 @@ sub is_playable {
 
 			my $joker_num = 0;
 			for my $i (0 .. $#play_cards) {
-				$joker_num++ if $play_card_datas[$i*2] == 13;
+				$joker_num++ if $play_card_datas[$i*2] == 13; # ｼﾞｮｰｶｰの枚数を取得
 			}
 
-			unless (($xmatch_num - $joker_num) == 0) {
+			unless (($xmatch_num - $joker_num) == 0) { # ｽｰﾄ違いの数とｼﾞｮｰｶｰの枚数が同じじゃないならｽｰﾄが違反
 				$mes .= '<p>ﾙｰﾙ違反 場札と同じｽｰﾄのｶｰﾄﾞを出してください</p>';
 				return (0, '');
 			}
