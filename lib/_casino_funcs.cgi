@@ -8,8 +8,8 @@ use constant LEAVE_PLAYER => 2; # 参加者が非ｱｸﾃｨﾌﾞになっている
 $_header_size = 5; # ﾍｯﾀﾞｰ配列のﾍﾞｰｽｻｲｽﾞ
 ($_state, $_lastupdate, $_participants, $_participants_datas, $_rate) = (0 .. $_header_size - 1); # ﾍｯﾀﾞｰ配列のｲﾝﾃﾞｯｸｽ
 
-$limit_think_time = 60 * 10; # 10分放置でﾌﾟﾚｲﾔｰ除外
-$limit_game_time = 60 * 20; # 20分放置でｹﾞｰﾑﾘｾｯﾄ
+$limit_think_time = 10; # 10分放置でﾌﾟﾚｲﾔｰ除外 60 * 10
+$limit_game_time = 20; # 20分放置でｹﾞｰﾑﾘｾｯﾄ 60 * 20
 
 sub init_header {
 	my $ref_arr = shift; # ﾘﾌｧﾚﾝｽは shift じゃないと取得できない（$_だと実体の[0]が取り出される？）
@@ -21,6 +21,13 @@ sub h_to_s { # ﾍｯﾀﾞｰ配列を文字列にして返す
 	my $str = '';
 	$str .= "$arr[$_]<>" for (0 .. $_header_size + $header_size - 1);
 	return "$str\n";
+}
+
+sub d_to_s { # ﾕｰｻﾞｰﾃﾞｰﾀを文字列にして返す
+	my @arr = @_;
+	my $str = '';
+	$str .= "$arr[$_]:" for (0 .. $#arr-1);
+	return "$str$arr[$#arr];";
 }
 
 sub admin_reset {
@@ -158,7 +165,9 @@ sub _default_run {
 	}
 	print qq|</form><font size="2">$member_c人:$member</font><br>|;
 
+	print qq|<font size="3">|;
 	&_show_game_info(@datas);
+	print qq|</font>|;
 
 	print qq|<hr>|;
 	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi ﾌｧｲﾙが開けません");
@@ -194,19 +203,15 @@ sub _get_member {
 	my $head_line = <$fh>;
 	# ｶｼﾞﾉのﾃﾞｰﾀ情報
 	# ｹﾞｰﾑの状態、ｹﾞｰﾑの最終更新時間、ｹﾞｰﾑの参加者、参加者のﾃﾞｰﾀ、ﾚｰﾄ、以降はｶｼﾞﾉ毎のｵﾘｼﾞﾅﾙﾃﾞｰﾀ
-	my @head_datas = split /<>/, $head_line;
+	my @head = split /<>/, $head_line;
+	my $is_no_participants = $head[$_participants] eq '';
 
-	my $is_reset = 0; # 第三者によるﾘｾｯﾄ：GAME_RESET、参加者による脱落確認：LEAVE_PLAYER
-	if (&is_member($head_datas[2], "$m{name}")) { # 参加者によるﾛｰﾄﾞでｹﾞｰﾑの最終更新時間を更新
-		$head_datas[1] = $time;
-	}
-	elsif ($head_datas[1] && $m{c_turn} < 1 && ($head_datas[1] + $limit_game_time < $time) && $head_datas[2] && $head_datas[2] !~ "\Q$m{name},\E") { # 非参加者が止まっているｹﾞｰﾑを閲覧したらﾘｾｯﾄ
-		$is_reset = GAME_RESET;
-		@non_active_players = split /,/, $head_datas[2];
-		$penalty_coin = $head_datas[4] if $head_datas[0]; # すでにｹﾞｰﾑを開始していたらｺｲﾝ没収
-		$is_game = $head_datas[0];
-		$head_datas[$_] = '' for (0 .. $_header_size + $header_size - 1);
-	}
+	# 参加者のﾃﾞｰﾀ順は固定なので常に新規作成
+	# 参加者文字列はﾀｰﾝ順も表すので書き換える必要がある
+	$head[$_participants_datas] = '';
+
+	my $is_member = 0 < $m{c_turn};
+	$mes .= "c_turn $m{c_turn}<br>";
 
 	my %sames = ();
 	my $is_find = 0;
@@ -214,54 +219,50 @@ sub _get_member {
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		next if $sames{$mname}++; # 同じ人なら次
 
-		unless ($head_datas[2]) { # 参加者が一人もいない
+		if ($is_no_participants) { # 参加者がいない
+			push @non_active_players, $mname if $mturn;
 			if ($mname eq $m{name}) {
 				$is_find = 1;
-				push @members, "$time<>$m{name}<>$maddr<>$m{c_turn}<><><>\n";
+				push @members, "$time<>$m{name}<>$maddr<>0<><><>\n";
 				$member .= "$mname($m{c_turn}),";
 			}
 			else {
 				if ($time < $mtime + $limit_member_time) {
-					push @members, "$mtime<>$mname<>$maddr<>$mturn<><><>\n";
+					push @members, "$mtime<>$mname<>$maddr<>0<><><>\n";
 					$member .= "$mname($mturn),";
 				}
 			}
 			next;
 		}
 
-		my $is_entry = &is_member($head_datas[2], "$mname");
 		if ($mname eq $m{name}) {
 			$is_find = 1;
 			$member .= "$mname($m{c_turn}),";
 			push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$mvalue<>$mstock<>\n"; # 自動で脱落するので余計なﾃﾞｰﾀ要らない（他のｶｼﾞﾉ行き来された時にc_turnは必要）
 			($m_turn, $m_value, $m_stock) = ($m{c_turn}, $mvalue, $mstock);
-			if ($is_entry) {
+			if ($is_member) {
 				push @active_players, "$m{name}";
-				$head_datas[3] = &update_member_datas($head_datas[3], $mname, $mvalue, $mstock); # s/(.*?)$name:.*?;(.*)/$1$name:$mvalue:$mstock;$2/;
-#				my $name = unpack 'H*', "$m{name}";
-#				$head_datas[3] =~ s/(.*?)$name:.*?;(.*)/$1$name:$mvalue:$mstock;$2/;
+#				$head[$_participants] .= "$m{name}," if !$head[$_state];
+				$head[$_participants_datas] .= &d_to_s($mname, $mvalue, $mstock);
 			}
 		}
 		else {
+			$mes .= "name $mname<br>";
+			my $is_entry = 0 < $mturn;
+			$mes .= "entry $mturn<br>";
 			# ｱｸﾃｨﾌﾞな参加者とｱｸﾃｨﾌﾞな閲覧者だけ残す
 			if ( ($is_entry && ($time < $mtime + $limit_think_time)) || ($time < $mtime + $limit_member_time) ) {
 				$member .= "$mname($mturn),";
 				push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
 				if ($is_entry) {
 					push @active_players, "$mname";
-					$head_datas[3] = &update_member_datas($head_datas[3], $mname, $mvalue, $mstock); # s/(.*?)$name:.*?;(.*)/$1$name:$mvalue:$mstock;$2/;
-#					my $name = unpack 'H*', "$mname";
-#					$head_datas[3] =~ s/(.*?)$name:.*?;(.*)/$1$name:$mvalue:$mstock;$2/;
+#					$head[$_participants] .= "$mname," if !$head[$_state];
+					$head[$_participants_datas] .= &d_to_s($mname, $mvalue, $mstock);
 				}
 			}
 			else {
-				if ($is_entry && &is_member($head_datas[2], "$m{name}")) { # 参加者を弾けるのは参加者の確認が必要
-#					my $name = unpack 'H*', "$mname";
-					$head_datas[2] = &remove_member($head_datas[2], $mname); # 参加者文字列から非ｱｸﾃｨﾌﾞﾌﾟﾚｲﾔｰを除外
-					$head_datas[3] = &remove_member_datas($head_datas[3], $mname); # 全参加者ﾃﾞｰﾀ文字列から非ｱｸﾃｨﾌﾞﾌﾟﾚｲﾔｰのﾃﾞｰﾀを除外
-
-#					$head_datas[2] =~ s/(.*?)$name,(.*)/$1$2/; # 参加者文字列から非ｱｸﾃｨﾌﾞﾌﾟﾚｲﾔｰを除外
-#					$head_datas[3] =~ s/(.*?)$name:.*?;(.*)/$1$2/; # 全参加者ﾃﾞｰﾀ文字列から非ｱｸﾃｨﾌﾞﾌﾟﾚｲﾔｰのﾃﾞｰﾀを除外
+				if ($is_entry && $is_member) { # 参加者を弾けるのは参加者の確認が必要
+					$head[$_participants] = &remove_member($head[$_participants], $mname); # 参加者文字列から非ｱｸﾃｨﾌﾞﾌﾟﾚｲﾔｰを除外
 					push @non_active_players, "$mname"; # 除外された参加者を追加
 					# ほぼほぼヌメロン用？
 #					$rate = $m{coin} unless $state; # ﾌﾟﾚｲ中でなければ賭け上限を残ったﾌﾟﾚｲﾔｰの全ｺｲﾝに
@@ -270,30 +271,43 @@ sub _get_member {
 		}
 	}
 	unless ($is_find) { # 自分が閲覧者にいないなら追加
-		push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<><><>\n"; # 自動で脱落するので余計なﾃﾞｰﾀ要らない（他のｶｼﾞﾉ行き来された時にc_turnは必要）
-		($m_turn, $m_value, $m_stock) = ($m{c_turn}, '', '');
-		$member .= "$m{name}($m{c_turn}),";
+		push @members, "$time<>$m{name}<>$addr<>0<><><>\n"; # 自動で脱落するので余計なﾃﾞｰﾀ要らない（他のｶｼﾞﾉ行き来された時にc_turnは必要）
+		($m_turn, $m_value, $m_stock) = (0, '', '');
+		$member .= "$m{name}(0),";
+		push @non_active_players, $m{name} if $m{c_turn};
 	}
 
-	if (!$is_reset && @non_active_players > 0) { # GAME_RESETで初期化されておらず、放置ﾌﾟﾚｲﾔｰがいる場合
-		$is_reset = LEAVE_PLAYER;
-		$penalty_coin = $head_datas[4] if $head_datas[0];
-		$is_game = $head_datas[0];
-		if (@active_players == 1 && $is_game) {
-			$head_datas[$_] = '' for (0 .. $_header_size + $header_size - 1);
+	my $is_reset = 0; # 第三者によるﾘｾｯﾄ：GAME_RESET、参加者による脱落確認：LEAVE_PLAYER
+	if (!$is_no_participants) { # 参加者がいる
+		if ($is_member) { # 参加者によるﾛｰﾄﾞでｹﾞｰﾑの最終更新時間を更新
+			$head[$_lastupdate] = $time;
+		}
+		elsif ($head[$_lastupdate] && $m{c_turn} < 1 && ($head[$_lastupdate] + $limit_game_time < $time) && $head[$_participants]) { # 非参加者が止まっているｹﾞｰﾑを閲覧したらﾘｾｯﾄ
+			$is_reset = GAME_RESET;
+			@non_active_players = &get_members($head[$_participants]);
+			$penalty_coin = $head[$_rate] if $head[$_state]; # すでにｹﾞｰﾑを開始していたらｺｲﾝ没収
+			$is_game = $head[$_state];
+			&init_header(\@head);
+			&reset_members(\@members);
+		}
+		if ($is_member && !$is_reset && 0 < @non_active_players) { # GAME_RESETで初期化されておらず、参加者と放置ﾌﾟﾚｲﾔｰがいる場合
+			$is_reset = LEAVE_PLAYER;
+			$penalty_coin = $head[$_rate] if $head[$_state];
+			$is_game = $head[$_state];
+			if (@active_players == 1 && $is_game) {
+				&init_header(\@head);
+				&reset_members(\@members);
+			}
 		}
 	}
 
-	my $header = '';
-	$header .= "$head_datas[$_]<>" for (0 .. $_header_size + $header_size - 1);
-	unshift @members, "$header\n"; # ﾍｯﾀﾞｰ
+	unshift @members, &h_to_s(@head); # ﾍｯﾀﾞｰ
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
 
 	if ($is_reset) { # 放置されたｹﾞｰﾑか放置しているﾌﾟﾚｲﾔｰの片付け
-		my @zeros = (['c_turn', '0'], ['c_value', '0'], ['c_stock', '0']);
 		for my $leave_player (@non_active_players) {
 			# ｹﾞｰﾑﾘｾｯﾄ
 #			if ($is_reset eq GAME_RESET) {
@@ -310,31 +324,38 @@ sub _get_member {
 					&system_comment("募集中の放置ﾌﾟﾚｲﾔｰ$leave_playerを除外しました");
 				}
 			}
-			&regist_you_array($leave_player, @zeros);
+			&regist_you_data($non_active_players[$i], 'c_turn', 0);
 		}
 		if ($is_reset eq GAME_RESET) {
 			&system_comment($is_game ? "放置されたﾌﾟﾚｲ中のｹﾞｰﾑをﾘｾｯﾄしました" : '放置された募集中のｹﾞｰﾑをﾘｾｯﾄしました');
 		}
 		elsif ($is_game && @active_players == 1) {
 			if ($active_players[0] eq $m{name}) {
-				$m{c_turn} = $m{c_value} = $m{c_stock} = '0';
+				$m{c_turn} = '0';
 				&write_user;
 			}
 			else {
-				&regist_you_array($active_players[0], @zeros);
+				&regist_you_data($non_active_players[$i], 'c_turn', 0);
 			}
 			&system_comment("参加者が$active_players[0]だけとなったためｹﾞｰﾑをﾘｾｯﾄしました");
 		}
 	}
-
-#	if (!&is_member($head_datas[2], "$m{name}") && 0 < $m{c_turn}) {
-#		$m{c_turn} = 0;
-#		&write_user;
-#	}
+	elsif ($is_no_participants && @non_active_players) {
+		for my $i (0 .. $#non_active_players) {
+			if ($non_active_players[$i] eq $m{name}) {
+				$m{c_turn} ='0';
+				&write_user;
+			}
+			else {
+				&regist_you_data($non_active_players[$i], 'c_turn', 0);
+			}
+		}
+		&system_comment("何らかの理由によりｹﾞｰﾑがﾘｾｯﾄされました");
+	}
 
 	my $member_c = @members - 1;
 
-	return ($member_c, $member, $m_turn, $m_value, $m_stock, @head_datas);
+	return ($member_c, $member, $m_turn, $m_value, $m_stock, @head);
 }
 
 #================================================
@@ -364,7 +385,13 @@ sub _show_game_info {
 			if ($max_entry <= @participants) { print qq|<br>ｹﾞｰﾑの開始を待っています|; } # 参加者が埋まっている
 			else { # 参加者が埋まっていない
 				if (!$coin_lack && $m{coin} < $head[$_rate]) { print '<br>ｺｲﾝがﾚｰﾄに足りていません'; } # ｺｲﾝが足りていない
-				else { &participate_form(@participants); } # 参加ﾌｫｰﾑ
+				else { &participate_form(@participants); }
+#				elsif ($head[$_participants]) { # 参加ﾌｫｰﾑ
+#					&participate_form;
+#				}
+#				else { # 親ﾌｫｰﾑ
+#					&leader_form;
+#				}
 			}
 		}
 	}
@@ -372,23 +399,23 @@ sub _show_game_info {
 }
 
 #================================================
-# 対人ｶｼﾞﾉに参加する
+# 対人ｶｼﾞﾉの親になる
 #================================================
-sub _participate { # 「参加する」処理
+sub _leader { # 「親になる」処理
 	my ($in_rate, $m_value, $m_stock, $is_rate) = @_;
 
 	my @members = ();
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
-	my ($state, $lastupdate, $participants, $participants_datas, $rate, @datas) = split /<>/, $head_line; # ﾍｯﾀﾞｰ
-	my @participants = split /,/, $participants;
+	my @head = split /<>/, $head_line; # ﾍｯﾀﾞｰ
+	my @participants = &get_members($head[$_participants]);
 	my $is_find = 0;
 	while (my $line = <$fh>) {
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		if ($mname eq $m{name}) {
 			$is_find = 1;
-			if (!$state && @participants < $max_entry) {
+			if (!$head[$_state] && @participants < $max_entry) {
 				($mtime, $mturn, $mvalue, $mstock) = ($time, 1, $m_value, $m_stock);
 				splice(@members, @participants, 0, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n"); # ﾒﾝﾊﾞｰﾌｧｲﾙ上で参加順を表現するために参加者の後ろに移動
 			}
@@ -398,7 +425,7 @@ sub _participate { # 「参加する」処理
 		}
 	}
 	unless ($is_find) { # 長期離席していたなど、ﾒﾝﾊﾞｰﾌｧｲﾙ上から消えていた場合
-		if (!$state && @participants < $max_entry) {
+		if (!$head[$_state] && @participants < $max_entry) {
 			splice(@members, @participants, 0, "$time<>$m{name}<>$addr<>1<>$m_value<>$m_stock<>\n");
 		}
 	}
@@ -408,29 +435,27 @@ sub _participate { # 「参加する」処理
 	if ($max_entry <= @participants) {
 		$is_entry_full = 1;
 	}
-	elsif (&is_member($participants, "$m{name}")) {
+	elsif (0 < $m{c_turn}) {
 		$is_entry = 1;
 	}
 	elsif (!$is_rate && $m{coin} < $rate) {
 		$is_no_coin = 1;
 	}
-	elsif (!$state && $m{c_turn} == 0) { # 募集人数埋まっておらず未参加かつ開始前で対人ｶｼﾞﾉをやっていない
+	elsif (!$head[$_state] && $m{c_turn} == 0) { # 募集人数埋まっておらず未参加かつ開始前で対人ｶｼﾞﾉをやっていない
 		unless ($participants[0]) { # 参加者がいないなら親
-			$rate = $in_rate;
-			$participants .= "$m{name},";
-			$leader_mes = " ﾚｰﾄ:$rate";
-			$lastupdate = $time;
+			$head[$_rate] = $in_rate;
+			$head[$_participants] .= "$m{name},";
+			$leader_mes = " ﾚｰﾄ:$head[$_rate]";
+			$head[$_lastupdate] = $time;
 		}
 		else {
-			$participants .= "$m{name},";
-			$lastupdate = $time;
+			$head[$_participants] .= "$m{name},";
+			$head[$_lastupdate] = $time;
 		}
-		$participants_datas .= "$m{name}:$m_value:$m_stock;";
+		$head[$_participants_datas] .= &d_to_s($m{name}, $m_value, $m_stock);
 	}
 
-	my $header = "$state<>$lastupdate<>$participants<>$participants_datas<>$rate<>";
-	$header .= "$datas[$_]<>" for (0 .. $header_size - 1);
-	unshift @members, "$header\n"; # ﾍｯﾀﾞｰ
+	unshift @members, &h_to_s(@head); # ﾍｯﾀﾞｰ
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
@@ -459,62 +484,156 @@ sub _participate { # 「参加する」処理
 }
 
 #================================================
-# 参加中の対人ｶｼﾞﾉから離れる
+# 参加するﾌｫｰﾑ
 #================================================
-sub _observe { # 「参加しない」処理
+#sub participate_form {
+#	print qq|<form method="$method" action="$this_script" name="form">|;
+#	print &create_submit("participate", "参加する");
+#	print qq|</form>|;
+#}
+
+#================================================
+# 対人ｶｼﾞﾉに参加する
+#================================================
+sub _participate { # 「参加する」処理
+	my ($in_rate, $m_value, $m_stock, @tmp_head) = @_;
+
 	my @members = ();
+	my $is_find = 0;
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
-	my @head_datas = split /<>/, $head_line;
-	my $is_entry = 0;
-	my $me = '';
-	if (!$head_datas[0] && &is_member($head_datas[2], "$m{name}") && $m{c_turn} < 2) { # 参加はしているがｹﾞｰﾑは開始していない
-		$is_entry = 1;
-#		my $name = unpack 'H*', "$m{name}";
-		$head_datas[2] = &remove_member($head_datas[2], $m{name}); # 参加者から除外
-#		$head_datas[2] =~ s/(.*?)$name,(.*)/$1$2/; # 参加者から除外
-		$head_datas[3] = &remove_member_datas($head_datas[3], $m{name}); # 全参加者ﾃﾞｰﾀから除外
-#		$head_datas[3] =~ s/(.*?)$name:.*?;(.*)/$1$2/; # 全参加者ﾃﾞｰﾀから除外
-	}
+	my @head = split /<>/, $head_line; # ﾍｯﾀﾞｰ
+	my @participants = &get_members($head[$_participants]);
+
+	# ｺｲﾝがﾚｰﾄに足りていて募集人数埋まっておらず開始前のｹﾞｰﾑに参加していない
+	my $is_participate = @participants ? ($coin_lack || $head[$_rate] <= $m{coin}) : ($coin_lack || $in_rate <= $m{coin});
+	$is_participate = $is_participate && !$head[$_state] && $m{c_turn} == 0 && @participants < $max_entry;
 
 	while (my $line = <$fh>) {
-		if ($is_entry && $line =~ "\Q$m{name}<>\E") {
-			$me = $line;
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if ($mname eq $m{name}) {
+			$is_find = 1;
+			if ($is_participate) { # 参加条件を満たしている
+				splice(@members, @participants, 0, "$time<>$mname<>$maddr<>1<>$m_value<>$m_stock<>\n"); # ﾒﾝﾊﾞｰﾌｧｲﾙ上で参加順を表現するために参加者の後ろに移動
+			}
+			else { push @members, "$time<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n"; }
+		}
+		else { push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n"; }
+	}
+	unless ($is_find) { # 長期離席していたなど、ﾒﾝﾊﾞｰﾌｧｲﾙ上から消えていた場合
+		splice(@members, @participants, 0, "$time<>$m{name}<>$addr<>1<>$m_value<>$m_stock<>\n") if $is_participate;
+	}
+
+	my $leader_mes = '';
+	if ($is_participate) { # 参加条件を満たしている
+		unless (@participants) { # 参加者がいないなら親
+			# ｹﾞｰﾑ毎のｵﾘｼﾞﾅﾙﾍｯﾀﾞｰを設定
+			$head[$_] = $tmp_head[$_-$_header_size] for ($_header_size .. ($_header_size+$header_size-1));
+
+			$head[$_rate] = $in_rate;
+			$head[$_participants] .= "$m{name},";
+			$leader_mes = " ﾚｰﾄ:$head[$_rate]";
+			$head[$_lastupdate] = $time;
 		}
 		else {
-			push @members, $line;
+			$head[$_participants] .= "$m{name},";
+			$head[$_lastupdate] = $time;
 		}
+		$head[$_participants_datas] .= &d_to_s($m{name}, $m_value, $m_stock);
 	}
-	if ($me) {
-		my @participants = split /,/, $head_datas[2];
-		splice(@members, @participants, 0, $me); # ﾒﾝﾊﾞｰﾌｧｲﾙ上で参加順を表現しているので、席を離れたら参加者の後ろに移動
-	}
-	my $is_reset = 0;
-	unless ($head_datas[2]) { # ﾒﾝﾊﾞｰの最後の一人が席を離れたらﾘｾｯﾄ
-		$is_reset = GAME_RESET;
-		$head_datas[$_] = '' for (0 .. $_header_size + $header_size - 1);
-	}
-	my $header = '';
-	$header .= "$head_datas[$_]<>" for (0 .. $_header_size + $header_size - 1);
-	unshift @members, "$header<>\n";
+
+	unshift @members, &h_to_s(@head); # ﾍｯﾀﾞｰ
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @members;
 	close $fh;
 
-	if ($head_datas[0]) {
+	if ($head[$_state]) {
 		return "すでにｹﾞｰﾑが始まっています";
 	}
-	elsif (!$is_entry) {
+	elsif ($m{c_turn}) {
+		return "すでに参加しています";
+	}
+	elsif ($max_entry <= @participants) {
+		return "すでに参加枠が埋まっています";
+	}
+	elsif (!$coin_lack && $m{coin} < $head[$_rate]) {
+		return "ｺｲﾝがﾚｰﾄに足りていません";
+	}
+	else {
+		$m{c_turn} = 1;
+		&write_user;
+		return "$m{name} が席に着きました$leader_mes";
+	}
+}
+
+#================================================
+# 参加中の対人ｶｼﾞﾉから離れる
+#================================================
+sub _observe { # 「参加しない」処理
+	$mes .= "_observe<br>";
+	my @members = ();
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	my @head = split /<>/, $head_line;
+	my $is_observe = !$head[$_state] && $m{c_turn} == 1; # 募集中のｹﾞｰﾑに参加している
+	my $me = '';
+
+	if ($is_observe) {
+		$head[$_participants] = '';
+		$head[$_participants_datas] = '';
+	}
+
+	while (my $line = <$fh>) {
+		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
+		if (!$head[$_state] && $mturn == 1) { # 募集中のｹﾞｰﾑに参加している
+			if ($m{name} eq $mname) {
+				$me = "$time<>$mname<>$maddr<>0<><><>\n";
+			}
+			else {
+				$head[$_participants] .= "$mname,";
+				$head[$_participants_datas] .= &d_to_s($mname, $mvalue, $mstock);
+				push @members, $line;
+			}
+		}
+		else {
+			push @members, $line;
+		}
+	}
+	my @participants = &get_members($head[$_participants]);
+	if ($me) {
+		splice(@members, @participants, 0, $me); # ﾒﾝﾊﾞｰﾌｧｲﾙ上で参加順を表現しているので、席を離れたら参加者の後ろに移動
+	}
+	elsif ($is_observe) {
+		splice(@members, @participants, 0, "$time<>$m{name}<>$addr<>0<><><>\n"); # ﾒﾝﾊﾞｰﾌｧｲﾙ上で参加順を表現しているので、席を離れたら参加者の後ろに移動
+	}
+
+	my $is_reset = 0;
+	unless ($head[$_participants]) { # ﾒﾝﾊﾞｰの最後の一人が席を離れたらﾘｾｯﾄ
+		$is_reset = GAME_RESET;
+		&init_header(\@head);
+	}
+
+	unshift @members, &h_to_s(@head);
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	if ($head[$_state]) {
+		return "すでにｹﾞｰﾑが始まっています";
+	}
+	elsif ($m{c_turn} == 0) {
 		return "ｹﾞｰﾑに参加していません";
 	}
 	else {
-		$m{c_turn} = 0; # $m{c_value} = $m{c_stock} = '0';
+		$m{c_turn} = 0;
 		&write_user;
 		my $result_mes = "$m{name} が席を離れました";
 		if ($is_reset eq GAME_RESET) {
-			&system_comment('参加者不在のためｹﾞｰﾑをﾘｾｯﾄしました');
+			&system_comment("$m{name} が席を離れたためｹﾞｰﾑをﾘｾｯﾄしました");
 			$result_mes = '';
 		}
 		return $result_mes;
@@ -551,6 +670,7 @@ sub _start_game {
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
+	my @old_head = split /<>/, $head_line;
 
 	# ﾌｧｲﾙﾊﾝﾄﾞﾙ、ﾍｯﾀﾞｰ、全ﾌﾟﾚｲﾔｰ、全参加者
 	&start_game($fh, \$head_line, \@members, \@game_members);
@@ -561,16 +681,19 @@ sub _start_game {
 	print $fh @members;
 	close $fh;
 
-	for my $game_member (@game_members) {
-		if ($game_member eq $m{name}) {
-			$m{c_turn} = 2;
-			&write_user;
-		}
-		else {
-	 		&regist_you_data($game_member, 'c_turn', '2');
+
+	if (!$old_head[$_state]) {
+		for my $game_member (@game_members) {
+			if ($game_member eq $m{name}) {
+				$m{c_turn} = 2;
+				&write_user;
+			}
+			else {
+		 		&regist_you_data($game_member, 'c_turn', '2');
+			}
 		}
 	}
-	return '勝負！';
+	return '勝負！' if !$old_head[$_state];
 }
 
 #================================================
@@ -853,7 +976,7 @@ sub remove_member {
 	my @game_members = &get_members($game_members);
 	my $new_game_members = '';
 	for my $i (0 .. $#game_members) {
-		$new_game_members .= "$game_members[$i]," if $game_members[$i] ne $remove_name
+		$new_game_members .= "$game_members[$i]," if $game_members[$i] ne $remove_name;
 	}
 	return $new_game_members;
 }

@@ -6,11 +6,21 @@
 ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：思い付いたこと3 人数多いと後ろの方のプレイヤーに10分放置がかかる？(ねーか？) (海底都市ﾙﾙｲｴ : 9/1 23:15)
 ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：思い付いたこと2 中断されたプレイの10分放置でリセットかかってないか (海底都市ﾙﾙｲｴ : 9/1 23:13)
 ブオーン[★★ｴﾆｯｷﾏｽﾀｰ]：思い付いたこと1 プレイ中に未参加者が親になるボタン押したときのメンバーファイル操作 (海底都市ﾙﾙｲｴ : 9/1 23:12)
+1<>1504707895<>ブオーン,ムラビトＮ,ムクガイヤ,すこ,<>ムラビトＮ:0:32,8;ムクガイヤ:0:15,41,43,34,36,37;すこ:1:27,5,31,44,10,23,49,11,26,53;<>0<>ムクガイヤ<>16<><><>2<>1<><>
+
+play card get
+game data open
+pass or play check
+pass
+field refresh check
+turn change1
+turn change2
+header 1<>1504793392<>ぶぶお,すこ,ｱﾙﾋﾞｽ,ムラビトＮ,su-,<>ｱﾙﾋﾞｽ:1:3,29,17,19,20,47,9,36,54;ムラビトＮ:0:16,18,11;su-:1:15,8,13,53;ぶぶお:0:1,42,43,31,45,46,10,12,38;すこ:1:2,41,32,37,25,39;<>0<>su-<><><><><><><> 
 =cut
 
 require './lib/_casino_funcs.cgi';
 
-$header_size = 7; # 大貧民用のﾍｯﾀﾞｰｻｲｽﾞ 親、場のｶｰﾄﾞ、ﾊﾟｽ回数、複数出し・階段の縛り、スート縛り、革命、イレバ
+$header_size = 7; # 大貧民用のﾍｯﾀﾞｰｻｲｽﾞ 親、場のｶｰﾄﾞ、勝者、複数出し・階段の縛り、スート縛り、革命、イレバ
 ($_leader, $_field_card, $_winner, $_bind_m, $_bind_s, $_revo, $_back) = ($_header_size .. $_header_size + $header_size - 1); # ﾍｯﾀﾞｰ配列のｲﾝﾃﾞｯｸｽ
 $coin_lack = 0; # 0 ｺｲﾝがﾚｰﾄに足りないと参加できない 1 ｺｲﾝがﾚｰﾄに足りなくても参加できる
 $min_entry = 2; # 最低2人
@@ -44,7 +54,6 @@ sub show_started_game { # 始まっているｹﾞｰﾑの表示 参加者かそうでないかは is_membe
 	}
 	&show_status(@head);
 	&play_form($m_turn, $m_value, $m_stock, $head[$_participants], $head[$_field_card], $head[$_winner]) if &is_member($head[$_participants], "$m{name}"); # ｹﾞｰﾑに参加している
-#	&show_members_hand($head[$_participants_datas]);
 }
 #sub show_tale_info { # 定義してなくても動作に問題ない
 #	my ($m_turn, $m_value, $m_stock, @head) = @_;
@@ -124,14 +133,14 @@ sub start_game {
 			${"card_$_"} = '' for (0 .. 13);
 			for my $i (0 .. $#{$cards[$c]}) {
 				my $j = ${$cards[$c]}[$i];
-				if ($j == 53 || $j == 54) {
+				if ($j == 53 || $j == 54) { # ｶｰﾄﾞをﾗﾝｸ順にｿｰﾄ ﾗﾝｸ毎に変数に格納し最後に1つに結合
 					${"card_13"} .= "$j,";
 				}
 				else {
 					${"card_".($j-1)%13} .= "$j,";
 				}
 			}
-			$mstock .= ${"card_$_"} for (0 .. 13);
+			$mstock .= ${"card_$_"} for (0 .. 13); # 1つに結合
 			($mtime, $mturn) = ($time, 2);
 			if ($leader_i == $c) { # ﾀﾞｲﾔの3を持っている参加者を一番に移動
 				$head[$_leader] = $mname;
@@ -160,20 +169,11 @@ sub play_form {
 		print "<br>手札：".@hand_cards."枚<br>";
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		unless (0 < $m_value && 0 < $pass) {
-#			my $old_suit = -1;
-#			print qq|<table border="0"><tr>|;
 			for my $hand_card (@hand_cards) {
 				my ($num, $suit) = &get_card($hand_card);
-				if ($old_suit != $suit) {
-					$old_suit = $suit;
-#					print qq|</tr><tr>|;
-				}
 				$is_joker = 1 if $num == 13;
-#				print qq|<td>|;
 				print &create_check_box("card_$hand_card", "$hand_card", "$suits[$suit]$nums[$num] を出す<br>");
-#				print qq|</td>|;
 			}
-#			print qq|</tr></table>|;
 			if ($field_cards eq '' && $is_joker) { # 場札がなく、手札にｼﾞｮｰｶｰがあるとき
 				print &create_radio_button('joker', 1, '複数枚出し');
 				print ' ';
@@ -218,7 +218,7 @@ sub play {
 	# 謎の強制終了時 ﾌｧｲﾙｵｰﾌﾟﾝから while ﾙｰﾌﾟの間がゴッソリ抜けてる
 	# 同時書き込みでファイルが壊れたとかファイルの中身を読み取れなかったか？
 	# でもこの程度でそんなことになるなら国ファイルもっとヤバいはず
-	#play card get game data open field refresh check header <><><><><><><><><><><><>
+	# play card get game data open field refresh check header <><><><><><><><><><><><>
 
 	my ($is_playable, $play_mes, $is_sequence, $is_double) = (0, '', 0, 0);
 	my $is_pass = 0;
@@ -524,8 +524,6 @@ sub show_status {
 		print ")";
 	}
 
-#	print $field_num < 4 ? "<br>状態：$double_names[$field_num]" : "<br>状態：革命";
-
 	print "<br>場札：";
 	for my $i (0 .. $#field_cards) {
 		my ($num, $suit) = &get_card($field_cards[$i]);
@@ -557,9 +555,10 @@ sub shuffled_deck {
 		$deck[$j] = $temp;
 	}
 
+	# ﾌﾞﾗｲﾝﾄﾞｶｰﾄﾞ 参加者全員が同じ手札枚数になるように調節
 	my $blind_num = 54 % $participants;
 	shift(@deck) for (0 .. $blind_num-1);
-	splice(@deck, int(rand(@deck)), 0, "$_") for (53 .. 54);
+	splice(@deck, int(rand(@deck)), 0, "$_") for (53 .. 54); # ｼﾞｮｰｶｰは除外対象から外れる
 
 	return @deck;
 }
@@ -586,12 +585,12 @@ sub is_playable {
 		return (0, '');
 	}
 
-	my @play_card_datas = (); # 出したｶｰﾄﾞの詳細
+	my @play_card_datas = (); # 出したｶｰﾄﾞの詳細 [0]1枚目のﾗﾝｸ [1]1枚目のｽｰﾄ [2]2枚目のﾗﾝｸ [3]2枚目のｽｰﾄ ...
 	($play_card_datas[$_*2], $play_card_datas[$_*2+1]) = &get_card($play_cards[$_]) for (0 .. $#play_cards);
-	my @field_card_datas = (); # 場のｶｰﾄﾞの詳細
+	my @field_card_datas = (); # 場のｶｰﾄﾞの詳細 [0]1枚目のﾗﾝｸ [1]1枚目のｽｰﾄ [2]2枚目のﾗﾝｸ [3]2枚目のｽｰﾄ ...
 	($field_card_datas[$_*2], $field_card_datas[$_*2+1]) = &get_card($field_cards[$_]) for (0 .. $#field_cards);
 
-	# 数字縛り 革命関係なくｼﾞｮｰｶｰは常に最強かつｼﾞｮｰｶｰに対してｽﾍﾟ3も強い
+	# 数字縛り 革命関係なくｼﾞｮｰｶｰは常に最強かつｼﾞｮｰｶｰに対してはｽﾍﾟ3が最も強い
 	my @num = ($play_card_datas[0], $field_card_datas[0]);
 	unless ($revo) { # 非革命中
 		$num[0] = 14 if @play_cards == 1 && $play_card_datas[0] == 0 && $play_card_datas[1] == 0 && $field_card_datas[0] == 13; # ｽﾍﾟ3
@@ -699,7 +698,7 @@ sub is_sequence {
 
 	if (2 < $size) { # 3枚以上から階段 上限なし
 		my ($is_suit, $is_joker) = (1, 0);
-		my ($e_max, $e_min) = ($card_datas[0*2], $card_datas[1*2]); # 1枚目と2枚目を初期値に
+		my ($max, $min) = ($card_datas[0*2], $card_datas[1*2]); # 1枚目と2枚目を初期値に
 		my @suit = ();
 		$suit[0] = $card_datas[0*2+1]; # 1枚目のスートを取得
 		for my $i (0 .. $size - 1) { # 最大値と最低値の取得
@@ -710,8 +709,8 @@ sub is_sequence {
 				last;
 			}
 			next if $is_joker; # ｼﾞｮｰｶｰは最大値として数えない
-			$e_max = $card_datas[$i*2] if $e_max < $card_datas[$i*2];
-			$e_min = $card_datas[$i*2] if $card_datas[$i*2] < $e_min;
+			$max = $card_datas[$i*2] if $max < $card_datas[$i*2];
+			$min = $card_datas[$i*2] if $card_datas[$i*2] < $min;
 		}
 
 		# 札 4枚 0をｼﾞｮｰｶｰとする 0～2 になる
@@ -722,21 +721,21 @@ sub is_sequence {
 		# 45008 = 8 - 4 + 1 = 5
 		# 45070 = 7 - 4 + 1 = 4
 		# 45600 = 6 - 4 + 1 = 3
-		my $diff = ($e_max - $e_min + 1);
+		my $diff = ($max - $min + 1);
 		if ($is_joker < 2) { # ｼﾞｮｰｶｰが1枚以下含まれる階段
 			if ($is_joker) {							# ｼﾞｮｰｶｰが1枚含まれる階段ならば、
 				my $diff2 = $size - $diff;			# ｶｰﾄﾞ枚数から (最高値 - 最低値 + 1) を引くと 0 ～ 1 になる
-				$is_sequence = 1 if ($diff2 == 0 || $diff2 == 1) && $is_suit; # （最高位をJokerで代替すると 1、下位だと 0）
+				$is_sequence = (($diff2 == 0 || $diff2 == 1) && $is_suit); # （最高位をJokerで代替すると 1、下位だと 0）
 			}
 			else { # ｼﾞｮｰｶｰが含まれない階段
-				$is_sequence = 1 if $diff == $size && $is_suit; # (最高値 - 最低値 + 1) == 出した枚数 && スート揃ってる
+				$is_sequence = ($diff == $size && $is_suit); # (最高値 - 最低値 + 1) == 出した枚数 && スート揃ってる
 			}
 		}
 		else { # ｼﾞｮｰｶｰが2枚含まれる階段
 			if ($size == 3) { $is_sequence = 1; } # ｼﾞｮｰｶｰ以外が1枚しかない階段
 			else {											# ｼﾞｮｰｶｰが2枚含まれる4枚以上の階段ならば、
 				my $diff2 = $size - $diff;				 # 出したｶｰﾄﾞ枚数から (最高値 - 最低値 + 1) を引くと 0 ～ 2 になる
-				$is_sequence = 1 if (-1 < $diff2 && $diff2 < 3) && $is_suit; # （最高位をJokerで代替すると 2、下位になるにつれ 1、0 となる）
+				$is_sequence = ((-1 < $diff2 && $diff2 < 3) && $is_suit); # （最高位をJokerで代替すると 2、下位になるにつれ 1、0 となる）
 			}
 		}
 	}

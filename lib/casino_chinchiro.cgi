@@ -36,7 +36,7 @@ sub show_game_info { # 親やﾍﾞｯﾄ額などの表示 参加者より前に表示される
 #sub show_start_info { } # 募集中のｹﾞｰﾑに参加しているﾌﾟﾚｲﾔｰに表示したい情報 _start_game_form の上に表示される 定義してなくても動作に問題ない
 sub show_started_game { # 始まっているｹﾞｰﾑの表示 参加者かそうでないかは is_member で判別し切り替える
 	my ($m_turn, $m_value, $m_stock, @head) = @_;
-	&play_form($m_turn, $m_value, $m_stock, $head[$_participants], $head[$_leader]) if &is_member($head[$_participants], "$m{name}"); # ｹﾞｰﾑに参加している
+	&play_form($m_turn, $m_value, $m_stock, $head[$_participants_datas], $head[$_leader]); # ｹﾞｰﾑに参加している
 }
 sub show_tale_info { # 定義してなくても動作に問題ない
 	my ($m_turn, $m_value, $m_stock, @head) = @_;
@@ -68,7 +68,7 @@ sub participate {
 	close $fh;
 	my @head = split /<>/, $head_line; # ﾍｯﾀﾞｰ
 	$in{bet} = $head[$_rate] if $head[$_rate] && $head[$_rate] < $in{bet};
-	&_participate($in{bet}, '', $in{bet}, 1);
+	&_participate($in{bet}, '', $in{bet});
 }
 
 #================================================
@@ -82,7 +82,6 @@ sub start_game {
 
 	if ($min_entry <= @participants && @participants <= $max_entry && !$head[$_state] && &is_member($head[$_participants], "$m{name}") && $m{c_turn} == 1) { # 参加者が必要十分、ｹﾞｰﾑ開始前なら
 		($is_start, $head[$_state], $head[$_lastupdate], $head[$_leader]) = (1, 1, $time, $participants[0]);
-		$head[$_participants] = &change_turn($head[$_participants]); # 親の行動がラストなのでｹﾞｰﾑ開始時に末尾へ移動
 	}
 	while (my $line = <$fh>) {
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
@@ -100,15 +99,21 @@ sub start_game {
 # ﾌﾟﾚｲのﾌｫｰﾑ 基本ｶｼﾞﾉ毎に丸々書き換える必要がある
 #================================================
 sub play_form {
-	my ($m_turn, $m_value, $m_stock, $participants) = @_;
-	my @participants = &get_members($participants);
+	my ($m_turn, $m_value, $m_stock, $participants_datas, $leader) = @_;
 
-	if ($participants[0] eq $m{name}) {
+	my $diced_num = 0;
+	my @participants_datas = split /;/, $participants_datas;
+	for my $i (0 .. $#participants_datas) {
+		my @datas = split /:/, $participants_datas[$i];
+		$diced_num++ if $datas[1] ne '';
+	}
+
+	if ( 1 < $m_turn && $m_turn < 5 && ($leader ne $m{name} || $diced_num == (@participants_datas-1)) ) {
 		print qq|<form method="$method" action="$this_script" name="form">|;
 		print &create_submit("play", "ｻｲｺﾛを振る");
 		print qq|</form>|;
 	}
-	else { print qq|<br>$participants[0]がﾌﾟﾚｲ中です<br>|; }
+	else { print qq|<br>| }
 }
 
 #================================================
@@ -127,7 +132,14 @@ sub play {
 	my $head_line = <$fh>;
 	my @head = split /<>/, $head_line; # ﾍｯﾀﾞｰ
 	my @participants = split /,/, $head[$_participants];
-	my $is_my_turn = $head[$_state] && &is_my_turn($head[$_participants], $m{name}) && 2 <= $m{c_turn}; # 開始しているｹﾞｰﾑに参加していて自分のﾀｰﾝ ﾁﾝﾁﾛﾘﾝはｻｲｺﾛの振れる数も含む 2 + 3
+	my $diced_num = 0;
+	my @participants_datas = split /;/, $head[$_participants_datas];
+	for my $i (0 .. $#participants_datas) {
+		my @datas = split /:/, $participants_datas[$i];
+		$diced_num++ if $datas[1] ne '';
+	}
+
+	my $is_my_turn = $head[$_state] && 1 < $m{c_turn} && $m{c_turn} < 5 && ($leader ne $m{name} || $diced_num == (@participants_datas-1)); # 開始しているｹﾞｰﾑに参加していて自分のﾀｰﾝ ﾁﾝﾁﾛﾘﾝはｻｲｺﾛの振れる数も含む 2 + 3
 	while (my $line = <$fh>) {
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		if ($is_my_turn && $mname eq $m{name}) {
@@ -137,7 +149,11 @@ sub play {
 			if (5 <= $m{c_turn}) { $result_mes = 'もう振れません'; } # ｻｲｺﾛ振る度にﾀｰﾝ数+1 2 を 0 とし 3 個ｻｲｺﾛ振るので 5
 			else {
 				$is_play = 1;
-				my @d_set = (int(rand(6)+1), int(rand(6)+1), int(rand(6)+1));
+				my @d_set = ();
+				$d_set[0] = int(rand(6)+1);
+				$d_set[1] = int(rand(6)+1);
+				$d_set[2] = int(rand(6)+1);
+
 				@d_set = sort {$a <=> $b} @d_set;
 				if ($d_set[0] == $d_set[1]) {
 					$mvalue = $d_set[2];
@@ -173,13 +189,16 @@ sub play {
 					&init_header(\@head);
 				}
 				else {
-					$head[$_participants] = &change_turn($head[$_participants]) if 5 <= $mturn; # ｻｲｺﾛを 3 個振ったらﾀｰﾝ交代
 					$n = $n == 3 ? 'ラスト' : $n . ' 投目';
 				}
 				$result_mes = "$n $d_set[0],$d_set[1],$d_set[2]";
 			}
 		}
 		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>$mstock<>\n";
+	}
+
+	if ($is_play && $m{name} eq $tmp_leader && $m{c_turn} == 5) {
+		&reset_members(\@members);
 	}
 
 	unshift @members, &h_to_s(@head); # ﾍｯﾀﾞｰ
