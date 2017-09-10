@@ -32,8 +32,7 @@ my @rank_status = (
     ['wiki','wiki—p',0],
 #    ['mil_sum','ŒR–',1],
 );
-=pod
-=cut
+
 #=================================================
 &decode;
 &header;
@@ -146,7 +145,7 @@ sub run {
 #=================================================
 sub update_player_ranking  {
 #	my $t0 = [gettimeofday];
-	for my $i(1..10){
+	for my $i(1..10){
 		my $to_file_name;
 		my $old_year = 10 - $i;
 		my $old_file_name = $this_file;
@@ -418,18 +417,18 @@ sub output_wiki{
 	open my $fh, "< $this_file" or &error("$this_fileÌ§²Ù‚ª“Ç‚İ‚ß‚Ü‚¹‚ñ");
 	my $year = $line = <$fh>;
 	chomp($year);
-	my @datas;
+	my @datas = ();
 	while ($line = <$fh>) {
-		my($index,$number,$name,$country) = split /<>/, $line;
+		my($index, $number, $name, $country) = split /<>/, $line;
 
 		#–¼‘O‚©‚ç`‚©‚çÅ‚à’D‚Á‚½‚ÌÒ¯¾°¼Ş‚ğíœ
-		if($index == 0){
+		if ($index == 0) {
 			my ($name_part, $mes_part) = split /\s+/,$name;
 			$name = $name_part;
 		}
 
 		#‹ó—“‚ğ–„‚ß‚é
-		if($name eq ""){
+		if ($name eq "") {
 			$number = $empty_character;
 			$name = $empty_character;
 		}
@@ -440,15 +439,13 @@ sub output_wiki{
 
 	#@rank_status‚ÌƒL[‚©‚ç”’l+–¼‘O‚Ì“ñ‚ÂƒZƒbƒg‚ğo—Í
 	my $set = sub {
-		my $key = @_[0];
-		foreach my $index (0 .. $#rank_status){
-			if (@rank_status[$index][0] == $key)
-
+		my $key = $_[0];
+		for my $index (0 .. $#rank_status) {
+			if ($rank_status[$index][0] eq $key) {
 				# Ÿ—¦‚Í¬”“_‰º3Œ…‚ÅŒ…”•\¦
-				if ($key == "win" && $datas['number'] != $empty_character)
-					$datas['number'] = sprintf("%.3f",$datas['number']);
-
+				$datas['number'] = sprintf("%.3f",$datas['number']) if ($key eq "win" && $datas['number'] ne $empty_character);
 				return "$right:\'\'$datas[$index]{'number'}\'\'|$center:[[$datas[$index]{name}]]|";
+			}
 		}
 	};
 
@@ -477,7 +474,7 @@ sub output_wiki{
 	print $set->("pro");
 	print "\n";
 
-	print "~|~|";
+	print "|~|";
 	print $set->("gou");
 	print $set->("cho");
 	print $set->("sen");
@@ -485,7 +482,7 @@ sub output_wiki{
 	print $set->("kou");
 	print "\n";
 
-	print "~|~|";
+	print "|~|";
 	print $set->("gou_t");
 	print $set->("cho_t");
 	print $set->("sen_t");
@@ -499,10 +496,10 @@ sub output_wiki{
 	print qq|<p>1”N×İ·İ¸ŞÍ¯ÀŞ°</p>|;
 	print qq|<textarea name="comment" cols="80" rows="5" class="textarea1">|;
 
-	print "|BGCOLOR(#CFF):CENTER:''”N''|>|BGCOLOR(#FCC):CENTER:''’D‘—Í''|>|BGCOLOR(#FCC):CENTER:''Ÿ—¦''|>|BGCOLOR(#CCC):CENTER:''‹‹—¿''|>|BGCOLOR(#CCC):CENTER:''‹~o''|>|BGCOLOR(#CCC):CENTER:''’E–''|";
-	print "|BGCOLOR(#CFF):CENTER:''î¨''|>|BGCOLOR(#CFC):CENTER:''”_‹Æ''|>|BGCOLOR(#CFC):CENTER:''¤‹Æ''|>|BGCOLOR(#CFC):CENTER:''’¥•º''|>|BGCOLOR(#CCC):CENTER:''’âí''|>|BGCOLOR(#CCC):CENTER:''—FD''|";
-	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D''|>|BGCOLOR(#CCF):CENTER:''’³•ñ''|>|BGCOLOR(#CCF):CENTER:''ô”]''|>|BGCOLOR(#CCF):CENTER:''‹UŒv''|>|BGCOLOR(#CCF):CENTER:''Ué''|";
-	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’³•ñ(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''ô”](—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’ã@''|>|BGCOLOR(#CCC):CENTER:''‘’{''|"
+	print "|BGCOLOR(#CFF):CENTER:''”N''|>|BGCOLOR(#FCC):CENTER:''’D‘—Í''|>|BGCOLOR(#FCC):CENTER:''Ÿ—¦''|>|BGCOLOR(#CCC):CENTER:''‹‹—¿''|>|BGCOLOR(#CCC):CENTER:''‹~o''|>|BGCOLOR(#CCC):CENTER:''’E–''|\n";
+	print "|BGCOLOR(#CFF):CENTER:''î¨''|>|BGCOLOR(#CFC):CENTER:''”_‹Æ''|>|BGCOLOR(#CFC):CENTER:''¤‹Æ''|>|BGCOLOR(#CFC):CENTER:''’¥•º''|>|BGCOLOR(#CCC):CENTER:''’âí''|>|BGCOLOR(#CCC):CENTER:''—FD''|\n";
+	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D''|>|BGCOLOR(#CCF):CENTER:''’³•ñ''|>|BGCOLOR(#CCF):CENTER:''ô”]''|>|BGCOLOR(#CCF):CENTER:''‹UŒv''|>|BGCOLOR(#CCF):CENTER:''Ué''|\n";
+	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’³•ñ(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''ô”](—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’ã@''|>|BGCOLOR(#CCC):CENTER:''‘’{''|\n";
 	print "|>|>|>|>|>|>|>|>|>|>||";
 	print "</textarea>";
 
