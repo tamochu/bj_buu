@@ -434,10 +434,18 @@ sub output_wiki{
 	}
 	close $fh;
 
-	#”’l+–¼‘O‚Ì“ñ‚ÂƒZƒbƒg‚ğƒCƒ“ƒfƒbƒNƒX‚Åw’è‚µ‚Äo—Í
+	#@rank_status‚ÌƒL[‚©‚ç”’l+–¼‘O‚Ì“ñ‚ÂƒZƒbƒg‚ğo—Í
 	my $set = sub {
-		my $index = @_[0];
-		return "$right:\'\'$datas[$index]{'number'}\'\'|$center:[[$datas[$index]{name}]]|";
+		my $key = @_[0];
+		foreach my $index (0 .. $#rank_status){
+			if (@rank_status[$index][0] == $key)
+
+				# Ÿ—¦‚Í¬”“_‰º3Œ…‚ÅŒ…”•\¦
+				if ($key == "win")
+					$datas['number'] = sprintf("%.3f",$datas['number']);
+
+				return "$right:\'\'$datas[$index]{'number'}\'\'|$center:[[$datas[$index]{name}]]|";
+		}
 	};
 
 	my $touitu_file = "$logdir/legend/touitu.cgi";
@@ -450,36 +458,48 @@ sub output_wiki{
 	#”z’u
 	print qq|<textarea name="comment" cols="80" rows="5" class="textarea1">|;
 	print "|$center:\'\'$year”N\'\'|";
-	print $set->(0);
-	print $set->(1);
-	print $set->(2);
-	print $set->(3);
-	print $set->(11);
+	print $set->("strong");
+	print $set->("win");
+	print $set->("sal");
+	print $set->("res");
+	print $set->("esc");
 	print "\n";
 
 	print "|$center:\'\'$prev_world\'\'|";
-	print "~|~|";
-	print $set->(4);
-	print $set->(5);
-	print $set->(6);
-	print $set->(10);
+	print $set->("nou");
+	print $set->("sho");
+	print $set->("hei");
+	print $set->("stop");
+	print $set->("pro");
 	print "\n";
 
-	print "|~|";
 	print "~|~|";
-	print $set->(7);
-	print $set->(8);
-	print $set->(9);
-	print $set->(16);
+	print $set->("gou");
+	print $set->("cho");
+	print $set->("sen");
+	print $set->("gik");
+	print $set->("kou");
+	print "\n";
+
+	print "~|~|";
+	print $set->("gou_t");
+	print $set->("cho_t");
+	print $set->("sen_t");
+	print $set->("tei");
+	print $set->("dai");
 	print "\n";
 	print "|>|>|>|>|>|>|>|>|>|>||";
 	print "</textarea>";
+
 
 	print qq|<p>1”N×İ·İ¸ŞÍ¯ÀŞ°</p>|;
 	print qq|<textarea name="comment" cols="80" rows="5" class="textarea1">|;
-	print "|BGCOLOR(#CFF):CENTER:''”N''|>|BGCOLOR(#FCC):CENTER:''’D‘—Í''|>|BGCOLOR(#CFC):CENTER:''”_‹Æ''|>|BGCOLOR(#CFC):CENTER:''¤‹Æ''|>|BGCOLOR(#CFC):CENTER:''’¥•º''|>|BGCOLOR(#FCC):CENTER:''‹~o''|\n";
-	print "|BGCOLOR(#CFF):CENTER:''î¨''|~|~|>|BGCOLOR(#CCF):CENTER:''‹­’D''|>|BGCOLOR(#CCF):CENTER:''’³•ñ''|>|BGCOLOR(#CCF):CENTER:''ô”]''|>|BGCOLOR(#CCF):CENTER:''‹UŒv''|\n";
-	print "|~|~|~|>|BGCOLOR(#CCF):CENTER:''‹­’D(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’³•ñ(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''ô”](—İŒv)''|>|BGCOLOR(#FCC):CENTER:''—FD''|\n";
+
+	print "|BGCOLOR(#CFF):CENTER:''”N''|>|BGCOLOR(#FCC):CENTER:''’D‘—Í''|>|BGCOLOR(#FCC):CENTER:''Ÿ—¦''|>|BGCOLOR(#CCC):CENTER:''‹‹—¿''|>|BGCOLOR(#CCC):CENTER:''‹~o''|>|BGCOLOR(#CCC):CENTER:''’E–''|";
+	print "|BGCOLOR(#CFF):CENTER:''î¨''|>|BGCOLOR(#CFC):CENTER:''”_‹Æ''|>|BGCOLOR(#CFC):CENTER:''¤‹Æ''|>|BGCOLOR(#CFC):CENTER:''’¥•º''|>|BGCOLOR(#CCC):CENTER:''’âí''|>|BGCOLOR(#CCC):CENTER:''—FD''|";
+	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D''|>|BGCOLOR(#CCF):CENTER:''’³•ñ''|>|BGCOLOR(#CCF):CENTER:''ô”]''|>|BGCOLOR(#CCF):CENTER:''‹UŒv''|>|BGCOLOR(#CCF):CENTER:''Ué''|";
+	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’³•ñ(—İŒv)''|>|BGCOLOR(#CCF):CENTER:''ô”](—İŒv)''|>|BGCOLOR(#CCF):CENTER:''’ã@''|>|BGCOLOR(#CCC):CENTER:''‘’{''|"
 	print "|>|>|>|>|>|>|>|>|>|>||";
 	print "</textarea>";
+
 }
