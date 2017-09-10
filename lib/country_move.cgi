@@ -217,7 +217,12 @@ sub country_to_neverland {
 # ÈÊŞ×İ‚©‚ç“K“–dŠ¯
 #=================================================
 sub neverland_to_random {
-	$cmd = int(rand($w{country}) + 1);
+	if ($w{world} eq $#world_states) { # ˆÃ•
+		$cmd = int(rand($w{country} - 1) + 1);
+	}
+	else { # ˆÃ•‚¶‚á‚È‚¢
+		$cmd = int(rand($w{country}) + 1);
+	}
 	return unless &is_move_from_neverland;
 
 	$m{random_migrate} = $w{year};
