@@ -403,12 +403,16 @@ sub update_wiki{
 
 #wiki用のデータ出力
 sub output_wiki{
+
 	#フォント設定
 	my $bgc = "BGCOLOR(#EEE)";
 	my $right = "RIGHT";
 	my $center = "CENTER";
 	my $bgr = "$bgc:$right";
 	my $bgc= "$bgc:$center";
+
+	# 空欄の場合の文字
+	my $empty_character = "-";
 
 	#データ回収
 	open my $fh, "< $this_file" or &error("$this_fileﾌｧｲﾙが読み込めません");
@@ -426,8 +430,8 @@ sub output_wiki{
 
 		#空欄を埋める
 		if($name eq ""){
-			$number = "-";
-			$name = "-";
+			$number = $empty_character;
+			$name = $empty_character;
 		}
 
 		$datas[$index] = {"number" => "$number", "name" => "$name"};
@@ -441,7 +445,7 @@ sub output_wiki{
 			if (@rank_status[$index][0] == $key)
 
 				# 勝率は小数点下3桁で桁数表示
-				if ($key == "win")
+				if ($key == "win" && $datas['number'] != $empty_character)
 					$datas['number'] = sprintf("%.3f",$datas['number']);
 
 				return "$right:\'\'$datas[$index]{'number'}\'\'|$center:[[$datas[$index]{name}]]|";
