@@ -443,6 +443,8 @@ sub play {
 	}
 
 	my $penalty_coin = 0;
+	my $size2 = @participants;
+	$mes .= "if init_header is_my_turn $is_my_turn && is_reset $is_reset == participants $size2";
 	if ($is_my_turn && $is_reset == @participants) {
 		$mes .= "reset1<br>";
 		$penalty_coin = $head[$_rate];

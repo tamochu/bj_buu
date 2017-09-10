@@ -8,8 +8,33 @@ use constant LEAVE_PLAYER => 2; # 参加者が非ｱｸﾃｨﾌﾞになっている
 $_header_size = 5; # ﾍｯﾀﾞｰ配列のﾍﾞｰｽｻｲｽﾞ
 ($_state, $_lastupdate, $_participants, $_participants_datas, $_rate) = (0 .. $_header_size - 1); # ﾍｯﾀﾞｰ配列のｲﾝﾃﾞｯｸｽ
 
-$limit_think_time = 10; # 10分放置でﾌﾟﾚｲﾔｰ除外 60 * 10
-$limit_game_time = 20; # 20分放置でｹﾞｰﾑﾘｾｯﾄ 60 * 20
+$limit_think_time = 60 * 10; # 10分放置でﾌﾟﾚｲﾔｰ除外 60 * 10
+$limit_game_time = 60 * 20; # 20分放置でｹﾞｰﾑﾘｾｯﾄ 60 * 20
+
+=pod
+間黒男：こんな感じで時間ある時に複垢なり手伝い頼むなりしてやってみてよ (蜀 : 9/10 21:53)
+間黒男：パターン５（パターン２で切るカードを８にしてみる） (蜀 : 9/10 21:52)
+間黒男：パターン４（Ｃは発言ボタンで更新、その後ＡまたはＢのうち自分の番のプレイヤーがパターン２） (蜀 : 9/10 21:52)
+間黒男：パターン３（Ｃは発言ボタンで更新、その後ＡまたはＢがパターン１） (蜀 : 9/10 21:51)
+間黒男：パターン２（Ｃはそのまま更新せずに待機、ＡまたはＢのうち自分の番のプレイヤーがカードを切る）←いちばん怪しい (蜀 : 9/10 21:51)
+間黒男：ここからパターン１（Ｃはそのまま更新せずに待機、ＡまたはＢが発言でゲームを更新） (蜀 : 9/10 21:50)
+間黒男：Ｃ、30秒後に止まっている大貧民を閲覧する (蜀 : 9/10 21:49)
+間黒男：更新をやめる前にＣに連絡して30秒後に大貧民に来るよう合図を送っておく (蜀 : 9/10 21:49)
+間黒男：AとＢで適当にゲーム進めて、二人同時に更新をやめる（発言ボタンも押さない） (蜀 : 9/10 21:48)
+間黒男：AとBでゲーム開始、Ｃはｶｼﾞﾉの外で待機 (蜀 : 9/10 21:47)
+間黒男：プレイヤー３人用意する（Ａ、Ｂ、Ｃ） (蜀 : 9/10 21:47)
+間黒男：明日からあんまりＩＮ出来ないから手順だけ書いとくぞ (蜀 : 9/10 21:47)
+間黒男：二人でゲーム開始して20秒更新しないまま誰かに閲覧してもらってどうなるか見てみたい (蜀 : 9/10 21:43)
+間黒男：ああ、でも$is_resetフラグが立てられてるから、この時点ではバグらない (蜀 : 9/10 21:40)
+間黒男：if文の中で@non_active_players = &get_members($head[$_participants]); (蜀 : 9/10 21:37)
+間黒男：あー、_casino_func.cgiで285行目のif文の条件が$is_no_participants==true (蜀 : 9/10 21:36)
+間黒男：ななみえー何時に帰ってくるのよもう…！ (蜀 : 9/10 21:13)
+間黒男：まあでも20秒止まったゲームを非参加者が閲覧するとinit_headerが呼ばれる (蜀 : 9/10 21:11)
+間黒男：あ、秒数だった (蜀 : 9/10 21:10)
+間黒男：$limit_game_timeが20に設定されてるけど$timeと（多分）$head[$_lastupdate]ってミリ秒だろ (蜀 : 9/10 21:03)
+間黒男：$head[$_lastupdate] + $limit_game_time < $time (蜀 : 9/10 21:03)
+間黒男：_casino_func.cgi 285行目だな (蜀 : 9/10 21:01)
+=cut
 
 sub init_header {
 	my $ref_arr = shift; # ﾘﾌｧﾚﾝｽは shift じゃないと取得できない（$_だと実体の[0]が取り出される？）
@@ -752,63 +777,112 @@ sub change_turn {
 # ｺｲﾝの増減
 #================================================
 sub coin_move{
-	my ($m_coin, $name, $no_system_comment) = @_;
-	return if $m_coin == 0 || $m_coin eq '';
-	my $ret_v;
-	
-	my $player_id = unpack 'H*', $name;
+# 811275
+# 500611
+	my ($add_coin, $name, $no_system_comment) = @_;
+	return 0 if $add_coin == 0 || $add_coin eq '';
+	return 0 unless &you_exists($name);
 
-	# 存在しない場合はスキップ
-	unless (-f "$userdir/$player_id/user.cgi") {
-		return $ret_v;
-	}
-	if($name eq $m{name}){
-		if ($m{coin} + $m_coin < 0){
-			$ret_v = -1 * $m{coin};
-		}else {
-			$ret_v = $m_coin;
-		}
-		
-		$m{coin} += $ret_v;
-		&write_user;
-	}else{
+	# 所持ｺｲﾝの取得
+	my $m_coin = $m{coin};
+	if ($name ne $m{name}) { # 所持ｺｲﾝの書き換え対象が他人なら
 		my %datas1 = &get_you_datas($name);
-		my $temp = $datas1{coin} + $m_coin;
+		$m_coin = $datas1{coin};
+	}
 
-		if ($temp < 0){
-			$temp = 0;
-			$ret_v = -1 * $datas1{coin};
-		} else {
-			if ($temp > 2500000) {
-				$temp = 2500000;
-			}
-			$ret_v = $m_coin;
+	# 移動できるｺｲﾝ数の取得
+	my $ret_v;
+	if ($m_coin + $add_coin < 0) { # 所持ｺｲﾝ + 払うｺｲﾝ でマイナスになるなら
+		$ret_v = -1 * $m_coin; # 払うｺｲﾝは所持ｺｲﾝが限度
+		$m_coin = 0; # 所持ｺｲﾝは 0
+	}
+	elsif (2500000 < ($m_coin_ + $add_coin)) { # 所持ｺｲﾝ + 得るｺｲﾝ が 2500000 を超えるなら
+		$ret_v = (2500000 - $m_coin); # 得るｺｲﾝは 2500000 が限度
+		$m_coin = 2500000; # 所持ｺｲﾝは 2500000
+	}
+	else { # ｺｲﾝの移動で所持できるｺｲﾝの上限や下限に引っかからない
+		$ret_v = $add_coin;
+		$m_coin += $add_coin;
+	}
+
+	# 所持ｺｲﾝの設定
+	if ($name eq $m{name}) {
+		$m{coin} = $m_coin;
+		&write_user;
+	}
+	else {
+		&regist_you_data($name, 'coin', $m_coin);
+	}
+	&system_comment("$name 移動させたいｺｲﾝ $add_coin 移動させたｺｲﾝ $ret_v 所持ｺｲﾝ $m_coin");
+
+=pod
+	if ($name eq $m{name}) {
+		if ($m{coin} + $add_coin < 0) { # 所持ｺｲﾝ + 払うｺｲﾝ でマイナスになるなら
+			$ret_v = -1 * $m{coin}; # 払うｺｲﾝは所持ｺｲﾝが限度
+		}
+		elsif (2500000 < ($m{coin} + $add_coin)) { # 所持ｺｲﾝ + 得るｺｲﾝ が 2500000 を超えるなら
+			$ret_v = (2500000 - $m{coin}); # 得るｺｲﾝは 2500000 が限度
+		}
+		else { # ｺｲﾝの移動で所持できるｺｲﾝの上限下限に引っかからない
+			$ret_v = $add_coin;
+		}
+		$m{coin} += $ret_v;
+		&system_comment("$m{name} 移動させたいｺｲﾝ $add_coin 実際に移動させるｺｲﾝ $ret_v");
+		&write_user;
+	}
+	else {
+		my %datas1 = &get_you_datas($name);
+		my $temp = $datas1{coin} + $add_coin; # 所持ｺｲﾝ + 支払われる(支払う)ｺｲﾝ
+
+		if ($temp < 0){ # 所持ｺｲﾝ + 払うｺｲﾝ でマイナスになるなら
+			$temp = 0; # 所持ｺｲﾝ没収
+			$ret_v = -1 * $datas1{coin}; # 払うｺｲﾝは所持ｺｲﾝが限度
+		}
+		elsif (2500000 < $temp) { # 所持ｺｲﾝ + 得るｺｲﾝ が 2500000 を超えるなら
+			$ret_v = (2500000 - $datas1{coin}); # 得るｺｲﾝは 2500000 が限度
+		}
+		else { # ｺｲﾝの移動で所持できるｺｲﾝの上限下限に引っかからない
+			$ret_v = $add_coin;
+			&system_comment("$name 移動させたいｺｲﾝ $add_coin 実際に移動させるｺｲﾝ $ret_v");
 		}
 		&regist_you_data($name,'coin',$temp);
+		&system_comment("$name 持ちｺｲﾝ $temp");
 	}
+=cut
+#	$m_coin = -100
+#	50 - 100
+#	$ret_v = -50
+#	
 
 	unless ($no_system_comment) {
-		if($ret_v > 0){
+		if (-1 < $ret_v) { # 移動させたｺｲﾝがマイナスではない
 			&system_comment("$name は $ret_v ｺｲﾝ得ました");
-		}else{
+		}
+		else { # 移動させたｺｲﾝがマイナス
 			my $temp = -1 * $ret_v;
 			&system_comment("$name は $temp ｺｲﾝ払いました");
 		}
 	}
-	
-	if ($m_coin < $ret_v) {
-		my $diff = ($ret_v - $m_coin) * 10;
-			
+
+	# 支払われる(支払う)ｺｲﾝよりも支払われた(支払った)ｺｲﾝが多い
+	# 実際に後者が前者より多くなるのはマイナスでしか考えられない（100万勝って150万貰えることはない）
+	# 150万負けて100万しか支払えなかったような場合は -150万 < -100万 となり後者のが大きくなる
+	# でも一応マイナスなのか確認
+	if ($add_coin < 0 && $ret_v < 0 && $add_coin < $ret_v) {
+		$add_coin *= -1;
+		my $diff = ($add_coin + $ret_v) * 10;
+		&system_comment("プールから持ち出されるｺｲﾝ $diff");
+
 		my $shop_id = unpack 'H*', $name;
 		my $this_pool_file = "$userdir/$shop_id/casino_pool.cgi";
 		my @lines = ();
 		if (-f $this_pool_file) {
 			open my $fh, "+< $this_pool_file" or &error("$this_pool_fileが開けません");
 			eval { flock $fh, 2; };
-			
+
 			while (my $line = <$fh>){
 				my($pool, $this_term_gain, $slot_runs) = split /<>/, $line;
-				$pool -= $diff;
+				$pool -= $diff if 0 < ($pool - $diff);
 				push @lines, "$pool<>$this_term_gain<>$slot_runs<>\n";
 				last;
 			}
@@ -819,7 +893,7 @@ sub coin_move{
 			close $fh;
 		}
 	}
-	
+
 	return $ret_v;
 }
 
