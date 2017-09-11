@@ -31,8 +31,13 @@
 				# 同じ名前の人が複数いる場合
 				next if ++$sames{$player} > 1;
  
-				&regist_you_data($player,'silent_time',$time+600);
-				&regist_you_data($player,'silent_kind',0);
+				my @data = (
+					['silent_time', $time + 600],
+					['silent_kind', 0]
+				);
+				&regist_you_array($player, @data);
+#				&regist_you_data($player,'silent_time',$time+600);
+#				&regist_you_data($player,'silent_kind',0);
 			}
 			close $fh;
 		}
@@ -54,8 +59,13 @@
 			# 同じ名前の人が複数いる場合
 			next if ++$sames{$player} > 1;
  
-			&regist_you_data($player,'silent_time',$time+600);
-			&regist_you_data($player,'silent_kind',int(rand(3)+1));
+			my @data = (
+				['silent_time', $time + 600],
+				['silent_kind', int(rand(3) + 1)]
+			);
+			&regist_you_array($player, @data);
+#			&regist_you_data($player,'silent_time',$time+600);
+#			&regist_you_data($player,'silent_kind',int(rand(3)+1));
 		}
 		close $fh;
 		$m{silent_time} = $time+600;
@@ -87,8 +97,13 @@
 				# 同じ名前の人が複数いる場合
 				next if ++$sames{$player} > 1;
  
-				&regist_you_data($player,'silent_time',$time+600);
-				&regist_you_data($player,'silent_kind',int(rand(3)+1));
+				my @data = (
+					['silent_time', $time + 600],
+					['silent_kind', int(rand(3) + 1)]
+				);
+				&regist_you_array($player, @data);
+#				&regist_you_data($player,'silent_time',$time+600);
+#				&regist_you_data($player,'silent_kind',int(rand(3)+1));
 			}
 			close $fh;
 		}
@@ -181,9 +196,16 @@
 				if ($datas{shogo} && $datas{shogo_t} eq ''){
 					my $t_shogo = $datas{shogo};
 					$t_shogo .= '(笑)';
-					&regist_you_data($player,'shogo',$t_shogo);
-					&regist_you_data($player,'shogo_t',$datas{shogo});
-					&regist_you_data($player,'trick_time',$time + 3600);
+
+					my @data = (
+						['shogo', $t_shogo],
+						['shogo_t', $datas{shogo}],
+						['trick_time', $time + 3600]
+					);
+					&regist_you_array($player, @data);
+#					&regist_you_data($player,'shogo',$t_shogo);
+#					&regist_you_data($player,'shogo_t',$datas{shogo});
+#					&regist_you_data($player,'trick_time',$time + 3600);
 				}
 			}
 			close $fh;
@@ -240,6 +262,7 @@
 			$cs{is_die}[$i] = 0 if $cs{is_die}[$i] < 2;
 			$cs{state}[$i] = 0;
 			$cs{tax}[$i] = 1;
+			$cs{barrier}[$i] = 50;
 			for my $j ($i+1..$w{country}){
 				my $p_c_c = "p_${i}_${j}";
 				$w{$p_c_c} = 0;
@@ -256,7 +279,11 @@
 		&mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使うと$m{name}のゆびさきからいてつくはどうがほとばしる!!</b>");
 		&write_cs;
 	},
+	sub{
+		$cs{barrier}[$_] for (1 .. $w{country});
+		&mes_and_world_news("<b>$pets[$m{pet}][1]★$m{pet_c}を使うと一つ目の巨人が全国の城壁をめちゃくちゃにしていった</b>");
+		&write_cs;
+	},
 );
-
 
 1; # 削除不可
