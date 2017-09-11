@@ -236,7 +236,7 @@ sub _get_member {
 	$head[$_participants_datas] = '';
 
 	my $is_member = 0 < $m{c_turn};
-	$mes .= "c_turn $m{c_turn}<br>";
+#	$mes .= "c_turn $m{c_turn}<br>";
 
 	my %sames = ();
 	my $is_find = 0;
@@ -272,9 +272,9 @@ sub _get_member {
 			}
 		}
 		else {
-			$mes .= "name $mname<br>";
+#			$mes .= "name $mname<br>";
 			my $is_entry = 0 < $mturn;
-			$mes .= "entry $mturn<br>";
+#			$mes .= "entry $mturn<br>";
 			# ｱｸﾃｨﾌﾞな参加者とｱｸﾃｨﾌﾞな閲覧者だけ残す
 			if ( ($is_entry && ($time < $mtime + $limit_think_time)) || ($time < $mtime + $limit_member_time) ) {
 				$member .= "$mname($mturn),";
@@ -395,7 +395,11 @@ sub _show_game_info {
 		print qq| 参加者:|;
 		print qq|$participants[$_],| for (0 .. $#participants);
 	}
-	else { print qq|ﾒﾝﾊﾞｰ募集中|; }
+	else {
+		unless ($this_file =~ "chat_casino_s") {
+			print qq|ﾒﾝﾊﾞｰ募集中|; 
+		}
+	}
 	&show_head_info($m_turn, $m_value, $m_stock, @head) if defined(&show_head_info); # すべてのﾌﾟﾚｲﾔｰに表示したい情報1
 	if ($head[$_state]) { # ｹﾞｰﾑが開始している
 		&show_started_game($m_turn, $m_value, $m_stock, @head);
@@ -410,7 +414,7 @@ sub _show_game_info {
 			if ($max_entry <= @participants) { print qq|<br>ｹﾞｰﾑの開始を待っています|; } # 参加者が埋まっている
 			else { # 参加者が埋まっていない
 				if (!$coin_lack && $m{coin} < $head[$_rate]) { print '<br>ｺｲﾝがﾚｰﾄに足りていません'; } # ｺｲﾝが足りていない
-				else { &participate_form(@participants); }
+				else { &participate_form(@participants) if defined(&participate_form); }
 #				elsif ($head[$_participants]) { # 参加ﾌｫｰﾑ
 #					&participate_form;
 #				}
@@ -1007,11 +1011,12 @@ sub create_submit {
 # セレクトメニュー formタグの間に挟む
 #================================================
 sub create_select_menu {
-	my ($name, @menus) = @_;
+	my ($name, $select, @menus) = @_;
 	my $result_str = '';
 	$result_str .= qq|<select name="$name" class="menu1">|;
 	for my $i (0 .. $#menus) {
-		$result_str .= qq|<option value="$i">$menus[$i]</option>| if $menus[$i] <= $m{coin};
+		my $select_str = ' selected' if $i == $select;
+		$result_str .= qq|<option value="$i"$select_str>$menus[$i]</option>| if $menus[$i] <= $m{coin};
 	}
 	$result_str .= qq|</select>|;
 	return $result_str;

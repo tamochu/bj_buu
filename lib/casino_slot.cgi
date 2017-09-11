@@ -2,101 +2,38 @@
 # ½Û¯ÄÀiƒvƒƒOƒŒƒbƒVƒuƒWƒƒƒbƒNƒ|ƒbƒgj
 #================================================
 require "$datadir/casino_bonus.cgi";
+require "./lib/_casino_funcs.cgi";
+
+$header_size = 2; # ½Û¯ÄÀ—p‚ÌÍ¯ÀŞ°»²½Ş JPA‹­§JP
+($_jp, $_ceil) = ($_header_size .. $_header_size + $header_size - 1); # Í¯ÀŞ°”z—ñ‚Ì²İÃŞ¯¸½
 
 sub run {
-	if ($in{mode} eq "play") {
-	    $in{comment} = &play;
-	    &write_comment if $in{comment};
-	}
-	&write_comment if ($in{mode} eq "write") && $in{comment};
-	my($member_c, $member, $jackpot) = &get_member;
 
-	print qq|<form method="$method" action="$this_script" name="form">|;
-	print qq|<input type="hidden" name="mode" value="play">|;
-	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-	print qq|<input type="submit" value="‰ñ‚·" class="button_s"><br>|;
-	print qq|bet coin<select name="bet_value" class="select1">|;
-	for my $i (1..3){
-		print $m{c_value} == $i ? qq|<option value="$i" selected>$i bet| : qq|<option value="$i">$i bet|;
-	}
-	print qq|</select>|;
-	print qq|</form><br>|;
-
-	print qq|<form method="$method" action="$script">|;
-	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-	print qq|<input type="submit" value="–ß‚é" class="button1"></form>|;
-	print qq|<h2>$this_title</h2>|;
-
-	print qq|<form method="$method" action="$this_script" name="form">|;
-	print qq|<input type="text"  name="comment" class="text_box_b"><input type="hidden" name="mode" value="write">|;
-	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
-	print qq|<input type="submit" value="”­Œ¾" class="button_s"><br>|;
-
-	unless ($is_mobile) {
-		print qq|©“®ØÛ°ÄŞ<select name="reload_time" class="select1"><option value="0">‚È‚µ|;
-		for my $i (1 .. $#reload_times) {
-			print $in{reload_time} eq $i ? qq|<option value="$i" selected>$reload_times[$i]•b| : qq|<option value="$i">$reload_times[$i]•b|;
-		}
-		print qq|</select>|;
-	}
-	print qq|</form><font size="2">$member_cl:$member</font><br>|;
-	print qq|¼Ş¬¯¸Îß¯Ä:$jackpot<br>|;
-
-	print qq|<hr>|;
-
-	open my $fh, "< $this_file.cgi" or &error("$this_file.cgi Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-	while (my $line = <$fh>) {
-		my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon) = split /<>/, $line;
-		$bname .= "[$bshogo]" if $bshogo;
-		$is_mobile ? $bcomment =~ s|ƒnƒ@ƒg|<font color="#FFB6C1">&#63726;</font>|g : $bcomment =~ s|ƒnƒ@ƒg|<font color="#FFB6C1">&hearts;</font>|g;
-		print qq|<font color="$cs{color}[$bcountry]">$bnameF$bcomment <font size="1">($cs{name}[$bcountry] : $bdate)</font></font><hr size="1">\n|;
-	}
-	close $fh;
+	&_default_run;
 }
 
-sub get_member {
-	my $is_find = 0;
-	my $member  = '';
-	my @members = ();
-	my %sames = ();
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($jackpot, $jceil) = split /<>/, $head_line;
-	push @members, "$jackpot<>$jceil<>\n";
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		if ($time - $limit_member_time > $mtime) {
-			next;
-		}
-		next if $sames{$mname}++; # “¯‚¶l‚È‚çŸ
-		
-		if ($mname eq $m{name}) {
-			push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$m{c_value}<>\n";
-			$is_find = 1;
-		}
-		else {
-			push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-		}
-		$member .= "$mname,";
-	}
-	unless ($is_find) {
-		push @members, "$time<>$m{name}<>$addr<>$m{c_turn}<>$m{c_value}<>\n";
-		$member .= "$m{name},";
-	}
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-
-	my $member_c = @members - 1;
-
-	return ($member_c, $member, $jackpot);
+sub show_head_info { # ‚·‚×‚Ä‚ÌÌßÚ²Ô°‚É•\¦‚µ‚½‚¢î•ñ1
+	my ($m_turn, $m_value, $m_stock, @head) = @_;
+	# ¶¼ŞÉ–ˆ‚Ìˆ—
+	print qq|¼Ş¬¯¸Îß¯ÄF$head[$_jp]|;
+	my @bets = ('1bet', '2bet', '3bet');
+	print qq|<form method="$method" action="$this_script" name="form">|;
+	print &create_submit("play", "‰ñ‚·");
+	print &create_select_menu("bet_value", $in{bet_value}, @bets);
+	print qq|</form>|;
 }
 
 sub play {
-	if ($m{coin} < 1000){
+	return unless $m{name} eq 'VIPPER' || $m{name} eq 'nanamie';
+	my $value = $in{bet_value} + 1;
+
+	# my $this_pool_file  = "$userdir/$id/casino_pool.cgi"; # ’è‹`–Y‚êH ’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½
+	# ‰½‚Ìˆ—‚©•ª‚©‚ç‚ñ º²İ‚ª 1000 ‚µ‚©‚È‚¢ê‡‚É 3 bet ‚Å‚«‚Ä‚µ‚Ü‚¢A
+	# Šº²İ‚ª -2000 ‚É‚È‚é•s‹ï‡‚ğC³‚µ‚½‚Æ‚«A‚»‚ê‚Å‚àˆÈ‰º‚Ìˆ—‚ª•K—v‚È‚Ì‚©H
+	if ($m{coin} < (1000 * $value)) { # Šº²İ‚ª 1000 –¢–‚©‚Ç‚¤‚©‚µ‚©Œ©‚Ä‚¢‚È‚©‚Á‚½‚Ì‚ÅA1000 º²İ‚ ‚ê‚Î 3 bet 3000 º²İÁ”ï‚Å‚«‚½
+=pod
+Šº²İ‚ª 1000 –¢–‚Ì‚Æ‚«Aˆá–@¶¼ŞÉ‚ğŒš‚Ä‚Ä‚¢‚ÄA‚©‚ÂÌß°Ùº²İ‚ª 1 ˆÈã‚Å‚Í‚È‚¢‚È‚çŠº²İ‚ª 0 ‚É‚È‚é
+$this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚»‚¤‚Æ‚·‚é‚Æ‚İ‚ñ‚ÈŠº²İ‚ªÁ‚¦‚Ä‚¢‚½
 		my $pool_find = 0;
 		if (-f "$userdir/$id/casino_pool.cgi") {
 			open my $fh, "< $this_pool_file" or &error("$this_pool_file‚ªŠJ‚¯‚Ü‚¹‚ñ");
@@ -113,169 +50,144 @@ sub play {
 			$m{coin} = 0;
 			&write_user;
 		}
+=cut
 		return ('º²İ‚ª‚ ‚è‚Ü‚¹‚ñ');
 	}
-	$m{c_value} = $in{bet_value};
+	$m{coin} -= (1000 * $value);
+
 	my @m = ('‚V');
-	my @m_exval = ('‡','ô','õ','š','™','¢','¥','Ÿ','›','œ','~','¡','÷','£','','Š','‰','§','ó','ò');
+	my @m_exval = ('‡','ô','õ','š','™','¢','¥','Ÿ','›','œ','~','¡','÷','£','','Š','‰','§','ó','ò'); # 20ŒÂ
 	for my $val (@m_exval){
-		push @m, $val for (0..5);
+		push @m, $val for (0..5); # 6ŒÂ
 	}
+	# 20ŒÂ‚ÌÏ°¸‚ğ6ŒÂ‚¸‚Â’Ç‰Á 120ŒÂ‚ÌÏ°¸‚Ì’†‚É 7 ‚ª1‚Â 1/121 ‚ÌŠm—¦‚Å 7
 	my @s = ();
 	my $gflag = 0;
 	my $rets = '';
+	my @prizes = ();
 	$s[$_] = int(rand(@m)) for (0 .. 8);
-	if (&ceil_over) {
-		$s[0] = 0;
-		$s[1] = 0;
-		$s[2] = 0;
+
+	open my $fh, "+< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
+	eval { flock $fh, 2; };
+	my $head_line = <$fh>;
+	my @head = split /<>/, $head_line; # Í¯ÀŞ°
+	while (my $line = <$fh>) {
+		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
+		next if $sames{$mname}++; # “¯‚¶l‚È‚çŸ
+		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
 	}
+
+	# ¼Ş¬¯¸Îß¯Ä‚Éº²İ—­‚Ü‚è‚·‚¬‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß‚Ì‹­§¼Ş¬¯¸Îß¯Ä
+	$s[0] = $s[1] = $s[2] = 0 if $head[$_jp] > $head[$_ceil];
+
 	$rets .= "<p>y$m[$s[3]]zy$m[$s[4]]zy$m[$s[5]]z</p>";
 	$rets .= "<p>y$m[$s[0]]zy$m[$s[1]]zy$m[$s[2]]z</p>";
 	$rets .= "<p>y$m[$s[6]]zy$m[$s[7]]zy$m[$s[8]]z</p>";
-	$m{coin} -= 1000;
+
 	if ($m[$s[0]] eq $m[$s[1]] && $m[$s[0]] eq $m[$s[2]]) {
 		if ($s[0] != 0) { # jackpotˆÈŠO
 			$m{coin} += 50000;
-			$rets .= "‚È‚ñ‚Æ!! $m[$s[0]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾";
-		}else{
+			$rets .= "‚È‚ñ‚Æ!! $m[$s[0]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾<br>";
+		}
+		else {
 			$rets .= "Jackpot!!!";
-			$rets .= &jackpot;
+			$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
 		}
 		$gflag = 1;
 	}
 
-	if($m{c_value} >= 2){
-		$m{coin} -= 1000;
+	if ($value >= 2) {
 		if ($m[$s[3]] eq $m[$s[4]] && $m[$s[3]] eq $m[$s[5]]) {
 			if ($s[3] != 0) { # jackpotˆÈŠO
 				$m{coin} += 50000;
-				$rets .= "‚È‚ñ‚Æ!! $m[$s[3]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾";
-			}else{
+				$rets .= "‚È‚ñ‚Æ!! $m[$s[3]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾<br>";
+			}
+			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot;
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
 			}
 			$gflag = 1;
 		}
 		if ($m[$s[6]] eq $m[$s[7]] && $m[$s[6]] eq $m[$s[8]]) {
 			if ($s[6] != 0) { # jackpotˆÈŠO
 				$m{coin} += 50000;
-				$rets .= "‚È‚ñ‚Æ!! $m[$s[6]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾";
-			}else{
+				$rets .= "‚È‚ñ‚Æ!! $m[$s[6]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾<br>";
+			}
+			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot;
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
 			}
 			$gflag = 1;
 		}
 	}
 	
-	if($m{c_value} == 3){
-		$m{coin} -= 1000;
+	if ($value == 3) {
 		if ($m[$s[3]] eq $m[$s[1]] && $m[$s[3]] eq $m[$s[8]]) {
 			if ($s[3] != 0) { # jackpotˆÈŠO
 				$m{coin} += 50000;
-				$rets .= "‚È‚ñ‚Æ!! $m[$s[3]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾";
-			}else{
+				$rets .= "‚È‚ñ‚Æ!! $m[$s[3]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾<br>";
+			}
+			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot;
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
 			}
 			$gflag = 1;
 		}
 		if ($m[$s[6]] eq $m[$s[1]] && $m[$s[6]] eq $m[$s[5]]) {
 			if ($s[6] != 0) { # jackpotˆÈŠO
 				$m{coin} += 50000;
-				$rets .= "‚È‚ñ‚Æ!! $m[$s[6]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾";
-			}else{
+				$rets .= "‚È‚ñ‚Æ!! $m[$s[6]] ‚ª3‚Â‚»‚ë‚¢‚Ü‚µ‚½!!º²İ 50000 –‡Šl“¾<br>";
+			}
+			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot;
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
 			}
 			$gflag = 1;
 		}
 	}
-	
-	if($gflag == 0){
-		&jackpot_add;
+
+	unless ($gflag) {
+		$head[$_jp] += 50 * ($value);
 		$rets .= '<p>Ê½ŞÚ</p>';
 	}
+
+	unshift @members, &h_to_s(@head);
+	seek  $fh, 0, 0;
+	truncate $fh, 0;
+	print $fh @members;
+	close $fh;
+
+	&send_item($m{name},$bonus[$prizes[$_]][0],$bonus[$prizes[$_]][1],$bonus[$prizes[$_]][2],$bonus[$prizes[$_]][3], 1) for (0 .. $#prizes);
+
 	&write_user;
 	return ($rets);
 }
-sub jackpot{
-	my $is_find = 0;
-	my $l_is_in = 0;
-	my $member  = '';
-	my @members = ();
-	my %sames = ();
+
+sub jackpot {
+	my ($ref_jp, $ref_ceil, $ref_prizes) = @_;
 	my $prize = '';
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($jackpot, $jceil) = split /<>/, $head_line;
-	$jceil = int(rand(100000000) + 3000000);
-	push @members, "3000000<>$jceil<>\n";
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # “¯‚¶l‚È‚çŸ
-		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-	}
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-	
-	while($jackpot > 2500000){
+
+	while ($$ref_jp > 2500000) {
 		my $item_no = int(rand($#bonus+1));
-		&send_item($m{name},$bonus[$item_no][0],$bonus[$item_no][1],$bonus[$item_no][2],$bonus[$item_no][3], 1);
-		if($bonus[$item_no][0] == 1){
+		push @$ref_prizes, $item_no;
+		if ($bonus[$item_no][0] == 1) {
 			$prize .= "$weas[$bonus[$item_no][1]][1]";
-		}elsif($bonus[$item_no][0] == 2){
+		}
+		elsif ($bonus[$item_no][0] == 2) {
 			$prize .= "$eggs[$bonus[$item_no][1]][1]";
-		}else{
+		}
+		else {
 			$prize .= "$pets[$bonus[$item_no][1]][1]";
 		}
-
-		$jackpot -= 1000000;
+		$$ref_jp -= 1000000;
 	}
-	
-	&mes_and_world_news("<b>¼Ş¬¯¸Îß¯Ä‚ğo‚µ‚Ü‚µ‚½</b>", 1);
 
-	$m{coin} += $jackpot;
-	return "º²İ $jackpot –‡ $prize ‚ğŠl“¾‚µ‚Ü‚µ‚½";
+#	&mes_and_world_news("<b>¼Ş¬¯¸Îß¯Ä‚ğo‚µ‚Ü‚µ‚½</b>", 1);
+
+	$m{coin} += $$ref_jp;
+	$$ref_jp = 3000000;
+	$$ref_ceil = int(rand(100000000) + 3000000);
+	return "º²İ $jp –‡ $prize ‚ğŠl“¾‚µ‚Ü‚µ‚½<br>";
 }
 
-sub jackpot_add{
-	my $is_find = 0;
-	my $l_is_in = 0;
-	my $member  = '';
-	my @members = ();
-	my %sames = ();
-	
-	open my $fh, "+< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	eval { flock $fh, 2; };
-	my $head_line = <$fh>;
-	my($jackpot, $jceil) = split /<>/, $head_line;
-	$jackpot += 50 * $m{c_value};
-	push @members, "$jackpot<>$jceil<>\n";
-	while (my $line = <$fh>) {
-		my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-		next if $sames{$mname}++; # “¯‚¶l‚È‚çŸ
-		push @members, "$mtime<>$mname<>$maddr<>$mturn<>$mvalue<>\n";
-	}
-	seek  $fh, 0, 0;
-	truncate $fh, 0;
-	print $fh @members;
-	close $fh;
-	
-	return "";
-}
-
-sub ceil_over{
-	open my $fh, "< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
-	my $head_line = <$fh>;
-	my($jackpot, $jceil) = split /<>/, $head_line;
-	close $fh;
-	
-	return ($jackpot > $jceil);
-}
 1;#íœ•s‰Â

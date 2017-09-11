@@ -87,7 +87,7 @@ sub participate_form {
 	my $button = $leader ? "参加する" : "親になる";
 	# ｶｼﾞﾉ毎の処理
 	print qq|<form method="$method" action="$this_script" name="form">|;
-	print "レート：".&create_select_menu("rate", @rates) unless $leader;
+	print "レート：".&create_select_menu("rate", 0, @rates) unless $leader;
 	print &create_submit("participate", "$button");
 	print qq|</form>|;
 }
@@ -190,7 +190,7 @@ sub play_form {
 			my ($num, $suit) = &get_card($hand_card);
 			push @cards, "$suits[$suit]$nums[$num]";
 		}
-		print "手札：".@hand_cards."枚 ".&create_select_menu("card", @cards);
+		print "手札：".@hand_cards."枚 ".&create_select_menu("card", 0, @cards);
 		print "<br>";
 	}
 }
