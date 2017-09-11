@@ -3,6 +3,7 @@ require 'config.cgi';
 require 'config_game.cgi';
 #use Time::HiRes qw(gettimeofday tv_interval);
 use File::Copy;
+use Encode;
 #=================================================
 # ˆê”N×Ý·Ý¸Þ Created by oiiiuiiii
 #=================================================
@@ -499,7 +500,8 @@ sub output_wiki{
 	print "|BGCOLOR(#CFF):CENTER:''”N''|>|BGCOLOR(#FCC):CENTER:''’D‘—Í''|>|BGCOLOR(#FCC):CENTER:''Ÿ—¦''|>|BGCOLOR(#CCC):CENTER:''‹‹—¿''|>|BGCOLOR(#CCC):CENTER:''‹~o''|>|BGCOLOR(#CCC):CENTER:''’E–''|\n";
 	print "|BGCOLOR(#CFF):CENTER:''î¨''|>|BGCOLOR(#CFC):CENTER:''”_‹Æ''|>|BGCOLOR(#CFC):CENTER:''¤‹Æ''|>|BGCOLOR(#CFC):CENTER:''’¥•º''|>|BGCOLOR(#CCC):CENTER:''’âí''|>|BGCOLOR(#CCC):CENTER:''—FD''|\n";
 	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D''|>|BGCOLOR(#CCF):CENTER:''’³•ñ''|>|BGCOLOR(#CCF):CENTER:''ô”]''|>|BGCOLOR(#CCF):CENTER:''‹UŒv''|>|BGCOLOR(#CCF):CENTER:''Ué''|\n";
-	print "|~|>|BGCOLOR(#CCF):CENTER:''‹­’D(—ÝŒv)''|>|BGCOLOR(#CCF):CENTER:''’³•ñ(—ÝŒv)''|>|BGCOLOR(#CCF):CENTER:''ô”](—ÝŒv)''|>|BGCOLOR(#CCF):CENTER:''’ãŽ@''|>|BGCOLOR(#CCC):CENTER:''‘’{''|\n";
+	print '|~|>|BGCOLOR(#CCF):CENTER:''‹­’D(—ÝŒv)''|>|BGCOLOR(#CCF):CENTER:''’³•ñ(—ÝŒv)''|>|BGCOLOR(#CCF):CENTER:''ô”](—ÝŒv)''|>|BGCOLOR(#CCF):CENTER:''’ã/Ž@''|>|BGCOLOR(#CCC):CENTER:''‘’{''|';
+	print "\n";
 	print "|>|>|>|>|>|>|>|>|>|>||";
 	print "</textarea>";
 
