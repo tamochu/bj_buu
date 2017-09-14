@@ -233,7 +233,7 @@ sub play {
 	my @winners = &get_members($head[$_winner]);
 	my %pass_datas = (); # 参加者のパス情報を持つ
 	my $is_my_turn = $head[$_state] && $participants[0] eq $m{name} && 2 <= $m{c_turn}; # 開始しているｹﾞｰﾑに参加していて自分のﾀｰﾝ
-	while (my $line = <$fh>) {
+	while (my $line = <$fh>) { # 全ﾌﾟﾚｲﾔｰﾃﾞｰﾀを上から走査
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		if ($is_my_turn && $mname eq $m{name}) {
 			$head[$_lastupdate] = $time;
@@ -445,7 +445,7 @@ sub play {
 	my $penalty_coin = 0;
 	my $size2 = @participants;
 	$mes .= "if init_header is_my_turn $is_my_turn && is_reset $is_reset == participants $size2";
-	if ($is_my_turn && $is_reset == @participants) {
+	if ($is_my_turn && $winner eq $m{name} && ($is_playable || $is_pass) && $is_reset == @participants) { # 若干不必要な感じもするけどとにかく終了条件厳しく
 		$mes .= "reset1<br>";
 		$penalty_coin = $head[$_rate];
 		&init_header(\@head);
