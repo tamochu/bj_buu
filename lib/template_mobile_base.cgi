@@ -57,8 +57,8 @@ sub top_menu_html {
 		require "$datadir/casino.cgi";
 		my $a_line = &all_member_n;
 		print $a_line;
-		print qq|<a href="./chat_casino.cgi?id=$id&pass=$pass">対人ｶｼﾞﾉ</a>/|;
 	}
+	print qq|<a href="./chat_casino.cgi?id=$id&pass=$pass">対人ｶｼﾞﾉ</a>/|;
 	print qq|<a href="./bbs_daihyo.cgi?id=$id&pass=$pass">代表\評議会</a>/| unless $m{disp_daihyo} eq '0';
 	print qq|<a href="./chat_admin.cgi?id=$id&pass=$pass">運営討論場</a>/| if (&is_sabakan);
 }
@@ -311,26 +311,40 @@ sub countries_info {
 #================================================
 sub all_member_n {
 	my $ret_str = '';
-	for my $i (0 .. $#files) {
-		my $member_c  = 0;
-		my %sames = ();
-		my $tf_name = "$logdir/chat_casino$files[$i][2]_member.cgi";
-	
-		open my $fh, "< $tf_name" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
-		my $head_line = <$fh>;
-		while (my $line = <$fh>) {
-			my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
-			if ($time - 60 > $mtime) {
-				next;
+	my $ret_str2 = '';
+	my $casino_n_file = "$logdir/casino_n.cgi";
+	my $lastmodified = (stat $casino_n_file)[9];
+
+	if (($lastmodified + 180) < $time) { # 3分毎に対人ｶｼﾞﾉの人数更新
+		for my $i (0 .. $#files) {
+			my $member_c  = 0;
+			my %sames = ();
+			my $tf_name = "$logdir/chat_casino$files[$i][2]_member.cgi";
+			open my $fh, "< $tf_name" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+			my $head_line = <$fh>;
+			while (my $line = <$fh>) {
+				my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
+				next if ($time - 180) > $mtime;
+				next if $sames{$mname}++; # 同じ人なら次
+				$member_c++;
 			}
-			next if $sames{$mname}++; # 同じ人なら次
-			
-			$member_c++;
+			close $fh;
+			$ret_str2 .= substr($files[$i][0], 0, 2) . "/$member_c <>";
 		}
+		open my $fh, "> $casino_n_file" or &error('対人ｶｼﾞﾉの人数ﾌｧｲﾙが開けません'); 
+		print $fh $ret_str2;
 		close $fh;
-		$ret_str .= substr($files[$i][0], 0, 2) . "/$member_c ";
-		$ret_str .= "<br>" if $i % 4 == 3;
 	}
+	else {
+		open my $fh, "< $casino_n_file" or &error('対人ｶｼﾞﾉの人数ﾌｧｲﾙが開けません'); 
+		$ret_str2 = <$fh>;
+		close $fh;
+	}
+	my @casinos_n = split /<>/, $ret_str2;
+	for my $i (0 .. $#casinos_n) {
+		$ret_str .= $casinos_n[$i];
+	}
+
 	return $ret_str;
 }
 
