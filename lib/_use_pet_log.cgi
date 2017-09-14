@@ -27,7 +27,7 @@ sub read_use_pet_log {
 
 	for my $hash (split /<>/, $line) {
 		my($k, $v) = split /;/, $hash;
-		$pet_logs{$k} = $v if $pet && $pet == $k;
+		$pet_logs{$k} = $v if !defined($pet) || $pet && $pet == $k; # 何かバグ報告されて !defined 足した覚えはあるけど理由忘れた… 未定義である必要が我ながらよく分からない
 	}
 
 	return $pet ? $pet_logs{$pet} : %pet_logs;
