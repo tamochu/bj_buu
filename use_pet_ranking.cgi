@@ -44,7 +44,7 @@ sub run {
 	}
 	print qq|<a href="player_ranking.cgi?no=0">廃人ﾗﾝｷﾝｸﾞ</a> / |;
 
-	print qq|<h1>$country_pets[$in{no}][1]廃人ﾗﾝｷﾝｸﾞ</h1>|;
+	print qq|<h1>$country_pets[$in{no}][1]国ﾍﾟﾗﾝｷﾝｸﾞ</h1>|;
 	print qq|<div class="mes"><ul><li>ﾗﾝｷﾝｸﾞは$use_pet_ranking_cycle_day日ごとにﾘｾｯﾄされ更新されます</ul></div><br>|;
 
 	print qq|<table class="table1" cellpadding="2"><tr><th>順位</th><th>数値</th><th>名前</th><th>所属国</th></tr>| unless $is_mobile;
