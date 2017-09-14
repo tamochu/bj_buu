@@ -63,6 +63,9 @@ sub participate {
 	$in{bet} ||= 0;
 	return '数字を入れてください' unless $in{bet} !~ /[^0-9]/;
 	$in{bet} = $m{coin} if $m{coin} < $in{bet};
+#	$in{bet} = int($m{coin} / 10) if $m{coin} < $in{bet};
+#	$in{bet} = int($m{coin} / 10) if int($m{coin} / 10) < $in{bet};
+	
 	open my $fh, "< ${this_file}_member.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
 	my $head_line = <$fh>;
 	close $fh;
@@ -150,10 +153,7 @@ sub play {
 			else {
 				$is_play = 1;
 				my @d_set = ();
-				$d_set[0] = int(rand(6)+1);
-				$d_set[1] = int(rand(6)+1);
-				$d_set[2] = int(rand(6)+1);
-
+				$d_set[$_] = int(rand(6)+1) for (0 .. 2);
 				@d_set = sort {$a <=> $b} @d_set;
 				if ($d_set[0] == $d_set[1]) {
 					$mvalue = $d_set[2];
@@ -213,7 +213,9 @@ sub play {
 			my %p_players = ();
 			for my $i (0 .. $#participants_datas) {
 				my @datas = split /:/, $participants_datas[$i];
-				next if $datas[0] eq $m{name};
+#				&system_comment("$datas[0]");
+				next if $datas[0] eq '';
+				next if $datas[0] eq $tmp_leader;
 				my $v = 0;
 				if ($m_value < $datas[1]) {
 					$v = $datas[2];
@@ -230,7 +232,9 @@ sub play {
 					$m_value == 7 ? 2 : 1;
 				}
 				$v = &coin_move($v, $datas[0], 1);
+#				&system_comment("おそらく試しの1回目");
 				&coin_move(-1 * $v, $datas[0], 1);
+#				&system_comment("試した分のチャラ");
 				$total -= $v;
 				$p_players{$datas[0]} = $v;
 				&regist_you_data($datas[0], 'c_turn', '0');
@@ -249,12 +253,15 @@ sub play {
 			my $p_rate = 1.0;
 			if ($m{coin} < -1 * $total) {
 				$p_rate = $m{coin} / (-1 * $total);
+#				&system_comment("$m{name} 内部的負けｺｲﾝ数 $m{coin} / (-1 * $total) = $p_rate");
 			}
 			for my $mn (keys(%p_players)) {
 				my $v = int($p_players{$mn} * $p_rate);
 				&coin_move($v, $mn, 1);
+#				&system_comment("$mn 内部的勝ちｺｲﾝ数 $p_players{$mn} * $p_rate = $v");
 			}
 			&coin_move($total, $m{name}, 1);
+#			&system_comment("$m{name} 内部的負けｺｲﾝ数その2 $total");
 			if (0 < $total) {
 				$result_mes .= "<br>$m{name} は $total ｺｲﾝ の浮きです[".&get_yaku_name($m_value)."]";
 			}
