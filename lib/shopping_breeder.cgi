@@ -35,9 +35,9 @@ sub begin {
 			$breed_times[$i] = $time;
 
 			if (-f "$fn$i.cgi") {
-				my $bc = ($eggs[$breeds[$i]][2] - $breed_cs[$i]) * $egg_per_sec[$i];
+				my $bc = ($eggs[$breeds[$i]][2] - $breed_cs[$i] + 1) * $egg_per_sec[$i];
 				$bc = $bc < 0 ? 0 : $bc;
-				utime ($time, $bc + $time, "$fn");
+				utime ($time, $bc + $time, "$fn$i.cgi");
 			}
 			$mes .= "$mode_names[$i]‚Ì $eggs[$breeds[$i]][1] ‚Í¡ $breed_cs[$i] / $eggs[$breeds[$i]][2]‚¾‚æ<br>";
 			push @menus, 'ˆø‚«Žæ‚é';
@@ -86,7 +86,7 @@ sub tp_1 { #
 
 			open my $fh, "> $fn$cmd.cgi" or &error("$fn$cmd.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 			close $fh;
-			my $bc = ($eggs[$m{egg}][2] - $m{egg_c}) * $egg_per_sec[$cmd];
+			my $bc = ($eggs[$m{egg}][2] - $m{egg_c} + 1) * $egg_per_sec[$cmd];
 			$bc = $bc < 0 ? 0 : $bc;
 			utime ($time, $bc + $time, "$fn$cmd.cgi");
 
