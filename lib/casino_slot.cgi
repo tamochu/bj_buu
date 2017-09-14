@@ -1,13 +1,64 @@
 #================================================
 # ½Û¯ÄÀiƒvƒƒOƒŒƒbƒVƒuƒWƒƒƒbƒNƒ|ƒbƒgj
 #================================================
-require "$datadir/casino_bonus.cgi";
+#require "$datadir/casino_bonus.cgi";
+# ¼Ş¬¯¸Îß¯Ä‚Ìd—l•Ï‚¦‚½‚¢‚Ì‚ÅA‹¤—p‚³‚ê‚Ä‚éª‚Íg‚í‚È‚¢‚±‚Æ‚Éc
+@bonus_5 = ( # 50000 / 225 * 3000 = 666666º²İ
+	[2,17,0,0],		# ÌßØÃ¨´¯¸Ş
+	[2,19,0,0],		# ½°Êß°´¯¸Ş
+	[2,34,0,0],		# ·°´¯¸Ş
+	[3,121,0,0],	# Îß²½Şİ¿ŞİËŞ
+);
+
+@bonus_10 = ( # 100000 / 225 * 3000 = 1333333º²İ
+	[2,3,0,0],		# –²—‘
+	[3,1,0,0],		# ºÃÂ
+	[3,14,0,0],		# ÏÈ·Èº
+	[3,124,0,0],	# ÃŞ½
+);
+
+@bonus_25 = (  # 250000 / 225 * 3000 = 3333333º²İ
+	[2,2,0,0],		# H—‘
+	[3,16,0,0],		# ËŞ¯·°
+	[3,17,0,0],		# ×Ì§´Ù
+	[3,18,0,0],		# Ğ¶´Ù
+);
+
+@bonus_50 = (  # 500000 / 225 * 3000 = 6666666º²İ
+	[2,32,0,0],		# ×ÌŞØ°´¯¸Ş
+	[2,38,0,0],		# ´Ø°Ä´¯¸Ş
+	[2,39,0,0],		# ÃŞ½´¯¸Ş
+);
+
+@bonus_100 = (  # 500000 / 225 * 3000 = 6666666º²İ
+	[2,37,0,0],		# ºŞ¯ÄŞ´¯¸Ş
+	[2,41,0,0],		# Ï½À°´¯¸Ş
+	[2,46,0,0],		# ÊŞÂ´¯¸Ş
+	[2,47,0,0],		# ¸×²Ñ´¯¸Ş
+);
+
+@bonus_200 = (  # 1000000 / 225 * 3000 = 13333333º²İ
+	[1,32,500,30],	#¸ÛÑÊ°Âš30
+	[3,168,0,0],	# Íß²İÀ°
+	[3,7,0,0],		# ÀŞ¸Î
+	[3,8,0,0],		# ºŞ°½Ä
+);
+
+@bonus_300 = ( # 2000000 / 225 * 3000 = 26666666º²İ
+	[2,54,0,0],		# À·µİ
+	[3,183,0,0],	# À¸Ğ
+	[3,21,0,0],		# ¶ŞÌŞØ´Ù
+);
+
 require "./lib/_casino_funcs.cgi";
 
 $header_size = 2; # ½Û¯ÄÀ—p‚ÌÍ¯ÀŞ°»²½Ş JPA‹­§JP
 ($_jp, $_ceil) = ($_header_size .. $_header_size + $header_size - 1); # Í¯ÀŞ°”z—ñ‚Ì²İÃŞ¯¸½
 
 sub run {
+	$option_form .= qq|<form method="$method" action="$this_script" name="form">|;
+	$option_form .= &create_submit("view_log", "JPƒƒO");
+	$option_form .= qq|</form>|;
 
 	&_default_run;
 }
@@ -18,13 +69,12 @@ sub show_head_info { # ‚·‚×‚Ä‚ÌÌßÚ²Ô°‚É•\¦‚µ‚½‚¢î•ñ1
 	print qq|¼Ş¬¯¸Îß¯ÄF$head[$_jp]|;
 	my @bets = ('1bet', '2bet', '3bet');
 	print qq|<form method="$method" action="$this_script" name="form">|;
-	print &create_submit("play", "‰ñ‚·");
 	print &create_select_menu("bet_value", $in{bet_value}, @bets);
+	print &create_submit("play", "‰ñ‚·");
 	print qq|</form>|;
 }
 
 sub play {
-	return unless $m{name} eq 'VIPPER' || $m{name} eq 'nanamie';
 	my $value = $in{bet_value} + 1;
 
 	# my $this_pool_file  = "$userdir/$id/casino_pool.cgi"; # ’è‹`–Y‚êH ’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½
@@ -56,16 +106,20 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 	$m{coin} -= (1000 * $value);
 
 	my @m = ('‚V');
-	my @m_exval = ('‡','ô','õ','š','™','¢','¥','Ÿ','›','œ','~','¡','÷','£','','Š','‰','§','ó','ò'); # 20ŒÂ
-	for my $val (@m_exval){
-		push @m, $val for (0..5); # 6ŒÂ
+	my @m_exval = ('‡','ô','š','™','¢','¥','Ÿ','›','œ','¡','£','','Š','‰','§','ó','ò'); # 17ŒÂ ,'õ','÷','~'
+	for my $val (@m_exval) {
+		push @m, $val for (0..3); # 4ŒÂ Œ³‚Í 6
 	}
-	# 20ŒÂ‚ÌÏ°¸‚ğ6ŒÂ‚¸‚Â’Ç‰Á 120ŒÂ‚ÌÏ°¸‚Ì’†‚É 7 ‚ª1‚Â 1/121 ‚ÌŠm—¦‚Å 7
+	# 17í‚ÌÏ°¸‚ğ4ŒÂ‚¸‚Â’Ç‰Á Œv68ŒÂ‚ÌÏ°¸‚Ì’†‚É 7 ‚ª1‚Â 1/69 ‚ÌŠm—¦‚Å 7
 	my @s = ();
 	my $gflag = 0;
-	my $rets = '';
+	my ($rets, $jp_log) = ('', '');
 	my @prizes = ();
 	$s[$_] = int(rand(@m)) for (0 .. 8);
+	# 17í‚ÌÏ°¸‚ğ4ŒÂ‚¸‚Â’Ç‰Á Œv68ŒÂ‚ÌÏ°¸‚Ì’†‚É 7 ‚ª1‚Â 1/69 ‚ÌŠm—¦‚Å 7 7 ‚ª3‚Âo‚é‚Ì‚Í 1/(69^3) = 1/250047
+	# 9‰ÓŠ‚Ìƒ}ƒX‚Åˆê—ñ‘µ‚¦‚Î“–‚½‚è 1/(9^2) = 1/81 ‚ÌŠm—¦‚Å‘µ‚¤i7ˆÈŠO‚Í•¡”‚ ‚é‚Ì‚Åˆá‚¤‚Í‚¸j
+	# 1/(63^3) = 1/250047 1/(9^2) = 1/81 ‚Â‚Ü‚èJP‚ªo‚éŠm—¦‚Í 1/20253807H
+	# 2/13468869 poppo
 
 	open my $fh, "+< ${this_file}_member.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
 	eval { flock $fh, 2; };
@@ -78,7 +132,7 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 	}
 
 	# ¼Ş¬¯¸Îß¯Ä‚Éº²İ—­‚Ü‚è‚·‚¬‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß‚Ì‹­§¼Ş¬¯¸Îß¯Ä
-	$s[0] = $s[1] = $s[2] = 0 if $head[$_jp] > $head[$_ceil];
+	$s[0] = $s[1] = $s[2] = 0 if 2500000 < $head[$_jp] && 2500000 < $head[$_ceil] && $head[$_ceil] < $head[$_jp];
 
 	$rets .= "<p>y$m[$s[3]]zy$m[$s[4]]zy$m[$s[5]]z</p>";
 	$rets .= "<p>y$m[$s[0]]zy$m[$s[1]]zy$m[$s[2]]z</p>";
@@ -91,7 +145,7 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 		}
 		else {
 			$rets .= "Jackpot!!!";
-			$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
+			$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes, \$jp_log);
 		}
 		$gflag = 1;
 	}
@@ -104,7 +158,7 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 			}
 			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes, \$jp_log);
 			}
 			$gflag = 1;
 		}
@@ -115,7 +169,7 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 			}
 			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes, \$jp_log);
 			}
 			$gflag = 1;
 		}
@@ -129,7 +183,7 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 			}
 			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes, \$jp_log);
 			}
 			$gflag = 1;
 		}
@@ -140,7 +194,7 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 			}
 			else {
 				$rets .= "Jackpot!!!";
-				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes);
+				$rets .= &jackpot(\$head[$_jp], \$head[$_ceil], \@prizes, \$jp_log);
 			}
 			$gflag = 1;
 		}
@@ -157,16 +211,144 @@ $this_pool_file ‚ª’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚Ì‚ÅAŒ‹‹Ç‚Ì‚Æ‚±‚ëº²İ‚ª 1000 –¢–‚Ìó‘Ô‚Å‰ñ‚
 	print $fh @members;
 	close $fh;
 
-	&send_item($m{name},$bonus[$prizes[$_]][0],$bonus[$prizes[$_]][1],$bonus[$prizes[$_]][2],$bonus[$prizes[$_]][3], 1) for (0 .. $#prizes);
+	for my $i (0 .. $#prizes) {
+		my @bonus = split /<>/, $prizes[$i];
+		&send_item($m{name},$bonus[0],$bonus[1],$bonus[2],$bonus[3], 1);
+	}
+
+	if ($jp_log) {
+		my @logs = ();
+		my $log_num = 0;
+		open my $fh, "+< ${this_file}_log.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
+		eval { flock $fh, 2; };
+		while (my $line = <$fh>) {
+			push @logs, $line;
+			$log_num++;
+			last if 29 <= $log_num;
+		}
+		unshift @logs, "$m{name} $jp_log $date\n";
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh @logs;
+		close $fh;
+
+		&mes_and_world_news("<b>¼Ş¬¯¸Îß¯Ä‚ğo‚µ‚Ü‚µ‚½</b>", 1);
+	}
 
 	&write_user;
 	return ($rets);
 }
 
 sub jackpot {
-	my ($ref_jp, $ref_ceil, $ref_prizes) = @_;
+	my ($ref_jp, $ref_ceil, $ref_prizes, $ref_log) = @_;
 	my $prize = '';
 
+	$$ref_log .= "jackpot:$$ref_jp my_coin:$m{coin} ";
+	my $jp = 2500000 - $m{coin}; # Šº²İ‚Ì¶İ½Ä‚ğ—Dæ‚µ‚Ä—]‚Á‚½º²İ‚ğ±²ÃÑ‰»
+	$$ref_log .= "get_coin:$jp–‡ ";
+	$$ref_jp = $$ref_jp - $jp;
+	$m{coin} = 2500000;
+
+	# ŠÖ”‰»‚µ‚½•û‚ª—Ç‚¢‚ª‚¿‚å‚Á‚Æ‚È‚ñ‚©•Ê‚É—Ç‚¢‚©‚È‚ÌƒRƒsƒy
+	if ($$ref_jp > 3000000) {
+		my $item_no = int(rand($#bonus_300+1));
+		push @$ref_prizes, join('<>', @{$bonus_300[$item_no]});
+		if ($bonus_300[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_300[$item_no][1]][1]";
+		}
+		elsif ($bonus_300[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_300[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_300[$item_no][1]][1]";
+		}
+		$$ref_jp -= 3000000;
+	}
+	if ($$ref_jp > 2000000) {
+		my $item_no = int(rand($#bonus_200+1));
+		push @$ref_prizes, join('<>', @{$bonus_200[$item_no]});
+		if ($bonus_200[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_200[$item_no][1]][1]";
+		}
+		elsif ($bonus_200[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_200[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_200[$item_no][1]][1]";
+		}
+		$$ref_jp -= 2000000;
+	}
+	if ($$ref_jp > 1000000) {
+		my $item_no = int(rand($#bonus_100+1));
+		push @$ref_prizes, join('<>', @{$bonus_100[$item_no]});
+		if ($bonus_100[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_100[$item_no][1]][1]";
+		}
+		elsif ($bonus_100[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_100[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_100[$item_no][1]][1]";
+		}
+		$$ref_jp -= 1000000;
+	}
+	if ($$ref_jp > 500000) {
+		my $item_no = int(rand($#bonus_50+1));
+		push @$ref_prizes, join('<>', @{$bonus_50[$item_no]});
+		if ($bonus_50[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_50[$item_no][1]][1]";
+		}
+		elsif ($bonus_50[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_50[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_50[$item_no][1]][1]";
+		}
+		$$ref_jp -= 500000;
+	}
+	if ($$ref_jp > 250000) {
+		my $item_no = int(rand($#bonus_25+1));
+		push @$ref_prizes, join('<>', @{$bonus_25[$item_no]});
+		if ($bonus_25[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_25[$item_no][1]][1]";
+		}
+		elsif ($bonus_25[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_25[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_25[$item_no][1]][1]";
+		}
+		$$ref_jp -= 250000;
+	}
+	if ($$ref_jp > 100000) {
+		my $item_no = int(rand($#bonus_10+1));
+		push @$ref_prizes, join('<>', @{$bonus_10[$item_no]});
+		if ($bonus_10[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_10[$item_no][1]][1]";
+		}
+		elsif ($bonus_10[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_10[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_10[$item_no][1]][1]";
+		}
+		$$ref_jp -= 100000;
+	}
+	if ($$ref_jp > 50000) {
+		my $item_no = int(rand($#bonus_5+1));
+		push @$ref_prizes, join('<>', @{$bonus_5[$item_no]});
+		if ($bonus_5[$item_no][0] == 1) {
+			$prize .= "$weas[$bonus_5[$item_no][1]][1]";
+		}
+		elsif ($bonus_5[$item_no][0] == 2) {
+			$prize .= "$eggs[$bonus_5[$item_no][1]][1]";
+		}
+		else {
+			$prize .= "$pets[$bonus_5[$item_no][1]][1]";
+		}
+		$$ref_jp -= 50000;
+	}
+=pod
 	while ($$ref_jp > 2500000) {
 		my $item_no = int(rand($#bonus+1));
 		push @$ref_prizes, $item_no;
@@ -181,13 +363,25 @@ sub jackpot {
 		}
 		$$ref_jp -= 1000000;
 	}
+=cut
 
-#	&mes_and_world_news("<b>¼Ş¬¯¸Îß¯Ä‚ğo‚µ‚Ü‚µ‚½</b>", 1);
-
-	$m{coin} += $$ref_jp;
-	$$ref_jp = 3000000;
-	$$ref_ceil = int(rand(100000000) + 3000000);
+#	$m{coin} += $$ref_jp;
+#	$$ref_jp = $$ref_jp > 0 ? $$ref_jp + 2500000 : 2500000 ;
+	$$ref_jp = 2500000;
+	# ‹­§JP “–‚½‚éŠm—¦‚ß‚Á‚¿‚á’á‚­‚µ‚ÄJP’™‚ß‚³‚¹‚Ä‚±‚ê‚Å“f‚©‚¹‚é‚æ‚èA‚»‚±‚»‚±“f‚©‚¹‚ÄJP—­‚Ü‚ç‚È‚¢‚æ‚¤‚É‚µ‚½•û‚ªŒ’‘S‚È‚Ì‚Å‚ÍH
+	# ‚È‚©‚È‚©JP“–‚½‚ç‚È‚¢‚Ì‚É‚±‚ê‚Å“f‚©‚ê‚é‚Æ‘S‘R“–‚½‚ç‚È‚¢‚Ì‚É“–‚½‚Á‚½l‚É‚Í‘å—ÊƒŠƒ^[ƒ“‚Å•sŒö•½Š´‹­‚¢
+	$$ref_ceil = int(rand(5000000) + 2500000);
+	$$ref_log .= "get_prize:$prize";
 	return "º²İ $jp –‡ $prize ‚ğŠl“¾‚µ‚Ü‚µ‚½<br>";
+}
+
+sub view_log {
+	open my $fh, "< ${this_file}_log.cgi" or &error('ÒİÊŞ°Ì§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ'); 
+	while (my $line = <$fh>) {
+		$mes .= "$line<br>";
+	}
+	close $fh;
+	return '';
 }
 
 1;#íœ•s‰Â
