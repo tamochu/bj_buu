@@ -117,7 +117,14 @@ sub tp_300 {
 	$mes .= "ただしﾄ･ｸ･ﾍﾞ･ﾂな大手術だからぁ、$cs{name}[0]の方しかすることができないのぉ<br>" if $m{country};
 	$mes .= "手術をするには、$menus[3][1] Gと手術時間$GWT分必要よぉ<br>";
 	$mes .= "手術をするとぉ、現在利用している銀行のお金はなくなってしまうわよぉ<br>" if $m{bank};
-	$mes .= "どぉするぅ？<br>";
+	$mes .= "どぉするぅ？";
+	if (&on_summer) {
+		$mes .= qq|<hr><font color="red">※イベント中に改名すると不具合が起きる可能性があります(名前で管理していることがあるため)</font>|;
+	}
+	else {
+		$mes .= "<br>";
+	}
+
 	$m{tp} += 10;
 	&menu("やめる", "$menus[3][0]する");
 }
@@ -203,6 +210,31 @@ sub tp_320 {
 		truncate $fh, 0;
 		print $fh @lines;
 		close $fh;
+
+		# 夏イベ中はラヂオ体操のログも書き換える(他はとりあえず知らん)
+		if (&on_summer) {
+			my $this_radio_dir = "$logdir/summer_radio";
+			for my $d (1..31) {
+				if (-f "$this_radio_dir/$d.cgi") {
+					my @members = ();
+					open my $fh, "+< $this_radio_dir/$d.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+					eval { flock $fh, 2; };
+					while (my $line = <$fh>) {
+						my ($mname, $mtime) = split /<>/, $line;
+						if ($mname eq $m{name}) {
+							push @members, "$in{new_name}<>$mtime<>\n";
+						}
+						else {
+							push @members, "$mname<>$mtime<>\n";
+						}
+					}
+					seek  $fh, 0, 0;
+					truncate $fh, 0;
+					print $fh @members;
+					close $fh;
+				}
+			}
+		}
 
 		$id = $new_id;
 		$m{name} = $in{new_name};
@@ -492,7 +524,27 @@ sub tp_520 {
 
 	if ($in{icon} && ($in{icon} == 1)) {
 		$m{icon_pet} = '';
+		$m{icon_pet_lv} = 0;
+		$m{icon_pet_exp} = 0;
 		$mes .= '外した首輪はこっちで回収しておくわね<br>';
+
+		my $id = unpack 'H*', $m{name};
+		my $this_file = "$userdir/$id/pet_icon.cgi";
+		if (-f "$this_file") {
+			open my $fh, "+< $this_file" or &error("$this_file ﾌｧｲﾙが開けません");
+			eval { flock $fh, 2; };
+			my $line = <$fh>;
+			if(index($line, "<>$m{pet};") >= 0){
+				$line =~ s/<>($m{pet});.*?;(.*?);(.*?)<>/<>$1;$m{icon_pet};$2;$3<>/;
+			}else{
+				$line = $line . "$m{pet};$m{icon_pet};1;22<>";
+			}
+			seek  $fh, 0, 0;
+			truncate $fh, 0;
+			print $fh $line;
+			close $fh;
+		}
+
 		&refresh;
 		&n_menu;
 	}
@@ -523,6 +575,8 @@ sub tp_520 {
 				my $line = <$fh>;
 				if(index($line, "<>$m{pet};") >= 0){
 					$line =~ s/<>($m{pet});.*?;(.*?);(.*?)<>/<>$1;$m{icon_pet};$2;$3<>/;
+					$m{icon_pet_lv} = $2;
+					$m{icon_pet_exp} = $3;
 				}else{
 					$line = $line . "$m{pet};$m{icon_pet};1;22<>";
 					$m{icon_pet_lv} = 1;
