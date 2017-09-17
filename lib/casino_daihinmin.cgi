@@ -411,7 +411,7 @@ sub play {
 			for my $i (0 .. $#participants) {
 				if ($next_num[0] == 0 && $participants[$i] ne $m{name} && $pass_datas{$participants[$i]} == 0) { # ﾊﾟｽをしていない直近のﾌﾟﾚｲﾔｰ
 					$next_num[0] = $i;
-					$is_find = 1;
+					$is_find = 1; # ﾊﾟｽをしていないﾌﾟﾚｲﾔｰが見つかった
 				}
 				elsif ($pass_datas{$participants[$i]} == 1) { # ﾊﾟｽをしているﾌﾟﾚｲﾔｰ
 					$next_num[1] = $i if $next_num[1] == 0 && $participants[$i] ne $m{name}; # ﾊﾟｽをしている直近のﾌﾟﾚｲﾔｰ
@@ -424,7 +424,7 @@ sub play {
 		}
 
 		$result_mes .= 'パス' if $is_pass;
-		if ($is_eight_cut || $is_s3_cut || ($is_find && @participants == ($pass_num+$refresh_num+1)) || (@participants == ($pass_num+$refresh_num))) { 
+		if ($is_eight_cut || $is_s3_cut || ($is_find && @participants == ($pass_num+$refresh_num+1)) || (!$is_find && @participants == ($pass_num+$refresh_num))) { 
 			$mes .= "turn change2<br>";
 			($head[$_field_card], $head[$_bind_m], $head[$_bind_s]) = ('', '', '');
 			$result_mes .= '<br>八切り' if $is_eight_cut;
@@ -439,12 +439,12 @@ sub play {
 
 		# ﾊﾟｽをしていないﾌﾟﾚｲﾔｰがいるなら直近のﾊﾟｽをしていないﾌﾟﾚｲﾔｰのﾀｰﾝ
 		# 全員がﾊﾟｽしているなら直近のﾊﾟｽをしているﾌﾟﾚｲﾔｰのﾀｰﾝ
-		$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[!$is_find]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
+		$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[!$is_find]) unless $is_eight_cut || $is_s3_cut; # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
 	}
 
 	my $penalty_coin = 0;
 	my $size2 = @participants;
-	$mes .= "if init_header is_my_turn $is_my_turn && is_reset $is_reset == participants $size2";
+	$mes .= "if init_header is_my_turn $is_my_turn && is_reset $is_reset == participants $size2<br>";
 	if ($is_my_turn && $winner eq $m{name} && ($is_playable || $is_pass) && $is_reset == @participants) { # 若干不必要な感じもするけどとにかく終了条件厳しく
 		$mes .= "reset1<br>";
 		$penalty_coin = $head[$_rate];
