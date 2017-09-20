@@ -23,6 +23,7 @@ my %calc_name = (
 	cho_c => "’³•ñ",
 	sen_c => "ô”]",
 	gik_c => "‹UŒv",
+	kou_c => "Ué",
 	tei_c => "’ãŽ@",
 	mat_c => "‘Ò•š",
 	year_strong => "ˆê”N’D‘—Í",
