@@ -43,15 +43,16 @@ sub tp_1 {
 		&n_menu;
 
 		require './lib/_use_pet_log.cgi';
-		&write_use_pet_log($id, $m{pet});
 
 		# ﾏﾓﾉﾉﾀﾈの場合
 		if ($m{pet} >= 128 && $m{pet} <= 130) {
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、$m{name}のことをじっと見ている…<br>";
 			$m{lib} = 'add_monster';
 			$m{tp}  = 100;
 		}
 		elsif ($m{pet} == 168){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、異次元への扉を開いた<br>";
 			open my $fh, "> $userdir/$id/upload_token.cgi";
 			close $fh;
@@ -63,6 +64,7 @@ sub tp_1 {
 			if ($m{act} >= 100) {
 				$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、$m{name}を牢獄へと誘おうとしたが疲れていたので断った<br>";
 			}else {
+				&write_use_pet_log($id, $m{pet});
 				$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、$m{name}を牢獄へと誘った<br>";
 
 				$m{lib} = 'prison';
@@ -70,48 +72,56 @@ sub tp_1 {
 			}
 		}
 		elsif ($m{pet} == 175){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、ｱｲｺﾝにいたずらを仕掛けようとした<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 100;
 		}
 		elsif ($m{pet} == 176){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、称号にいたずらを仕掛けようとした<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 200;
 		}
 		elsif ($m{pet} == 185){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、財布にいたずらを仕掛けようとした<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 300;
 		}
 		elsif ($m{pet} == 186){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、声を出せないようにしようとした<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 400;
 		}
 		elsif ($m{pet} == 188){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、他の国から有用な人材を引き抜こうとした<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 500;
 		}
 		elsif ($m{pet} == 189){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、全国に聞こえるくらい大きな声で叫んだ<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 600;
 		}
 		elsif ($m{pet} == 190){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、あだ名をつけた<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 700;
 		}
 		elsif ($m{pet} == 191){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、世界に一つだけの武器を見つけた<br>";
 
 			$m{lib} = 'trick';
@@ -130,6 +140,7 @@ sub tp_1 {
 				}
 				$cs{strong}[$m{country}] -= $total;
 				&write_cs;
+				&write_use_pet_log($id, $m{pet});
 				&remove_pet;
 				my %sames;
 				open my $fh, "< $logdir/$m{country}/member.cgi";
@@ -147,12 +158,14 @@ sub tp_1 {
 			}
 		}
 		elsif ($m{pet} == 198){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、変な語尾を付けようとしている<br>";
 
 			$m{lib} = 'trick';
 			$m{tp}  = 900;
 		}
 		elsif ($m{pet} == 201){
+			&write_use_pet_log($id, $m{pet});
 			$mes .= "$pets[$m{pet}][1]★$m{pet_c}は、風説の流布しようとしている<br>";
 
 			$m{lib} = 'trick';
@@ -170,6 +183,7 @@ sub tp_1 {
 				}
 			}
 			if($use_flag){
+				&write_use_pet_log($id, $m{pet});
 				&{ $pets[$m{pet}][3] };
 				if ($m{pet} > 0) {
 					$mes .= "役目を終えた $pets[$m{pet}][1]★$m{pet_c} は光の彼方へ消えていった…<br>$pets[$m{pet}][1]★$m{pet_c}　ﾉｼ<br>";
