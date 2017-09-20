@@ -90,7 +90,12 @@ sub run {
 	print qq|</tr></table>|;
 	
 	my $rows = $is_mobile ? 2 : 5;
-	print qq|<form method="get" action="$this_script"><input type="hidden" name="mode" value="write">|;
+	if ($is_mobile) {
+		print qq|<form method="get" action="$this_script"><input type="hidden" name="mode" value="write">|;
+	}
+	else {
+		print qq|<form method="post" action="$this_script"><input type="hidden" name="mode" value="write">|;
+	}
 	print qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass"><input type="hidden" name="guid" value="ON">|;
 	print qq|<textarea name="comment" cols="60" rows="$rows" wrap="soft" class="textarea1">$in{text}$in{file_name}</textarea><br>|;
 	print qq|<input type="submit" value="‘‚«ž‚Þ" class="button_s"><input type="checkbox" name="img" value="1"/>‰æ‘œ‚ð‘I‚Ô|;
