@@ -7,6 +7,7 @@ require 'lib/_write_tag.cgi';
 # ‘‚«‚İˆ—
 #=================================================
 sub write_comment {
+	return 0 if ($ENV{REQUEST_METHOD} ne 'POST') && !$is_mobile;
 	&error('–{•¶‚É‰½‚à‘‚©‚ê‚Ä‚¢‚Ü‚¹‚ñ') if $in{comment} eq '';
 	&error("–{•¶‚ª’·‚·‚¬‚Ü‚·(”¼Šp$max_comment•¶š‚Ü‚Å)") if length $in{comment} > $max_comment;
 	&error('‘‚«‚İŒ ŒÀ‚ª‚ ‚è‚Ü‚¹‚ñ') if (!&writer_check);
