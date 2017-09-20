@@ -508,7 +508,7 @@ sub check_flag {
 		my $line = <$fh>;
 		my($letters) = split /<>/, $line;
 		close $fh;
-		print qq|<hr><font color="#FFCC66">è†‚ª $letters Œ“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
+		print qq|<hr><font color="#FFCC66">è†‚ª $letters Œ“Í‚¢‚Ä‚¢‚Ü‚·</font><br>| if $letters;
 	}
 	if (-f "$userdir/$id/depot_flag.cgi") {
 		print qq|<hr><font color="#FFCC00">—a‚©‚èŠ‚É‰×•¨‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;

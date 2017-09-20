@@ -193,7 +193,7 @@ sub status_html {
 		my $line = <$fh>;
 		my($letters) = split /<>/, $line;
 		close $fh;
-		$head_mes .= qq|<font color="#FFCC66">è†‚ª $letters Œ“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
+		$head_mes .= qq|<font color="#FFCC66">è†‚ª $letters Œ“Í‚¢‚Ä‚¢‚Ü‚·</font><br>| if $letters;
 	}
 	if (-f "$userdir/$id/depot_flag.cgi") {
 		$head_mes .= qq|<font color="#FFCC00">—a‚©‚èŠ‚É‰×•¨‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;

@@ -63,7 +63,12 @@ if ($m{wt} > 0) { # S‘©ŠÔ
 	elsif ($m{lib_r} eq '') {
 		my $head_mes = '';
 		if (-f "$userdir/$id/letter_flag.cgi") {
-			$main_screen .= qq|<font color="#FFCC66">è†‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
+			open my $fh, "< $userdir/$id/letter_flag.cgi";
+			my $line = <$fh>;
+			my($letters) = split /<>/, $line;
+			close $fh;
+			$main_screen .= qq|<font color="#FFCC66">è†‚ª $letters Œ“Í‚¢‚Ä‚¢‚Ü‚·</font><br>| if $letters;
+#			$main_screen .= qq|<font color="#FFCC66">è†‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;
 		}
 		if (-f "$userdir/$id/depot_flag.cgi") {
 			$main_screen .= qq|<font color="#FFCC00">—a‚©‚èŠ‚É‰×•¨‚ª“Í‚¢‚Ä‚¢‚Ü‚·</font><br>|;

@@ -119,6 +119,8 @@ sub tp_210 {
 				close $fh;
 				
 				# ŽèŽ†‚ª‚ ‚é‚æÌ×¸Þ‚ð‚½‚Ä‚é
+				&set_letter_flag($y_id, 2);
+=pod
 				my $letters = 0;
 				if(-f "$userdir/$send_id/letter_flag.cgi"){
 					open my $fh9, "< $userdir/$y_id/letter_flag.cgi";
@@ -131,6 +133,7 @@ sub tp_210 {
 				open my $fh9, "> $userdir/$y_id/letter_flag.cgi";
 				print $fh9 "$letters<>";
 				close $fh9;
+=cut
 			}
 			close $fh_m;
 			

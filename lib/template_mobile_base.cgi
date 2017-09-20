@@ -127,7 +127,7 @@ sub check_flag {
 		my $line = <$fh>;
 		my($letters) = split /<>/, $line;
 		close $fh;
-		print qq|<hr><font color="#FFCC66">手紙が $letters 件届いています</font><br>|;
+		print qq|<hr><font color="#FFCC66">手紙が $letters 件届いています</font><br>| if $letters;
 	}
 	if (-f "$userdir/$id/depot_flag.cgi") {
 		print qq|<hr><font color="#FFCC00">預かり所に荷物が届いています</font><br>|;
@@ -320,7 +320,7 @@ sub all_member_n {
 			my $member_c  = 0;
 			my %sames = ();
 			my $tf_name = "$logdir/chat_casino$files[$i][2]_member.cgi";
-			open my $fh, "< $tf_name" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません'); 
+			open my $fh, "< $tf_name" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
 			my $head_line = <$fh>;
 			while (my $line = <$fh>) {
 				my($mtime, $mname, $maddr, $mturn, $mvalue) = split /<>/, $line;
@@ -331,12 +331,12 @@ sub all_member_n {
 			close $fh;
 			$ret_str2 .= substr($files[$i][0], 0, 2) . "/$member_c <>";
 		}
-		open my $fh, "> $casino_n_file" or &error('対人ｶｼﾞﾉの人数ﾌｧｲﾙが開けません'); 
+		open my $fh, "> $casino_n_file" or &error('対人ｶｼﾞﾉの人数ﾌｧｲﾙが開けません');
 		print $fh $ret_str2;
 		close $fh;
 	}
 	else {
-		open my $fh, "< $casino_n_file" or &error('対人ｶｼﾞﾉの人数ﾌｧｲﾙが開けません'); 
+		open my $fh, "< $casino_n_file" or &error('対人ｶｼﾞﾉの人数ﾌｧｲﾙが開けません');
 		$ret_str2 = <$fh>;
 		close $fh;
 	}

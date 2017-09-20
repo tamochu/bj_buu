@@ -173,7 +173,14 @@ sub union {
 #==========================================================
 sub send_letter {
 	my($name, $is_save_log) = @_;
-	
+	my $letter_type = 1;
+	if ($this_file =~ /blog/) {
+		$letter_type = 3;
+	}
+	elsif ($this_script =~ /horyu/) {
+		$letter_type = 4;
+	}
+
 	if ($name =~ /^&lt;(.*)&gt;$/ && &is_sabakan) {
 		&send_group($1);
 		return;
@@ -189,14 +196,16 @@ sub send_letter {
 	&write_comment;
 	
 	# 手紙があるよﾌﾗｸﾞをたてる
-	my $letters = 0;
-	if(-f "$userdir/$send_id/letter_flag.cgi"){
-		open my $fh, "< $userdir/$send_id/letter_flag.cgi";
-		my $line = <$fh>;
-		($letters) = split /<>/, $line;
-		close $fh;
-	}
-	else {
+	&set_letter_flag($send_id, $letter_type);
+#	my $letters = 0;
+#	if (-f "$userdir/$send_id/letter_flag.cgi") {
+#		open my $fh, "< $userdir/$send_id/letter_flag.cgi";
+#		my $line = <$fh>;
+#		($letters) = split /<>/, $line;
+#		close $fh;
+#	}
+#	else {
+	unless (-f "$userdir/$send_id/letter_flag.cgi") {
 		my %you_datas = &get_you_datas($send_id, 1);
 		if ($you_datas{mail_address} =~ /^[^@]+@[^.]+\..+/) {
 			my $sendmail = '/usr/sbin/sendmail';
@@ -236,11 +245,11 @@ EOS
 			close(SDML);
 		}
 	}
-	$letters++;
+#	$letters++;
 	
-	open my $fh, "> $userdir/$send_id/letter_flag.cgi";
-	print $fh "$letters<>";
-	close $fh;
+#	open my $fh, "> $userdir/$send_id/letter_flag.cgi";
+#	print $fh "$letters<>";
+#	close $fh;
 	
 	&send_letter_save_log($name) if $is_save_log eq '1';
 }
@@ -488,6 +497,44 @@ sub header {
 		print qq|<script type="text/javascript" src="$htmldir/nokori_time.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/jquery-1.11.1.min.js?$jstime"></script>\n|;
 		print qq|<script type="text/javascript" src="$htmldir/js/bj.js?$jstime"></script>\n|;
+=pod
+		print qq|<script>|;
+		print qq|var pinching = false;|;
+		print qq|var d0 = 1;|;
+		print qq|var d1 = 1;|;
+		print qq|var dx = 0;|;
+		print qq|var scale = 1;|;
+#		print qq|document.getElementById("body").onscroll = function(){|;
+#		print qq|  var $scrollLeft = this.scrollLeft;|;
+#		print qq|  document.querySelector("#commands").style.left = $scrollLeft;|;
+#		print qq|};|;
+		print qq|document.addEventListener("touchmove", function(e){|;
+		print qq|  if (e.touches.length == 2) {|;
+		print qq|    if (!pinching) {|;
+		print qq|      pinching = true;|;
+		print qq|      scale = ev.originalEvent.scale;|;
+		print qq|      d0 = Math.sqrt(|;
+		print qq|        Math.pow(e.touches[1].screenX - e.touches[0].screenX, 2) +|;
+		print qq|        Math.pow(e.touches[1].screenY - e.touches[0].screenY, 2)|;
+		print qq|      );|;
+		print qq|      dx = e.touches[0].screenX;|;
+		print qq|    } else {|;
+		print qq|      d1 = Math.sqrt(|;
+		print qq|        Math.pow(e.touches[1].screenX - e.touches[0].screenX, 2) +|;
+		print qq|        Math.pow(e.touches[1].screenY - e.touches[0].screenY, 2)|;
+		print qq|      );|;
+#		print qq|      document.querySelector("#commands").style.zoom = d1 / d0;|;
+		print qq|      document.querySelector("#commands").style.width = window.innerWidth / scale;|;
+#		print qq|      document.querySelector("#commands").style.margin-left = dx;|;
+		print qq|    }|;
+		print qq|  }|;
+		print qq|});|;
+		print qq|document.addEventListener("touchend", function(e){|;
+		print qq|  pinching = false;|;
+		print qq|});|;
+		print qq|</script>|;
+=cut
+		print qq|<script type="text/javascript" src="$htmldir/js/appli.js?$jstime"></script>\n|;
 	}
 #	print qq|<meta name="viewport" content="width=320, ">| if $is_smart;
 	unless ($is_appli) {
@@ -513,11 +560,12 @@ sub header {
 sub footer {
 	print qq|<p><a href="#top">▲上</a></p>| if $is_mobile;
 	print qq|<br><div align="right" style="font-size:11px">|;
-	print qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br><a href="http://www.game-smartphone.com/simulation/game_387.html">スマートフォンゲームズ</a><br>|; # 著作表示:削除・非表示 禁止!!
+	print qq|Blind Justice Ver$VERSION<br><a href="http://cgi-sweets.com/" target="_blank">CGI-Sweets</a><br><a href="http://amaraku.net/" target="_blank">Ama楽.net</a><br><a href="http://www.game-smartphone.com/simulation/game_387.html">スマートフォンゲームズ</a><br>当サイトでは<a href="https://www.emojione.com/">Emoji One</a>の絵文字を利用しています(<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)<br>|; # 著作表示:削除・非表示 禁止!!
 	print qq|$copyright|;
 	printf("%0.10f秒",Time::HiRes::time - $load_time);
-#	print qq|</div></body></html>|;
-	print qq|</div></div></body></html>|;
+	print qq|</div>|;
+	print qq|</div>| if $is_appli;
+	print qq|</body></html>|;
 }
 
 #==========================================================
@@ -789,7 +837,7 @@ sub load_RWD {
 # 専用アプリ向けのページスイッチャー
 #================================================
 sub show_page_switcher {
-	print qq|<div align="center" valign="bottom" id="commands">|;
+	print qq|<div valign="bottom" id="commands">|;
 
 	print qq|<form method="$method" action="news.cgi">|;
 	print qq|<input type="hidden" name="id" value="$in{id}"><input type="hidden" name="pass" value="$in{pass}"><input type="hidden" name="no" value="$in{no}">|;
@@ -842,6 +890,43 @@ sub show_page_switcher {
 	print qq|<input type="submit" value="運営議論場" class="button2s"></form>|;
 
 	print qq|</div>|;
+}
+
+# 手紙があるよﾌﾗｸﾞをたてる
+sub set_letter_flag {
+	my ($send_id, $type) = @_;
+	my $len = 5 - 1; # letter.cgi の受信箱の数 - 1 配列の上限値 system.cgi でも定義 set_letter_flag
+	my @letters = (); # 各受信箱の未読数
+	my $line = '';
+
+	if (-f "$userdir/$send_id/letter_flag.cgi") {
+		open my $fh, "+< $userdir/$send_id/letter_flag.cgi" or &error('ﾒﾝﾊﾞｰﾌｧｲﾙが開けません');
+		eval { flock $fh, 2; };
+		$line = <$fh>;
+		@letters = split /<>/, $line;
+		$letters[$type]++ if $type; # 専用の受信箱がなく、「すべて」の未読数を増やそうと 0 を指定したとき、「すべて」が2通増えてしまうのを避ける
+		$letters[0]++;
+#		for my $i (0 .. $#letters-1) {
+#			$letters[$#letters-$i]++ if $i == $type;
+#			$letters += $letters[$#letters-$i];
+#		}
+#		$letters[0] = $letters;
+		$line = '';
+		$line .= "$letters[$_]<>" for (0 .. $len);
+		seek  $fh, 0, 0;
+		truncate $fh, 0;
+		print $fh $line;
+		close $fh;
+	}
+	else {
+		$letters[$_] = 0 for (0 .. $len); # calloc 0 初期化
+		$letters[$type]++ if $type; # 専用の受信箱がなく、「すべて」の未読数を増やそうと 0 を指定したとき、「すべて」が2通増えてしまうのを避ける
+		$letters[0]++;
+		$line .= "$letters[$_]<>" for (0 .. $len);
+		open my $fh, "> $userdir/$send_id/letter_flag.cgi";
+		print $fh $line;
+		close $fh;
+	}
 }
 
 1; # 削除不可
