@@ -437,9 +437,11 @@ sub play {
 			}
 		}
 
-		# ﾊﾟｽをしていないﾌﾟﾚｲﾔｰがいるなら直近のﾊﾟｽをしていないﾌﾟﾚｲﾔｰのﾀｰﾝ
-		# 全員がﾊﾟｽしているなら直近のﾊﾟｽをしているﾌﾟﾚｲﾔｰのﾀｰﾝ
-		$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[!$is_find]) unless $is_eight_cut || $is_s3_cut; # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
+		unless ($is_eight_cut || $is_s3_cut) {
+			# ﾊﾟｽをしていないﾌﾟﾚｲﾔｰがいるなら直近のﾊﾟｽをしていないﾌﾟﾚｲﾔｰのﾀｰﾝ
+			# 全員がﾊﾟｽしているなら直近のﾊﾟｽをしているﾌﾟﾚｲﾔｰのﾀｰﾝ
+			$head[$_participants] = &change_turn($head[$_participants]) for (1 .. $next_num[!$is_find]); # ﾀｰﾝ終了 1ﾀｰﾝで複数回行動するようなｹﾞｰﾑならｺﾒﾝﾄｱｳﾄし、最終的な行動で実行
+		}
 	}
 
 	my $penalty_coin = 0;
