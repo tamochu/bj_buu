@@ -28,8 +28,9 @@ sub begin {
 	$mes .= '‚Ç‚±‚És‚«‚Ü‚·‚©?<br>';
 	&menu(map { $_->[0] } @menus);
 }
-sub tp_1  { &b_menu(@menus); }
-
-
+sub tp_1  {
+	return if &is_ng_cmd(1..$#menus);
+	&b_menu(@menus);
+}
 
 1; # íœ•s‰Â

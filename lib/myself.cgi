@@ -227,6 +227,9 @@ sub tp_1 {
 
 		&begin;
 	}
+	else {
+		&b_menu(@menus);
+	}
 }
 
 
