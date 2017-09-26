@@ -262,6 +262,7 @@ sub tp_910 { &form1('諜報を行う(長期)') }
 sub tp_1010 { &form1('洗脳を行う(長期)') }
 sub form1 {
 	$mes .= "$c_yに到着しました<br>";
+
 	$m{tp} += 10;
 	$m{value} = int(rand(20))+5;#$config_test ? 0 : int(rand(20))+5;
 	$m{value} += int(rand(10)+1);#$config_test ? 0 : int(rand(10)+1); # ゲームバランスを考えて初期値ﾌﾞｰｽﾄはそのまま
@@ -694,8 +695,9 @@ sub tp_1100 {
 	&daihyo_c_up('mil_c'); # 代表熟練度
 	if ( $w{world} eq $#world_states) {
 		require './lib/vs_npc.cgi';
-#		if (rand(12) < $npc_mil || ($cs{strong}[$w{country}] < 50000 && rand(4) < $npc_mil) ){ 		
-		if (rand(14) < 1 || ($cs{strong}[$w{country}] < 50000 && rand(5) < 1) ) { # (1/14) + (1/5) - ( (1/14) * (1/5) ) = 0.25714285714
+#		if (rand(12) < $npc_mil || ($cs{strong}[$w{country}] < 50000 && rand(4) < $npc_mil) ){ # (1/12) + (1/4) - ( (1/12) * (1/4) ) = 0.3125
+#		if (rand(14) < 1 || ($cs{strong}[$w{country}] < 50000 && rand(5) < 1) ) { # (1/14) + (1/5) - ( (1/14) * (1/5) ) = 0.25714285714
+		if (rand(13) < 1 || ($cs{strong}[$w{country}] < 50000 && rand(4) < 1) ) { # (1/13) + (1/4) - ( (1/13) * (1/4) ) = 0.307692308
 		   &npc_military;
 		}
 	}

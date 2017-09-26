@@ -290,6 +290,27 @@ sub npc_war {
 =cut
 	require "$datadir/npc_war_$w{country}.cgi";
 	if ($cs{strong}[$w{country}] < 50000) {
+		  rand(4)  < 1 ? &npc_use_pet_fenrir # ¶³İÀ°—¦‚ª“ˆê‘—Í‚É¶‰E‚³‚ê‚é‚Ì‚ÅA–³‰ü‘¢‚æ‚è‚àÌªİØÙ”­“®—¦ã‚°‚Ä¶³İÀ°—¦•Ï“®‚³‚¹‚½‚¢
+		: rand(12) < 1 ? &npc_use_pet_prisoner # ÌªİØÙã‚°‚é‚ÆNPC’D‘‚ª”­“®‚µ‚É‚­‚­‚È‚é‚Ì‚ÅA’Pƒ‚ÉNPC’D‘‚Ì‚½‚ß‚ÉŠm—¦‰º‚°‚é
+		: rand(20) < 1 ? &npc_use_pet_pesto
+		: rand(15) < 1 ? &npc_use_pet_loptr # ÛÌßÄ‰º‚°‚È‚¢‚Æ•¨‘ƒXƒbƒJƒ‰ƒJƒ“‚É‚È‚é‰Â”\«‚‚»‚¤‚Æv‚Á‚½‚¯‚Ç‚»‚¤‚Å‚à‚È‚©‚Á‚½‚Á‚Û‚¢
+		: rand(45) < 1 ? &npc_use_pet_meteo # NPC±Ù¶“¯—lA’Pƒ‚ÉNPC’D‘‚Ì‚½‚ß‚ÉŠm—¦‰º‚°‚é Ä“¯–¿Œ‹‚ñ‚¾uŠÔNPCÒÃµ—‚¿‚Ä‚«‚½‚Ì‚Í‚í‚ç‚½
+		:                &npc_get_strong
+		;
+	}
+	else {
+		  rand(3)  < 1 ? &npc_use_pet_fenrir
+		: rand(15) < 1 ? &npc_use_pet_prisoner
+		: rand(20) < 1 ? &npc_use_pet_pesto
+		: rand(20) < 1 ? &npc_use_pet_loptr
+		: rand(50) < 1 ? &npc_use_pet_meteo
+		:                &npc_get_strong
+		;
+	}
+
+=pod
+	–³‰ü‘¢
+	if ($cs{strong}[$w{country}] < 50000) {
 		  rand(6)  < 1 ? &npc_use_pet_fenrir
 		: rand(10) < 1 ? &npc_use_pet_prisoner
 		: rand(20) < 1 ? &npc_use_pet_pesto
@@ -307,6 +328,7 @@ sub npc_war {
 		:                &npc_get_strong
 		;
 	}
+=cut
 =pod
 	  rand($npc_pet_pars[0])  < 1 ? &npc_use_pet_fenrir
 	: rand($npc_pet_pars[1]) < 1 ? &npc_use_pet_prisoner
@@ -324,12 +346,12 @@ sub npc_use_pet_fenrir { # ÌªİØÙ
 		next if $cs{is_die}[$i];
 		next if $cs{strong}[$i] < 1000;
 		$cs{strong}[$i] -= $touitu_strong * 0.6 > $cs{strong}[$w{country}] ? int(rand(400)+400) : int(rand(200)+200);
-#		$cs{barrier}[$i] -= 10;
-#		$cs{barrier}[$i] = 0 if $cs{barrier}[$i] < 0;
+		$cs{barrier}[$i] -= 5;
+		$cs{barrier}[$i] = 0 if $cs{barrier}[$i] < 0;
 	}
-	$cs{barrier}[$w{country}] += 10;
-	$cs{barrier}[$w{country}] = 200 if $cs{barrier}[$w{country}] > 200;
-	
+	$cs{barrier}[$w{country}] += 5;
+	$cs{barrier}[$w{country}] = 100 if $cs{barrier}[$w{country}] > 100;
+
 	$touitu_strong * 0.6 > $cs{strong}[$w{country}] ? 
 		&write_world_news("$cs{name}[$w{country}]‚Ì$npcs[0]{name}‚Ì–‚_‚Ì‘MŒõ!Še‘‚Ì$e2j{strong}‚ªí‚ç‚ê‚Ü‚µ‚½"):
 		&write_world_news("$cs{name}[$w{country}]‚Ì$npcs[4]{name}‚Ì”j‰óŒõü!Še‘‚Ì$e2j{strong}‚ªí‚ç‚ê‚Ü‚µ‚½");
@@ -406,6 +428,7 @@ sub npc_get_strong { # ’D‘
 	return if ($cs{is_die}[$country] && $cs{strong}[$country] < 5000);        # –Å–S‘‚©‚ç‚Í’D‚í‚È‚¢
 	return if $cs{strong}[$country] < 1000; # ‘—Í1000–¢–‚Í’D‚í‚È‚¢
 
+#	my $v = $cs{strong}[$w{country}] < 30000 ? int(rand(500)+300) : int(rand(300)+300); # Šî–{’D‘—Í 300 ` 599
 	my $v = int(rand(300)+300); # Šî–{’D‘—Í 300 ` 599
 
 	# ˆÃ•‘¤‚ÌdŠ¯l”‚ª••ˆó‘¤í‘ˆ‘‚Ì•z”‚ğã‰ñ‚Á‚½‚è‰º‰ñ‚Á‚½ê‡‚ÉNPC’D‘—Í‚ğ’²®‚·‚é
