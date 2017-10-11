@@ -47,8 +47,8 @@ sub write_comment {
 	else {
 		my ($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bicon_pet) = split /<>/, $line;
 	}
-	# 手紙じゃないなら同一本文の投稿をスルー、手紙は再受信
-	if ($in{comment} eq $hcomment && $this_file !~ /letter/) {
+	# 手紙じゃないなら同一人物・同一本文の投稿をスルー、手紙は再受信
+	if ($m{name} eq $hname && $in{comment} eq $hcomment && $this_file !~ /letter/) {
 		close $fh;
 		return 0;
 	}

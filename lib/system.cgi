@@ -193,28 +193,21 @@ sub send_letter {
 	&error("$nameというﾌﾟﾚｲﾔｰが存在しません") unless -f "$this_file.cgi";
 
 	require './lib/_bbs_chat.cgi';
+	local $max_log = 100;
 	&write_comment;
-	
+
 	# 手紙があるよﾌﾗｸﾞをたてる
 	&set_letter_flag($send_id, $letter_type);
-#	my $letters = 0;
-#	if (-f "$userdir/$send_id/letter_flag.cgi") {
-#		open my $fh, "< $userdir/$send_id/letter_flag.cgi";
-#		my $line = <$fh>;
-#		($letters) = split /<>/, $line;
-#		close $fh;
-#	}
-#	else {
-	unless (-f "$userdir/$send_id/letter_flag.cgi") {
-		my %you_datas = &get_you_datas($send_id, 1);
-		if ($you_datas{mail_address} =~ /^[^@]+@[^.]+\..+/) {
-			my $sendmail = '/usr/sbin/sendmail';
-			my $from = 'Blind Justice にゃあ鯖';
-			my $to = $you_datas{mail_address};
-			my $cc = '';
-			my $subject = '手紙が届きました';
-			my $msg = <<"EOS";
-$nameさん宛てに手紙が届いています。
+
+	my %you_datas = &get_you_datas($send_id, 1);
+	if ($you_datas{mail_address} =~ /^[^@]+@[^.]+\..+/) {
+		my $sendmail = '/usr/sbin/sendmail';
+		my $from = 'Blind Justice にゃあ鯖';
+		my $to = $you_datas{mail_address};
+		my $cc = '';
+		my $subject = '手紙が届きました';
+		my $msg = <<"EOS";
+手紙が届いています。
 ----------------------------------------
 Blind Justice にゃあ鯖
 http://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi
@@ -225,32 +218,26 @@ http://www.pandora.nu/nyaa/cgi-bin/bj/index.cgi
 ----------------------------------------
 EOS
 
-			$subject = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $subject));
-			$subject = encode_base64($subject, '');
-			$subject = "=?ISO-2022-JP?B?$subject?=";
-			$from = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $from));
-			$from = encode_base64($from, '');
-			$from = "=?ISO-2022-JP?B?$from?= <nyaa\@pandora.nu>";
-			$msg = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $msg));
-			
-			open(SDML,"| $sendmail -i -f nyaa\@pandora.nu $to") || die 'sendmail error';
-			print SDML "From: $from\n";
-			print SDML "To: nyaa\@pandora.nu\n";
-			print SDML "Cc: $cc\n";
-			print SDML "Subject: $subject\n";
-			print SDML "MIME-Version: 1.0\n";
-			print SDML "Content-Type: text/plain; charset=ISO-2022-JP\n";
-			print SDML "Content-Transfer-Encoding: 7bit\n\n";
-			print SDML "$msg";
-			close(SDML);
-		}
+		$subject = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $subject));
+		$subject = encode_base64($subject, '');
+		$subject = "=?ISO-2022-JP?B?$subject?=";
+		$from = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $from));
+		$from = encode_base64($from, '');
+		$from = "=?ISO-2022-JP?B?$from?= <nyaa\@pandora.nu>";
+		$msg = Encode::encode('ISO-2022-JP', Encode::decode('Shift_JIS', $msg));
+		
+		open(SDML,"| $sendmail -i -f nyaa\@pandora.nu $to") || die 'sendmail error';
+		print SDML "From: $from\n";
+		print SDML "To: nyaa\@pandora.nu\n";
+		print SDML "Cc: $cc\n";
+		print SDML "Subject: $subject\n";
+		print SDML "MIME-Version: 1.0\n";
+		print SDML "Content-Type: text/plain; charset=ISO-2022-JP\n";
+		print SDML "Content-Transfer-Encoding: 7bit\n\n";
+		print SDML "$msg";
+		close(SDML);
 	}
-#	$letters++;
-	
-#	open my $fh, "> $userdir/$send_id/letter_flag.cgi";
-#	print $fh "$letters<>";
-#	close $fh;
-	
+
 	&send_letter_save_log($name) if $is_save_log eq '1';
 }
 # ------------------
@@ -905,12 +892,7 @@ sub set_letter_flag {
 		$line = <$fh>;
 		@letters = split /<>/, $line;
 		$letters[$type]++ if $type; # 専用の受信箱がなく、「すべて」の未読数を増やそうと 0 を指定したとき、「すべて」が2通増えてしまうのを避ける
-		$letters[0]++;
-#		for my $i (0 .. $#letters-1) {
-#			$letters[$#letters-$i]++ if $i == $type;
-#			$letters += $letters[$#letters-$i];
-#		}
-#		$letters[0] = $letters;
+		$letters[0]++; # 「すべて」を1通増やす
 		$line = '';
 		$line .= "$letters[$_]<>" for (0 .. $len);
 		seek  $fh, 0, 0;
@@ -921,7 +903,7 @@ sub set_letter_flag {
 	else {
 		$letters[$_] = 0 for (0 .. $len); # calloc 0 初期化
 		$letters[$type]++ if $type; # 専用の受信箱がなく、「すべて」の未読数を増やそうと 0 を指定したとき、「すべて」が2通増えてしまうのを避ける
-		$letters[0]++;
+		$letters[0]++; # 「すべて」を1通増やす
 		$line .= "$letters[$_]<>" for (0 .. $len);
 		open my $fh, "> $userdir/$send_id/letter_flag.cgi";
 		print $fh $line;

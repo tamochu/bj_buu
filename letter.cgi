@@ -5,9 +5,10 @@ require "$datadir/header_myroom.cgi";
 # 手紙 Created by Merino
 #================================================
 
+# おそらくこの定義があまり意味ない
+# letter.cgi 内だけでの挙動ならば正しく動くが、例えば日記ｺﾒﾝﾄから手紙が飛んでくると blog.cgi の $max_log に上書きされ、そちらのログ数で擦り切られる
+# send_letter 関数内で $max_log をさらに上書きするようにしたので、件数をイジる場合はそちらも要変更
 $max_log = 100; # 手紙のログ数
-
-# 手紙の受信箱設定 項目数増えたら system.cgi の set_letter_flag も要変更
 
 &get_data;
 &header_myroom;
@@ -212,6 +213,7 @@ sub letter_box_greeting_card {
 	close $fh;
 }
 
+# 手紙の受信箱設定 項目数増えたら system.cgi の set_letter_flag も要変更
 sub header_letter_box {
 	my $month = shift;
 	my $len = 5 - 1; # letter.cgi の受信箱の数 - 1 配列の上限値 system.cgi でも定義 set_letter_flag
