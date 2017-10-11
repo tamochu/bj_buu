@@ -129,55 +129,64 @@ sub tp_300 {
 	}
 }
 
+# Í¯ÄŞÊİÄ
 sub tp_100 {
-	$mes .= '‘¼‘‚©‚çŠ©—U‚ğó‚¯‚Ü‚µ‚½<br>';
-	$m{tp} += 10;
-	&n_menu;
-}
-
-sub tp_110 {
 	my @head_hunt;
 	$mes .= '‚Ç‚ÌŠ©—U‚ğó‚¯‚Ü‚·‚©?<br>';
 	open my $fh, "+< $userdir/$id/head_hunt.cgi" or &error("$userdir/$id/head_hunt.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		my($hname, $hcountry) = split /<>/, $line;
-		push @head_hunt, $cs{name}[$hcountry];
+		$mes .= "$hname‚©‚ç $cs{name}[$hcountry] ‚Ö‚ÌŠ©—U‚ğó‚¯‚Ä‚¢‚Ü‚·<br>";
+		push @head_hunt, $cs{name}[$hcountry] if defined($cs{name}[$hcountry]);
 	}
 	close $fh;
 	$m{tp} += 10;
 	&menu('’f‚é', @head_hunt);
 }
 
-sub tp_120 {
+sub tp_110 {
+	unless (defined($cmd)) { # $cmd –¢’è‹`
+		$m{tp} -= 10;
+		&{ 'tp_'.$m{tp} };
+		return;
+	}
+	elsif ($cmd eq '0') { # ’f‚é
+		$mes .= "Š©—U‚ğ’f‚é‚±‚Æ‚É‚µ‚Ü‚µ‚½<br>";
+		open my $fh, "> $userdir/$id/head_hunt.cgi" or &error("$userdir/$id/head_hunt.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+		close $fh;
+		&refresh;
+		&n_menu;
+		return;
+	}
+
 	my $i_c = 0;
+	my ($from_name, $from_country);
 	open my $fh, "+< $userdir/$id/head_hunt.cgi" or &error("$userdir/$id/head_hunt.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
 	eval { flock $fh, 2; };
 	while (my $line = <$fh>) {
 		++$i_c;
 		if($i_c == $cmd){
 			my($hname, $hcountry) = split /<>/, $line;
-			if ($hcountry eq $m{country}) {
+			if ($hcountry eq $m{country}) { # ©‘‚©‚ç‚ÌŠ©—U‚ÍÍÄŞÊİŒø‰ÊÁ¸
 				$mes .= "©‘‚ÉdŠ¯‚Í‚Å‚«‚Ü‚¹‚ñ<br>";
-				&begin;
+				&begin; # Šm”F‚µ‚Ä‚È‚¢‚¯‚Ç begin ‚Å—Ç‚¢‚Ì‚©”÷–­
 			}
 			elsif (defined $cs{name}[$hcountry]) { # ‘‚ª‘¶İ‚·‚é
 				if ($m{country}) {
-					# ŒNå
-					if ($m{name} eq $cs{ceo}[$m{country}]) {
+					if ($m{name} eq $cs{ceo}[$m{country}]) { # ŒNå‚È‚çÍÄŞÊİŒø‰Ê‘±
 						$mes .= "$c_m‚Ì$e2j{ceo}‚ğ«”C‚·‚é•K—v‚ª‚ ‚è‚Ü‚·<br>";
-						&begin;
+						&refresh;
+						&n_menu;
+						close $fh;
 						return;
 					}
 					$cs{money}[$m{country}] += $need_money;
 				}
-				&move_player($m{name}, $m{country}, $hcountry);
-				$m{country} = $hcountry;
-				$m{vote} = '';
-				&mes_and_world_news("$hname‚Ì—U‚¢‚Å$cs{name}[$hcountry]‚ÉdŠ¯‚µ‚Ü‚µ‚½",1);
+				($from_name, $from_country) = ($hname, $hcountry);
 			}
-			else {
-				&begin;
+			else { # ÍÄŞÊİÁ–Å
+				&begin; # Šm”F‚µ‚Ä‚È‚¢‚¯‚Ç begin ‚Å—Ç‚¢‚Ì‚©”÷–­
 			}
 			last;
 		}
@@ -185,6 +194,14 @@ sub tp_120 {
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	close $fh;
+
+	if (defined($from_name) && defined($from_country)) {
+		&move_player($m{name}, $m{country}, $from_country);
+		$m{country} = $from_country;
+		$m{vote} = '';
+		&mes_and_world_news("$from_name‚Ì—U‚¢‚Å$cs{name}[$from_country]‚ÉdŠ¯‚µ‚Ü‚µ‚½",1);
+	}
+
 	&refresh;
 	&n_menu;
 }

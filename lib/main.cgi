@@ -237,19 +237,25 @@ sub main_system {
 		close $fh;
 	}
 	elsif ((-s "$userdir/$id/head_hunt.cgi") && $m{random_migrate} ne $w{year}) {
-		open my $fh, "+< $userdir/$id/head_hunt.cgi" or &error("$userdir/$id/head_hunt.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
-		eval { flock $fh, 2; };
-		while (my $line = <$fh>) {
-			my($hname, $hcountry) = split /<>/, $line;
-			$mes .= "$hname‚©‚ç $cs{name}[$hcountry] ‚Ö‚ÌŠ©—U‚ğó‚¯‚Ü‚µ‚½<br>";
-			if ($m{shogo} eq $shogos[1][0]) {
-				$m{shogo} = '';
-				$m{shogo_t} = $shogos[1][0];
+		if ($in{head_hunt} ne '1') {
+			open my $fh, "< $userdir/$id/head_hunt.cgi" or &error("$userdir/$id/head_hunt.cgiÌ§²Ù‚ªŠJ‚¯‚Ü‚¹‚ñ");
+			while (my $line = <$fh>) {
+				my($hname, $hcountry) = split /<>/, $line;
+				$mes .= "$hname‚©‚ç $cs{name}[$hcountry] ‚Ö‚ÌŠ©—U‚ğó‚¯‚Ä‚¢‚Ü‚·<br>";
 			}
+			close $fh;
+
+			$mes .= qq|<form method="$method" action="$script">|;
+			$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+			$mes .= qq|<input type="hidden" name="head_hunt" value="1">|;
+			$mes .= qq|<input type="submit" value="Š©—U‚ğó‚¯‚é" class="button1"></form>|;
 		}
-		$m{lib} = 'country_move';
-		$m{tp} = 100;
-		close $fh;
+		else {
+			$mes .= "Š©—U‚ğó‚¯‚é‚±‚Æ‚É‚µ‚Ü‚µ‚½<br>";
+			$m{lib} = 'country_move';
+			$m{tp} = 100;
+			&n_menu;
+		}
 	}
 	# ‘‚ÉŠ‘®‚µ‚Ä‚¢‚éê‡
 	elsif ($m{country}) {
