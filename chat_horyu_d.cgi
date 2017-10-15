@@ -313,7 +313,6 @@ sub close_line {
 	my @voter = ();
 
 	return 1 if ($target eq "no_write");
-	return 1 if ($m{name} ne $cs{ceo}[$m{country}] && !&delete_check);
 	&error("ƒtƒ@ƒCƒ‹–¼‚ªˆÙí‚Å‚·") if ($target =~ /[^0-9]/);
 	&error("$target.cgi‚Æ‚¢‚¤ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚Ü‚¹‚ñ") unless(-e "$this_dir/$target.cgi");
 	my @lines = ();
@@ -321,30 +320,25 @@ sub close_line {
 	eval { flock $fh, 2; };
 	my $head_line = <$fh>;
 	my ($bgood,$bbad,$limit,$hidden) = split /<>/, $head_line;
-	
-	my @goods = split /,/, $bgood;
-	for my $name (@goods) {
-		push @voter, $name;
-	}
-	my @bads = split /,/, $bbad;
-	for my $name (@bads) {
-		push @voter, $name;
-	}
-	
+
 	$limit = $time + $in{limit} * 24 * 3600;
 	push @lines, "<><>$limit<>$hidden<>\n";
 	$line = <$fh>;
 	my($btime,$bdate,$bname,$bcountry,$bshogo,$baddr,$bcomment,$bicon,$bid) = split /<>/, $line;
-	my ($lmin, $lhour, $lday, $lmon) = (localtime($limit))[1, 2, 3, 4];
+	my $aname = $bname;
+	$aname =~ s/‚³‚ñ’ño<br>‹c‘è//g;
+
+	if ($aname ne $m{name} && $m{name} ne $cs{ceo}[$m{country}] && !&delete_check) {
+		close $fh;
+		return 1;
+	}
+
+	my ($lmin, $lhour, $lday, $lmon) = (localtime($limit))[1..4];
 	$lmon += 1;
 	$vcomment = "‰ü‘¢ˆÄ" . $bcomment . "‚Ì“Š•[ŠúŒÀ‚ª$lmonŒ$lday“ú$lhour$lmin•ª‚Éİ’è‚³‚ê‚Ü‚µ‚½<br>“Š•[‚µ‚Ü‚µ‚å‚¤<hr>y‰ü‘¢ˆÄ‚©‚ç‘—Mz";
 	$bcomment .= "<br>‹c˜_ŠúŒÀ:$lmonŒ$lday“ú$lhour$lmin•ª";
+
 	push @lines, "$btime<>$bdate<>$bname<>$bcountry<>$bshogo<>$baddr<>$bcomment<>$bicon<>\n";
-	
-#	for my $vname (@voter) {
-#		&system_letter($vname, $vcomment);
-#	}
-	
 	while (my $line = <$fh>) {
 		push @lines, $line;
 	}
