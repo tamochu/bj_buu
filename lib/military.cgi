@@ -491,6 +491,7 @@ sub tp_440 { # ’ã@
 	$mes .= "$e2j{tax}F$cs{tax}[$y{country}]% <br>"        if $m{turn} >= 4;
 	$mes .= "$e2j{state}F$country_states[ $cs{state}[$y{country}] ]<br>" if $m{turn} >= 5;
 	$mes .= "$e2j{strong}F$cs{strong}[$y{country}] <br>"   if $m{turn} >= 6;
+	$mes .= "é•ÇF$cs{barrier}[$y{country}]% <br>"             if $m{turn} >= 7;
 	$mes .= "ã‹L‚Ìî•ñ‚ğ$c_m‚Ì‰ï‹cº‚É•ñ‚µ‚Ü‚·‚©?<br>";
 	&menu('‚â‚ß‚é','•ñ‚·‚é');
 	$m{tp} += 10;
@@ -533,7 +534,8 @@ sub tp_450 {
 		$comment .= "$e2j{tax}F$cs{tax}[$y{country}]%/"        if $m{turn} >= 4;
 		$comment .= "$e2j{state}F$country_states[ $cs{state}[$y{country}] ]/" if $m{turn} >= 5;
 		$comment .= "$e2j{strong}F$cs{strong}[$y{country}]/"   if $m{turn} >= 6;
-		$comment .= "<br>$bbs_name‚Ì‰ï˜b‚ğ—§‚¿•·‚«‚µ‚Ü‚µ‚½" if $m{turn} > 7;
+		$comment .= "é•ÇF$cs{barrier}[$y{country}]%/"         if $m{turn} >= 7;
+		$comment .= "<br>$bbs_name‚Ì‰ï˜b‚ğ—§‚¿•·‚«‚µ‚Ü‚µ‚½"     if $m{turn} > 7;
 
 		my $comment2 = '';
 		$comment2 .= $lcomment if $m{turn} > $need_count;
@@ -657,7 +659,7 @@ sub tp_1900 {
 	&refresh;
 	my $renzoku = $m{unit} eq '18' ? $m{renzoku_c} * 2: $m{renzoku_c};
 	if ( (($w{world} eq '11' || ($w{world} eq '19' && $w{world_sub} eq '11')) && $renzoku > rand(4) ) || $renzoku > rand(7) + 2 || ($cs{is_die}[$m{country}] && $renzoku == 1 && rand(9) < 1) || ($cs{is_die}[$m{country}] && $renzoku == 2 && rand(8) < 1)) {
-		&write_world_news("$c_m‚Ì$m{name}‚ªŒR–”C–±‚É¸”s‚µ$c_y‚Ì˜S–‚É—H•Â‚³‚ê‚Ü‚µ‚½");
+		&write_world_news("$c_m‚Ì$m{name}‚ªŒR–”C–±‚É¸”s‚µ$c_y‚Ì$cs{prison_name}[$y{country}]‚É—H•Â‚³‚ê‚Ü‚µ‚½");
 		&add_prisoner;
 	}
 	else { # ‘Ş‹p¬Œ÷

@@ -289,7 +289,16 @@ sub npc_war {
 	}
 =cut
 	require "$datadir/npc_war_$w{country}.cgi";
-	if ($cs{strong}[$w{country}] < 50000) {
+	if ($cs{strong}[$w{country}] < 30000) {
+		  rand(6)  < 1 ? &npc_use_pet_fenrir
+		: rand(10) < 1 ? &npc_use_pet_prisoner
+		: rand(20) < 1 ? &npc_use_pet_pesto
+		: rand(15) < 1 ? &npc_use_pet_loptr
+		: rand(40) < 1 ? &npc_use_pet_meteo
+		:                &npc_get_strong
+		;
+	}
+	elsif ($cs{strong}[$w{country}] < 50000) {
 		  rand(4)  < 1 ? &npc_use_pet_fenrir # ｶｳﾝﾀｰ率が統一国力に左右されるので、無改造よりもﾌｪﾝﾘﾙ発動率上げてｶｳﾝﾀｰ率変動させたい
 		: rand(12) < 1 ? &npc_use_pet_prisoner # ﾌｪﾝﾘﾙ上げるとNPC奪国が発動しにくくなるので、単純にNPC奪国のために確率下げる
 		: rand(20) < 1 ? &npc_use_pet_pesto
@@ -403,7 +412,7 @@ sub npc_use_pet_prisoner { # 牢獄
 		print $fh "$cs{$k}[$i]<>$i<>\n";
 		close $fh;
 	}
-	&write_world_news("<b>$cs{name}[$w{country}]の$npcs[int(rand(@npcs))]{name}が不気味な光を放ち各国の $e2j{$k} が$cs{name}[$w{country}]の牢獄に幽閉されました</b>");
+	&write_world_news("<b>$cs{name}[$w{country}]の$npcs[int(rand(@npcs))]{name}が不気味な光を放ち各国の $e2j{$k} が$cs{name}[$w{country}]の$cs{prison_name}[$w{country}]に幽閉されました</b>");
 }
 sub npc_get_strong { # 奪国
 	# 資源が足らないとき

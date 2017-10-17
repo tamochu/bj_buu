@@ -14,7 +14,7 @@ sub write_cs {
 	
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可)
 	my @keys = (qw/
-		name bbs_name strong barrier tax food money soldier state is_die member capacity color
+		name bbs_name prison_name strong barrier tax food money soldier state is_die member capacity color
 		win_c old_ceo ceo war dom mil pro war_c dom_c mil_c pro_c ceo_continue
 		modify_war modify_dom modify_mil modify_pro
 		extra extra_limit disaster disaster_limit
@@ -979,7 +979,7 @@ sub regist_you_array {
 #================================================
 sub add_prisoner {
 	$mes .= "$m{name}は、敵国兵に取り囲まれ捕まってしまった!<br>";
-	$mes .= "牢獄へ連行されます。次に行動できるのは$GWT分後です<br>";
+	$mes .= "$cs{prison_name}[$y{country}]へ連行されます。次に行動できるのは$GWT分後です<br>";
 	$m{lib} = 'prison';
 	$m{renzoku_c} = $m{act} = 0;
 	$m{tp} = 100;
@@ -994,7 +994,7 @@ sub add_prisoner {
 	require './lib/_bbs_chat.cgi';
 	$this_file = "$logdir/$y{country}/bbs";
 	my $w_name = ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) ? '名無し':$m{name};
-	$in{comment} = "$m{mes_lose}【朗報】$w_nameが牢獄に連行されました";
+	$in{comment} = "$m{mes_lose}【朗報】$w_nameが$cs{prison_name}[$y{country}]に連行されました";
 	$bad_time = 0;
 	&write_comment;
 }

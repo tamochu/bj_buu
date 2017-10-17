@@ -49,12 +49,14 @@ sub begin {
 	}
 	else {
 		$mes .= "流刑者を各国の$e2j{ceo}の投票により削除することができます<br>" if $is_ceo_delete;
-		$mes .= "$c_mの名前、色、方針、会議室名を変更することができます<br>";
+		$mes .= "$c_mの名前、色、方針、会議室名や牢獄名を変更することができます<br>";
 		$mes .= "$e2j{name}：$c_m<br>";
 		$mes .= "国色：$cs{color}[$m{country}]<br>";
+		$mes .= "会議室名：";
 		$mes .= $cs{bbs_name}[$m{country}] eq '' ? "$cs{name}[$m{country}]作戦会議室" : $cs{bbs_name}[$m{country}];
+		$mes .= "<br>牢獄名：$cs{prison_name}[$m{country}]";
 	}
-	my @menus = ('やめる', '国名/色を変更', '方針/ｼﾝﾎﾞﾙを変更','NPC名を変更','国庫の設定','各国設定','会議室名を変更','安楽死');
+	my @menus = ('やめる', '国名/色を変更', '方針/ｼﾝﾎﾞﾙを変更','NPC名を変更','国庫の設定','各国設定','会議室名を変更','牢獄名を変更','安楽死');
 	if ($is_ceo_delete) {
 		push @menus, '流刑者議決';
 		push @menus, '流刑者申\請';
@@ -493,9 +495,59 @@ sub tp_610 {
 }
 
 #================================================
-# 安楽死
+# 牢獄名変更
 #================================================
 sub tp_700 {
+	my $prison_name = $cs{prison_name}[$m{country}] ? $cs{prison_name}[$m{country}] : '牢獄';
+
+	$mes .= qq|牢獄名は全角7(半角14)文字まで。半角記号(,;"'&)、空白(ｽﾍﾟｰｽ)は使えません<br>|;
+	#"
+	$mes .= qq|<form method="$method" action="$script">|;
+	$mes .= qq|会議室名：<input type="text" name="prison_name" value="$prison_name" class="text_box1"><br>|;
+	$mes .= qq|<input type="checkbox" name="default" value="1">ﾃﾞﾌｫﾙﾄにする<br>|;
+	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<p><input type="submit" value="変更する/やめる" class="button1"></p></form>|;
+	$m{tp} += 10;
+	&n_menu;
+}
+sub tp_710 {
+	my $is_rewrite = 0;
+	if ($in{default} eq '1') {
+		$cs{prison_name}[$m{country}] = '牢獄'; # ﾃﾞﾌｫﾙﾄ
+
+		$mes .= "牢獄名をﾃﾞﾌｫﾙﾄに変更しました<br>";
+
+		$is_rewrite = 1;
+	}
+	elsif ($in{prison_name}) {
+		unless ($cs{prison_name}[$m{country}] eq $in{prison_name}) {
+			&error("牢獄名を記入してください") if $in{prison_name} eq '';
+			&error("牢獄名に不正な文字( ,;\"\'&<>\\\/ )が含まれています") if $in{prison_name} =~ /[,;\"\'&<>\\\/]/;
+			#"
+			&error("牢獄名に不正な空白が含まれています") if $in{prison_name} =~ /　/ || $in{prison_name} =~ /\s/;
+			&error("牢獄名は全角7(半角14)文字までです") if length $in{prison_name} > 14;
+
+			$mes .= "牢獄名を$in{prison_name}に変更しました<br>";
+			
+			$cs{prison_name}[$m{country}] = $in{prison_name};
+			$is_rewrite = 1;
+		}
+	}
+
+	if ($is_rewrite) {
+		&write_cs;
+	}
+	else {
+		$mes .= 'やめました<br>';
+	}
+
+	&begin;
+}
+
+#================================================
+# 安楽死
+#================================================
+sub tp_800 {
 	my @lines = &get_country_members($m{country});
 	$mes .= '以下のプレイヤーがキャラクター削除を望んでいます';
 	$mes .= qq|<form method="$method" action="$script">|;
@@ -514,8 +566,7 @@ sub tp_700 {
 
 	$m{tp} += 10;
 }
-
-sub tp_710 {
+sub tp_810 {
 	if ($in{suicide}) {
 		my %you_datas = &get_you_datas($in{suicide});
 		if ($pets[$you_datas{pet}][2] eq 'life_down') {
@@ -529,7 +580,7 @@ sub tp_710 {
 #================================================
 # 流刑者議決
 #================================================
-sub tp_800 {
+sub tp_900 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには決議権がありません<br>";
 		&begin;
@@ -569,8 +620,7 @@ sub tp_800 {
 
 	$m{tp} += 10;
 }
-
-sub tp_810 {
+sub tp_910 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには決議権がありません<br>";
 		&begin;
@@ -701,11 +751,10 @@ sub tp_810 {
 	&begin;
 }
 
-
 #================================================
 # 流刑者申請
 #================================================
-sub tp_900 {
+sub tp_1000 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには申\請権がありません<br>";
 		&begin;
@@ -726,7 +775,7 @@ sub tp_900 {
 	$m{tp} += 10;
 	&n_menu;
 }
-sub tp_910 {
+sub tp_1010 {
 	unless ($is_ceo_delete && $is_delete) {
 		$mes .= "参入直後のﾌﾟﾚｲﾔｰには申\請権がありません<br>";
 		&begin;
@@ -763,11 +812,10 @@ sub tp_910 {
 	&begin;
 }
 
-
 #================================================
 # 多重者ﾁｪｯｸ
 #================================================
-sub tp_1000 {
+sub tp_1100 {
 	if (!$is_ceo_delete || !$is_ceo_watch_multi) {
 		&begin;
 		return;
@@ -852,7 +900,7 @@ sub tp_1000 {
 	
 	$m{tp} += 10;
 }
-sub tp_1010 {
+sub tp_1110 {
 	if ($in{violator}) {
 		$m{tp} = 900;
 		&{ 'tp_'.$m{tp} };

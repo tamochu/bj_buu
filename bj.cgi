@@ -147,7 +147,6 @@ else {
 		&begin;
 	}
 }
-
 &auto_heal unless $is_battle;
 $is_mobile ? require './lib/template_mobile_base.cgi' :
 	$is_smart ? require './lib/template_smart_base.cgi' :
@@ -237,7 +236,7 @@ sub disp_now {
 			$state .= "(’·Šúô”])";
 		}
 	}elsif($m{lib} eq 'prison'){
-		$state = "$cs{name}[$y{country}]‚Ì˜S–‚Å—H•Â’†‚Å‚·";
+		$state = "$cs{name}[$y{country}]‚Ì$cs{prison_name}[$y{country}]‚Å—H•Â’†‚Å‚·";
 	}elsif($m{lib} eq 'promise'){
 		$state = "$cs{name}[$y{country}]‚ÖˆÚ“®’†‚Å‚·";
 		if($m{tp} eq '110'){

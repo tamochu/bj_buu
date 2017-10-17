@@ -94,7 +94,7 @@ sub war_lose {
 	my $renzoku = $m{unit} eq '18' ? $m{renzoku_c} * 2: $m{renzoku_c};
 	if ( ( ($w{world} eq '7' || ($w{world} eq '19' && $w{world_sub} eq '7')) && $cs{strong}[$y{country}] <= 3000 ) || ( ($w{world} eq '11' || ($w{world} eq '19' && $w{world_sub} eq '11')) && $renzoku > rand(4) ) || $renzoku > rand(7) + 2  || ($cs{is_die}[$m{country}] && $renzoku == 1 && rand(9) < 1) || ($cs{is_die}[$m{country}] && $renzoku == 2 && rand(8) < 1)) {
 		my $mname = &name_link($m{name});
-		&write_world_news("$c_mの$mnameが$c_yの牢獄に幽閉されました");
+		&write_world_news("$c_mの$mnameが$c_yの$cs{prison_name}[$y{country}]に幽閉されました");
 		&add_prisoner;
 	}
 
@@ -379,9 +379,8 @@ sub war_win {
 	# 暗黒
 	if ($w{world} eq $#world_states) {
 		my @acs = ();
-		my $dark_side = 0;
 		for my $c (1 .. $w{country}-1) {
-			push @acs, $c if $w{"p_".$i."_".$w{country}} != 1; # 暗黒と同盟を組んでない国
+			push @acs, $c if $w{"p_".$c."_".$w{country}} != 1; # 暗黒と同盟を組んでない国
 		}
 		# ｱﾎｱﾘｱ自体は暗黒の同盟国が暗黒を滅ぼすと同盟国を経由して暗黒に統一フラグが立ち暗黒勝利になる現象
 		my $ahoalia = 1;
@@ -469,7 +468,7 @@ sub war_win {
 #				if ($touitu_strong < 50000 && ($touitu_strong*0.5) < $dark_strong) { # 統一国力が5万切っていて、かつ暗黒の国力が統一国力の半分より高い 要は終盤かつ暗黒の統一近い
 				# 上記だと統一国力が 50000 を切らないと暗黒のｶｳﾝﾀｰが弱体化されず、国数が多いような鯖でプレイすると延々暗黒がｶｳﾝﾀｰ率高いまま走り抜けそう
 				if (($touitu_strong*0.7) < $dark_strong) { # 暗黒が統一国力の7割より多く国力を保有している 暗黒の統一近い
-					$divisor += ($dark_strong+$holy_strong_ave) / 2; # 暗黒とその仮想同盟の国力が高いほどｶｳﾝﾀｰ率低下
+					$divisor += ($dark_strong+$holy_strong_ave); # 暗黒とその仮想同盟の国力が高いほどｶｳﾝﾀｰ率低下
 					# (統一国力 - (暗黒国力 + 封印平均国力)) / ((暗黒国力 + 封印平均国力) / 2 + 統一国力)
 					# ここで終盤ｶｳﾝﾀｰ率下がるが、ﾍﾟｯﾄ連射で余裕で統一狙えるはず
 					# そこで統一できなくても修羅ﾓｰﾄﾞあるからまだなんとかなるはず はず
@@ -477,11 +476,16 @@ sub war_win {
 				elsif ($dark_strong < 30000) { # 暗黒の国力が3万切っているなら本気ﾓｰﾄﾞ
 					$divisor -= $holy_strong_ave / 2; # 封印の平均国力が高いほど暗黒のｶｳﾝﾀｰ率上昇 本気ﾓｰﾄﾞ
 					# (統一国力 - (暗黒国力 + 封印平均国力)) / (統一国力 - 封印国力 / 2)
-					$dividend = $divisor * 0.5 if 0.5 < ($dividend / $divisor); # 暗黒の最高ｶｳﾝﾀｰ率 50% 一回目はたしか青天井だった こっちに天井付けて、修羅も 80 に引き下げ
+					$dividend = $divisor * 0.60 if 0.60 < ($dividend / $divisor); # 暗黒の最高ｶｳﾝﾀｰ率 60% 一回目はたしか青天井だった こっちに天井付けて、修羅も 80 に引き下げ
 				}
 			}
+#			$divisor = 10; # 暗黒死にそう 修羅ﾓｰﾄﾞ
+#			$dividend = 10; # 暗黒のｶｳﾝﾀｰ率 80% 一回目は 100 % だった
 
-			if (rand($divisor) < $dividend) {
+#			my $div = $dividend / $divisor;
+#			$mes .= "<br>ｶｳﾝﾀｰ発生しないので確認用 $dividend / $divisor = $div<br>";
+
+			if (int(rand($divisor)) < int($dividend)) {
 				require './lib/vs_npc.cgi';
 				&npc_war;
 			}

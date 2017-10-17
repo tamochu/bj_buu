@@ -34,7 +34,7 @@ sub tp_100 {
 			&escape;
 	}
 	else {
-		$mes .= "$m{name}‚Í$c_y‚Ì˜S–‚É•Â‚¶‚ß‚ç‚ê‚Ü‚µ‚½<br>";
+		$mes .= "$m{name}‚Í$c_y‚Ì$cs{prison_name}[$y{country}]‚É•Â‚¶‚ß‚ç‚ê‚Ü‚µ‚½<br>";
 		$mes .= '‚Ç‚¤‚µ‚Ü‚·‚©?<br>';
 		&menu('•‚¯‚ğ‘Ò‚Â','’E‘–‚ğ‚İ‚é','Q•Ô‚é');
 		$m{tp} += 10;
@@ -46,11 +46,11 @@ sub tp_110 {
 	if ($cmd eq '1') {
 		$mes .= "$m{name}‚Í’E‘–‚ª‚Å‚«‚»‚¤‚©FX‚Æ‚µ‚Ä‚İ‚½<br>";
 		if ( int(rand(4)) == 0 ) { # ¬Œ÷
-			$mes .= '‚È‚ñ‚Æ‚©˜S–‚©‚ç’Eo‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚½!<br>';
+			$mes .= '‚È‚ñ‚Æ‚©$cs{prison_name}[$y{country}]‚©‚ç’Eo‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚½!<br>';
 			$m{tp} += 10;
 		}
 		elsif ( $m{cha} > rand(1000)+400 ) {
-			$mes .= 'ŠÅç‚ğ—U˜f‚µ‚Ä˜S–‚©‚ç’Eo‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚½!<br>';
+			$mes .= 'ŠÅç‚ğ—U˜f‚µ‚Ä$cs{prison_name}[$y{country}]‚©‚ç’Eo‚·‚é‚±‚Æ‚É¬Œ÷‚µ‚½!<br>';
 			$m{tp} += 10;
 		}
 		else {
@@ -80,7 +80,7 @@ sub tp_120 {
 	$m{tp} += 10;
 	$m{value} = int(rand(40))+40;
 	$m{turn}  = int(rand(4)+4);
-	$mes .= "˜S–‚©‚ç’Eo‚µ‚Ü‚µ‚½! <br>";
+	$mes .= "$cs{prison_name}[$y{country}]‚©‚ç’Eo‚µ‚Ü‚µ‚½! <br>";
 	$mes .= "$c_y’Eo‚Ü‚Åc‚èy$m{turn}À°İz“G•º‚Ì‹C”zy$m{value}%z<br>";
 	$mes .= '‚Ç‚¿‚ç‚Éi‚İ‚Ü‚·‚©?<br>';
 	&menu('¶','‰E');
@@ -135,7 +135,7 @@ sub tp_140 {
 		&loop_menu;
 	}
 	else {
-		$mes .= '“G•º‚ÉˆÍ‚Ü‚ê˜S–‚Ö‚Æ˜A‚ê–ß‚³‚ê‚Ü‚µ‚½<br>';
+		$mes .= '“G•º‚ÉˆÍ‚Ü‚ê$cs{prison_name}[$y{country}]‚Ö‚Æ˜A‚ê–ß‚³‚ê‚Ü‚µ‚½<br>';
 		$m{tp} = 100;
 		$m{act} += 20;
 		&n_menu;

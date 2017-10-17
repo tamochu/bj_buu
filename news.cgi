@@ -133,7 +133,7 @@ sub show_wait {
 			$state .= "(’·Šúô”])";
 		}
 	}elsif($m{lib} eq 'prison'){
-		$state = "˜S–‚Å—H•Â’†‚Å‚·";
+		$state = "$cs{prison_name}[$y{country}]‚Å—H•Â’†‚Å‚·";
 	}elsif($m{lib} eq 'promise'){
 		$state = "ˆÚ“®’†‚Å‚·";
 		if($m{tp} eq '110'){
