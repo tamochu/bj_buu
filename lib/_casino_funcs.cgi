@@ -244,7 +244,7 @@ sub _get_member {
 		my ($mtime, $mname, $maddr, $mturn, $mvalue, $mstock) = split /<>/, $line;
 		next if $sames{$mname}++; # 同じ人なら次
 
-		if ($is_no_participants) { # 参加者がいない
+		if ($this_file =~ 'daihinmin' && $is_no_participants) { # 参加者がいない
 			push @non_active_players, $mname if $mturn;
 			if ($mname eq $m{name}) {
 				$is_find = 1;
@@ -365,7 +365,7 @@ sub _get_member {
 			&system_comment("参加者が$active_players[0]だけとなったためｹﾞｰﾑをﾘｾｯﾄしました");
 		}
 	}
-	elsif ($is_no_participants && @non_active_players) {
+	elsif ($this_file =~ 'daihinmin' && $is_no_participants && @non_active_players) {
 		for my $i (0 .. $#non_active_players) {
 			if ($non_active_players[$i] eq $m{name}) {
 				$m{c_turn} ='0';
@@ -800,7 +800,7 @@ sub coin_move{
 		$ret_v = -1 * $m_coin; # 払うｺｲﾝは所持ｺｲﾝが限度
 		$m_coin = 0; # 所持ｺｲﾝは 0
 	}
-	elsif (2500000 < ($m_coin_ + $add_coin)) { # 所持ｺｲﾝ + 得るｺｲﾝ が 2500000 を超えるなら
+	elsif (2500000 < ($m_coin + $add_coin)) { # 所持ｺｲﾝ + 得るｺｲﾝ が 2500000 を超えるなら
 		$ret_v = (2500000 - $m_coin); # 得るｺｲﾝは 2500000 が限度
 		$m_coin = 2500000; # 所持ｺｲﾝは 2500000
 	}
@@ -872,6 +872,7 @@ sub coin_move{
 	# 実際に後者が前者より多くなるのはマイナスでしか考えられない（100万勝って150万貰えることはない）
 	# 150万負けて100万しか支払えなかったような場合は -150万 < -100万 となり後者のが大きくなる
 	# でも一応マイナスなのか確認
+=pod
 	if ($add_coin < 0 && $ret_v < 0 && $add_coin < $ret_v) {
 		$add_coin *= -1;
 		my $diff = ($add_coin + $ret_v) * 10;
@@ -897,7 +898,7 @@ sub coin_move{
 			close $fh;
 		}
 	}
-
+=cut
 	return $ret_v;
 }
 
