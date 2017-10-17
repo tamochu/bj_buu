@@ -188,9 +188,9 @@ sub tp_410{
 		&begin;
 		return;
 	}
-	&regist_you_data($in{trick_name},'silent_time',$time+3600);
-	&regist_you_data($in{trick_name},'silent_kind',0);
-	&remove_pet if rand(3) < 1;
+	&regist_you_data($in{trick_name},'silent_time', $time + (60 * 20)); # 20•ª
+	&regist_you_data($in{trick_name},'silent_kind', 0);
+	&remove_pet if int(rand(3)) < 1;
 	&mes_and_world_news("$in{trick_name}‚É‰ŒD‚ğ‚©‚¯‚Ü‚µ‚½");
 	&refresh;
 	&n_menu;
