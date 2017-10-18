@@ -32,6 +32,7 @@ my $casino_cycle_day = int($sales_ranking_cycle_day / 5);
 $casino_cycle_day = 1 if $casino_cycle_day <= 0;
 
 &update_sales_ranking if -M $flag_file > $casino_cycle_day;
+#&update_sales_ranking;
 &run;
 &footer;
 exit;
@@ -41,7 +42,7 @@ exit;
 #=================================================
 sub run {
 	my $flag_time = (stat $flag_file)[9];
-	my($min, $hour, $mday, $month) = ( localtime( $flag_time + $sales_ranking_cycle_day * 24 * 3600) )[1..4];
+	my($min, $hour, $mday, $month) = ( localtime( $flag_time + $casino_cycle_day * 24 * 3600) )[1..4];
 	++$month;
 
 	print qq|<form action="$script_index"><input type="submit" value="ＴＯＰ" class="button1"></form>|;
@@ -50,7 +51,7 @@ sub run {
 	}
 	print qq|違法ｶｼﾞﾉ / |;
 	print qq|<h1>違法ｶｼﾞﾉ売上ﾗﾝｷﾝｸﾞ</h1>|;
-	print qq|<div class="mes"><ul><li>ﾗﾝｷﾝｸﾞと各お店の売上金と売上数は、$sales_ranking_cycle_day日ごとにﾘｾｯﾄされ更新されます|;
+	print qq|<div class="mes"><ul><li>ﾗﾝｷﾝｸﾞと各お店の売上金と売上数は、$casino_cycle_day日ごとにﾘｾｯﾄされ更新されます|;
 
 	print qq|<li>更新のﾀｲﾐﾝｸﾞでプレイ回数数が $min_sale_c個未満のお店は閉店となります|;
 	print qq|<li>次の更新時間：$month月$mday日$hour時$min分</ul></div><br>|;
@@ -78,7 +79,7 @@ sub update_sales_ranking  {
 	# 更新周期ﾌﾗｸﾞﾌｧｲﾙを更新
 	open my $fh9, "> $flag_file";
 	close $fh9;
-	
+
 	my %sames = ();
 	my @lines = ();
 	open my $fh, "+< $this_file" or &error("$this_fileﾌｧｲﾙが開けません");
@@ -178,8 +179,7 @@ sub update_sales_ranking  {
 	truncate $fh2, 0;
 	print $fh2 "$pool<>0<>0<>";
 	close $fh2;
-	
-	
+
 	seek  $fh, 0, 0;
 	truncate $fh, 0;
 	print $fh @new_lines;
