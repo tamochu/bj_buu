@@ -40,8 +40,8 @@ $y_ag = $y{ag};
 
 if    ($guas[$m{gua}][2] =~ /–³|Œ•|•€|‘„/) { $m_df += $guas[$m{gua}][3]; }
 elsif ($guas[$m{gua}][2] =~ /‰Š|•—|—‹/)    { $m_mdf+= $guas[$m{gua}][3]; }
-if    ($guas[$y{gua}][2] =~ /–³|Œ•|•€|‘„/) { $y_df += $guas[$m{gua}][3]; }
-elsif ($guas[$y{gua}][2] =~ /‰Š|•—|—‹/)    { $y_mdf+= $guas[$m{gua}][3]; }
+if    ($guas[$y{gua}][2] =~ /–³|Œ•|•€|‘„/) { $y_df += $guas[$y{gua}][3]; }
+elsif ($guas[$y{gua}][2] =~ /‰Š|•—|—‹/)    { $y_mdf+= $guas[$y{gua}][3]; }
 # g—p‚·‚é‚Ì‚Í AT or MAT, DF or MDF ‚Ì‚Ç‚¿‚ç‚©
 if    ($weas[$m{wea}][2] =~ /–³|Œ•|•€|‘„/) { $m_at = $m{at}  + $weas[$m{wea}][3]; }
 elsif ($weas[$m{wea}][2] =~ /‰Š|•—|—‹/)    { $m_at = $m{mat} + $weas[$m{wea}][3]; $y_df = $y_mdf; }
@@ -49,20 +49,19 @@ if    ($weas[$y{wea}][2] =~ /–³|Œ•|•€|‘„/) { $y_at = $y{at}  + $weas[$y{wea}][3]
 elsif ($weas[$y{wea}][2] =~ /‰Š|•—|—‹/)    { $y_at = $y{mat} + $weas[$y{wea}][3]; $m_df = $m_mdf; }
 
 $m_ag -= $guas[$m{gua}][5];
-$y_ag -= $guas[$y{gua}][5];
-if($guas[$m{gua}][0] ne '7'){
-	$m_ag -= $weas[$m{wea}][5];
-}
+$m_ag -= $weas[$m{wea}][5] if $guas[$m{gua}][0] ne '7';
 $m_ag = int(rand(5)) if $m_ag < 1;
+
+$y_ag -= $guas[$y{gua}][5];
 $y_ag -= $weas[$y{wea}][5];
 $y_ag = int(rand(5)) if $y_ag < 1;
 
 $m_at = int($m_at * 0.5) if $m{wea} && $m{wea_c} <= 0;
 
 if ($m{wea} && $y{wea}) {
-	if (&is_tokkou($m{wea},$y{wea})){
-		$m_at = int(1.5 *$m_at);
-		$y_at = int(0.75*$y_at);
+	if (&is_tokkou($m{wea}, $y{wea})) {
+		$m_at = int(1.5 * $m_at);
+		$y_at = int(0.75 * $y_at);
 		$is_m_tokkou = 1;
 	}
 	elsif (&is_tokkou($y{wea},$m{wea})) {
@@ -77,12 +76,13 @@ if ($m{wea} && $y{wea}) {
 # ‘fè‚Å–h‹ï‚¿‰£‚Á‚½‚ç‰º•ûC³“¯—lA•Ší‚Å–h‹ï‚È‚µ‰£‚Á‚½‚çã•ûC³‚Æ‚©‚Í‚µ‚È‚¢‚ÌH ‘fè•s—˜‚Å‘Š‘Î“I‚É•Ší‚¿—L—˜‚Æ‚àŒ¾‚¦‚é‚¯‚Ç
 if ($y{gua}) {
 	if ($m{wea}) {
-		if (&is_gua_valid($y{gua},$m{wea})){
-			$m_at = int(0.5 *$m_at);
+		if (&is_gua_valid($y{gua},$m{wea})) {
+			$m_at = int(0.5 * $m_at);
 			$is_y_tokkou2 = 1;
 		}
-	} else {
-		$m_at = int(0.3 *$m_at);
+	}
+	else {
+		$m_at = int(0.3 * $m_at);
 		$is_y_tokkou2 = 1;
 	}
 }
@@ -91,19 +91,18 @@ if ($y{gua}) {
 #}
 if ($m{gua}) {
 	if ($y{wea}) {
-		if (&is_gua_valid($m{gua},$y{wea})){
-			$y_at = int(0.5 *$y_at);
+		if (&is_gua_valid($m{gua},$y{wea})) {
+			$y_at = int(0.5 * $y_at);
 			$is_m_tokkou2 = 1;
 		}
 	} else {
-		$y_at = int(0.3 *$y_at);
+		$y_at = int(0.3 * $y_at);
 		$is_m_tokkou2 = 1;
 	}
 }
 #else {
 #	$y_at = int($y_at * 1.2) if $y{wea};
 #}
-
 
 #================================================
 # Ò²İ“®ì
@@ -126,44 +125,48 @@ sub run_battle2 {
 		&lose;
 	}
 	else {
-		# –³‰ü‘¢‚Ìó‘Ô‚Æˆá‚Á‚ÄŒãU‚Å‚àæU‚Éæ‚ñ‚¶‚ÄŒø‰Ê‚ğ”­Šö‚·‚éˆ—‚ªÀ‘•‚³‚ê‚½
-		# ‚µ‚½‚ª‚Á‚ÄAæUŒãU‚Æ‚¢‚¤‚Ç‚¿‚ç‚ğ—Dæ‚µ‚Äˆ—‚·‚é‚©ˆÈ‘O‚É—¼•û‚Å‚«‚é‚¾‚¯‚Ìˆ—‚ğs‚¤
+		# –³‰ü‘¢‚Æˆá‚Á‚Äƒ^[ƒ“‡‚ğ–³‹‚µ‚ÄŒø‰Ê‚ğ”­Šö‚·‚éˆ—‚ªÀ‘•‚³‚ê‚Ä‚¢‚é
+		# æUEŒãU‚Ç‚¿‚ç‚ğ—Dæ‚µ‚Äˆ—‚·‚é‚©ˆÈ‘O‚É—¼•û‚Ìƒtƒ‰ƒOŠÇ—‚ğs‚¤
 
-		local $m_s = undef;
-		local $pikorin;
+		# ‚Ü‚¸©•ª‚Æ‘Šè‚ÌUŒ‚E•KE‹Z”»’è $m_s ‚ª–¢’è‹`‚È‚ç©•ªA$y_s ‚ª–¢’è‹`‚È‚ç‘Šè‚ÍUŒ‚
+		local $m_s = undef; # ÌßÚ²Ô°‚Ì‹Zƒf[ƒ^‚ª“ü‚é –¢’è‹`‚È‚çUŒ‚
+		local $pikorin; # ÌßÚ²Ô°‚ª‹Z‚ğ‘M‚¢‚½‚© 1 ‘M‚¢‚½ 0 ‘M‚¢‚Ä‚È‚¢
 		if (!$metal) { # ÒÀÙ‘Šè‚É‚Íí‚ÉUŒ‚‚Å•KE‹Z‚à‘M‚©‚È‚¢
 			$m_s = $skills[ $m_skills[ $cmd - 1 ] ] if $cmd > 0 && $guas[$m{gua}][0] ne '21'; # 1ºÏİÄŞˆÈã‚ğ“ü—Í‚µ‚Ä‚¢‚Ä‹¶ím‚ÌŠZ‚¶‚á‚È‚­ÒÀÙ‘Šè‚¶‚á‚È‚¢‚È‚ç•KE‹Z
 			$m_s = undef if defined($m_s) && ($weas[$m{wea}][2] ne $m_s->[2] || !&m_mp_check($m_s)); # •KE‹Z‚ğ‘I‘ğ‚µ‚Ä‚¢‚Ä‚à‘®«‚ªˆá‚Á‚½‚èMP‚ª‘«‚è‚È‚¢‚È‚çUŒ‚
-	
 			# ‹Z‘M‚¢‚Ä‚àƒtƒ‰ƒO‚ª—§‚½‚È‚¢–â‘è‘Îô ƒtƒ‰ƒO©‘Ì‚ÍæUŒãUŠÖŒW‚È‚¢‚Ì‚Å—\‚ß‘M‚«ˆ—‚ğÏ‚Ü‚¹‚Îƒtƒ‰ƒO—§‚Ä‚ç‚ê‚é
 			$pikorin = &_learning if !defined($m_s); # UŒ‚‚Å‹Z‚ğ‘M‚¢‚½‚È‚ç‚Î 1 ‚ª•Ô‚èA‘M‚¢‚½‹Z‚Í $m_s ‚É“ü‚é
 		}
+		local $y_s = undef; # “G‚Ì‹Zƒf[ƒ^‚ª“ü‚é –¢’è‹`‚È‚çUŒ‚
+		$y_s = $skills[ $y_skills[ int(rand(6)) - 1 ] ] if $guas[$y{gua}][0] ne '21'; # ‹¶ím‚ÌŠZ‚¶‚á‚È‚¢‚È‚ç•KE‹Z
+		$y_s = undef if defined($y_s) && ($weas[$y{wea}][2] ne $y_s->[2] || !&y_mp_check($y_s) || $metal); # •KE‹Z‚ğ‘I‘ğ‚µ‚Ä‚¢‚Ä‚à‘®«‚ªˆá‚Á‚½‚èMP‚ª‘«‚è‚È‚¢‚Æ‚©ÒÀÙ‚È‚çUŒ‚
 
-		local $y_s = $skills[ $y_skills[ int(rand(6)) - 1 ] ] if $guas[$y{gua}][0] ne '21'; # ‹¶ím‚ÌŠZ‚¶‚á‚È‚¢‚È‚ç•KE‹Z
-		$y_s = undef if defined($y_s) && ($weas[$y{wea}][2] ne $y_s->[2] || !&y_mp_check($y_s)); # •KE‹Z‚ğ‘I‘ğ‚µ‚Ä‚¢‚Ä‚à‘®«‚ªˆá‚Á‚½‚èMP‚ª‘«‚è‚È‚¢‚È‚çUŒ‚
-
-=pod
-		# UŒ‚ƒtƒ‰ƒO‚â–h‹ïƒtƒ‰ƒO‚à—\‚ß‚±‚±‚ÅÏ‚Ü‚¹‚Ä‚µ‚Ü‚¢‚½‚¢‚ªƒCƒW‚é•”•ª‚ª‘‚¦‚é‚Ì‚Å‚Æ‚è‚ ‚¦‚¸Œ»óˆÛ
-		# ƒtƒ‰ƒO—Ş‚ğ‚Ü‚¸‘S•”ô‚¢o‚µ‚Ä‚©‚çˆ—‚·‚ê‚Î•Ï‚È‹““®‚µ‚È‚­‚È‚é
+		# ƒtƒ‰ƒO‚ğ‚Ü‚¸‘S•”ô‚¢o‚µ‚Ä‚©‚çˆ—‚·‚ê‚Î•Ï‚È‹““®‚µ‚È‚­‚È‚é
 		# —á
 		#   –³Œø‹Z‚ğÈºĞĞ‚Å”ğ‚¯‚ç‚ê‚é‚ÆMPÁ”ï‚¹‚¸‚É–³Œø‹Z‚ğ”­Šö‚Å‚«‚é
 		#   ½Àİ‹Z‚ğÔÀÉ¶¶ŞĞ‚Å•Ô‚³‚ê‚Ä‚à‘Šè‚É½ÀİŒø‰Ê‚ğ—^‚¦‚é
-		# í“¬‚Í $who ‚Å©•ª‚Æ‘Šè‚ğØ‚è‘Ö‚¦‚Ä‚é‚Ì‚Å‚»‚ê“¯—l $who ‚Åí“¬ƒtƒ‰ƒO‚àØ‚è‘Ö‚¦‚é
-		local $who = 'm';
-		&m_flag2; # ${"$who"."_is_guard"} ¨ $m_is_guard ‚È‚Çƒtƒ‰ƒO“ü‚é
-		local $who = 'y';
-		$y_flag2; # ${"$who"."_is_guard"} ¨ $y_is_guard ‚È‚Çƒtƒ‰ƒO“ü‚é
-=cut
+		# í“¬‚Í $who ‚Å©•ª‚Æ‘Šè‚ğØ‚è‘Ö‚¦‚Ä‚é‚Ì‚Å‚»‚ê“¯—l $who ‚Åƒtƒ‰ƒOŠÇ—‚àØ‚è‘Ö‚¦‚é
 
-		# Ÿ”s”»’è‚É‚Â‚¢‚Ä‚Í–¢’…è
+		local $who = '';
+		$who = 'm';
+		&get_battle_flags; # $m_is_guard, $m_is_stanch, ... ‚È‚Ç‚ª“ü‚é skill.cgi QÆ
+		$who = 'y';
+		&get_battle_flags; # $y_is_guard, $y_is_stanch, ... ‚È‚Ç‚ª“ü‚é skill.cgi QÆ
+
+		# ‚±‚±‚ÅUŒ‚Ò‚Ì½ÀİŒø‰Ê‚ğƒIƒt‚É‚·‚ê‚Î½Àİ‹Z”½ËƒoƒO‹N‚«‚È‚¢‚Í‚¸
+		# $m_is_stanch = 0 if $m_is_stanch && $y_gua_skill_mirror;
+		# $y_is_stanch = 0 if $y_is_stanch && $m_gua_skill_mirror;
+
 		# Šî–{“I‚ÉƒvƒŒƒCƒ„[•s—˜‚É‚È‚Á‚Ä‚¢‚é‚ªAæUŒãU‚Å•ª‚¯‚é‚Ì‚à—Ç‚¢‚Ì‚Å‚ÍH
 		if ( rand($m_ag * 3) >= rand($y_ag * 3) ) { # ƒvƒŒƒCƒ„[æU
-			my $v = &m_attack2;
+			$who = 'm';
+			my $v = &attack;
 			if ($y{hp} <= 0 && $m{hp} > 0) { # Ø½¸ÀŞÒ°¼Ş‚Å©•ª‚ªHP0‚É‚È‚Á‚Ä‚à“G‚ÌUŒ‚‚ÉˆÚ‚é«
 				&win; # ÌßÚ²Ô°æU‚¾‚©‚ç‚Ü‚¸‚ÍŸ—˜”»’è‚¾‚Æv‚í‚ê‚é
 			}
 			else {
-				&y_attack2;
+				$who = 'y';
+				&attack;
 				if    ($m{hp} <= 0) { &lose; } # ‚³‚ç‚ÉØ½¸ÀŞÒ°¼Ş‚Å‘Šè‚ªHP0‚É‚È‚Á‚Ä‚à‚·‚Å‚É©•ª‚ÍHP0‚È‚Ì‚Å•‰‚¯‚é
 				elsif ($y{hp} <= 0) { &win;  }
 				elsif ($m{pet}) {
@@ -171,25 +174,27 @@ sub run_battle2 {
 						&use_pet('battle', $v);
 					}
 					if    ($m{hp} <= 0) { &lose; } # ÌßÚ²Ô°æU‚¾‚©‚çŸ—˜”»’èæ‚É‚µ‚½‚çH
-					elsif ($y{hp} <= 0) { &win; }
+					elsif ($y{hp} <= 0) { &win;  }
 				}
 			}
 		}
 		else { # NPCæU
-			&y_attack2;
+			$who = 'y';
+			&attack;
 			if ($m{hp} <= 0) { # Ø½¸ÀŞÒ°¼Ş‚Å“G‚ªHP0‚É‚È‚Á‚Ä‚à‚±‚Á‚¿‚ÌUŒ‚‚ÉˆÚ‚é«
 				&lose; # NPCæU‚¾‚©‚ç‚Ü‚¸‚Í”s–k”»’è‚¾‚Æv‚í‚ê‚é
 			}
 			else {
-				my $v = &m_attack2;
-				if    ($m{hp} <= 0) { &lose;  } # ‚³‚ç‚ÉØ½¸ÀŞÒ°¼Ş‚Å‚±‚Á‚¿‚ªHP0‚É‚È‚é‚Æ•‰‚¯‚é
-				elsif ($y{hp} <= 0) { &win; }
+				$who = 'm';
+				my $v = &attack;
+				if    ($m{hp} <= 0) { &lose; } # ‚³‚ç‚ÉØ½¸ÀŞÒ°¼Ş‚Å‚±‚Á‚¿‚ªHP0‚É‚È‚é‚Æ•‰‚¯‚é
+				elsif ($y{hp} <= 0) { &win;  }
 				elsif ($m{pet}) {
 					unless($boss && ($m{pet} eq '122' || $m{pet} eq '123' || $m{pet} eq '124')){
 						&use_pet('battle', $v);
 					}
 					if    ($m{hp} <= 0) { &lose; }
-					elsif ($y{hp} <= 0) { &win; }
+					elsif ($y{hp} <= 0) { &win;  }
 				}
 			}
 		}
@@ -198,6 +203,133 @@ sub run_battle2 {
 	$m{mp} = 0 if $m{mp} < 0;
 	$y{mp} = 0 if $y{mp} < 0;
 }
+
+#=================================================
+# ©•ª‚ÌUŒ‚
+#=================================================
+sub attack {
+	my $temp_y = $who eq 'm' ? 'y' : 'm'; # UŒ‚‘¤‚ğu©•ªv‚Æ‚µ‚½ê‡‚Ìu‘Šèv‚ğİ’è
+	my $temp_y_name = ${$temp_y}{name};
+	my $skill = ${$who.'_s'} if defined(${$who.'_s'});
+
+	if ($who eq 'm' && $pikorin) { # ]—ˆÈºĞĞ‘Šè‚ÉUŒ‚‚µ‚Ä”ğ‚¯‚ç‚ê‚é‚Æ‹Z‚ğ‘M‚©‚È‚©‚Á‚½ ‘M‚­‚ª“–‚½‚ç‚È‚¢‚ÉC³
+		${$who.'_mes'} = "‘M‚¢‚½!! $m_s->[1]!";
+		$mes .= qq|<font color="#CCFF00">™‘M‚«!!$m{name}‚Ì$m_s->[1]!!</font><br>|;
+	}
+	if ($who eq 'y' && $metal) {
+		$mes .= "$y{name}‚Í—lq‚ğŒ©‚Ä‚¢‚é";
+		return;
+	}
+	if (${$temp_y.'_gua_avoid'}) { # ‘Šè‚ÌÈºĞĞ”»’è
+		$mes .= "$temp_y_name‚Í‚Ğ‚ç‚è‚Æg‚ğ‚©‚í‚µ‚½<br>";
+		return;
+	}
+
+	my $hit_damage = ${$temp_y}{hp}; # —^‚¦‚½ƒ_ƒ[ƒW‚ğ‚Â
+	if (defined($skill)) { # •KE‹Z
+		if ($who eq 'm' && $pikorin) { # ]—ˆ’Ê‚è‘M‚¢‚½‹Z‚ÍMPÁ”ï‚à‚È‚¯‚ê‚Î–³Œø‹Z‚È‚Ç‚Ìƒtƒ‰ƒO–³‹
+			&{ $skill->[4] }($m_at);
+		}
+		else {
+			# NPC‘¤‚Å¸ÜÊŞ×‚Ì‚¨ç‚è‚ª‹@”\‚µ‚Ä‚È‚¢ ‹­‚·‚¬‚é‚©‚çH
+			${$who}{mp} -= $who eq 'm' && $guas[${$who}{gua}][0] eq '6' ? int($skill->[3] / 2) : $skill->[3];
+			${$who.'_mes'} = $skill->[5] ? "$skill->[5]" : "$skill->[1]!" unless ${$who.'_mes'};
+			$mes .= "${$who}{name}‚Ì$skill->[1]!!<br>";
+			if (${$temp_y.'_is_guard'}) { # ‘Šè‚ª–³Œø‹Z
+				&{ $skill->[4] }(${$who.'_at'});
+				${$temp_y}{hp} = $hit_damage;
+			}
+			elsif (${$temp_y.'_gua_skill_mirror'}) { # ‘Šè‚ª”½Ë–h‹ï
+				&{ $skill->[4] }(${$who.'_at'});
+				${$who}{hp} -= $hit_damage - ${$temp_y}{hp};
+				$mes .= "‚µ‚©‚µ$guas[${$temp_y}{gua}][1]‚ª‹Z‚ğ”½Ë‚µ ".($hit_damage - ${$temp_y}{hp})." ‚ÌÀŞÒ°¼Ş‚ğ‚¤‚¯‚Ü‚µ‚½!!<br>";
+				${$temp_y}{hp} = $hit_damage;
+			}
+			else {
+				&{ $skill->[4] }(${$who.'_at'});
+			}
+		}
+	}
+	else { # UŒ‚
+		my $sc = 1;
+		if ($guas[${$who}{gua}][0] eq '1' && rand(3) < 1) {
+			$sc = 2;
+		}
+		elsif ($guas[${$who}{gua}][0] eq '15') {
+			$sc = 1 + int(rand(4));
+		}
+		for my $scc (1..$sc) {
+			$mes .= "${$who}{name}‚ÌUŒ‚!!";
+			my $kaishin_flag = ${$who}{hp} < ${$who}{max_hp} * 0.25 && int(rand(${$who}{hp})) == 0; # 999->249.75 && 0`248 1/249
+			$kaishin_flag = int(rand(${$who}{hp} / 10)) == 0 if $guas[${$who}{gua}][0] eq '8'; # 999->99.9 0`98 1/99 ‚È‚ñ‚Æ‚È‚­1/3‚®‚ç‚¢‚Å‰ïS‚Å‚à‚¦‚¦‚ñ‚Å‚È‚¢‚©
+			my $gua_mes;
+			my $m_at_bf = ${$who.'_at'};
+			if ($guas[${$who}{gua}][0] eq '10' && rand(10) < 3) {
+				$gua_mes = "<br>$guas[${$who}{gua}][1]‚ª‹ì“®‚·‚é!";
+				${$who.'_at'} = int(${$who.'_at'} * 1.2);
+			}
+			elsif ($guas[${$who}{gua}][0] eq '21') {
+				$gua_mes .= "<br>$guas[${$who}{gua}][1]‚ª–\\‘–‚·‚é!";
+				${$who.'_at'} = int(${$who.'_at'} * 1.5);
+			}
+			my $v = $kaishin_flag ? &_attack_kaishin(${$who.'_at'}) : &_attack_normal(${$who.'_at'}, ${$temp_y.'_df'});
+			${$who.'_at'} = $m_at_bf;
+			$mes .= "$gua_mes<br>";
+
+			if (${$temp_y.'_is_counter'}) {
+				$mes .= "UŒ‚‚ğ•Ô‚³‚ê $v ‚ÌÀŞÒ°¼Ş‚ğ‚¤‚¯‚Ü‚µ‚½<br>";
+				${$who}{hp} -= $v;
+			}
+			elsif (${$temp_y.'_is_stanch'}) {
+				$mes .= "½Àİ‚Å“®‚¯‚È‚¢!<br>";
+			}
+			else {
+				$mes .= "$v ‚ÌÀŞÒ°¼Ş‚ğ‚ ‚½‚¦‚Ü‚µ‚½<br>";
+				if ($who eq 'm' && $m{wea_c} > 0 && $scc eq '1') {
+					--$m{wea_c};
+					my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
+					$mes .= "$wname‚Í‰ó‚ê‚Ä‚µ‚Ü‚Á‚½<br>" if $m{wea_c} == 0;
+				}
+				${$temp_y}{hp} -= $v;
+			}
+		}
+	}
+	$hit_damage -= ${$temp_y}{hp};
+
+	# ‘—“d•‚Íó‚¯‚½ƒ_ƒ[ƒW‚Å‰ñ•œ‚·‚é‚Æv‚Á‚Ä‚½‚¯‚Ç—^‚¦‚½ƒ_ƒ[ƒW‚Å‰ñ•œ‚·‚é •ª‚¯‚Ä‘‚¢‚Ä‚ ‚é‚±‚Æ‚©‚çd—l‚Æv‚í‚ê‚é
+	# ¸ÜÊŞ×‚ÍÁ”ïMP”¼Œ¸‚¾‚©‚ç–³Œø‹Z˜A‘Å‚Å‚à‰¶Œbó‚¯‚ç‚ê‚é‚ªA‘—“d•‚Í—^‚¦‚½ƒ_ƒ[ƒW‚ÉˆË‘¶‚·‚é‚Ì‚Å¸ÜÊŞ×‚Ù‚Ç‰¶Œbó‚¯‚È‚¢‚Æv‚í‚ê‚é
+	# ‚–£—Í‚ª¿°×İŒ‚‚Á‚Ä‰^‚ª—Ç‚¯‚ê‚Î¸ÜÊŞ×‚æ‚è‚àŒø—¦‚Í—Ç‚¢‚ªc20‚©‚ç18,15‚Æ‚©‚É‚·‚é‚Ì‚ÍH
+	if ($guas[${$who}{gua}][0] eq '13' && $hit_damage) {
+		my $v = int($hit_damage / 20);
+		$mes .= "‚ ‚½‚¦‚½ÀŞÒ°¼Ş‚©‚ç MP ‚ğ $v ‹zû‚µ‚Ü‚µ‚½<br>";
+		${$who}{mp} += $v;
+		${$who}{mp} = ${$who}{max_mp} if ${$who}{mp} > ${$who}{max_mp};
+	}
+
+	if (${$temp_y.'_gua_relief'} && $hit_damage) {
+		my $v = int($hit_damage / 10);
+		$mes .= "$v ‚ÌÀŞÒ°¼Ş‚ğ–h‚¬‚Ü‚µ‚½<br>";
+		${$temp_y}{hp} += $v;
+	}
+	elsif (${$temp_y.'_gua_remain'} && $hit_damage && ${$temp_y}{hp} <= 0) {
+		$mes .= "$guas[${$temp_y}{gua}][1]‚ÉUŒ‚‚ª“–‚½‚èŠïÕ“I‚É’v–½‚ğ‚Ü‚Ì‚ª‚ê‚½<br>";
+		${$temp_y}{hp} = 1;
+	}
+	elsif (${$temp_y.'_gua_half_damage'} && $hit_damage) {
+		$mes .= "$guas[${$temp_y}{gua}][1]‚ªÀŞÒ°¼Ş‚ğ”¼Œ¸‚³‚¹‚Ü‚µ‚½<br>";
+		${$temp_y}{hp} += int($hit_damage / 2);
+	}
+}
+
+#=================================================
+# UŒ‚E–hŒäÌ×¸Ş
+#=================================================
+sub get_battle_flags { # $who ‚ÅØ‚è‘Ö‚¦ $who = 'm' or $who = 'y'
+	return if ($guas[${$who}{gua}][0] eq '21') && ($who ne 'm' || !$pikorin); # ‹¶ím‚ÌŠZ‚ÍUŒ‚‹­§ ‘M‚¢‚Ä‚é‚È‚ç‹¶ím‚ÌŠZ‚Å‚à•KE‹Z
+	&{ ${$who.'_s'}->[6] } if defined(${$who.'_s'}); # •KE‹Z‚ÌÌ×¸Ş
+	&{ $guas[ ${$who}{gua} ]->[6] } if ${$who}{gua}; # –h‹ï‚ÌÌ×¸Ş
+}
+
 
 #=================================================
 # ©•ª‚ÌUŒ‚
@@ -406,6 +538,15 @@ sub y_attack2 {
 		$mes .= "$guas[$m{gua}][1]‚ªÀŞÒ°¼Ş‚ğ”¼Œ¸‚³‚¹‚Ü‚µ‚½<br>";
 		$m{hp} += int($hit_damage / 2);
 	}
+}
+
+#=================================================
+# UŒ‚E–hŒäÌ×¸Ş
+#=================================================
+sub get_battle_flags { # $who ‚ÅØ‚è‘Ö‚¦ $who = 'm' or $who = 'y'
+	return if ($guas[${$who}{gua}][0] eq '21') && ($who ne 'm' || !$pikorin); # ‹¶ím‚ÌŠZ‚ÍUŒ‚‹­§ ‘M‚¢‚Ä‚é‚È‚ç‹¶ím‚ÌŠZ‚Å‚à•KE‹Z
+	&{ ${$who.'_s'}->[6] } if defined(${$who.'_s'}); # •KE‹Z‚ÌÌ×¸Ş
+	&{ $guas[ ${$who}{gua} ]->[6] } if ${$who}{gua}; # –h‹ï‚ÌÌ×¸Ş
 }
 
 #=================================================
