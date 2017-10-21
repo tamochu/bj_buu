@@ -146,79 +146,11 @@ sub war_escape {
 sub war_win {
 	my $is_single = shift;
 
-
 	# ’D‘—ÍÍŞ°½:ŠK‹‰‚ª‚‚¢‚Ù‚ÇÌß×½B‰ºãAŠv–½‚Ì‚ÍŠK‹‰‚ª’á‚¢‚Ù‚ÇÌß×½
 	my $v = ($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2')) ? (@ranks - $m{rank}) * 10 + 10 : $m{rank} * 8 + 10;
 
-	# ’èˆõ‚ª­‚È‚¢•ªÌß×½‘½‚¢•ªÏ²Å½
-#	if ($m{country}) {
-#		$mem = &modified_member($m{country});
-#	} else {
-#		$mem = 0;
-#	}
-#	$v += ($cs{capacity}[$m{country}] - $mem) * 10 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
-	$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 5 unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country}));
-
-
-	# ‘î¨‚É‚æ‚è’D‘—Í‘‰Á
-	if (($w{world} eq '4' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '4' || $w{world_sub} eq '5')))) { # –\ŒNA¬“×
-		$v *= 2.5;
-	}
-	elsif (($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2'))) { # Šv–½:ã‘—L—˜
-		my $sum = 0;
-		for my $i (1 .. $w{country}) {
-			$sum += $cs{win_c}[$i];
-		}
-		$v *= 2.5 if $cs{win_c}[$m{country}] <= $sum / $w{country};
-		if ($m{sedai} < 5) {
-			$v *= 3;
-		}
-		elsif ($m{sedai} < 10) {
-			$v *= 2.5;
-		}
-	}
-	elsif (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) { # ”’•º
-			$v += $m{sedai} > 10 ? 100 : $m{sedai} * 10;
-			$v *= 1.2;	
-	}
-	else {
-		$v += $m{sedai} > 10 ? 100 : $m{sedai} * 10;
-	}
-	
-	# Œğí’†‚È‚ç2”{
-	my $p_c_c = 'p_' . &union($m{country}, $y{country});
-	$v *= 2 if $w{$p_c_c} eq '2';
-	
-	# Še‘İ’è
-	$v *= &get_modify('war');
-
-	# é•Ç•â³
-	my ($r_v, $r_vv) = &get_rampart_modify($y{country}); # é•Ç‚É‚æ‚é’D‘—ÍE’D‘ãŒÀ‚Ì•â³‚ª•Ô‚é
-	$v *= $r_v;
-
-	# Q–d‚Í’D‘—Í1.1”{
-	if ($cs{war}[$m{country}] eq $m{name}) {
-		$v = int($v * 1.1) ;
-	}
-	# ŒNå‚Í’D‘—Í1.05”{A–\ŒN‚È‚ç‚Î1.2”{
-	elsif ($cs{ceo}[$m{country}] eq $m{name}) {
-		my $ceo_value = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05;
-		$v = int($v * $ceo_value);
-	}
-#	#‘ã•\ƒ{[ƒiƒX
-#	$v = int($v * 1.1) if $cs{war}[$m{country}] eq $m{name};    
-#	$v = int($v * 1.05) if $cs{ceo}[$m{country}] eq $m{name};
-
-	# b‰»
-	$v = &seed_bonus('red_moon', $v);
-	
-	$v = $v * $m{value} * (rand(0.4)+0.8);
-	$v = &seed_bonus('war_win', $v);
-
-	if ($m{pet} eq '193') { # ÀŞ°×ËŞAŠK‹‰•â³‚Æ¢‘ã•â³‚ÉiŒR•â³
-		$v = 0;
+	if ($m{pet} eq '193' && !($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) ) { # ”’•º‚Å‚Í‚È‚¢ÀŞ°×ËŞAŠK‹‰•â³‚Æ¢‘ã•â³‚ÉiŒR•â³‚Ì‚İ
 		if (($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2'))) { # Šv–½:ã‘—L—˜
-			$v = (@ranks - $m{rank}) * 10 + 10; # ŠK‹‰•â³
 			if ($m{sedai} < 5) { # Šv–½™¢‘ã•â³
 				$v *= 3;
 			}
@@ -227,31 +159,81 @@ sub war_win {
 			}
 		}
 		else {
-			$v = $m{rank} * 8 + 10; # ŠK‹‰•â³
 			$v += $m{sedai} > 10 ? 100 : $m{sedai} * 10; # ¢‘ã•â³
 		}
 		$v *= $m{value}; # iŒR•â³
 	}
+	else {
+		# ’èˆõ‚ª­‚È‚¢•ªÌß×½‘½‚¢•ªÏ²Å½BO‘uEg”’AˆÃ•‚ÌˆÃ•–¯‚É‚Íl”•â³‚È‚µ
+		unless ($w{world} eq $#world_states - 3 || $w{world} eq $#world_states - 2 || ($w{world} eq $#world_states && $m{country} eq $w{country})) {
+			$v += ($cs{capacity}[$m{country}] - $cs{member}[$m{country}]) * 5;
+		}
 
-	if($m{unit} eq '18'){
-		$v = $v * 1.5;
-		$v = &use_pet('war_result', $v) unless (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) || $m{pet} eq '12');
+		# ‘î¨‚É‚æ‚è’D‘—Í‘‰Á
+		if (($w{world} eq '4' || $w{world} eq '5' || ($w{world} eq '19' && ($w{world_sub} eq '4' || $w{world_sub} eq '5')))) { # –\ŒNA¬“×
+			$v *= 2.5;
+		}
+		elsif (($w{world} eq '2' || ($w{world} eq '19' && $w{world_sub} eq '2'))) { # Šv–½:ã‘—L—˜
+			my $sum = 0;
+			for my $i (1 .. $w{country}) {
+				$sum += $cs{win_c}[$i];
+			}
+			$v *= 2.5 if $cs{win_c}[$m{country}] <= $sum / $w{country};
+			if ($m{sedai} < 5) {
+				$v *= 3;
+			}
+			elsif ($m{sedai} < 10) {
+				$v *= 2.5;
+			}
+		}
+		elsif (($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'))) { # ”’•º
+			$v += $m{sedai} > 10 ? 100 : $m{sedai} * 10;
+			$v *= 1.2;
+		}
+		else {
+			$v += $m{sedai} > 10 ? 100 : $m{sedai} * 10;
+		}
+
+		# Œğí’†‚È‚ç2”{
+		my $p_c_c = 'p_' . &union($m{country}, $y{country});
+		$v *= 2 if $w{$p_c_c} eq '2';
+
+		# ‘İ’è
+		$v *= &get_modify('war');
+
+		# é•Ç•â³
+		my ($r_v, $r_vv) = &get_rampart_modify($y{country}); # é•Ç‚É‚æ‚é’D‘—ÍE’D‘ãŒÀ‚Ì•â³‚ª•Ô‚é
+		$v *= $r_v;
+
+		#‘ã•\ƒ{[ƒiƒX
+		# Q–d‚Í’D‘—Í1.1”{
+		$v = int($v * 1.1) if $cs{war}[$m{country}] eq $m{name};
+		# ŒNå‚Í’D‘—Í1.05”{A–\ŒN‚È‚ç‚Î1.2”{
+		if ($cs{ceo}[$m{country}] eq $m{name}) {
+			my $ceo_bonus = ($w{world} eq '4' || ($w{world} eq '19' && $w{world_sub} eq '4')) ? 1.2 : 1.05;
+			$v = int($v * $ceo_bonus);
+		}
+
+		# b‰»
+		$v = &seed_bonus('red_moon', $v);
+
+		# —”
+		$v = $v * $m{value} * (rand(0.4)+0.8);
+
+		# í‘°ÎŞ°Å½
+		$v = &seed_bonus('war_win', $v);
 	}
-	elsif ($m{unit} eq '7' || $m{unit} eq '8') {
-		$v = &use_pet('war_result', $v) unless ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17') || ($m{pet} eq '12' && ($time + 2 * 24 * 3600 < $w{limit_time})) );
+
+	$v *= 1.5 if $m{unit} eq '18'; # àÂ’m•â³
+
+	unless ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17')) { # ”’•º‚Å‚Í‚È‚¢
+		# àÂ’mÛ·A“ˆêŠúŒÀc‚è2“úˆÈã‚Ì”{‘¬Û·‚Å‚Í‚È‚¢
+		unless ( $m{pet} eq '12' && (($m{unit} eq '18') || (($m{unit} eq '7' || $m{unit} eq '8') && ($time + 2 * 24 * 3600 < $w{limit_time}))) ) {
+			$v = &use_pet('war_result', $v);
+		}
 	}
-	else{
-		$v = &use_pet('war_result', $v) unless ($w{world} eq '17' || ($w{world} eq '19' && $w{world_sub} eq '17'));
-	}
-	
-	if ($cs{extra}[$m{country}] eq '1' && $cs{extra_limit}[$m{country}] >= $time) {
-		$v = 999;
-	}
-	
-	if ($w{world} eq $#world_states - 5) {
-		$v = int($v / 10);
-	}
-	
+
+	$v = 999 if $cs{extra}[$m{country}] eq '1' && $cs{extra_limit}[$m{country}] >= $time; # ³ÛÎŞŠoÁ
 
 	# ’D‘—ÍãŒÀ
 	if ($v !~ /^(\d)\1+$/) { # ¿ŞÛ–Ú(³ÛÎŞÛ½g—p‚È‚Ç)
@@ -260,23 +242,29 @@ sub war_win {
 			$v = $v > 200 ? int(rand(80)+120) : int($v);
 		}
 		else { # ’ÊíE’·Šú
-			if($m{unit} eq '18'){
-				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # “ˆêŠúŒÀc‚è‚P“ú
-					$v = $v > (2000 + $r_vv) ? int(rand(500+($r_vv*0.5))+1500+($r_vv*0.5)) : int($v);
+			unless ($w{world} eq $#world_states - 5) { # Ù‘¬‚Å‚Í‚È‚¢
+				if ($m{unit} eq '18') {
+					if ($time + 2 * 24 * 3600 > $w{limit_time}) { # “ˆêŠúŒÀc‚è‚P“ú
+						$v = $v > (2000 + $r_vv) ? int(rand(500+($r_vv*0.5))+1500+($r_vv*0.5)) : int($v);
+					}
+					else {
+						$v = $v > (1500 + $r_vv) ? int(rand(500+($r_vv*0.5))+1000+($r_vv*0.5)) : int($v);
+#						$v = $v > 1500  ? int(rand(200)+1300) : int($v);
+					}
 				}
 				else {
-					$v = $v > (1500 + $r_vv) ? int(rand(500+($r_vv*0.5))+1000+($r_vv*0.5)) : int($v);
-#					$v = $v > 1500  ? int(rand(200)+1300) : int($v);
+					if ($time + 2 * 24 * 3600 > $w{limit_time}) { # “ˆêŠúŒÀc‚è‚P“ú
+						$v = $v > (1500 + $r_vv) ? int(rand(500+($r_vv*0.5))+1000+($r_vv*0.5)) : int($v);
+#						$v = $v > 1500 ? int(rand(250)+1250) : int($v);
+					}
+					else {
+#						$v = $v > 600  ? int(rand(200)+400) : int($v);
+						$v = $v > (800 + $r_vv)  ? int(rand(200+($r_vv*0.5))+600+($r_vv*0.5)) : int($v);
+					}
 				}
-			}else{
-				if ($time + 2 * 24 * 3600 > $w{limit_time}) { # “ˆêŠúŒÀc‚è‚P“ú
-					$v = $v > (1500 + $r_vv) ? int(rand(500+($r_vv*0.5))+1000+($r_vv*0.5)) : int($v);
-#					$v = $v > 1500 ? int(rand(250)+1250) : int($v);
-				}
-				else {
-#					$v = $v > 600  ? int(rand(200)+400) : int($v);
-					$v = $v > (800 + $r_vv)  ? int(rand(200+($r_vv*0.5))+600+($r_vv*0.5)) : int($v);
-				}
+			}
+			else {
+				$v = int($v);
 			}
 			# “ˆêŠúŒÀ‚ª‹ß‚Ã‚¢‚Ä‚«‚½‚çÌß×½
 			$v += $time + 4 * 24 * 3600 > $w{limit_time} ? 40
@@ -285,7 +273,7 @@ sub war_win {
 			    ;
 		}
 	}
-	
+
 	# –Å–S‘‚Ìê‡”±‘¥
 	if ($cs{is_die}[$y{country}]) {
 		$v = int($v * 0.5);
@@ -312,19 +300,16 @@ sub war_win {
 		'war', 1, 1
 	);
 
-	if ($w{world} eq $#world_states - 5) {
-		$mes .= "$v‚Ì$e2j{strong}‚ğ“¾‚Ü‚µ‚½<br>";
-	} else {
-		$mes .= "$c_y‚©‚ç$v‚Ì$e2j{strong}‚ğ’D‚¢‚Ü‚µ‚½<br>";
-	}
-	
 	my $mname = &name_link($m{name});
 	if ($w{world} eq '16' || ($w{world} eq '19' && $w{world_sub} eq '16')) {
 		$mname = '–¼–³‚µ';
 	}
+
 	if ($w{world} eq $#world_states - 5) {
+		$mes .= "$v‚Ì$e2j{strong}‚ğ“¾‚Ü‚µ‚½<br>";
 		&write_world_news(qq|$c_m‚Ì$mname‚ª<font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ“¾‚é–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
 	} else {
+		$mes .= "$c_y‚©‚ç$v‚Ì$e2j{strong}‚ğ’D‚¢‚Ü‚µ‚½<br>";
 		if ($is_single) {
 			&write_world_news(qq|$c_m‚Ì$mname‚ª$c_y‚ÉNUA$y{name}‚Æˆê‹R“¢‚¿‚Ì––‚±‚ê‚ğ‰º‚µ <font color="#FF00FF"><b>$v</b> ‚Ì$e2j{strong}‚ğ’D‚¤–‚É¬Œ÷</font>‚µ‚½‚æ‚¤‚Å‚·|);
 		}
@@ -345,6 +330,7 @@ sub war_win {
 	&c_up('win_c');
 	++$m{medal};
 	my $vv = int( (rand(21)+20) * $m{value} );
+	$vv = int($vv * 0.55) if $w{world} eq $#world_states - 5; # í‘ˆÅ‚ŒoŒ±’l int(40.99.. * 1.5) = 61 int(61 * 0.55) = 33
 	$vv = &use_pet('war_win', $vv);
 	$m{exp}      += $vv;
 	$m{rank_exp} += int( (rand(11)+20) * $m{value} );
@@ -529,48 +515,47 @@ sub war_win {
 	}
 	# Ù‘¬
 	elsif ($w{world} eq $#world_states - 5) {
-		my $cou = 0;
+		my $strongest_country = 0;
 		my $max_value = 0;
 		for my $i (1 .. $w{country}) {
 			if ($cs{strong}[$i] > $max_value) {
-				$cou = $i;
+				$strongest_country = $i;
 				$max_value = $cs{strong}[$i];
 			}
 		}
-		$strongest_country = $cou;
 		if ($y{country} eq $strongest_country) {
-			if (rand(3) < 1) {
-				my($kkk,$vvv) = &_steal_country( 'strong',  int(rand(10)+10) * 10  );
-				&write_world_news("<b>Ø³Ş§²±»İ‚Ì‘å—’I$cs{name}[$m{country}]‚Í$cs{name}[$y{country}]‚Ì$e2j{$kkk}‚ğ $vvv ’D‚¢‚Ü‚µ‚½</b>");
+			if (int(rand(3)) < 1) {
+				my $steal_v = int(rand(15)+10) * 100; # ’D‘ãŒÀ“P”p‚³‚ê‚Ä‚é‚Ì‚Å‘½‚ß‚É
+				$steal_v = $cs{strong}[$strongest_country] if $steal_v > $cs{strong}[$strongest_country];
+				$cs{strong}[$strongest_country] -= $steal_v;
+				$cs{strong}[$m{country}] += $steal_v unless $strongest_country eq $m{country};
+				&write_world_news("<b>Ø³Ş§²±»İ‚Ì‘å—’I$cs{name}[$m{country}]‚Í$cs{name}[$strongest_country]‚Ì$e2j{strong}‚ğ $steal_v ’D‚¢‚Ü‚µ‚½</b>");
 			}
-		} else {
-			if (rand(3) < 1) {
-				my $type = int(rand(12));
-				if ($type == 0) {
+		}
+		else {
+			if (int(rand(3)) < 1) {
+				my $type = int(rand(14));
+				if ($type < 2) {
 					for my $i (1..$w{country}) {
 						next if $i eq $m{country};
 						$cs{strong}[$i] -= int(rand(40)+40);
 					}
 					&write_world_news("<b>Še‘‚Ì$e2j{strong}‚ª‰º‚ª‚è‚Ü‚µ‚½</b>");
-				} elsif ($type <= 10) {
-					if (rand(3) < 1) {
-						$cs{food}[$m{country}] += 100000;
-						&write_world_news("$c_m‚Ì$e2j{food}‚ª100000‘‰Á‚µ‚Ü‚µ‚½");
-					} elsif (rand(2) < 1) {
-						$cs{money}[$m{country}] += 100000;
-						&write_world_news("$c_m‚Ì$e2j{money}‚ª100000‘‰Á‚µ‚Ü‚µ‚½");
-					} else {
-						$cs{soldier}[$m{country}] += 50000;
-						&write_world_news("$c_m‚Ì$e2j{soldier}‚ª50000‘‰Á‚µ‚Ü‚µ‚½");
-					}
-				} else {
+				}
+				elsif ($type < 3) {
 					for my $i (1..$w{country}) {
 						for my $j ($i+1..$w{country}) {
-							$w{"f_${i}_${j}"}=int(rand(20));
-							$w{"p_${i}_${j}"}=2;
+							$w{"f_${i}_${j}"} = int(rand(20));
+							$w{"p_${i}_${j}"} = 2;
 						}
 					}
 					&write_world_news("<b>¢ŠE’†‚ªŠJí‚Æ‚È‚è‚Ü‚µ‚½</b>");
+				}
+				elsif ($type <= 11) {
+					my @types = ('food', 100000, 'money', 100000, 'soldier', 50000);
+					my $sub_type = int(rand(3)) * 2;
+					$cs{$types[$sub_type]}[$m{country}] += $types[$sub_type+1];
+					&write_world_news("$c_m‚Ì$e2j{$types[$sub_type]}‚ª$types[$sub_type+1]‘‰Á‚µ‚Ü‚µ‚½");
 				}
 			}
 		}
@@ -592,16 +577,13 @@ sub war_win {
 		my($kkk,$vvv) = &_steal_country( 'strong',  int(rand(10)+10) * 100  );
 		&write_world_news("<b>Ø³Ş§²±»İ‚Ì‘å—’I$cs{name}[$m{country}]‚Í$cs{name}[$y{country}]‚Ì$e2j{$kkk}‚ğ $vvv ’D‚¢‚Ü‚µ‚½</b>");
 	}
-	if($w{world} eq '19'){# “ä
-		if($w{sub_time} < $time){
-			$w{world_sub} = int(rand(@world_states-4));
-			$w{sub_time} = $time + 6 * 3600;
-		}
+
+	if ($w{world} eq '19' && $w{sub_time} < $time) { # “äî¨‚Ìî¨•ÏX
+		$w{world_sub} = int(rand(@world_states-4));
+		$w{sub_time} = $time + 6 * 3600; # 6ŠÔŒã
 	}
-	
 
 	&write_cs;
-
 	&n_menu;
 }
 

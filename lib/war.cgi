@@ -61,7 +61,7 @@ sub tp_100 {
 		$y{sol} = int($rank_sols[$y{rank}] * $m{value}); # ÀŞ°ÄÙ‚Í­”–³Œø
 	}
 	if ($config_test) {
-		$y{sol} = 20000;
+		$y{sol} /= 100;
 	}
 
 	# •º‚ª‘«‚è‚È‚¢
@@ -544,7 +544,7 @@ sub _get_war_npc_data {
 	if ($cs{strong}[$y{country}] <= 3000) {
 		$v = 0;
 	}
-	elsif ($c1 eq $y{country} || $c2 eq $y{country}) {
+	elsif ($c1 eq $y{country} || $c2 eq $y{country} || $w{world} eq $#world_states - 5) {
 		$v += 1;
 	}
 	$v = $#npcs if $v > $#npcs;

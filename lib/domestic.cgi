@@ -247,6 +247,13 @@ sub after1 { # $m{turn} から拘束時間を割り出せる最後のタイミングで呼ばれる
 			:                   $GWT   * $i
 			;
 	&gain_dom_barrier($g);
+
+	# 拘束時間で効果量変わるかもしれないのでここに定義
+	if ($w{world} eq $#world_states - 5 && int(rand(13)) < 1 && $w{reset_time} < $time) { # 拙速時に開戦してたら 1/12 で
+		my $v = int(rand(50)+1) * 10;
+		$cs{strong}[$m{country}] += $v;
+		&mes_and_world_news("<b>$c_mの$e2j{strong}が$v増加しました</b>");
+	}
 }
 sub after2 {
 	my $v = int( (rand(3)+4) * $m{turn} );

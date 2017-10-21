@@ -7,7 +7,7 @@ use File::Path;
 #================================================
 # 紅白 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
 # 三国志 ｼｬｯﾌﾙ 熟練度ﾊﾞｯｸｱｯﾌﾟ ﾈﾊﾞﾗﾝ行き 熟練度ﾘｽﾄｱ
-# 拙速 ﾉｰｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
+# 拙速 ｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
 # 混乱 ｼｬｯﾌﾙ ﾈﾊﾞﾗﾝ行き
 
 #================================================
@@ -54,12 +54,16 @@ sub begin_festival_world {
 	} elsif ($w{year} % 40 == 10) { # 拙速
 		$w{world} = $#world_states-5;
 		$w{game_lv} = 99;
-		$w{reset_time} = $config_test ? $time: $time + 3600 * 12;
-		$w{limit_time} = $config_test ? $time: $time + 3600 * 36;
+		$w{win_countries} = '';
+		$w{reset_time} = $time; # $config_test ? $time: $time + 3600 * 12; # 終戦期間
+		$w{limit_time} = $config_test ? $time: $time + 3600 * 24; # 統一期限
 		for my $i (1 .. $w{country}) {
-			$cs{strong}[$i] = 5000;
-			$cs{tax}[$i] = 99;
-			$cs{state}[$i] = 5;
+			$cs{strong}[$i]  = 5000;
+			$cs{tax}[$i]     = 99;
+			$cs{state}[$i]   = 5;
+			$cs{food}[$i]    = 999999;
+			$cs{money}[$i]   = 999999;
+			$cs{soldier}[$i] = 999999;
 		}
 		&run_sessoku(1);
 	} else { # 混乱
@@ -213,6 +217,9 @@ sub run_sessoku {
 	$is_start = shift;
 
 	if ($is_start) { # 拙速開始時の処理
+		&player_shuffle(1..$w{country});
+=pod
+		ｼｬｯﾌﾙしない用
 		opendir my $dh, "$userdir" or &error("ﾕｰｻﾞｰﾃﾞｨﾚｸﾄﾘが開けません");
 		while (my $pid = readdir $dh) {
 			next if $pid =~ /\./;
@@ -223,6 +230,7 @@ sub run_sessoku {
 			&wt_c_reset(\%m, \%you_datas); # 稼働率ﾗﾝｷﾝｸﾞの更新とﾘｾｯﾄ	
 		}
 		closedir $dh;
+=cut
 	} # 拙速開始時の処理
 	else { # 拙速終了時の処理
 		require './lib/shopping_offertory_box.cgi';
@@ -266,12 +274,24 @@ sub run_sessoku {
 			if ($you_datas{name} eq $m{name}){
 				$m{country} = 0;
 				$m{vote} = '';
+				# 代表熟練度のﾘｽﾄｱ
+				for my $k (qw/war dom pro mil/) {
+					$m{"${k}_c"} = $m{"${k}_c_t"};
+					$m{"${k}_c_t"} = 0;
+				}
 				&write_user;
 			} else {
 				my @data = (
 					['country', 0],
 					['vote', '']
 				);
+				for my $k (qw/war dom pro mil/) {
+					my @data2 = (
+						["${k}_c", $you_datas{"${k}_c_t"}],
+						["${k}_c_t", 0]
+					);
+					push @data, @data2;
+				}
 				&regist_you_array($you_datas{name}, @data);
 			}
 
@@ -390,19 +410,20 @@ sub add_festival_country {
 		}
 
 		my $num = $i-($w{country}+1-$country_num);
-		$cs{name}[$i]     = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1][$num];
-		$cs{color}[$i]    = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
-		$cs{member}[$i]   = 0;
-		$cs{win_c}[$i]    = 999;
-		$cs{tax}[$i]      = 99;
-		$cs{strong}[$i]   = $max_c * 500; # 仕官上限 * 500
-		$cs{food}[$i]     = $config_test ? 999999 : 0;
-		$cs{money}[$i]    = $config_test ? 999999 : 0;
-		$cs{soldier}[$i]  = $config_test ? 999999 : 0;
-		$cs{state}[$i]    = 0;
-		$cs{capacity}[$i] = $max_c;
-		$cs{is_die}[$i]   = 0;
-		$cs{barrier}[$i]  = &get_init_barrier;
+		$cs{name}[$i]        = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[1][$num];
+		$cs{color}[$i]       = FESTIVAL_COUNTRY_PROPERTY->{$festival_name}[2][$num];
+		$cs{prison_name}[$i] = '牢獄';
+		$cs{member}[$i]      = 0;
+		$cs{win_c}[$i]       = 999;
+		$cs{tax}[$i]         = 99;
+		$cs{strong}[$i]      = $max_c * 500; # 仕官上限 * 500
+		$cs{food}[$i]        = $config_test ? 999999 : 0;
+		$cs{money}[$i]       = $config_test ? 999999 : 0;
+		$cs{soldier}[$i]     = $config_test ? 999999 : 0;
+		$cs{state}[$i]       = 0;
+		$cs{capacity}[$i]    = $max_c;
+		$cs{is_die}[$i]      = 0;
+		$cs{barrier}[$i]     = &get_init_barrier;
 	}
 
 	for my $i (1 .. $w{country}-$country_num) {
