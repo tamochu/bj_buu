@@ -122,7 +122,7 @@ sub write_user {
 	# -------------------
 	# 変数追加する場合は半角ｽﾍﾟｰｽか改行を入れて追加(順不同、並べ替え可(login_time以外))
 	my @keys = (qw/
-		login_time ldate start_time mail_address name pass lib tp lib_r tp_r wt act sex shogo sedai vote vote_year
+		login_time ldate start_time mail_address name pass magic_word lib tp lib_r tp_r wt act sex shogo sedai vote vote_year
 		country job seed lv exp rank rank_exp super_rank rank_name unit sol sol_lv medal money coin skills renzoku renzoku_c total_auction skills_sub skills_sub2 skills_sub3 money_limit
 		max_hp hp max_mp mp at df mat mdf ag cha lea wea wea_c wea_lv wea_name gua egg egg_c pet pet_c shuffle master master_c boch_pet
 		marriage lot is_full next_salary icon icon_pet icon_pet_lv icon_pet_exp mes mes_win mes_lose mes_touitsu ltime gacha_time gacha_time2 offertory_time trick_time breed_time silent_time
@@ -305,6 +305,7 @@ sub menu {
 			$menu_cmd .= qq|<input type="submit" value="$mline" class="button1s"><input type="hidden" name="cmd" value="$i">|;
 			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 #			$menu_cmd .= qq|<input type="hidden" name="rest" value="$rest">| if $rest; # 拘束中のコマンド入力であることを伝える 飛んだ先で $m{wt} も判定すること
+			$menu_cmd .= qq|<input type="hidden" name="magic_word" value="$magic_word">| if $magic_word; # 多窓させないための一時キー
 			$menu_cmd .= qq|</form>|;
 			$menu_cmd .= qq|</td>|;
 			if($i % 4 == 3){
@@ -325,6 +326,7 @@ sub menu {
 			$menu_cmd .= qq|<input type="submit" value="$menus[$i]" class="button2s"><input type="hidden" name="cmd" value="$i">|;
 			$menu_cmd .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 #			$menu_cmd .= qq|<input type="hidden" name="rest" value="$rest">| if $rest; # 拘束中のコマンド入力であることを伝える 飛んだ先で $m{wt} も判定すること
+			$menu_cmd .= qq|<input type="hidden" name="magic_word" value="$magic_word">| if $magic_word; # 多窓させないための一時キー
 			$menu_cmd .= qq|</form>|;
 			$menu_cmd .= qq|<br class="cmd_br" />| if ($i+1) % 7 == 0;
 		}
@@ -338,6 +340,7 @@ sub menu {
 		}
 		$menu_cmd .= qq|</select><input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 #		$menu_cmd .= qq|<input type="hidden" name="rest" value="$rest">| if $rest; # 拘束中のコマンド入力であることを伝える 飛んだ先で $m{wt} も判定すること
+		$menu_cmd .= qq|<input type="hidden" name="magic_word" value="$magic_word">| if $magic_word; # 多窓させないための一時キー
 		$menu_cmd .= $is_mobile ? qq|<br><input type="submit" value="決 定" class="button1" accesskey="#"><input type="hidden" name="guid" value="ON"></form>|: qq|<br><input type="submit" value="決 定" class="button1"><input type="hidden" name="guid" value="ON"></form>|;
 	}
 

@@ -1,3 +1,4 @@
+use Time::HiRes;
 my $this_file = "$userdir/$id/depot.cgi";
 my $this_log = "$userdir/$id/depot_log.cgi";
 my $this_lock_file = "$userdir/$id/depot_lock.cgi";
@@ -38,8 +39,15 @@ my %taboo_items = (
 	gua => [], # 防具
 );
 
+my @magic_words = ('a'..'z', 'A'..'Z', 0..9);
+
 #================================================
 sub begin {
+
+	local $magic_word = '';
+	$magic_word .= $magic_words[int(rand($#magic_words+1))] for (0 .. 12);
+	$m{magic_word} = $magic_word;
+
 	if (-f "$userdir/$id/depot_flag.cgi") {
 		unlink "$userdir/$id/depot_flag.cgi";
 	}
@@ -59,8 +67,13 @@ sub begin {
 	&menu('やめる', '引出す', '預ける', '整理する', '相手に送る', '一括売却', '捨てる', 'ロックをかける', '履歴');
 }
 sub tp_1 {
+	unless ($in{magic_word} eq $m{magic_word}) {
+		$mes .= "不正な処理により倉庫の操作を中断しました<br>";
+		&begin;
+		return;
+	}
 	return if &is_ng_cmd(1..8);
-	
+
 	$m{tp} = $cmd * 100;
 	&{ 'tp_'. $m{tp} };
 }
@@ -69,6 +82,12 @@ sub tp_1 {
 # 引出す
 #=================================================
 sub tp_100 {
+	unless ($in{magic_word} eq $m{magic_word}) {
+		$mes .= "不正な処理により倉庫の操作を中断しました<br>";
+		&begin;
+		return;
+	}
+
 	my $no = $_[0];
 	$layout = 2;
 	my($count, $sub_mes) = &radio_my_depot($no);
@@ -80,12 +99,25 @@ sub tp_100 {
 	$mes .= "どれを引出しますか? [ $count / $max_depot$lost_mes ]<br>";
 	$mes .= $sub_mes;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
+	$mes .= qq|<input type="hidden" name="magic_word" value="$in{magic_word}">|; # 多窓させないための一時キー
 	$mes .= $is_mobile ? qq|<p><input type="submit" value="引出す" class="button1" accesskey="#"></p>|:
 		qq|<p><input type="submit" value="引出す" class="button1"></p>|;
 	$mes .= qq|<label><input type="checkbox" id="pet_summary" name="show_summary" value="1">ﾍﾟｯﾄの効果を確認する</label></form>|;
 	$m{tp} += 10;
 }
 sub tp_110 {
+	unless ($in{magic_word} eq $m{magic_word}) {
+		$mes .= "不正な処理により倉庫の操作を中断しました<br>";
+		&begin;
+		return;
+	}
+	else { # ここでキーが変わった瞬間からあとに続く呼び出しが弾かれるが、キーが変わる瞬間に入られるとおそらく結局同時処理されそうな気がする
+		my $magic_word = '';
+		$magic_word .= $magic_words[int(rand($#magic_words+1))] for (0 .. 12);
+		$in{magic_word} = $magic_word;
+		$m{magic_word} = $magic_word;
+		&write_user;
+	}
 	if ($in{show_summary} && $cmd && $cmd <= $lost_depot) { # ﾍﾟｯﾄの説明ﾓｰﾄﾞかつ非表示ﾃﾞｰﾀにアクセスしてない
 		require './data/pet.cgi';
 		my $count = 0;
@@ -160,7 +192,13 @@ sub tp_110 {
 					push @lines, $line;
 				}
 			}
-			if ($new_line) {
+			if ($in{magic_word} ne $m{magic_word}) { # ここたぶん要らない？ 念のため
+				$mes = "不正な処理により倉庫の操作を中断しました<br>";
+				close $fh;
+				&begin;
+				return;
+			}
+			elsif ($new_line) {
 				push @lines, $add_line if $add_line;
 				seek  $fh, 0, 0;
 				truncate $fh, 0; 
@@ -187,7 +225,7 @@ sub tp_110 {
 					$m{pet_c}  = $item_c;
 					$mes .= "$pets[$m{pet}][1]★$m{pet_c}を引出しました<br>";
 					$l_mes .= $s_mes = "$pets[$m{pet}][1]★$m{pet_c}";
-	
+
 					&get_icon_pet;
 				}
 				elsif ($kind eq '4') {
@@ -210,6 +248,9 @@ sub tp_110 {
 				# 引出すﾀｲﾐﾝｸﾞで新しいｱｲﾃﾑがあればｺﾚｸｼｮﾝに追加
 				require './lib/add_collection.cgi';
 				&add_collection;
+
+
+#				Time::HiRes::sleep(2.5);
 			}
 			else {
 				close $fh;
@@ -224,7 +265,7 @@ sub tp_110 {
 #=================================================
 sub tp_200 {
 	$mes .= 'どれを預けますか?';
-	
+
 	my @menus = ('やめる');
 	push @menus, $m{wea} ? $weas[$m{wea}][1] : '';
 	push @menus, $m{egg} ? $eggs[$m{egg}][1] : '';
