@@ -124,7 +124,7 @@ sub write_players_html {
 		
 		# íœŠúŒÀ‚É‚È‚èŽ©“®íœ
 		if ($time > $p{ltime} + $auto_delete_day * 3600 * 24 && $player ne $admin_name && !$p{delete_shield}) {
-			# Ž©“®íœ‰„–½Íß¯Ä‚ð‘•”õ‚µ‚Ä‚¢‚é‚È‚çŽ©“®íœ“ú{24“ú‚Ííœ‚µ‚È‚¢
+			# Ž©“®íœ‰„–½Íß¯Ä‚ð‘•”õ‚µ‚Ä‚¢‚é‚È‚çŽ©“®íœ“ú{30“ú‚Ííœ‚µ‚È‚¢
 			if ($pets[$p{pet}][2] eq 'life_up') {
 				if ($time > $p{ltime} + ($auto_delete_day + 30) * 3600 * 24) {
 					&move_player($player, $country, 'del');
