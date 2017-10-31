@@ -214,7 +214,7 @@ $timing_base = 0; # 0.2 # –³ðŒ‚Å”­¶‚È‚ç 0 ‚ð’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ðŒ”­“®Žž
 Íß¯ÄÚÍÞÙ		ƒR[ƒhŽQÆ		š7‚Ô‚¿ž‚ñ‚Å2.6
 ‹‹—¿			2.3				+24ŽžŠÔ‚ÅÝ’è‚µ‚Ä‚½‚¯‚Ç‚Æ‚ñ‚Å‚à‚È‚­Žg‚¢‚É‚­‚©‚Á‚½ +6ŽžŠÔ‚Å‰„X‹‹—¿ŽžŠÔL‚Ñ‚é‚¯‚ÇÄÞ×³ÌßÆÙ‚Å‹‹—¿ŽžŠÔƒ`ƒƒƒ‰‚É‚È‚é‰Â”\«‚ ‚é
 no1n—û		2.2				Œ¸‚Á‚Ä‘‚¦‚Ä‚à‚Ù‚Æ‚ñ‚Ç–â‘è‚ª‚È‚¢ã‚Éã‚ª‚è‚É‚­‚¢n—û‚È‚Ì‚Å‚¤‚Á‚Ä‚Â‚¯
-½ÃÀÞ³Ý		2					9‚Â‚ ‚éƒXƒe‚Ì1‚Â‚ª-0`19‚¾‚µ‘å‚µ‚½‚±‚Æ‚È‚¢ “–‚½‚è
+½ÃÀÞ³Ý		2					9‚Â‚ ‚éƒXƒe‚Ì1‚Â‚ª-19`0‚¾‚µ‘å‚µ‚½‚±‚Æ‚È‚¢ “–‚½‚è
 —£¥			1.6				‚±‚ê‚àÃÞÒØ¯Ä‚¶‚á‚È‚­‚È‚é‰Â”\«‚à‚ ‚é‚¯‚Ç‘å‚µ‚½‚±‚Æ‚È‚¢‚©H
 •ŠíÚÍÞÙ		1.6				ÃÞÒØ¯Ä‚¶‚á‚È‚¢‚Æ‚àŒ¾‚¦‚é‚µ¼Þ¬Ý¸‚ÅƒSƒ~•Ší”ƒ‚Á‚Ä’b‚¦‚ÄŽg‚Á‚Ä‚ª‚¤‚Ü‚¢‚¯‚Ç“–‚½‚è‚Á‚Ä‚±‚Æ‚Å
 ŒMÍ			1.2				10ŒÂÁ”ï¨5ŒÂÁ”ï¨3ŒÂÁ”ï‚É•ÏX ½¶Ú‚à‚ ‚é‚µ5ŒÂ‚ª—Ç‚¢‚©‚àH
@@ -239,9 +239,9 @@ $demerit_base = 0.5; # –³ðŒ‚Å”­¶‚È‚ç 0 ‚ð’´‚¦‚é”’l ‚»‚Ì”’l‚ª–³ðŒ”­“®Žž‚Ìƒ
 	[3,		'½Ã°À½ÀÞ³Ý',	sub{ @st = (qw/max_hp max_mp at df mat mdf ag cha lea/); $k = $st[int(rand(@st))]; $m{$k} -= int(rand(20)); $m{$k} = $m{$k} <= 0 ? int(rand(20)):$m{$k}; return 2; },	1.2,	0],
 	[4,		'vŒ£’l100Œ¸­',		sub{ $m{rank_exp} -= 100; return 1; },	1,	1],
 #	[5,		'vŒ£’l100Œ¸­(Žã)',		sub{ $m{rank_exp} -= 100; return 0.8; },	0.8,	0],
-	[5,		'ŠŽ‹à10%Á”ï',		sub{ if ($m{money} > 49999999) { my $vv = 4999999 * 0.0000005; $m{money} -= int(4999999 * 0.1); return $vv > 0 ? $vv + 0.75 : $demerit_base; } else { my $vv = $m{money} * 0.0000005; $m{money} = int($m{money} * 0.9); return $vv > 0 ? $vv + 0.75 : $demerit_base; } },	0.7,	1], # »Ï°¼Þ¬ÝÎÞ¾Þ³½‚Åˆê”­‚ÅI‚í‚é‚©‚ç‚ ‚Æ‚Ål‚¦‚é
+	[5,		'ŠŽ‹à10%Á”ï',		sub{ if ($m{money} > 4999999) { my $vv = 4999999 * 0.0000005; $m{money} -= int(4999999 * 0.1); return $vv > 0 ? $vv + 0.75 : $demerit_base; } else { my $vv = $m{money} * 0.0000005; $m{money} = int($m{money} * 0.9); return $vv > 0 ? $vv + 0.75 : $demerit_base; } },	0.7,	1], # »Ï°¼Þ¬ÝÎÞ¾Þ³½‚Åˆê”­‚ÅI‚í‚é‚©‚ç‚ ‚Æ‚Ål‚¦‚é
 	[6,		'ŠŽ‹à10000Á”ï',		sub{ $m{money} -= 10000; return 0.7; },	0.7,	0],
-	[7,		'ŒMÍ3ŒÂ•Ôã',		sub{ $m{medal} -= 3; return 1.2; },	1.5,	1],
+	[7,		'ŒMÍ3ŒÂ•Ôã',		sub{ if (3 <= $m{medal}) { $m{medal} -= 3; return 1.2; } else { return $demerit_base; } },	1.5,	1],
 #	[8,		'ŒMÍ10ŒÂ•Ôã(Žã)',		sub{ $m{medal} -= 10; return 1; },	1,	0],
 	[8,		'º²Ý10%Œ¸­',		sub{ my $vv = $m{coin} * 0.0000005; $m{coin} = int($m{coin} * 0.9); return $vv > 0 ? $vv + 0.65 : $demerit_base ; },	0.8,	1],
 	[9,		'º²Ý10000Œ¸­',		sub{ if ($m{coin} > 9999) { $m{coin} -= 10000; return 0.6; } else { return $demerit_base; } },	0.5,	0],
