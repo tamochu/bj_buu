@@ -68,7 +68,7 @@ sub begin {
 	&menu(@menus);
 }
 sub tp_1 {
-	return if &is_ng_cmd(1..10);
+	return if &is_ng_cmd(1..11);
 
 	$m{tp} = $cmd * 100;
 	&{ 'tp_'.$m{tp} };
