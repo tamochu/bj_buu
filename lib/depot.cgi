@@ -157,6 +157,12 @@ sub tp_110 {
 			open my $fh, "+< $this_file" or &error("$this_fileが開けません");
 			eval { flock $fh, 2; };
 			while (my $line = <$fh>) {
+				if ($in{magic_word} ne $m{magic_word}) { # ここで弾くと効果テキメンらしい 不具合らしい謎の効き目
+					$mes = "不正な処理により倉庫の操作を中断しました<br>";
+					close $fh;
+					&begin;
+					return;
+				}
 				my($rkind, $ritem_no, $ritem_c, $ritem_lv) = split /<>/, $line;
 				$depot_line .= "$rkind,$ritem_no,$ritem_c,$ritem_lv<>";
 				++$count;
