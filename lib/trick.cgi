@@ -23,7 +23,7 @@ sub tp_1  {
 sub tp_100{
 	$mes .= qq|<form method="$method" action="$script"><p>いたずら対象：<input type="text" name="trick_name" class="text_box1"></p>|;
 	$mes .= qq|<input type="radio" name="icon" value="0" checked> やめる<hr>|;
-	
+
 	opendir my $dh, "$userdir/$id/picture" or &error('ﾏｲﾋﾟｸﾁｬが開けません');
 	while (my $file_name = readdir $dh) {
 		next if $file_name =~ /^\./;
@@ -39,7 +39,6 @@ sub tp_100{
 	$mes .= qq|<p><input type="submit" value="このアイコンに変える" class="button1"></p></form>|;
 	$m{tp} += 10;
 }
-
 sub tp_110{
 	if ($in{icon} eq '0'){
 		$mes .= 'やめました<br>';
@@ -59,18 +58,18 @@ sub tp_110{
 	my $trick_id = unpack 'H*', $in{trick_name};
 	my %datas = &get_you_datas($trick_id, 1);
 	if ($datas{icon_t} eq ''){
-	   if ($in{icon} && -f "$userdir/$id/picture/$in{icon}") {
-	      &error("同じﾀｲﾄﾙのものがすでに使われています") if -f "$icondir/$in{icon}";
-	      rename "$userdir/$id/picture/$in{icon}", "$icondir/$in{icon}"  or &error("rename error");
-	      &regist_you_data($in{trick_name},'icon_t',$datas{icon});
-	      &regist_you_data($in{trick_name},'icon',$in{icon});
-	      &regist_you_data($in{trick_name},'trick_time',$time + $trick_time);
+		if ($in{icon} && -f "$userdir/$id/picture/$in{icon}") {
+			&error("同じﾀｲﾄﾙのものがすでに使われています") if -f "$icondir/$in{icon}";
+			rename "$userdir/$id/picture/$in{icon}", "$icondir/$in{icon}"  or &error("rename error");
+			&regist_you_data($in{trick_name},'icon_t',$datas{icon});
+			&regist_you_data($in{trick_name},'icon',$in{icon});
+			&regist_you_data($in{trick_name},'trick_time',$time + $trick_time);
 			&remove_pet;
-	      &mes_and_world_news("$datas{name}のｱｲｺﾝにいたずらをしました");
-	   }
-	   else {
+			&mes_and_world_news("$datas{name}のｱｲｺﾝにいたずらをしました");
+		}
+		else {
 			$mes .= 'やめました<br>';
-	   }
+		}
 	}
 	&refresh;
 	&n_menu;
@@ -86,9 +85,7 @@ sub tp_200{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
 sub tp_210{
 	return if &is_ng_cmd(1);
 	if ($in{trick_name} eq '') {
@@ -127,9 +124,7 @@ sub tp_300{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
 sub tp_310{
 	return if &is_ng_cmd(1);
 	if ($in{trick_name} eq '') {
@@ -145,13 +140,14 @@ sub tp_310{
 	my $trick_id = unpack 'H*', $in{trick_name};
 	my %datas = &get_you_datas($trick_id, 1);
 	my $v = int(rand(6)+1) * 10000;
-	 $mes.="$pets[$m{pet}][1]★$m{pet_c}が$in{trick_name}のお金を $v G";
+	$mes.="$pets[$m{pet}][1]★$m{pet_c}が$in{trick_name}のお金を $v G";
 	if (rand(2) < 1 && $datas{money} > 10000) {
 		$datas{money} -= $v;
 		$datas{money} = 10000 if $datas{money} < 10000;
 		&regist_you_data($in{trick_name},'money',$datas{money});
 		$mes.="減らしました<br>";
-	} else { 
+	}
+	else { 
 		$datas{money} += $v;
 		&regist_you_data($in{trick_name},'money',$datas{money});
 		$mes.="増やしました<br>";
@@ -173,9 +169,7 @@ sub tp_400{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
 sub tp_410{
 	return if &is_ng_cmd(1);
 	if ($in{trick_name} eq '') {
@@ -206,9 +200,7 @@ sub tp_500{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="勧誘" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
 sub tp_510{
 	return if &is_ng_cmd(1);
 	if ($w{world} eq $#world_states || $w{world} eq $#world_states - 5) {
@@ -226,7 +218,7 @@ sub tp_510{
 		&begin;
 		return;
 	}
-	
+
 	my $trick_id = unpack 'H*', $in{trick_name};
 	my %datas = &get_you_datas($trick_id, 1);
 	if ($datas{country} eq $m{country}) {
@@ -254,30 +246,25 @@ sub tp_510{
 #================================================
 # ﾒｶﾞﾎﾝ
 #================================================
-sub tp_600{
+sub tp_600 {
 	$mes .= qq|<form method="$method" action="$script"><p>発言内容：<input type="text" name="topic" class="text_box1"></p>|;
 	$mes .= qq|<input type="radio" name="cmd" value="0">やめる<br>|;
 	$mes .= qq|<input type="radio" name="cmd" value="1" checked>叫ぶ<br>|;
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="叫ぶ" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
-sub tp_610{
+sub tp_610 {
+	return if &is_ng_cmd(1);
 	my $is_error = 0;
 	if ($in{topic} =~ /[,;\"\'&<>]/) {
-		$mes .= "$in{topic}に不正な文字( ,;\"\'&<> )が含まれています<br>";
+		$mes .= "発言内容に不正な文字( ,;\"\'&<> )が含まれています<br>$in{topic}<br>";
 		$is_error = 1;
-		last;
 	}
 	elsif (length($in{topic}) > 80) {
-		$mes .= "$in{topic}は全角40(半角20)文字以内です<br>";
+		$mes .= "発言内容は全角40(半角80)文字以内です<br>$in{topic}<br>";
 		$is_error = 1;
-		last;
 	}
-
-	return if &is_ng_cmd(1);
 	if ($is_error) {
 		&begin;
 		return;
@@ -285,30 +272,36 @@ sub tp_610{
 	&remove_pet;
 	$mes .= "$m{name}は";
 	my $place = int(rand(1000));
-	if($place < 950){
+	if ($place < 950) {
 		$mes .= "広場で";
 		&_write_news('world_news', "$m{name}は「$in{topic}」と叫んだ");
-	}elsif($place < 960){
+	}
+	elsif ($place < 960) {
 		$mes .= "物々交換の場で";
 		&write_send_news("$m{name}は「$in{topic}」と叫んだ");
-	}elsif($place < 970){
+	}
+	elsif ($place < 970) {
 		$mes .= "日記置場で";
 		&write_blog_news("$m{name}は「$in{topic}」と叫んだ");
-	}elsif($place < 980){
+	}
+	elsif ($place < 980) {
 		$mes .= "闘技場で";
 		&write_colosseum_news("$m{name}は「$in{topic}」と叫んだ");
-	}elsif($place < 990){
+	}
+	elsif ($place < 990) {
 		$mes .= "絵の展示場で";
 		&write_picture_news("$m{name}は「$in{topic}」と叫んだ");
-	}elsif($place < 999){
+	}
+	elsif ($place < 999) {
 		$mes .= "本屋で";
 		&write_book_news("$m{name}は「$in{topic}」と叫んだ");
-	}else{
+	}
+	else {
 		$mes .= "世界の中心で";
 		&write_world_big_news("$m{name}は「$in{topic}」と叫んだ");
 	}
 	$mes .= "「$in{topic}」と叫んだ\n";
-	
+
 	&refresh;
 	&n_menu;
 }
@@ -324,9 +317,7 @@ sub tp_700{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
 sub tp_710{
 	return if &is_ng_cmd(1);
 	if ($in{trick_name} eq '') {
@@ -382,7 +373,6 @@ sub tp_800{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="決定" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
 sub tp_810{
 	return if &is_ng_cmd(1);
@@ -391,12 +381,11 @@ sub tp_810{
 		&begin;
 		return;
 	}
-	
 	if ($m{wea}) {
-		# オリジナル武器持った状態でﾃﾝﾁﾄﾋﾄﾂを使うとオリジナル武器の中身がコピーされてしまう
-		# コピーされることではなくｸﾛﾑﾊｰﾂになって戻ってこないことが問題
+		# ｵﾘｼﾞﾅﾙ武器持った状態でﾃﾝﾁﾄﾋﾄﾂを使うとｵﾘｼﾞﾅﾙ武器の中身がｺﾋﾟｰされてしまう
+		# ｺﾋﾟｰされることではなくｸﾛﾑﾊｰﾂになって戻ってこないことが問題
 		if ($m{wea_name}) {
-			&send_item($m{name}, 1, 32, 0, 0, 1);
+			&send_item($m{name}, 1, 32, 0, 0, 1); # ｸﾛﾑﾊｰﾂ
 		}
 		else {
 			&send_item($m{name}, 1, $m{wea}, $m{wea_c}, $m{wea_lv}, 1);
@@ -405,7 +394,8 @@ sub tp_810{
 	my $i;
 	if ($in{type} >= 1 && $in{type} <= 6) {
 		$i = ($in{type} - 1) * 5 + int(rand(5)) + 1
-	} else {
+	}
+	else {
 		$i = int(rand($#weas)+1);
 	}
 
@@ -428,7 +418,7 @@ sub tp_810{
 #================================================
 # ｶｼﾗ
 #================================================
-sub tp_900{
+sub tp_900 {
 	$mes .= qq|<form method="$method" action="$script"><p>拘束対象：<input type="text" name="trick_name" class="text_box1"></p><br>|;
 	$mes .= qq|<p>強制語尾：<input type="text" name="tail" value="ｶｼﾗ" class="text_box1"></p><br>|;
 	$mes .= qq|<input type="radio" name="cmd" value="0">やめる<br>|;
@@ -436,10 +426,8 @@ sub tp_900{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
-sub tp_910{
+sub tp_910 {
 	return if &is_ng_cmd(1);
 	if ($in{trick_name} eq '') {
 		$mes .= '拘束先が記入されていません<br>';
@@ -492,9 +480,7 @@ sub tp_1000{
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
 	$mes .= qq|<p><input type="submit" value="いたずら" class="button1"></p></form>|;
 	$m{tp} += 10;
-
 }
-
 sub tp_1010{
 	if ($in{trick_name} eq '') {
 		$mes .= 'いたずら名が記入されていません<br>';
@@ -503,11 +489,14 @@ sub tp_1010{
 	}
 	if ($cmd eq '1') {
 		&mes_and_send_news("$in{trick_name}に$pets[$in{trick_pet}][1]を送りました");
-	} elsif ($cmd eq '2') {
+	}
+	elsif ($cmd eq '2') {
 		&write_world_news("<b>$cs{name}[$m{country}]の$in{trick_name}が</b><b>$cs{name}[$in{trick_country}]に宣戦布告をしました</b>");
-	} elsif ($cmd eq '3') {
+	}
+	elsif ($cmd eq '3') {
 		&write_world_news("<b>$cs{name}[$m{country}]の$in{trick_name}が</b><b>$cs{name}[$in{trick_country}]と停戦条約を結びました</b>");
-	} else {
+	}
+	else {
 		$mes .= 'やめました<br>';
 		&begin;
 		return;
