@@ -24,7 +24,7 @@ my @rank_status = (
     ['kou','攻城',50],
     ['res','救出',3],
     ['esc','脱獄',3],
-    ['tei','偵察',30],
+    ['tei','偵察',5],
     ['win','勝率（20戦以上）',50],
     ['stop','停戦',5],
     ['pro','友好',10],
@@ -78,7 +78,7 @@ if ($in{no} eq $#rank_status) { # wiki用
 }
 else {
 	&update_player_ranking if $in{renew};
-	#&update_player_ranking; #すぐに更新したい場合はここのコメントアウトを外す（ただし処理が重くなるので速やかに戻すこと）
+#	&update_player_ranking; #すぐに更新したい場合はここのコメントアウトを外す（ただし処理が重くなるので速やかに戻すこと）
 	&run;
 }
 
