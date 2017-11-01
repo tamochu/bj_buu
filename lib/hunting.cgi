@@ -15,7 +15,10 @@ my $boss_par = $pets[$m{pet}][2] eq 'hunt_lv' ? 5:
 my $metal_par = $pets[$m{pet}][2] eq 'no_boss' ? (50-2*$m{pet_c}) :50;
 
 # ボスが逃げる確率(分の1)
-my $boss_run_away = 50;
+# ログインし直しを続けることでボスから必ず逃げられた 抜け穴塞いだ代わりに逃走率うｐ
+# もうちょっと逃走率上げても良いかもしれないが、これとはまた別件でﾎﾞｰﾅｽﾓﾝｽﾀｰが出てこない状態だったのも修正
+# ﾎﾞｽが簡単に逃げすぎてﾎﾞｰﾅｽﾓﾝｽﾀｰ狩りがしやすくなっても困るのでちょっとうｐ
+my $boss_run_away = 40; # 元は 50
 
 # 普通のNPCモンスターが出る確率(分の1)
 my $npc_par = 5;
@@ -65,7 +68,7 @@ sub begin {
 		next if $i == 0 && $m{sedai} > $new_sedai;
 		push @menus, "$places[$i][2]" if $m_st * 2 >= $places[$i][1] || $pets[$m{pet}][2] eq 'hunt_lv';
 	}
-	
+
 	&menu(@menus);
 }
 sub tp_1 {
@@ -85,11 +88,64 @@ sub tp_1 {
 #=================================================
 sub _get_hunt_you_data {
 	my $line = '';
-	my $data_num = $places[$m{stock}][0];
-	unless ($pets[$m{pet}][2] ne 'hunt_lv' && $data_num eq 'boss') {
-		open my $fh, "< $logdir/monster/$data_num.cgi" or &error("$logdir/monster/$data_num.cgiﾌｧｲﾙがありません");
-		rand($.) < 1 and $line = $_ while <$fh>;
+	# ['boss',	999999,	'君の銀の庭',	[2,3,38,40,41],],
+	my $data_num = $places[$m{stock}][0]; # 君の銀の庭だけ $data_num が 'boss' になる
 
+	if (-f "$datadir/metal.cgi" && (!$m{no_boss} || $data_num eq 'boss') && 5 < $m{stock} && rand($metal_par) < 1) { # ﾎﾞｰﾅｽﾓﾝｽﾀｰ
+		require "$datadir/metal.cgi";
+		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
+			$y{$k} = $metal[$m{stock}]{$k};
+		}
+		$y{icon} = $default_icon unless -f "$icondir/$y{icon}"; # $y{icon} = &random_icon;
+		$m{tp} = 500;
+		$mes .= "ボーナスモンスター $y{name} に遭遇した！<br>";
+		&n_menu;
+	}
+	elsif ($data_num eq 'boss' || (!$m{no_boss} && 5 < $m{stock} && rand($boss_par) < 1 && -f "$logdir/monster/boss.cgi")) { # ﾎﾞｽﾓﾝｽﾀｰ
+		open my $bfh, "< $logdir/monster/boss.cgi" or &error("$logdir/monster/boss.cgiﾌｧｲﾙがありません");
+		$line = <$bfh>;
+		close $bfh;
+		my @datas = split /<>/, $line;
+		my $i = 0;
+		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
+			$y{$k} = $datas[$i];
+			++$i;
+		}
+		$y{icon} = $default_icon unless -f "$icondir/$y{icon}"; # $y{icon} = &random_icon;
+		if ( rand($m{cha}) < rand(2000) ) {
+			$m{tp} = 400;
+			$mes .= "超ボス $y{name} が襲いかかってきました<br>";
+			&n_menu;
+		}
+		else {
+			$m{tp} = 300;
+			$mes .= "超ボス $y{name} がいます<br>";
+			&menu('戦う','逃げる');
+		}
+	}
+	elsif (rand($npc_par) < 1) { # NPCﾓﾝｽﾀｰ
+		require "$datadir/npc_hunting.cgi";
+		my $stock_npcs_ref = $npc[$m{stock}];
+		my @stock_npcs = @$stock_npcs_ref;
+		my $enemy = int(rand($stock_npcs));
+		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
+			$y{$k} = $stock_npcs[$enemy]{$k};
+		}
+		if ( rand($m{cha}) < rand($y{cha}) ) {
+			$m{tp} = 200;
+			$mes .= "$y{name} が襲いかかってきました<br>";
+			&n_menu;
+		}
+		else {
+			$m{tp} = 100;
+			$mes .= "$y{name} がいます<br>";
+			&menu('戦う','逃げる');
+		}
+	}
+	else { # ﾓﾝｽﾀｰ
+		open my $fh, "< $logdir/monster/$data_num.cgi" or &error("$logdir/monster/$data_num.cgiﾌｧｲﾙがありません");
+		# $. 読み込んだ行数だかが代入されている 1行目は必ず代入され、それ以降の行については確率 出て来るﾓﾝｽﾀｰ偏ってそうだけど、かなりエクセレントなコード
+		rand($.) < 1 and $line = $_ while <$fh>;
 		close $fh;
 
 		my @datas = split /<>/, $line;
@@ -98,92 +154,8 @@ sub _get_hunt_you_data {
 			$y{$k} = $datas[$i];
 			++$i;
 		}
-		$y{hp} = $y{max_hp};
-		$y{mp} = $y{max_mp};
 		$y{icon} = $default_icon unless -f "$icondir/$y{icon}";
 		$y{wea_name} = '';
-		$y{gua} = 0;
-	}
-	if ($data_num eq 'boss') {
-		open my $bfh, "< $logdir/monster/boss.cgi" or &error("$logdir/monster/boss.cgiﾌｧｲﾙがありません");
-		$line = <$bfh>;
-		close $bfh;
-		my @datas = split /<>/, $line;
-		my $i = 0;
-		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
-			$y{$k} = $datas[$i];
-			++$i;
-		}
-		$y{hp} = $y{max_hp};
-		$y{mp} = $y{max_mp};
-#			$y{icon} = &random_icon;
-		$y{gua} = 0;
-		if( rand($m{cha}) < rand(2000) ){
-			$m{tp} = 400;
-			$mes .= "超ボス $y{name} が襲いかかってきました<br>";
-			&n_menu;
-		}else{
-			$m{tp} = 300;
-			$mes .= "超ボス $y{name} がいます<br>";
-			&menu('戦う','逃げる');
-		}
-	} elsif(!$m{no_boss} && $m{stock} > 5 && rand($metal_par) < 1 && -f "$datadir/metal.cgi"){
-		require "$datadir/metal.cgi";
-		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
-			$y{$k} = $metal[$m{stock}]{$k};
-		}
-		$y{hp} = $y{max_hp};
-		$y{mp} = $y{max_mp};
-#			$y{icon} = &random_icon;
-		$y{gua} = 0;
-		$m{tp} = 500;
-		$mes .= "ボーナスモンスター $y{name} に遭遇した！<br>";
-		&n_menu;
-	} elsif(!$m{no_boss} && $m{stock} > 5 && rand($boss_par) < 1 && -f "$logdir/monster/boss.cgi"){
-		open my $bfh, "< $logdir/monster/boss.cgi" or &error("$logdir/monster/boss.cgiﾌｧｲﾙがありません");
-		$line = <$bfh>;
-		close $bfh;
-		my @datas = split /<>/, $line;
-		my $i = 0;
-		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
-			$y{$k} = $datas[$i];
-			++$i;
-		}
-		$y{hp} = $y{max_hp};
-		$y{mp} = $y{max_mp};
-#			$y{icon} = &random_icon;
-		$y{gua} = 0;
-		if( rand($m{cha}) < rand(2000) ){
-			$m{tp} = 400;
-			$mes .= "超ボス $y{name} が襲いかかってきました<br>";
-			&n_menu;
-		}else{
-			$m{tp} = 300;
-			$mes .= "超ボス $y{name} がいます<br>";
-			&menu('戦う','逃げる');
-		}
-	} elsif(rand($npc_par) < 1) {
-		require "$datadir/npc_hunting.cgi";
-		my $stock_npcs_ref = $npc[$m{stock}];
-		my @stock_npcs = @$stock_npcs_ref;
-		my $enemy = int(rand($stock_npcs));
-		for my $k (qw/name country max_hp max_mp at df mat mdf ag cha wea skills mes_win mes_lose icon wea_name/) {
-			$y{$k} = $stock_npcs[$enemy]{$k};
-		}
-		$y{hp} = $y{max_hp};
-		$y{mp} = $y{max_mp};
-		$y{gua} = 0;
-		if ( rand($m{cha}) < rand($y{cha}) ) {
-			$m{tp} = 200;
-			$mes .= "$y{name} が襲いかかってきました<br>";
-			&n_menu;
-		}
-		else {
-			$m{tp} = 100;
-			$mes .= "$y{name} がいます<br>";
-			&menu('戦う','逃げる');
-		}
-	} else {
 		if ( rand($m{cha}) < rand($y{cha}) ) {
 			$m{tp} = 200;
 			$mes .= "$y{name} が襲いかかってきました<br>";
@@ -195,6 +167,10 @@ sub _get_hunt_you_data {
 			&menu('戦う','逃げる');
 		}
 	}
+
+	$y{hp} = $y{max_hp};
+	$y{mp} = $y{max_mp};
+	$y{gua} = 0;
 }
 
 #=================================================
@@ -326,6 +302,7 @@ sub tp_300 {
 		&n_menu;
 	}
 }
+
 #=================================================
 # 超ボス戦闘
 #=================================================
@@ -358,9 +335,10 @@ sub tp_400 {
 		print $bfh @lines;
 		close $bfh;
 
-		if($m{stock} == 0){
+		if ($m{stock} == 0) {
 			$m{act} += 8;
-		}else {
+		}
+		else {
 			my $lossp = $m{stock} >= 9 ? 0.5:
 					$m{stock} >= 5 ? 0.1:
 					$m{stock} == 4 ? 0.08:
@@ -418,22 +396,23 @@ sub tp_400 {
 		$mes .= '討伐を続けますか?<br>';
 		&menu('続ける','やめる','討伐地変更');
 		$m{tp} = 210;
-	} elsif (rand($boss_run_away) < 1) {
+	}
+	elsif (defined($cmd) && rand($boss_run_away) < 1) {
 		open my $bfh, "+< $logdir/monster/boss.cgi" or &error("$logdir/monster/boss.cgiﾌｧｲﾙがありません");
 		my $head_line = <$bfh>;
 		my $is_added = 1;
 		my @lines = ();
 		push @lines, "$y{name}<>$y{country}<>$y{hp}<>$y{max_mp}<>$y{at}<>$y{df}<>$y{mat}<>$y{mdf}<>$y{ag}<>$y{cha}<>$y{wea}<>$y{skills}<>$y{mes_win}<>$y{mes_lose}<>$y{icon}<>$y{wea_name}<>\n";
-		if($y{max_hp} > $y{hp}){
-			while(my $line = <$bfh>){
-				my($bname, $bdamage) = split /<>/, $line;
-				if($bname eq $m{name}){
+		if ($y{max_hp} > $y{hp}) {
+			while (my $line = <$bfh>) {
+				my ($bname, $bdamage) = split /<>/, $line;
+				if ($bname eq $m{name}) {
 					$bdamage += $y{max_hp} - $y{hp};
 					$is_added = 0;
 				}
 				push @lines, "$bname<>$bdamage<>\n";
 			}
-			if($is_added){
+			if ($is_added) {
 				my $bdamage = $y{max_hp} - $y{hp};
 				push @lines, "$m{name}<>$bdamage<>\n";
 			}

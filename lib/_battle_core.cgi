@@ -153,6 +153,12 @@ sub run_battle2 {
 		$who = 'y';
 		&get_battle_flags; # $y_is_guard, $y_is_stanch, ... などが入る skill.cgi 参照
 
+		# ここで防衛者の無効効果をオフにすれば無効技MP未消費バグ起きないはず
+		# ただ、無効というよりﾈｺﾐﾐの高速移動で避けてるイメジが強すぎる(当てる気のない必殺技を避けても意味ない避けられないみたいな)のと、
+		# 単純に無効が強いのでMP未消費バグ残ってるぐらいでちょうど良い気しかしない
+		# $m_is_guard = 0 if $m_is_guard && $y_gua_avoid;
+		# $y_is_guard = 0 if $y_is_guard && $m_gua_avoid;
+
 		# ここで攻撃者のｽﾀﾝ効果をオフにすればｽﾀﾝ技反射バグ起きないはず
 		# $m_is_stanch = 0 if $m_is_stanch && $y_gua_skill_mirror;
 		# $y_is_stanch = 0 if $y_is_stanch && $m_gua_skill_mirror;
@@ -217,7 +223,7 @@ sub attack {
 		$mes .= qq|<font color="#CCFF00">☆閃き!!$m{name}の$m_s->[1]!!</font><br>|;
 	}
 	if ($who eq 'y' && $metal) {
-		$mes .= "$y{name}は様子を見ている";
+		$mes .= "$y{name}は様子を見ている<br>";
 		return;
 	}
 	if (${$temp_y.'_gua_avoid'}) { # 相手のﾈｺﾐﾐ判定
@@ -284,7 +290,8 @@ sub attack {
 				$mes .= "ｽﾀﾝで動けない!<br>";
 			}
 			else {
-				$mes .= "$v のﾀﾞﾒｰｼﾞをあたえました<br>";
+				$mes .= "$v のﾀﾞﾒｰｼﾞを";
+				$mes .= $who eq 'm' ? 'あたえました<br>' : 'うけました<br>';
 				if ($who eq 'm' && $m{wea_c} > 0 && $scc eq '1') {
 					--$m{wea_c};
 					my $wname = $m{wea_name} ? $m{wea_name} : $weas[$m{wea}][1];
@@ -308,11 +315,13 @@ sub attack {
 
 	if (${$temp_y.'_gua_relief'} && $hit_damage) {
 		my $v = int($hit_damage / 10);
-		$mes .= "$v のﾀﾞﾒｰｼﾞを防ぎました<br>";
+		$mes .= "$v のﾀﾞﾒｰｼﾞを";
+		$mes .= $who eq 'm' ? '防がれました<br>' : '防ぎました<br>';
 		${$temp_y}{hp} += $v;
 	}
 	elsif (${$temp_y.'_gua_remain'} && $hit_damage && ${$temp_y}{hp} <= 0) {
-		$mes .= "$guas[${$temp_y}{gua}][1]に攻撃が当たり奇跡的に致命傷をまのがれた<br>";
+		$mes .= "$guas[${$temp_y}{gua}][1]に攻撃が当たり奇跡的に致命傷を";
+		$mes .= $who eq 'm' ? 'まぬがれられた<br>' : 'まぬがれた<br>';
 		${$temp_y}{hp} = 1;
 	}
 	elsif (${$temp_y.'_gua_half_damage'} && $hit_damage) {
@@ -366,6 +375,7 @@ sub _learning {
 				}
 			}
 			$m{skills} .= "$no," if $is_learning;
+			@m_skills = split /,/, $m{skills};
 			$m_s = $skills[ $no ];
 			return 1;
 		}
@@ -420,7 +430,7 @@ sub battle_menu {
 	}else{
 		$menu_cmd  = qq|<form method="$method" action="$script"><select name="cmd" class="menu1">|;
 		$menu_cmd .= qq|<option value="0">攻撃</option>|;
-		for my $i (1 .. $#m_skills+1) {
+		for my $i (1 .. $#m_skills+1) { # ｺﾏﾝﾄﾞ位置 配列要素位置は -1
 #			next if $m{mp} < $skills[ $m_skills[$i-1] ][3];
 			next unless &m_mp_check($skills[ $m_skills[$i-1] ]);
 			next if $weas[$m{wea}][2] ne $skills[ $m_skills[$i-1] ][2];
@@ -470,7 +480,6 @@ sub lose {
 
 	$result = 'lose';
 }
-
 
 #=================================================
 # 武器により特攻がつくかどうか
