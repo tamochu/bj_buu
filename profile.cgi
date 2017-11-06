@@ -403,7 +403,7 @@ sub collection_pars { # ±²ÃÑ
 			$pars{$kind} = int(@nos / ($#eggs - 1) * 100);
 		}
 		elsif ($kind eq '3') {
-			$pars{$kind} = int(@nos / ($#pets - 4) * 100);
+			$pars{$kind} = int(@nos / ($#pets - 5) * 100);
 		}
 		elsif ($kind eq '4') {
 			$pars{$kind} = int(@nos / ($#guas - 4) * 100);
