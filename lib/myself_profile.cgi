@@ -3,6 +3,9 @@ require "$datadir/profile.cgi";
 # ﾌﾟﾛﾌｨｰﾙ設定 Created by Merino
 #================================================
 
+my @mail_alarm_names = ('日記', '改造案');
+my @mail_alarm_types = ('diary', 'kaizou');
+
 #================================================
 sub begin {
 	$layout = 2;
@@ -30,7 +33,16 @@ sub begin {
 		my $boch_pet = $m{sex} eq '1' ? '脳内嫁' : 'ﾏｽｺｯﾄｷｬﾗ';
 		$mes .= qq|<hr>$boch_pet<br><input type="text" name="boch_pet" value="$m{boch_pet}" class="text_box_b"><br>|; 
 	}
-	$mes .= qq|<hr>メールアドレス（手紙の受信通知に利用）<br><input type="text" name="mail_address" value="$m{mail_address}" class="text_box_b"><br>|; 
+	# 日記・改造案 system.cgi も要修正
+	my @mail_datas = split /,/, $m{mail_address}; # [0]ﾒｰﾙｱﾄﾞﾚｽ [1]日記 [2]改造案
+	$mes .= qq|<hr>メールアドレス（手紙の受信通知に利用）<br><input type="text" name="mail_address" value="$mail_datas[0]" class="text_box_b"><br>|; 
+
+	for my $i (0 .. $#mail_alarm_types) {
+		my $checked = $mail_datas[$i+1] ? ' checked' : '';
+		$mes .= qq|<input type="checkbox" name="mail_alarm_$mail_alarm_types[$i]" value="1"$checked>$mail_alarm_names[$i] |;
+	}
+	$mes .= '※個人宛は必ず通知されます';
+
 #	if ($w{world} eq $#world_states-4) {
 #		require './lib/fate.cgi';
 #		$mes .= &regist_mes(0);
@@ -91,8 +103,13 @@ sub tp_1 {
 			$m{boch_pet} = $in{boch_pet};
 			$mes .= $m{sex} eq '1' ? '脳内嫁に名前を付けました<br>':'ﾏｽｺｯﾄｷｬﾗに名前を付けました<br>';
 		}
-		unless ($in{mail_address} eq $m{mail_address}) {
+
+		my @mail_datas = split /,/, $m{mail_address};
+		unless ($in{mail_address} eq $mail_datas[0] && $mail_datas[1] eq $in{mail_alarm_diary} && $mail_datas[2] eq $in{mail_alarm_kaizou}) {
 			if ($in{mail_address} =~ /^[^@]+@[^.]+\..+/) {
+				for my $i (0 .. $#mail_alarm_types) {
+					$in{mail_address} .= qq|,$in{"mail_alarm_$mail_alarm_types[$i]"}|;
+				}
 				$m{mail_address} = $in{mail_address};
 				$mes .= 'メールアドレスを設定しました<br>';
 			}

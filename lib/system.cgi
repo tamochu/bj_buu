@@ -200,7 +200,9 @@ sub send_letter {
 	&set_letter_flag($send_id, $letter_type);
 
 	my %you_datas = &get_you_datas($send_id, 1);
-	if ($you_datas{mail_address} =~ /^[^@]+@[^.]+\..+/) {
+	my @mail_datas = split /,/, $you_datas{mail_address}; # [0]Ò°Ù±ÄŞÚ½ [1]“ú‹L [2]‰ü‘¢ˆÄ
+
+	if ($mail_datas[0] =~ /^[^@]+@[^.]+\..+/ && ($letter_type == 1 || ($mail_datas[1] && $letter_type == 3) || ($mail_datas[2] && $letter_type == 4))) {
 		my $sendmail = '/usr/sbin/sendmail';
 		my $from = 'Blind Justice ‚É‚á‚ I';
 		my $to = $you_datas{mail_address};
