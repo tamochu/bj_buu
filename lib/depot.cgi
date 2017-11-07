@@ -800,17 +800,15 @@ sub radio_my_depot {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
 		if (!$is_show && $count > $lost_depot) {
-			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
-			$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
-			$sub_mes .= ' 溢れてます<br>';
+			my $item_name = &get_item_name($kind, $item_no, $item_c, $item_lv);
+			$sub_mes .= &show_item_datas($item_name, $lock{"$kind<>$item_no<>"}, $lost_depot < $count);
 		}
 		else {
 			$checked = $no == $count ? " checked" : "" ;
 			$sub_mes .= qq|<label>| unless $is_mobile;
 			$sub_mes .= qq|<input type="radio" name="cmd" value="$count"$checked>|;
-			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
-			$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
-			$sub_mes .= ' 溢れてます' if $count > $lost_depot;
+			my $item_name = &get_item_name($kind, $item_no, $item_c, $item_lv);
+			$sub_mes .= &show_item_datas($item_name, $lock{"$kind<>$item_no<>"}, $lost_depot < $count);
 			$sub_mes .= qq|</label>| unless $is_mobile;
 			$sub_mes .= qq|<br>|;
 		}
@@ -843,12 +841,10 @@ sub checkbox_my_depot {
 	while (my $line = <$fh>) {
 		++$count;
 		my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-
 		$sub_mes .= qq|<label>| unless $is_mobile;
 		$sub_mes .= qq|<input type="checkbox" name="$count" value="1">|;
-		$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
-		$sub_mes .= ' ロックされてます' if $lock{"$kind<>$item_no<>"};
-		$sub_mes .= ' 溢れてます' if $count > $lost_depot;
+		my $item_name = &get_item_name($kind, $item_no, $item_c, $item_lv);
+		$sub_mes .= &show_item_datas($item_name, $lock{"$kind<>$item_no<>"}, $lost_depot < $count);
 		$sub_mes .= qq|</label>| unless $is_mobile;
 		$sub_mes .= qq|<br>|;
 	}
@@ -885,15 +881,10 @@ sub checkbox_my_depot_lock_checked {
 		unless ($sames{"$kind<>$item_no<>"}) {
 			$sub_mes .= qq|<label>| unless $is_mobile;
 			$sub_mes .= qq|<input type="checkbox" name="$count" value="1"|;
-			my $lock_mes = '';
-			if ($lock{"$kind<>$item_no<>"}) {
-				$sub_mes .= qq| checked|;
-				$lock_mes = ' ロックされてます';
-			}
+			$sub_mes .= qq| checked| if $lock{"$kind<>$item_no<>"};
 			$sub_mes .= qq|>|;
-			$sub_mes .= &get_item_name($kind, $item_no, $item_c, $item_lv);
-			$sub_mes .= $lock_mes;
-			$sub_mes .= ' 溢れてます' if $count > $lost_depot;
+			my $item_name = &get_item_name($kind, $item_no, $item_c, $item_lv);
+			$sub_mes .= &show_item_datas($item_name, $lock{"$kind<>$item_no<>"}, $lost_depot < $count);
 			$sub_mes .= qq|</label>| unless $is_mobile;
 			$sub_mes .= qq|<br>|;
 		}
@@ -960,6 +951,18 @@ sub add_log {
 		print $wfh "$s_mes\n";
 		close $wfh;
 	}
+}
+
+#=================================================
+# アイテムデータの表示
+#=================================================
+sub show_item_datas {
+	my ($item_name, $is_lock, $is_over) = @_;
+	my $item_datas = '';
+	$item_datas .= $item_name;
+	$item_datas .= qq|<img src="$icondir/emoji/1f512.png" width="14px" height="14px">| if $is_lock;
+	$item_datas .= ' 溢れてます' if $is_over;
+	return $item_datas;
 }
 
 1; # 削除不可
