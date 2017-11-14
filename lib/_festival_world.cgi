@@ -25,23 +25,22 @@ use constant FESTIVAL_COUNTRY_PROPERTY => {
 # 祭り情勢開始時の国や情勢を設定して始める
 #================================================
 sub begin_festival_world {
-	# 拙速以外の祭り情勢開始時の既存国すべての君主と君主ファイルを初期化
-	if ($w{year} % 40 != 10) {
-		for my $i (0 .. $w{country}) {
-			$cs{old_ceo}[$i] = $cs{ceo}[$i] if $w{year} % 40 != 30; # 紅白・三国志のみ $cs{old_ceo} に退避している
-			$cs{ceo}[$i] = '';
-			for my $key (qw/war dom mil pro/) {
-				$cs{$key}[$i] = '';
-				$cs{$key.'_c'}[$i] = 0;
-			}
-			$cs{member}[$i] = 0;
-			open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiﾌｧｲﾙが開けません");
-			close $fh;
-			open my $fh2, "> $logdir/$i/leader.cgi" or &error("$logdir/$i/leader.cgiﾌｧｲﾙが開けません");
-			close $fh2;
+	# 祭り情勢開始時の既存国すべての国民と君主ファイルを初期化
+	# ｼｬｯﾌﾙすると実際にいるメンバーと立候補・投票データとで齟齬が生じる
+	for my $i (0 .. $w{country}) {
+		$cs{old_ceo}[$i] = $cs{ceo}[$i] if $w{year} % 40 == 0 || $w{year} % 40 == 20; # 紅白・三国志のみ $cs{old_ceo} に退避している
+		$cs{ceo}[$i] = '';
+		for my $key (qw/war dom mil pro/) {
+			$cs{$key}[$i] = '';
+			$cs{$key.'_c'}[$i] = 0;
 		}
-		&write_cs;
+		$cs{member}[$i] = 0;
+		open my $fh, "> $logdir/$i/member.cgi" or &error("$logdir/$i/member.cgiﾌｧｲﾙが開けません");
+		close $fh;
+		open my $fh2, "> $logdir/$i/leader.cgi" or &error("$logdir/$i/leader.cgiﾌｧｲﾙが開けません");
+		close $fh2;
 	}
+	&write_cs;
 
 	if ($w{year} % 40 == 0){ # 不倶戴天
 		$w{world} = $#world_states-2;
@@ -87,7 +86,7 @@ sub end_festival_world {
 			&run_konran(0);
 		}
 		# 紅白・三国志は開始時に初期化さえすれば済むが、
-		# 拙速・混乱中の君主データなどがあるので終了時にも初期化
+		# 拙速・混乱は君主データなどがあるので終了時にも初期化
 		for my $i (1 .. $w{country}) {
 			$cs{ceo}[$i] = '';
 			for my $key (qw/war dom mil pro/) {
@@ -659,7 +658,8 @@ sub player_shuffle {
 
 #================================================
 # 祭り情勢用のプレイヤー移動関数
-# 諸々のチェックが必要ないためメンバーファイルに追記するだけ
+# 通常であれば移動元・移動先のメンバーファイルや立候補・投票データなども修正するが、
+# そういった諸々のチェックが必要ないためメンバーファイルに追記するだけ
 #================================================
 sub move_player2 {
 	my($name, $to_country) = @_;
