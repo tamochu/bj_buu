@@ -280,7 +280,7 @@
 		&write_cs;
 	},
 	sub{
-		$cs{barrier}[$_] for (1 .. $w{country});
+		$cs{barrier}[$_] = int(rand(20)) for (1 .. $w{country});
 		&mes_and_world_news("<b>$pets[$m{pet}][1]š$m{pet_c}‚ğg‚¤‚Æˆê‚Â–Ú‚Ì‹l‚ª‘S‘‚Ìé•Ç‚ğ‚ß‚¿‚á‚­‚¿‚á‚É‚µ‚Ä‚¢‚Á‚½</b>");
 		&write_cs;
 	},
