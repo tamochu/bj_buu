@@ -35,6 +35,7 @@ if    ($in{mode} eq 'admin_delete_user') { &admin_delete_user; }
 elsif ($in{mode} eq 'admin_get_depot_data')   { &admin_get_depot_data; }
 elsif ($in{mode} eq 'admin_get_akindo_data')   { &admin_get_akindo_data; }
 elsif ($in{mode} eq 'admin_get_bank_log')     { &admin_get_bank_log; }
+elsif ($in{mode} eq 'admin_wt0')     { &admin_wt0; }
 elsif ($in{mode} eq 'admin_refresh')     { &admin_refresh; }
 elsif ($in{mode} eq 'admin_go_neverland')     { &admin_go_neverland; }
 elsif ($in{mode} eq 'admin_violate')   { &admin_violate; }
@@ -60,6 +61,7 @@ elsif ($in{mode} eq 'admin_all_pet_check')   { &admin_all_pet_check; }
 elsif ($in{mode} eq 'admin_letter_log_check')   { &admin_letter_log_check; }
 elsif ($in{mode} eq 'admin_incubation_log_check')   { &admin_incubation_log_check; }
 elsif ($in{mode} eq 'admin_shopping_log_check')   { &admin_shopping_log_check; }
+elsif ($in{mode} eq 'admin_hunt_log_check')   { &admin_hunt_log_check; }
 
 &top;
 &footer;
@@ -140,6 +142,7 @@ sub top {
 					print qq|</td>|;
 					print qq|<td>$pname</td>|;
 					print qq|<td>$pid</td>|;
+					print qq|<td><input type="button" class="button_s" value="拘束0" onClick="location.href='?mode=admin_wt0&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
 					print qq|<td><input type="button" class="button_s" value="ﾘｾｯﾄ" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
 					print qq|<td><input type="button" class="button_s" value="無所属へ" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$pid&country=$pcountry&sort=$in{sort}';"></td>|;
 					print qq|<td>$cs{name}[$pcountry]</td>|;
@@ -178,6 +181,7 @@ sub top {
 			print qq|</td>|;
 			print qq|<td>$name</td>|;
 			print qq|<td>$id</td>|;
+			print qq|<td><input type="button" class="button_s" value="拘束0" onClick="location.href='?mode=admin_wt0&pass=$in{pass}&id=$id&country=$pcountry&sort=$in{sort}';"></td>|;
 			print qq|<td><input type="button" class="button_s" value="ﾘｾｯﾄ" onClick="location.href='?mode=admin_refresh&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
 			print qq|<td><input type="button" class="button_s" value="無所属へ" onClick="location.href='?mode=admin_go_neverland&pass=$in{pass}&id=$id&country=$in{country}&sort=$in{sort}';"></td>|;
 			print qq|<td>$cs{name}[$country]</td>|;
@@ -390,6 +394,12 @@ sub top {
 	print qq|<p><input type="submit" value="チェック" class="button_s"></p></form></div>|;
 
 	print qq|<br><br><br>|;
+	print qq|<div class="mes">討伐卵入手履歴<ul>|;
+	print qq|<form method="$method" action="$this_script"><input type="hidden" name="mode" value="admin_hunt_log_check">|;
+	print qq|<input type="hidden" name="pass" value="$in{pass}">|;
+	print qq|<p><input type="submit" value="チェック" class="button_s"></p></form></div>|;
+
+	print qq|<br><br><br>|;
 	my @files = glob "$logdir/monster/*.cgi";
 	for my $p_name (@files){
 		if ($p_name =~ /boss/ || $p_name =~ /beginner/) {
@@ -479,6 +489,19 @@ sub admin_delete_user {
 			}
 		}
 	}
+}
+
+#=================================================
+# ﾘｾｯﾄ処理：画面真っ黒　ハマった場合に使用(何かしらの異常ｴﾗｰ)
+#=================================================
+sub admin_wt0 {
+	$mes .= "$in{id}の拘束時間をﾘｾｯﾄしました<br>";
+	return unless $in{id};
+
+	my $name = pack 'H*', $in{id};
+	&regist_you_data($name, "wt", 0);
+
+	$mes .= "$nameの拘束時間をﾘｾｯﾄしました<br>";
 }
 
 #=================================================
@@ -1121,14 +1144,22 @@ sub admin_all_pet_check {
 		my $depot_file = "$userdir/$pid/depot.cgi";
 		my %pm = &get_you_datas($pid, 1);
 
-		if ($pm{pet} && $pm{pet_c} >= 10) {
+		my $is_find = 0;
+#		if ($pm{pet} && $pm{pet_c} >= 10) {
+		if ($pm{pet} == 169) {
+			push @lines, "$pm{name}<>3<>$pm{pet}<>$pm{pet_c}<>0<>\n";
 			push @lines, "$pm{name}<>3<>$pm{pet}<>$pm{pet_c}<>0<>\n";
 		}
 		open my $fh, "< $depot_file" or &error("$depot_file が読み込めません");
 		while (my $line = <$fh>) {
+			next if $is_find;
 			my($kind, $item_no, $item_c, $item_lv) = split /<>/, $line;
-			if ($kind eq '3' && $item_c >= 10) {
-				push @lines, "$pm{name}<>$line";
+#			if ($kind eq '3' && $item_c >= 10) {
+			if ($kind eq '3') {
+				if ($item_no == 169) {
+					push @lines, "$pm{name}<>$line";
+					$is_find = 1;
+				}
 			}
 		}
 		close $fh;
@@ -1400,5 +1431,25 @@ sub admin_get_bank_log {
 		$mes .= qq|<tr><td>$y_name</td><td>$type</td><td>$money</td><td>$ltime2</td></tr>|;
 	}
 	close $fh2;
+	$mes .= qq|</table>|;
+}
+
+#=================================================
+# 討伐の卵入手履歴
+#=================================================
+sub admin_hunt_log_check {
+	$mes .= qq|<table><tr><th>討伐者</th><th>討伐地</th><th>拾った卵</th><th>拾えたか</th><th>日時</th></tr>\n|;
+
+	open my $fh, "< $logdir/hunt_log.cgi" or &error("$logdir/hunt_log.cgiﾌｧｲﾙが開けません");
+	while (my $line = <$fh>) {
+		my($m_name, $place, $item, $is_get, $ltime) = split /<>/, $line;
+		my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ltime);
+		$year += 1900;
+		$mon++;
+		my $ltime2 = sprintf("%04d-%02d-%02d %02d:%02d:%02d",$year,$mon,$mday,$hour,$min,$sec);
+		$mes .= qq|<tr><td>$m_name</td><td>$place</td><td>$item</td><td>$is_get</td><td>$ltime2</td></tr>\n|;
+	}
+	close $fh;
+
 	$mes .= qq|</table>|;
 }
