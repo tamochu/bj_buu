@@ -356,7 +356,8 @@ sub tp_500 {
 		($pool, $this_term_gain, $slot_runs) = split /<>/, $line;
 	}
 	close $fh;
-	
+
+	$mes .= qq|引き出す際には1ｺｲﾝ以上残してください|;
 	$mes .= qq|<form method="$method" action="$script">|;
 	$mes .= qq|現在のプールｺｲﾝ数：$poolｺｲﾝ<br>|;
 	$mes .= qq|<input type="radio" name="multiple" value="1" checked>プールする<br>|;
