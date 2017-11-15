@@ -61,7 +61,7 @@ sub tp_100 {
 		$y{sol} = int($rank_sols[$y{rank}] * $m{value}); # ÀŞ°ÄÙ‚Í­”–³Œø
 	}
 	if ($config_test) {
-		$y{sol} /= 100;
+		$y{sol} *= 10;
 	}
 
 	# •º‚ª‘«‚è‚È‚¢
@@ -255,7 +255,7 @@ sub tp_190 {
 				&menu(@war_forms,'‘Ş‹p');
 				$m{tp} = 120;
 			}
-			elsif ( ((($pets[$m{pet}][2] eq 'war_single' && $w{world} ne '17') && int(rand($m{turn}+3)) == 0) || int(rand($m{turn}+15)) == 0 || ($pets[$y{pet}][2] eq 'ambush_single' && $w{world} ne '17')) && $m{unit} ne '18') {
+			elsif ( ((($pets[$m{pet}][2] eq 'war_single' && $w{world} ne '17') && (int(rand($m{turn}+3)) == 0 || $config_test)) || int(rand($m{turn}+15)) == 0 || ($pets[$y{pet}][2] eq 'ambush_single' && $w{world} ne '17')) && $m{unit} ne '18') {
 				&menu(@war_forms,'ˆê‹R‘Å‚¿');
 				$m{tp} = 130;
 			}

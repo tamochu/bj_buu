@@ -29,8 +29,8 @@ sub header_myroom {
 		next if $is_mobile && $files[$i][1] eq 'oekaki_spp';
 		print $in{no} eq $i ? qq| $files[$i][0] /| : qq| <a href="$files[$i][1].cgi?id=$id&pass=$pass&no=$i">$files[$i][0]</a> /|;
 	}
+	print qq| <a href="./../upbbs/imgboard.cgi?id=$id&pass=$pass">‰æ‘œŒf¦”Â</a>|;
 	print qq|<h1>$files[$in{no}][0]</h1>|;
 }
-
 
 1; # íœ•s‰Â
