@@ -157,19 +157,43 @@ sub tp_210 {
 #=================================================
 sub tp_300 {
 	$mes .= qq|<form method="$method" action="$script">|;
-	$mes .= qq|$e2j{tax} [1%～99%]：<input type="text" name="tax" value="$cs{tax}[$m{country}]" class="text_box_s" style="text-align:right">%<br>|;
+	$mes .= qq|$e2j{tax} [1%～99%]：<input type="text" name="tax" value="" class="text_box_s" style="text-align:right">% 現在：$cs{tax}[$m{country}]%<br>|; # 数値入力
 	$mes .= qq|<input type="hidden" name="id" value="$id"><input type="hidden" name="pass" value="$pass">|;
-	$mes .= qq|<input type="submit" value="変更する" class="button1"></form>|;
+
+	$mes .= qq|<div>|;
+	$mes .= qq|<label>| unless $is_moble;
+	$mes .= qq|<input type="radio" name="mode" value="0" checked="checked">数値入力<br>|;
+	$mes .= qq|</label>| unless $is_moble;
+	$mes .= qq|<label>| unless $is_moble;
+	$mes .= qq|<input type="radio" name="mode" value="1">1% に変更する<br>|;
+	$mes .= qq|</label>| unless $is_moble;
+	$mes .= qq|<label>| unless $is_moble;
+	$mes .= qq|<input type="radio" name="mode" value="2">99% に変更する|;
+	$mes .= qq|</label>| unless $is_moble;
+	$mes .= qq|</div>|;
+
+	$mes .= qq|<br><input type="submit" value="変更する" class="button1"></form>|;
+
 	$m{tp} += 10;
 	&n_menu;
 }
 sub tp_310 {
-	if ($in{tax} && $cs{tax}[$m{country}] ne $in{tax}) {
+	if ($in{mode} < 1 && $in{tax} && $cs{tax}[$m{country}] ne $in{tax}) {
 		&error("$e2j{tax}を半角数字で記入してください") if $in{tax} eq '' || $in{tax} =~ /[^0-9]/;
 		&error("$e2j{tax}は1% ～ 99%までです") if $in{tax} < 1 || $in{tax} > 99;
 
 		$mes .= "$e2j{tax}を $in{tax} %に変更しました<br>";
 		$cs{tax}[$m{country}] = $in{tax};
+		&write_cs;
+	}
+	elsif ($in{mode} == 1 && $cs{tax}[$m{country}] != 1) {
+		$mes .= "$e2j{tax}を 1 %に変更しました<br>";
+		$cs{tax}[$m{country}] = 1;
+		&write_cs;
+	}
+	elsif ($in{mode} == 2 && $cs{tax}[$m{country}] != 99) {
+		$mes .= "$e2j{tax}を 99 %に変更しました<br>";
+		$cs{tax}[$m{country}] = 99;
 		&write_cs;
 	}
 	else {
